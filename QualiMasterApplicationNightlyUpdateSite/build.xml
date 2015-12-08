@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="QMIConf-Nightly-UpdateSite" default="createUpdateSite" basedir="." xmlns:plugins="antlib:de.uni_hildesheim.sse.easy.standalone.versionReplacement">
+    <property file="${user.home}/global-build.properties"/>
+
+    <path id ="task.libs">
+        <!-- Libs of the Task -->
+        <fileset dir="task">
+            <include name="**/*.jar" />
+        </fileset>
+    </path>
+    
+    <taskdef resource="VersionReplacement.properties" classpathref="task.libs" />
+    
+    <target name="createUpdateSite">
+        <delete dir="gen"/>
+        <mkdir dir="gen"/>
+        <mkdir dir="gen/intermediate"/>
+        <mkdir dir="gen/intermediate/plugins"/>
+        <mkdir dir="gen/intermediate/features"/>
+        <mkdir dir="gen/final"/>
+        
+        <tstamp>
+            <format property="DAY" pattern="yyyyMMdd" locale="de,DE"/>
+            <format property="TIME" pattern="HHmm" locale="de,DE"/>
+            <format property="GENERATED_TIME" pattern="HH:mm, dd. MMMM yyyy" locale="en,EN"/>
+        </tstamp>
+        <property name="version" value="4.${DAY}.${TIME}"/> <!-- due to Maven -->
+        
+    	<antcall target="buildAntTask"/>
+        <antcall target="replacePlugins"/>
+        <antcall target="createFeature"/>
+        <antcall target="createSiteXML"/>
+        <antcall target="createArtifactJars"/>
+        <antcall target="zip.Site"/>
+        <antcall target="publish"/>
+    </target>
+	
+	<target name="buildAntTask">
+		<mkdir dir="bin"/>
+		<javac srcdir="src" destdir="bin" classpath="lib/ant-1.8.4.jar" />
+		<jar destfile="qmTask.jar" basedir="bin"/>
+	</target>
+    
+    <target name="replacePlugins">
+        <delete dir="gen/tmp"/>
+        <mkdir dir="gen/tmp"/>
+        <mkdir dir="gen/tmpBundles"/>
+        <copy toDir="gen/tmpBundles">
+            <fileset dir="${user.home}/Eclipse/EASyPlugins">
+              <filename name="*.jar"/>
+            </fileset>
+            <fileset dir="${user.home}/Eclipse/QmPlugins">
+              <filename name="*.jar"/>
+            </fileset>
+        </copy>
+
+        <!-- adapt settings - nightly has specific update side and may use qm2.devel -->
+        <delete dir="gen/appFiles"/>
+        <mkdir dir="gen/appFiles"/>
+        <unzip src="gen/tmpBundles/QMIConf.jar" dest="gen/appFiles">
+          <patternset>
+            <include name="app.properties"/>
+            <include name="p2.inf"/>
+          </patternset>
+        </unzip>
+        <replace file="gen/appFiles/app.properties" token="https://svn.l3s.uni-hannover.de/qualimaster/trunk/artifacts/ConfModel" value="https://svn.l3s.uni-hannover.de/qualimaster/trunk/artifacts/QM2.devel"/>
+        <replace file="gen/appFiles/p2.inf" token="//projects.sse.uni-hildesheim.de/qmConfig/" value="//projects.sse.uni-hildesheim.de/qm/qmicNightly/"/>
+        <jar update="true" destfile="gen/tmpBundles/QMIConf.jar" basedir="gen/appFiles" includes="app.properties p2.inf"/>
+
+        <plugins TempFolder="gen/tmp" SourceFolder="gen/tmpBundles" Version="${version}" DestinationFolder="gen/intermediate/plugins" ExclusionPattern="^.*(instantiator.copy.*.jar|(test|tests|drools).jar|org.eclipse.equinox.*.jar)$"/>
+    </target>
+    
+    <target name="createFeature">
+        <features SourceFolder="Features" Version="${version}" DestinationFolder="gen/intermediate/features"/>
+    </target>
+    
+    <target name="createSiteXML">
+        <updatesite SourceFolder="Site" Version="${version}" DestinationFolder="gen/intermediate"/>
+    </target>
+    
+    <target name="createArtifactJars">
+    	
+        <!-- the update site for the eclipse to create the nightly versions -->
+    	<mkdir dir="${basedir}/gen/final/internal"/>
+        <java jar="${eclipse.launcher}" fork="true" failonerror="true" maxmemory="128m">
+            <arg value="-application" />
+            <arg value="org.eclipse.equinox.p2.publisher.UpdateSitePublisher" />
+            <arg value="-metadataRepository" />
+            <arg value="file:${basedir}/gen/final/internal" />
+            <arg value="-artifactRepository" />
+            <arg value="file:${basedir}/gen/final/internal" />
+            <arg value="-source" />
+            <arg value="${basedir}/gen/intermediate" />
+            <arg value="-compress" />
+            <arg value="-publishArtifacts" />
+        </java>
+    	
+    	<!-- and now the update site for the RCP application -->
+        <product ProductFile="QM/qualiMasterApplication.product" DestinationFile="gen/intermediate/QualiMasterApplication.product" Version="${version}"/>
+
+        <copy todir="${basedir}/gen/intermediate/plugins">
+            <fileset dir="${user.home}/Eclipse/qmRepository/plugins"/>
+        </copy>
+        <copy todir="${basedir}/gen/intermediate/plugins">
+            <fileset dir="${user.home}/Eclipse/qmRepository/binary"/>
+        </copy>
+        <copy todir="${basedir}/gen/intermediate/features">
+            <fileset dir="${user.home}/Eclipse/qmRepository/features"/>
+        </copy>
+        <copy todir="${basedir}/gen/intermediate/plugins">
+            <fileset dir="${user.home}/Eclipse/delta-4.3.2/eclipse/plugins"/>
+        </copy>
+    	
+    	<java jar="${eclipse.launcher}" fork="true" failonerror="true" maxmemory="128m">
+            <arg value="-application" />
+            <arg value="org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher" />
+            <arg value="-metadataRepository" />
+            <arg value="file:${basedir}/gen/final" />
+            <arg value="-artifactRepository" />
+            <arg value="file:${basedir}/gen/final" />
+            <arg value="-source" />
+            <arg value="${basedir}/gen/intermediate" />
+            <arg value="-compress" />
+            <arg value="-publishArtifacts" />
+        </java>
+    	
+    	<mkdir dir="${basedir}/gen/final/binary"/>
+    	<binary SourceFolder="/var/lib/jenkins/Eclipse/qmRepository/binary" DestinationFolder="${basedir}/gen/final/binary" Version="${version}" Prefix="de.uni-hildesheim.sse.qualiMasterApplication"/>
+
+        <java jar="${eclipse.launcher}" fork="true" failonerror="false" maxmemory="128m">
+            <arg value="-application" />
+            <arg value="org.eclipse.equinox.p2.director" />
+            <arg value="-metadataRepository" />
+            <arg value="file:${basedir}/gen/final" />
+            <arg value="-artifactRepository" />
+            <arg value="file:${basedir}/gen/final" />
+            <arg value="-productFile" />
+            <arg value="${basedir}/gen/intermediate/QualiMasterApplication.product" />
+            <arg value="-append"/>
+        	<arg value="-flavor" />
+        	<arg value="tooling" />
+        	<arg value="-executables" />
+        	<arg value="${eclipse.delta.executables}"/>
+            <arg value="-compress" />
+        	<arg value="-configs" />
+        	<arg value="win32.win32.x86" />
+        </java>
+    </target>
+    
+    <target name="zip.Site">
+        <zip destfile="gen/Update-Site.zip" basedir="gen/final"/>
+    </target>
+    
+    <target name="publish">
+        <property name="remoteFolder" value="/var/www/qm/qmicNightly"/>
+        <echo file="${basedir}/gen/final/generated.html">
+            <![CDATA[
+                <b>Build from</b>: ${GENERATED_TIME}
+            ]]>
+        </echo>
+        <sshexec host="projects.sse.uni-hildesheim.de" username="jenkins" trust="true" keyfile="${user.home}/.ssh/id_rsa" command="rm -R ${remoteFolder}/*"/>
+        <scp todir="jenkins@projects.sse.uni-hildesheim.de:${remoteFolder}" trust="true" keyfile="${user.home}/.ssh/id_rsa">
+            <fileset dir="${basedir}/gen/final">
+                <include name="**/*"/>
+            </fileset>
+        </scp>
+    </target>
+</project>

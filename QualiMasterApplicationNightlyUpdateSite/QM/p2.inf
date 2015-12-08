@@ -1,0 +1,7 @@
+instructions.configure=\
+   addRepository(name:SSE Update Site,type:0,location:http${#58}//projects.sse.uni-hildesheim.de/qm/qmicNightly/);\
+   addRepository(name:SSE Update Site,type:1,location:http${#58}//projects.sse.uni-hildesheim.de/qm/qmicNightly/);
+   addRepository(name:Kepler Update Site,type:0,location:http${#58}//download.eclipse.org/releases/kepler/);\
+   addRepository(name:Kepler Update Site,type:1,location:http${#58}//download.eclipse.org/releases/kepler/);
+   addRepository(name:Kepler Update Site,type:0,location:http${#58}//download.eclipse.org/eclipse/updates/4.3/);\
+   addRepository(name:Kepler Update Site,type:1,location:http${#58}//download.eclipse.org/eclipse/updates/4.3/);

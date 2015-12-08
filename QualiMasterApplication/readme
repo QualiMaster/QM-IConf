@@ -1,0 +1,132 @@
+README
+
+Prerequisite:
+- EASy is available, either checked out as source bundles or installed
+- Eugenia diagram editor generation framework is available. Please be careful. Installing
+  the required GMF tooling may be a pain if not done correctly. Install
+  - GMF from the Eclipse (Kepler) repository
+  - GMF-tools (just the tools SDK and the experimental SDK) from *the update page matching your Eclipse*, e.g.,
+    for Kepler this is http://download.eclipse.org/modeling/gmp/gmf-tooling/updates/releases-3.1.2/
+  - Eugenia (currently no UML/HUTN bundles) from
+    http://download.eclipse.org/epsilon/updates
+  - Emfatic editor from
+    http://download.eclipse.org/emfatic/update/
+
+Documentation:
+- for Eugenia see 
+  - http://www.eclipse.org/epsilon/doc/articles/
+  - http://epsilonblog.wordpress.com/2009/06/15/eugenia-polishing-your-gmf-editor/
+- modifying the editor (please experiment in a separate project first)
+  - modify pipelineGEditor/model/pipeline.emf and click context menu "Generate Ecore Model"
+  - or: modify the Ecore model in pipelineGEditor/model/pipeline.ecore and click context menu "Generate Emfatic Source"
+  - on ecore or emf model, context menu "Eugenia | Generate GMF editor"
+  Things may go wrong when you delete elements from the model. Just delete the generated code and regenerate. Eugenia
+  does not clean up before generation :o
+- IVML/VIL/VTL. The most recent documentation is in the EASy SVN at SUH. Please contact us for access.
+  - The documentation of the release version can be obtained from 
+    - http://projects.sse.uni-hildesheim.de/easy/docs/ivml_spec.pdf
+    - http://projects.sse.uni-hildesheim.de/easy/docs/vil_spec.pdf  
+  
+Software-side prerequisites (please read also the Configuration page in the QM Wiki):
+- Menu extension points must be provided, namely
+  - a menu with id "file", having items or at least invisible separators with ids "print" and "additions"
+  - a menu with id "edit", having items or at least invisible separators with ids "additions" and (optional) 
+    "validationGroup"
+
+Setup:
+- Done automatically due to the SVN repository connector.
+- The Repository URI is part of the QM application bundle in app.properties
+- The application can further be configured using a local (optional) conf.properties
+  - repository-url: overrides the default repository-url in app.properties
+  - disable-login: may disable the credential input (state before repository connector integration)
+  - model-location: the file location where the QM configuration location can be accessed (overridden by 
+    repository connector if used once)
+    Example:  
+    model-location = W://runtime-EclipseApplication1//QM2
+  - source-location: Importing the QM configuration model from another location into the application workspace.
+    Rationale: If rthe model location is not in the same directory of the runtime workspace, you the Pipeline Editor 
+    will not be able to save the pipeline. To solve this problem, you need to checkout the model in your runtime 
+    workspace and import it from there. In some cases, Eclipse may not find its resources. Then please delete all files 
+    and folders except for .project from the folder of the model in the runtime workspace. Further, please checkout the 
+    model again in somewhere else of your file system and add this path under the tag 
+    "source-location = <path-to-a-local-SVN-checkout>" in conf.properties. 
+    Example:
+    source-location = W://..//QM2
+    Then start the application tool once. It will take a while to copy the entire source directory into the project 
+    directory. Please close the application and change source-location to -source-location in your conf.properties file 
+    and disable the source-location property. After this if you still have the problem with the Pipeline Editor, you 
+    might try it with a new workspace and adjust the conf.properties settings with the same ways as described above. 
+    When you try it with a new workspace, the "model-location" should be set as the model path in your new workspace and 
+    the "source-location" set as the model path from your old workspace.
+  - demo-mode: Enables the demo mode. While in demo mode the repository connector is turned off as well as the login 
+    dialog. Furthermore a local copy of the model will be created and used which can be reseted any time. Its important 
+    to note that the model has to be initially placed into the workspace within a directory called "backup/ConfModel" 
+    (i.e.: runtime-EclipseApplication1/backup/ConfModel).
+- Adjust the JVM parameters for your run configuration to
+  -XX:PermSize=64M -XX:MaxPermSize=128M -Xms512M -Xmx1024M
+
+Development:
+- Please create a local conf.properties (ignored by SVN) with at least the following line
+  repository-url = https://svn.l3s.uni-hannover.de/qualimaster/trunk/artifacts/QM2.devel
+  in order to avoid conflicts with the released version.
+  
+Release:
+- Check EASyLoggerFactory.DEBUG must be false!
+- Test the development version.
+- Check that all QMapp bundles as well as relevant EASy bundles have a new (minor) version number.
+- Change Product version number according to the main application bundle (Qualimaster application plugin).
+- Update qualiMasterApplicationFeature according to the new / added Q; bundles - without version numbers. Do not change 
+  qualiMasterApplication.product unless new Eclipse features are required.
+- Update qualiMasterApplicationFeature.platform only if Eclipse/common plugins are needed that are not in some feature. 
+  Else add the feature to qualiMasterApplication.product.
+- If qualiMasterApplicationFeature.platform was modified, call the validiation of the product (upper right toolbar, 
+  validation button). If required, iterate over the features / plugins to add missing parts. Finally, update it in the 
+  nightly update site, but only if changed!
+- Announce release preparation by mail in case that the model will change.
+- Export product:
+  This needs two steps, an export from the qualiMasterApplication.product and a subsequent installation of the QualiMaster
+  bundle into the RCP platform, as otherwise updates will not work.
+  - Adjust the createInstallable.bat (from QualiMasterApplicationNightlyUpdateSite) to the target platforms to be exported
+  - Execute the export of the QualiMaster Application. Open the 'qualiMasterApplication.product' file
+    in Eclipse and click on the 'Overview' tab. On the right bottom corner there is a link called 'Eclipse Product Export Wizard'.
+    Click on the link and follow the instructions on the screen. Multiple platforms here is only relevant to test the 
+    exported products.
+  - Test the standalone version to install the RCP application into an appropriate eclipse.
+  - Execute the createInstallable.bat
+  - Upload the contents of the exported repository directory to projects.sse.uni-hildesheim.de:www-Ordner/qmConfig (not the nightly one).
+    Yes, this is an extended update site, i.e., the update site itself is not required anymore.
+- Diff configuration model (last release vs. new development version). Please avoid changing the .EASyConfig file. Update release model.
+- Upload now standalone versions to projects.sse.uni-hildesheim.de:www-Ordner/qm/<version>
+- Update Configuration page in QM-Wiki.
+- Announce the new version/updates by mail.
+
+Release nightly:
+- Take a new eclipse of the same base version (typically a dedicated installation is easier to handle for Jenkins than a copied one).
+  In case of a new Eclipse version, an update of the qmRepository folder on Jenkins is required. Please note that there is
+  a specific naming convention for the executables, that can be taken from the exported OS/UI/Arch-specific version.
+- Start it and point it to a new workspace
+- Install the nightly packages from https://projects.sse.uni-hildesheim.de/qm/qmicNightly/internal (this is the plain Eclipse update
+  site, not the site for RCP!)
+- Deactivate / delete the existing update sites
+- Restart Eclipse
+- Create an empty Java project
+- Copy the files from QualiMasterApplicationNightlyUpdateSite\QM (actually a full project, can be checked out)
+- Validate the product configuration (as above)
+- Export the project as above
+  Set export path
+  Disable sync
+- Adjust createInstallable if required and run createInstallable.bat to install the RCP application into an appropriate eclipse.
+- Upload the installable to projects and change the link in the Wiki accordingly.
+- Updating this Eclipse: Only the QM-nightly, not the other bundles (shall not happen if you disabled / deleted them).
+
+Model conventions:
+- Model structure is fixed, i.e., projects, project names, imports, types (linked in VariabilityModel.java), some 
+  top-level variables (such as in Infrastructure.ivml)
+- String variables named "name" in compounds will be used to display the name in the tree on the left side.
+- Text editor labels will be taken from the internationalized comment text, or, if not present from the variable name. 
+- Graph nodes directly correspond to the IVML pipeline compounds in terms of their name and attributes.
+  Reference attributes representing the graph become references in the graph. Enums and other references become integer 
+  attributes of the same name with default value -1. Constraint sets are mapped into the String representation of
+  the constraints separated by ";" (the IVML separator character). Other attributes are directly mapped to graph 
+  attributes with the Java default value. Also Booleans go to integer (0 = true, 1 = false, EASy-Editor Convention). Please do not omit default values for the graph attributes!
+  

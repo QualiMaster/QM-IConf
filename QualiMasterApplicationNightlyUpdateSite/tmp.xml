@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="QMIConf-Nightly-UpdateSite" default="test" basedir=".">
+  <target name="test">
+      <delete dir="gen/appFiles"/>
+      <mkdir dir="gen/appFiles"/>
+      <unzip src="gen/tmpBundles/QMIConf.jar" dest="gen/appFiles">
+        <patternset>
+          <include name="app.properties"/>
+          <include name="p2.inf"/>
+        </patternset>
+      </unzip>
+      <replace file="gen/appFiles/app.properties" token="https://svn.l3s.uni-hannover.de/qualimaster/trunk/artifacts/ConfModel" value="https://svn.l3s.uni-hannover.de/qualimaster/trunk/artifacts/QM2.devel"/>
+      <replace file="gen/appFiles/p2.inf" token="//projects.sse.uni-hildesheim.de/qmConfig/" value="//projects.sse.uni-hildesheim.de/qm/qmicNightly"/>
+      <jar update="true" destfile="gen/tmpBundles/QMIConf.jar" basedir="gen/appFiles" includes="app.properties p2.inf"/>
+  </target>
+</project>

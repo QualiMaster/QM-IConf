@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="QMIConf" default="jar" basedir=".">
+	<!-- import of the global Jenkins properties -->
+	<property file="${user.home}/global-build.properties"/>
+	<property file="${user.home}/qualimaster-build.properties"/>
+	
+	<!-- Settings for the project -->
+	<property name="src.dir" value="src"/>
+	<property name="javacSource" value="1.7"/>
+	<property name="javacTarget" value="1.7"/>
+	
+	<path id ="includes">
+
+	    <!-- include required EASy components -->
+	    <pathelement path="${libs.utils}"/>
+        <pathelement path="${libs.model}"/>
+	    <pathelement path="${libs.reasonerCore}"/>
+        <pathelement path="${libs.instantiator.copy.core}"/>
+        <pathelement path="${libs.instantiator.core}"/>
+        <pathelement path="${libs.dslCore}"/>
+        <pathelement path="${libs.dslCore.ui}"/>
+        <pathelement path="${libs.ivml}"/>
+        <pathelement path="${libs.ivml.ui}"/>
+        <pathelement path="${libs.vil.expressions.core}"/>
+        <pathelement path="${libs.vil.core}"/>
+        <pathelement path="${libs.template.core}"/>
+        <pathelement path="${libs.easy.ui.core}"/>
+        <pathelement path="${libs.easy.UI}"/>
+        <pathelement path="${libs.easy.PLugin}"/>
+        <pathelement path="${libs.easy.persistence}"/>
+        <pathelement path="${libs.easy.persistence.eclipse}"/>
+        <pathelement path="${libs.sseReasoner}"/>
+        
+        <pathelement path="${libs.instantiatorCore.rt.core}"/>
+        <pathelement path="${libs.vil.rt.core}"/>
+        <pathelement path="${libs.vil.rt.ui}"/>
+        	           	    
+        <!-- include specific parts of the configuration tool -->
+        <pathelement path="${libs.RepositoryConnector.java}"/>
+        <pathelement path="${libs.ManifestUtils.java}"/>
+        <pathelement path="${libs.pipelineGEditor.java}"/>
+	    <pathelement path="${libs.pipelineGEditor.edit.java}"/>
+	    <pathelement path="${libs.pipelineGEditor.editor.java}"/>
+	    <pathelement path="${libs.pipelineGEditor.diagram.java}"/>
+        <fileset dir="lib">
+            <include name="**/*.jar" />
+        </fileset>              
+	    <fileset dir="${eclipse.plugins.dir}">
+            <include name="**/*.jar" />
+        </fileset>
+	</path>
+	
+	<!-- Targets  -->
+	<target name="init">
+		<!-- Delete generated folders -->
+		<delete dir="${build.base.dir}"/>
+		
+		<!-- Create folders -->
+        <mkdir dir="${build.base.dir}"/>
+		<mkdir dir="${build.classes.dir}"/>
+		<mkdir dir="${build.jar.dir}"/>
+	</target>
+	
+	<!-- Compile all files without test classes -->
+	<target name="compile" depends="init">
+	    <!-- <echo message="${toString:includes}"/> -->
+		<javac srcdir="${src.dir}" debug="on" destdir="${build.classes.dir}" includeAntRuntime="no" failonerror="true" source="${javacSource}" target="${javacTarget}" encoding="${javac.encoding}">
+			<classpath refid="includes" />	
+		</javac>
+    </target>
+    
+	<!-- Test missing -->
+	
+	<!-- Creates a jar file -->
+	<target name="jar" depends="compile">
+		<jar destfile="${build.jar.dir}/${ant.project.name}.jar" manifest="META-INF/MANIFEST.MF">
+		    <fileset dir="${build.classes.dir}" />
+            <fileset dir="." includes="lib/**/*.* icons/**/*.* app.properties p2.inf plugin.xml splash.bmp plugin_customization.ini"/>
+		</jar>
+        <copy todir="${qm.bundles.dir}">
+            <fileset dir="${build.jar.dir}" includes="**/*.jar"/>
+        </copy>
+        
+        
+        <property name="intermediate" value="${basedir}/bin/intermediate"/>
+        <property name="bundles" value="${basedir}/bin/bundles"/>
+            
+        <mkdir dir="${intermediate}"/>
+        <mkdir dir="${intermediate}/plugins"/>
+        <mkdir dir="${intermediate}/features"/>
+        <copy toDir="${intermediate}/plugins">
+            <fileset dir="${user.home}/Eclipse/EASyPlugins">
+              <filename name="*.jar"/>
+            </fileset>
+            <fileset dir="${user.home}/Eclipse/QmPlugins">
+              <filename name="*.jar"/>
+            </fileset>
+        </copy>
+        <copy toDir="${intermediate}/features">
+            <fileset dir="${projects.features.dir}">
+              <filename name="*"/>
+            </fileset>
+        </copy>
+        <copy todir="${intermediate}/plugins">
+            <fileset dir="${user.home}/Eclipse/qmRepository/plugins"/>
+            <fileset dir="${user.home}/Eclipse/qmRepository/addPlugins"/>
+            <fileset dir="${user.home}/Eclipse/qmRepository/binary"/>
+            <fileset dir="${user.home}/Eclipse/delta-4.3.2/eclipse/plugins"/>
+        </copy>
+<!-- <copy todir="${intermediate}/features">
+            <fileset dir="${user.home}/Eclipse/qmRepository/features"/>
+        </copy> -->        
+        
+        <property name="eclipse.home" value="${user.home}/Eclipse/EclipseCompile_SSE200"/>
+        <property name="eclipse.launcher" value="${eclipse.home}/plugins/org.eclipse.equinox.launcher_1.3.0.v20130327-1440.jar"/>
+        <property name="eclipse.delta.executables" value="${user.home}/Eclipse/delta-4.3.2/eclipse/features/org.eclipse.equinox.executable_3.6.0.v20140117-1004"/>
+        
+         
+        <java jar="${eclipse.launcher}" fork="true" failonerror="true" maxmemory="128m">
+            <arg value="-application" />
+            <arg value="org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher" />
+            <arg value="-metadataRepository" />
+            <arg value="file:${bundles}" />
+            <arg value="-artifactRepository" />
+            <arg value="file:${bundles}" />
+            <arg value="-source" />
+            <arg value="${intermediate}" />
+            <arg value="-compress" />
+            <arg value="-publishArtifacts" />
+        </java>
+        
+       <!--  does not work as the installed eclipse is a windows-based eclipse
+            
+        <property name="target" value="${basedir}/qmIConf.win32.win32.x86"/>
+        <exec dir="${eclipse.home}" executable="eclipsec.exe" failonerror="false">
+            <arg value="-nosplash" />
+            <arg value="-application" />
+            <arg value="org.eclipse.equinox.p2.director" />
+            <arg value="-metadataRepository" />
+            <arg value="file:${bundles}" />
+            <arg value="-artifactRepository" />
+            <arg value="file:${bundles}" />
+            <arg value="-installIU" />
+            <arg value="de.uni-hildesheim.sse.qualiMasterApplication" />
+            <arg value="-destination" />
+            <arg value="${target}"/>
+            <arg value="-profile" />
+            <arg value="QMIConf"/>
+            <arg value="-bundlepool" />
+            <arg value="${target}"/>
+            <arg value="-profileProperties" />
+            <arg value="org.eclipse.update.install.features=true"/>
+            <arg value="-p2.os" />
+            <arg value="win32"/>
+            <arg value="-p2.ws" />
+            <arg value="win32"/>
+            <arg value="-p2.arch" />
+            <arg value="x86"/>
+            <arg value="-roaming" />
+            <arg value="-consoleLog" />
+            <arg value="-purgeHistory"/>
+            <arg value="-vmArgs" />
+            <arg value="${target}"/>
+        </exec> -->
+        
+	</target>
+	
+</project>

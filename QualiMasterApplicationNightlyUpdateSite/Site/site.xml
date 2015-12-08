@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description url="http://projects.sse.uni-hildesheim.de/eclipse/update-sites/easy_nightly">
+      Nightly builds of the QualiMaster Infrastructure Configuration Tool (QM-IConf)
+   </description>
+   <feature url="features/QMNightly.jar" id="QMIConf.Nightly.Feature" version="0.0.0">
+      <category name="QMIConf.Nightly"/>
+   </feature>
+   <category-def name="QMIConf.Nightly" label="QM-IConf Nightly Builds"/>
+</site>

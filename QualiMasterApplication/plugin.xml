@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension id="application" point="org.eclipse.core.runtime.applications">
+      <application>
+         <run class="de.uni_hildesheim.sse.qmApp.Application">
+         </run>
+      </application>
+   </extension>
+
+   
+   <extension point="org.eclipse.ui.elementFactories">
+     <factory id="de.uni_hildesheim.sse.qmApp.editors.DecisionVariableEditorInputFactory" 
+       class="de.uni_hildesheim.sse.qmApp.editors.DecisionVariableEditorInputFactory"/>
+     <factory id="de.uni_hildesheim.sse.qmApp.editorInput.ContainerVariableEditorInputCreatorElementFactory" 
+       class="de.uni_hildesheim.sse.qmApp.editorInput.ContainerVariableEditorInputCreatorElementFactory"/>
+     <factory id="de.uni_hildesheim.sse.qmApp.editorInput.CompoundVariableEditorInputCreatorElementFactory" 
+       class="de.uni_hildesheim.sse.qmApp.editorInput.CompoundVariableEditorInputCreatorElementFactory"/>
+     <factory id="de.uni_hildesheim.sse.qmApp.treeView.PipelineElementFactory$DeferredURIEditorInputElementFactory" 
+       class="de.uni_hildesheim.sse.qmApp.treeView.PipelineElementFactory$DeferredURIEditorInputElementFactory"/>
+   </extension>
+   
+   <extension point="org.eclipse.ui.perspectives" id="rcp-perspective">
+      <perspective
+            class="de.uni_hildesheim.sse.qmApp.Perspective"
+            id="QualiMasterApplication.perspective"
+            name="Perspective">
+      </perspective>
+   </extension>
+   <extension point="org.eclipse.ui.views">
+      <view
+            class="de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElementsView"
+            id="QualiMasterApplication.view"
+            name="View">
+      </view>
+   </extension>
+   <extension point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="*">
+         <hiddenMenuItem id="org.eclipse.search.menu"></hiddenMenuItem>
+         <hiddenMenuItem id="org.eclipse.ui.run"></hiddenMenuItem>
+         <view standalone="true"
+               minimized="false"
+               relative="org.eclipse.ui.editorss"
+               relationship="left"
+               id="QualiMasterApplication.view">
+         </view>
+      </perspectiveExtension>
+   </extension>
+   <extension point="org.eclipse.ui.menus">
+      <menuContribution locationURI="menu:org.eclipse.ui.main.menu">
+         <menu label="Model" id="file">
+            <command commandId="de.uni_hildesheim.sse.qmApp.saveAll"
+                  label="Save all">
+            </command>
+            <separator
+                  name="repository"
+                  visible="true">
+            </separator>
+            <command commandId="de.uni_hildesheim.sse.qmApp.updateModel"
+                  label="Update from Repository">
+            </command>
+            <command commandId="de.uni_hildesheim.sse.qmApp.commitModel"
+                  label="Commit to Repository">
+            </command>
+            <command commandId="de.uni_hildesheim.sse.qmApp.resetModel"
+            	  label="Reset model">
+            </command>
+            <command commandId="de.uni_hildesheim.sse.qmApp.revertModel"
+                  label="Revert all">
+            </command>
+            <separator
+                  name="print"
+                  visible="true">
+            </separator>            
+            <separator
+                  name="additions"
+                  visible="false">
+            </separator>
+            <command commandId="org.eclipse.ui.file.exit"
+                  label="Exit">
+            </command>
+         </menu>
+         <menu label="Validate" id="edit">
+            <separator
+                  name="additions"
+                  visible="false">
+            </separator>
+            <separator
+                  name="validationGroup"
+                  visible="false">
+            </separator>
+            <command commandId="de.uni_hildesheim.sse.qmApp.validateAll"
+                  label="Validate All">
+            </command>
+            <separator name="find.ext" visible="false"/>            
+         </menu>
+         <menu label="Instantiate" id="additions">
+            <command commandId="de.uni_hildesheim.sse.qmApp.instantiateLocal"
+                  label="Instantiate local">
+            </command>
+            <command commandId="de.uni_hildesheim.sse.qmApp.instantiateInterfacesLocal"
+                  label="Instantiate interfaces">
+            </command>
+            <separator
+                  name="additions"
+                  visible="false">
+            </separator>            
+         </menu>
+         <menu label="Window" id="window">
+            <command commandId="de.uni_hildesheim.sse.qmApp.switchToInitialPerspective"
+                  label="Switch to configuration perspective">
+                  <visibleWhen>
+                      <with variable="activeWorkbenchWindow.activePerspective">
+                          <not>
+                              <equals value="QualiMasterApplication.perspective"/>
+                          </not>
+                      </with>
+                  </visibleWhen>
+            </command>
+            <command commandId="org.eclipse.ui.window.resetPerspective"
+                  label="Reset perspective">
+            </command>
+            <command commandId="org.eclipse.ui.window.savePerspective"
+                  label="Save perspective...">
+            </command>
+            <separator
+                  name="additions"
+                  visible="false">
+            </separator>            
+         </menu>
+         <menu label="Help" id="helpMenu">
+         <!--
+         	<command commandId="org.eclipse.equinox.p2.ui.sdk.update"
+				label="Check for updates">
+			</command> -->
+			<command commandId="de.uni_hildesheim.sse.qmApp.commands.P2UpdateHandler"
+				label="Check for updates">
+			</command>
+			<command commandId="de.uni_hildesheim.sse.qmApp.commands.AboutHandler"
+			    label="About..."> 
+			</command>
+         </menu>
+         <menu id="about" label="helpMenu">
+             <separator name="additions" visible="false"></separator>
+             <separator name="about" visible="false"> </separator>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.SaveAllHandler"
+            id="de.uni_hildesheim.sse.qmApp.saveAll"
+            name="SaveAll">
+      </command>
+      <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.UpdateModel"
+            id="de.uni_hildesheim.sse.qmApp.updateModel"
+            name="SaveAll">
+      </command>
+      <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.CommitModel"
+            id="de.uni_hildesheim.sse.qmApp.commitModel"
+            name="SaveAll">
+      </command>
+      <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.ResetModel"
+          id="de.uni_hildesheim.sse.qmApp.resetModel"
+          name="Reset Model">
+      </command>
+      <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.RevertModel"
+          id="de.uni_hildesheim.sse.qmApp.revertModel"
+          name="Revert all">
+      </command>
+      <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.ValidateAll"
+            id="de.uni_hildesheim.sse.qmApp.validateAll"
+            name="ValidateAll">
+      </command>
+      <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.InstantiateLocal"
+            id="de.uni_hildesheim.sse.qmApp.instantiateLocal"
+            name="InstantiateLocal">
+      </command>
+      <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.InstantiateInterfacesLocal"
+            id="de.uni_hildesheim.sse.qmApp.instantiateInterfacesLocal"
+            name="InstantiateInterfacesLocal">
+      </command>
+      <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.SwitchToInitialPerspective"
+            id="de.uni_hildesheim.sse.qmApp.switchToInitialPerspective"
+            name="SwitchToInitialPerspective">
+      </command>
+      <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.P2UpdateHandler"
+      		id="de.uni_hildesheim.sse.qmApp.commands.P2UpdateHandler"
+      		name="P2UpdateHandler">
+      </command>
+      <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.AboutHandler"
+          id="de.uni_hildesheim.sse.qmApp.commands.AboutHandler"
+          name="About">
+      </command>
+   </extension>   
+   
+   <extension
+       point="org.eclipse.ui.commandImages">
+           
+           <image
+               commandId = "de.uni_hildesheim.sse.qmApp.saveAll"
+               icon = "icons/save all.png">
+           </image>
+           <image
+               commandId = "de.uni_hildesheim.sse.qmApp.updateModel"
+               icon = "icons/update.png">
+           </image>
+           <image
+               commandId = "de.uni_hildesheim.sse.qmApp.commitModel"
+               icon = "icons/commit.png">
+           </image>
+           <image
+               commandId = "de.uni_hildesheim.sse.qmApp.validateAll"
+               icon = "icons/validation.png">
+           </image>
+           <image
+               commandId = "org.eclipse.ui.file.exit"
+               icon = "icons/exit.png">
+           </image>
+           <image
+               commandId = "de.uni_hildesheim.sse.qmApp.instantiateLocal"
+               icon = "icons/local.png">
+           </image>
+           <image
+               commandId = "de.uni_hildesheim.sse.qmApp.instantiateInterfacesLocal"
+               icon = "icons/interface.png">
+           </image>
+           <image
+               commandId="org.eclipse.ui.window.resetPerspective"
+               icon = "icons/reset.png">
+           </image>
+           <image
+               commandId="org.eclipse.ui.window.savePerspective"
+               icon = "icons/save all.png">
+           </image>
+           <image 
+               commandId="de.uni_hildesheim.sse.qmApp.commands.AboutHandler"
+               icon="icons/help.png">
+           </image>
+           <image 
+               commandId="de.uni_hildesheim.sse.qmApp.commands.P2UpdateHandler"
+               icon="icons/checkForUpdates.png">
+           </image>
+   </extension>
+   
+   <extension point="org.eclipse.ui.editors">
+      <!-- contributorClass -->
+      <editor class="de.uni_hildesheim.sse.qmApp.editors.ConfigurationEditor"
+            icon="icons/types.png"
+            id="de.uni_hildesheim.sse.qmApp.TypesEditor"
+            name="Types">
+      </editor>
+      <editor class="de.uni_hildesheim.sse.qmApp.editors.ConfigurationEditor"
+            icon="icons/gpMachines.png"
+            id="de.uni_hildesheim.sse.qmApp.HardwareEditor"
+            name="Hardware">
+      </editor>
+      <editor class="de.uni_hildesheim.sse.qmApp.editors.ConfigurationEditor"
+            icon="icons/reconfigMachines.png"
+            id="de.uni_hildesheim.sse.qmApp.ReconfigurableHardwareEditor"
+            name="Reconfigurable Hardware">
+      </editor>
+      <editor class="de.uni_hildesheim.sse.qmApp.editors.ConfigurationEditor"
+            icon="icons/algorithms.png"
+            id="de.uni_hildesheim.sse.qmApp.AlgorithmsEditor"
+            name="Algorithms">
+      </editor>
+      <editor class="de.uni_hildesheim.sse.qmApp.editors.ConfigurationEditor"
+            icon="icons/families.png"
+            id="de.uni_hildesheim.sse.qmApp.FamiliesEditor"
+            name="Algorithm Families">
+      </editor>
+      <editor class="de.uni_hildesheim.sse.qmApp.editors.ConfigurationEditor"
+            icon="icons/pipelines.png"
+            id="de.uni_hildesheim.sse.qmApp.PipelinesEditor"
+            name="Pipelines">
+      </editor>
+      <editor class="de.uni_hildesheim.sse.qmApp.editors.ConfigurationEditor"
+            icon="icons/dataManagement.png"
+            id="de.uni_hildesheim.sse.qmApp.DataManagementEditor"
+            name="Data Management">
+      </editor>
+      <editor class="de.uni_hildesheim.sse.qmApp.editors.ProjectEditor"
+            icon="icons/infrastructure.png"
+            id="de.uni_hildesheim.sse.qmApp.InfrastructureEditor"
+            name="Infrastructure">
+      </editor>
+      <editor class="de.uni_hildesheim.sse.qmApp.editors.VariableEditor"
+            icon="icons/gpMachine.png"
+            id="de.uni_hildesheim.sse.qmApp.VariableEditor"
+            name="Hardware">
+      </editor>
+      <editor class="de.uni_hildesheim.sse.qmApp.editors.FamilyEditor"
+            icon="icons/gpMachine.png"
+            id="de.uni_hildesheim.sse.qmApp.FamilyEditor"
+            name="Hardware">
+      </editor>      
+      <editor class="de.uni_hildesheim.sse.qmApp.editors.AlgorithmEditor"
+            icon="icons/algorithm.png"
+            id="de.uni_hildesheim.sse.qmApp.AlgorithmEditor"
+            name="Algorithm">
+      </editor>
+      <editor class="de.uni_hildesheim.sse.qmApp.editors.RuntimeEditor"
+            icon="icons/runtime.png"
+            id="de.uni_hildesheim.sse.qmApp.RuntimeEditor"
+            name="Runtime">
+      </editor>
+      <editor class="de.uni_hildesheim.sse.qmApp.editors.SourceSinkEditor"
+            icon="icons/dataManagement.png"
+            id="de.uni_hildesheim.sse.qmApp.SourceSinkEditor"
+            name="Data Management">
+      </editor>
+      <editor class="de.uni_hildesheim.sse.qmApp.editors.ConfigurationEditor"
+            icon="icons/observables.png"
+            id="de.uni_hildesheim.sse.qmApp.ObservablesEditor"
+            name="Observables">
+      </editor>
+      <editor class="de.uni_hildesheim.sse.qmApp.editors.ConfigurationEditor"
+            icon="icons/adaptation.png"
+            id="de.uni_hildesheim.sse.qmApp.AdaptationEditor"
+            name="Adaptation">
+      </editor>
+   </extension>
+   
+   <extension 
+      point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+      <propertyContributor
+            contributorId="pipelineGEditor.diagram"
+            tabDescriptorProvider="de.uni_hildesheim.sse.qmApp.tabbedViews.TabDescriptorProvider">
+         <propertyCategory category="visual">
+         </propertyCategory>
+         <propertyCategory category="domain">
+         </propertyCategory>
+      </propertyContributor>
+   </extension>
+   
+ 
+   <extension point="org.eclipse.ui.editors" id="gmf-editor">
+      <?gmfgen generated="true"?>
+      <editor
+         id="de.uni_hildesheim.sse.qmApp.editors.PipelineDiagramEditorID"
+         name="%editorName"
+         icon="icons/pipelines.png"
+         extensions="pipeline_diagram"
+         default="true"
+         class="de.uni_hildesheim.sse.qmApp.editors.QMPipelineEditor"
+         matchingStrategy="pipeline.diagram.part.PipelineMatchingStrategy"
+         contributorClass="pipeline.diagram.part.PipelineDiagramActionBarContributor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.activities">
+      <activity
+            description="see http://codeandme.blogspot.de/2011/09/hiding-ui-elements-in-rcp.html"
+            id="QualiMasterApplication.hideOpenLocalFile"
+            name="Hide Open Local File">
+      </activity>
+      <activityPatternBinding
+            activityId="QualiMasterApplication.hideOpenLocalFile"
+            isEqualityPattern="true"
+            pattern="org.eclipse.ui.edit.text.openLocalFile">
+      </activityPatternBinding>
+      <activity
+            description="see http://www.richclient2.de/2006_03_20/getting-rid-of-convert-line-delimiters-to/"
+            id="QualiMasterApplication.hideConvertLineDelimiters"
+            name="Hide Convert Line Delimiters">
+      </activity>      
+      <activityPatternBinding
+            activityId="QualiMasterApplication.hideConvertLineDelimiters"
+            pattern="org.eclipse.ui.editors/org.eclipse.ui.edit.text.delimiter.*">
+      </activityPatternBinding>
+      <activity
+            description="see http://codeandme.blogspot.de/2011/09/hiding-ui-elements-in-rcp.html"
+            id="QualiMasterApplication.hideInstallNewSoftware"
+            name="Hide install new software">
+      </activity>
+      <activityPatternBinding
+            activityId="QualiMasterApplication.hideInstallNewSoftware"
+            isEqualityPattern="true"
+            pattern="org.eclipse.equinox.p2.ui.sdk.install">
+      </activityPatternBinding>
+   </extension>
+   <extension
+         id="QualiMasterApplication"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="QualiMasterApplication.application"
+            name="de.uni-hildesheim.sse.qualiMasterApplication">
+         <property
+               name="appName"
+               value="de.uni-hildesheim.sse.qualiMasterApplication">
+         </property>
+         <property
+               name="startupForegroundColor"
+               value="0080FF">
+         </property>
+         <property
+               name="startupMessageRect"
+               value="7,252,445,20">
+         </property>
+         <property
+               name="startupProgressRect"
+               value="5,275,445,15">
+         </property>
+         <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
+         </property>
+      </product>
+   </extension>
+</plugin>

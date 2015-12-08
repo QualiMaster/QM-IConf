@@ -1,0 +1,50 @@
+Source / License of the icons:
+See document "Icon Sources.pdf" for more information.
+
+algorithm.png: https://www.iconfinder.com/icons/126784/browser_diagram_hierarchy_map_marketing_menu_navigation_optimization_plan_relations_seo_site_sitemap_structure_tree_web_icon#size=24
+               Link to creators website: http://www.aha-soft.com/ - creative commons
+
+commit: https://www.iconfinder.com/icons/6005/arrow_commit_database_up_upload_icon#size=128
+
+
+dataManagement: https://www.iconfinder.com/designmodo - creative commons
+exit: https://www.iconfinder.com/icons/3226/exit_power_quit_icon#size=128 - GNU Lesser General Public License
+family: https://www.iconfinder.com/icons/126784/browser_diagram_hierarchy_map_marketing_menu_navigation_optimization_plan_relations_seo_site_sitemap_structure_tree_web_icon#size=24
+Link to creators website: http://www.aha-soft.com/ - creative commons
+
+gpMachine: https://www.iconfinder.com/icons/84536/desktop_icon#size=32
+
+infrastructure: https://www.iconfinder.com/icons/68734/blue_gear_icon#size=64
+creative commons
+Link to owners site: http://www.doublejdesign.co.uk/
+
+interface: https://www.iconfinder.com/icons/132064/interface_menu_menus_icon#size=48 - creative commons
+Link to creators website: http://www.aha-soft.com/
+
+local: https://www.iconfinder.com/icons/324963/business_earth_global_internet_local_seo_web_website_icon#size=128
+free for commercial use
+
+pipeline: https://www.iconfinder.com/icons/1562/pipe_icon#size=128
+reconfigMachine: https://www.iconfinder.com/icons/143824/gear_preferences_settings_system_tool_tools_icon#size=128 - free for commercial use
+remote: https://www.iconfinder.com/icons/6667/remote_icon#size=128
+reset: https://www.iconfinder.com/icons/59198/refresh_reload_repeat_reset_icon#size=32 - creative commons
+Link to creators website: http://pc.de/
+
+save all: https://www.iconfinder.com/icons/51415/disk_save_icon#size=64 creative commons
+Link to creators website. http://shlyapnikova.deviantart.com/
+
+update: https://www.iconfinder.com/icons/172618/update_icon#size=128 creative commons
+Link to creators website: http://icons8.com/
+
+validation: https://www.iconfinder.com/icons/32520/accept_check_good_green_ok_success_tick_valid_validation_vote_yes_icon#size=24
+creative commons
+Link to creators website: http://www.aha-soft.com/
+
+check for updates: https://www.iconfinder.com/icons/105225/arrow_arrows_change_exchange_refresh_reload_renew_sync_synchronize_update_icon#size=16
+creative commons
+Link to creators webiste: http://www.aha-soft.com/
+
+runtime: https://www.iconfinder.com/icons/131918/analytics_chart_diagram_graph_graphs_line_statistics_xy_icon#size=32
+free for commercial use
+
+Non-listed icons are self-made or created out of the the listed icons.

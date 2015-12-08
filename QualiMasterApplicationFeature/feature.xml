@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="QualiMasterApplicationFeature"
+      label="QualiMasterApplicationFeature"
+      version="0.6.6"
+      provider-name="University of Hildesheim - SSE">
+
+   <description url="http://qualimaster.eu">
+      QualiMaster Infrastructure Configuration Tool (QM-IConf)
+Partially founded by the European Commission in the 7th Framework Programme under grant agreement nr. 619525.
+For further information, please visit http://qualimaster.eu
+   </description>
+
+   <copyright url="http://qualimaster.eu">
+      Copyright 2015 QualiMaster Consortium and Stiftung University Hildesheim - Software Systems Engineering, Hildesheim, Germany
+   </copyright>
+
+   <license url="http://www.apache.org/licenses/LICENSE-2.0">
+      Copyright 2015 QualiMaster Consortium and Stiftung University Hildesheim - Software Systems Engineering, Hildesheim, Germany
+
+      Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+or implied.
+See the License for the specific language governing permissions
+and limitations under the License.
+   </license>
+
+   <requires>
+      <import plugin="org.eclipse.equinox.ds"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.apache.ant"/>
+      <import plugin="org.apache.commons.io" version="2.0.1" match="greaterOrEqual"/>
+      <import plugin="org.apache.commons.lang" version="2.6.0" match="greaterOrEqual"/>
+      <import plugin="ReasonerCore" version="0.10.3" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.osgi.services"/>
+      <import plugin="org.eclipse.emf.ecore"/>
+      <import plugin="org.eclipse.xtext" version="2.5.0" match="greaterOrEqual"/>
+      <import plugin="de.uni_hildesheim.sse.utils" version="0.4.3" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.jdt.ui"/>
+      <import plugin="org.eclipse.ui.forms"/>
+      <import plugin="org.eclipse.jdt.core"/>
+      <import plugin="org.eclipse.ui.navigator.resources"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.ui.workbench"/>
+      <import plugin="org.eclipse.xtext.ui" version="2.3.1" match="greaterOrEqual"/>
+      <import plugin="de.uni_hildesheim.sse.easy_producer.eclipse" version="0.11.3" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.console" version="3.5.100" match="greaterOrEqual"/>
+      <import plugin="de.uni_hildesheim.sse.vil.buildlang" version="0.5.3" match="greaterOrEqual"/>
+      <import plugin="de.uni_hildesheim.sse.vil.templatelang" version="0.5.3" match="greaterOrEqual"/>
+      <import plugin="de.uni_hildesheim.sse.ivml" version="0.10.3" match="greaterOrEqual"/>
+      <import plugin="de.uni_hildesheim.sse.ivml.ui" version="0.10.3" match="greaterOrEqual"/>
+      <import plugin="de.uni_hildesheim.sse.easy_producer.core" version="0.11.3" match="greaterOrEqual"/>
+      <import plugin="org.apache.log4j" version="1.2.15" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.xtext.util"/>
+      <import plugin="org.eclipse.emf.common"/>
+      <import plugin="org.antlr.runtime"/>
+      <import plugin="org.eclipse.xtext.common.types"/>
+      <import plugin="de.uni_hildesheim.sse.dslCore" version="0.8.3" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.mwe2.launch" version="2.5.0" match="greaterOrEqual"/>
+      <import plugin="org.apache.commons.logging"/>
+      <import plugin="org.eclipse.xtext.xbase.lib"/>
+      <import plugin="de.uni-hildesheim.sse.easy.instantiatorCore" version="0.11.3" match="greaterOrEqual"/>
+      <import plugin="de.uni_hildesheim.sse.vil.expressions" version="0.5.3" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.mwe2.launch" version="2.3.0" match="greaterOrEqual"/>
+      <import plugin="de.uni_hildesheim.sse.varModel" version="0.11.3" match="greaterOrEqual"/>
+      <import plugin="de.uni_hildesheim.sse.vil.rt"/>
+      <import plugin="de.uni_hildesheim.sse.vil.rt.ui"/>
+      <import plugin="de.uni_hildesheim.sse.dslCore.ui"/>
+   </requires>
+
+   <plugin
+         id="de.uni-hildesheim.sse.easy.instantiatorCore"
+         download-size="0"
+         install-size="0"
+         version="0.11.3"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.dslCore"
+         download-size="0"
+         install-size="0"
+         version="0.8.3"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.easy.ui"
+         download-size="0"
+         install-size="0"
+         version="0.11.3"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.easy_producer.core"
+         download-size="0"
+         install-size="0"
+         version="0.11.3"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.easy_producer.eclipse"
+         download-size="0"
+         install-size="0"
+         version="0.11.3"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.ivml"
+         download-size="0"
+         install-size="0"
+         version="0.10.3"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.ivml.ui"
+         download-size="0"
+         install-size="0"
+         version="0.10.3"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.utils"
+         download-size="0"
+         install-size="0"
+         version="0.4.3"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.varModel"
+         download-size="0"
+         install-size="0"
+         version="0.11.3"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.vil.buildlang"
+         download-size="0"
+         install-size="0"
+         version="0.5.3"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.vil.expressions"
+         download-size="0"
+         install-size="0"
+         version="0.5.3"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.vil.templatelang"
+         download-size="0"
+         install-size="0"
+         version="0.5.3"
+         unpack="false"/>
+
+   <plugin
+         id="RepositoryConnector"
+         download-size="0"
+         install-size="0"
+         version="1.0.1"
+         unpack="false"/>
+
+   <plugin
+         id="ReasonerCore"
+         download-size="0"
+         install-size="0"
+         version="0.10.3"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni-hildesheim.sse.easy.instantiator.velocity"
+         download-size="0"
+         install-size="0"
+         version="1.8.2"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.easy.instantiator.java"
+         download-size="0"
+         install-size="0"
+         version="0.2.3"
+         unpack="false"/>
+
+   <plugin
+         id="pipelineGEditor"
+         download-size="0"
+         install-size="0"
+         version="1.0.1"
+         unpack="false"/>
+
+   <plugin
+         id="pipelineGEditor.diagram"
+         download-size="0"
+         install-size="0"
+         version="1.0.0.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="pipelineGEditor.edit"
+         download-size="0"
+         install-size="0"
+         version="1.0.1"
+         unpack="false"/>
+
+   <plugin
+         id="pipelineGEditor.editor"
+         download-size="0"
+         install-size="0"
+         version="1.0.1"
+         unpack="false"/>
+
+   <plugin
+         id="QualiMasterApplication"
+         download-size="0"
+         install-size="0"
+         version="0.6.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.reasoning.reasoner"
+         download-size="0"
+         install-size="0"
+         version="0.0.2"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.easy.instantiator.maven"
+         download-size="0"
+         install-size="0"
+         version="3.2.3.0"
+         unpack="false"/>
+
+   <plugin
+         id="eu.qualimaster.ManifestUtils"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni-hildesheim.sse.easy.instantiatorCore.rt"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.easy.instantiator.ant"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.easy.instantiator.aspectj"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="QualiMaster.Extension"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.varModel.persistency"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.vil.templatelang.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.dslCore.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.gmf.runtime.lite"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.gmf.runtime.lite.svg"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.gmf.tooling.runtime"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.commons.io"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="javax.xml"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.xerces"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.xml.resolver"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.xml.serializer"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.w3c.dom.events"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.w3c.dom.smil"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.vil.buildlang.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="de.uni_hildesheim.sse.vil.expressions.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
