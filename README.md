@@ -1,6 +1,6 @@
 # QM-IConf
-The QualiMaster infrastructure configuration tool (QM-IConf) allows configuring the QualiMaster infrastructure as well as the data analysis pipelines
-running on a certain infrastructure. In particular, it allows configuring data analysis pipelines in a graphical drag-and-drop fashion and enables
+The QualiMaster (http://qualimaster.eu) infrastructure configuration tool (QM-IConf) allows configuring the QualiMaster infrastructure (https://github.com/QualiMaster/Infrastructure) as 
+well as the data analysis pipelines running on a certain infrastructure. In particular, it allows configuring data analysis pipelines in a graphical drag-and-drop fashion and enables
 the user to generate the respective pipeline code from the configuration. QM-IConf is a domain-specific graphical frontend for the Open Source product 
 line toolset EASy-Producer (https://github.com/SSEHUB/EASyProducer).
 
