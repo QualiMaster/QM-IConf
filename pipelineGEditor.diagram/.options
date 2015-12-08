@@ -1,0 +1,7 @@
+# Tracing options for the pipelineGEditor.diagram plug-in
+
+# Common issues
+pipelineGEditor.diagram/debug=false
+
+# Visual IDs
+pipelineGEditor.diagram/debug/visualID=false

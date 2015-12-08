@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="ASCII"?>
+<gmfgraph:Canvas xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gmfgraph="http://www.eclipse.org/gmf/2006/GraphicalDefinition" name="pipeline">
+  <figures name="Default">
+    <figures xsi:type="gmfgraph:PolylineDecoration" name="FlowFigureTargetDecoration"/>
+    <descriptors name="SourceFigure">
+      <actualFigure xsi:type="gmfgraph:SVGFigure" name="SourceFigure" documentURI="platform:/plugin/pipelineGEditor/svg/source.svg">
+        <preferredSize dx="60" dy="60"/>
+        <border xsi:type="gmfgraph:MarginBorder">
+          <insets top="5" left="5" bottom="5" right="5"/>
+        </border>
+      </actualFigure>
+    </descriptors>
+    <descriptors name="SourceLabelFigure">
+      <actualFigure xsi:type="gmfgraph:Label" name="SourceLabelFigure" text="Source"/>
+    </descriptors>
+    <descriptors name="SinkFigure">
+      <actualFigure xsi:type="gmfgraph:SVGFigure" name="SinkFigure" documentURI="platform:/plugin/pipelineGEditor/svg/sink.svg">
+        <preferredSize dx="55" dy="55"/>
+        <border xsi:type="gmfgraph:MarginBorder">
+          <insets top="5" left="5" bottom="5" right="5"/>
+        </border>
+      </actualFigure>
+    </descriptors>
+    <descriptors name="SinkLabelFigure">
+      <actualFigure xsi:type="gmfgraph:Label" name="SinkLabelFigure" text="Sink"/>
+    </descriptors>
+    <descriptors name="FamilyElementFigure">
+      <actualFigure xsi:type="gmfgraph:SVGFigure" name="FamilyElementFigure" documentURI="platform:/plugin/pipelineGEditor/svg/familyelement.svg">
+        <preferredSize dx="60" dy="60"/>
+        <border xsi:type="gmfgraph:MarginBorder">
+          <insets top="5" left="5" bottom="5" right="5"/>
+        </border>
+      </actualFigure>
+    </descriptors>
+    <descriptors name="FamilyElementLabelFigure">
+      <actualFigure xsi:type="gmfgraph:Label" name="FamilyElementLabelFigure" text="FamilyElement"/>
+    </descriptors>
+    <descriptors name="DataManagementElementFigure">
+      <actualFigure xsi:type="gmfgraph:SVGFigure" name="DataManagementElementFigure" documentURI="platform:/plugin/pipelineGEditor/svg/datamanagement.svg">
+        <preferredSize dx="60" dy="60"/>
+        <border xsi:type="gmfgraph:MarginBorder">
+          <insets top="5" left="5" bottom="5" right="5"/>
+        </border>
+      </actualFigure>
+    </descriptors>
+    <descriptors name="DataManagementElementLabelFigure">
+      <actualFigure xsi:type="gmfgraph:Label" name="DataManagementElementLabelFigure" text="DataManagementElement"/>
+    </descriptors>
+    <descriptors name="FlowFigure">
+      <actualFigure xsi:type="gmfgraph:PolylineConnection" name="FlowFigure" targetDecoration="//@figures.0/@figures.0"/>
+    </descriptors>
+    <descriptors name="FlowLabelFigure">
+      <actualFigure xsi:type="gmfgraph:Label" name="FlowLabelLabel" text="Flow"/>
+    </descriptors>
+  </figures>
+  <nodes name="Source" figure="SourceFigure">
+    <facets xsi:type="gmfgraph:DefaultSizeFacet">
+      <defaultSize dx="60" dy="60"/>
+    </facets>
+  </nodes>
+  <nodes name="Sink" figure="SinkFigure">
+    <facets xsi:type="gmfgraph:DefaultSizeFacet">
+      <defaultSize dx="55" dy="55"/>
+    </facets>
+  </nodes>
+  <nodes name="FamilyElement" figure="FamilyElementFigure">
+    <facets xsi:type="gmfgraph:DefaultSizeFacet">
+      <defaultSize dx="60" dy="60"/>
+    </facets>
+  </nodes>
+  <nodes name="DataManagementElement" figure="DataManagementElementFigure">
+    <facets xsi:type="gmfgraph:DefaultSizeFacet">
+      <defaultSize dx="60" dy="60"/>
+    </facets>
+  </nodes>
+  <connections name="Flow" figure="FlowFigure"/>
+  <labels name="SourceLabel" figure="SourceLabelFigure" elementIcon="false"/>
+  <labels name="SinkLabel" figure="SinkLabelFigure" elementIcon="false"/>
+  <labels name="FamilyElementLabel" figure="FamilyElementLabelFigure" elementIcon="false"/>
+  <labels name="DataManagementElementLabel" figure="DataManagementElementLabelFigure" elementIcon="false"/>
+  <labels name="FlowLabel" figure="FlowLabelFigure" elementIcon="false"/>
+</gmfgraph:Canvas>

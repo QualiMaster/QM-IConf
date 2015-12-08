@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: QualiMaster Pipeline Editor - tests
+Bundle-SymbolicName: pipelineGEditor.tests;singleton:=true
+Bundle-Version: 1.0.1
+Bundle-ClassPath: .
+Bundle-Vendor: University of Hildesheim - SSE
+Bundle-Localization: plugin
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: pipeline.tests
+Require-Bundle: org.eclipse.core.runtime,
+ pipelineGEditor;visibility:=reexport,
+ org.eclipse.emf.ecore.xmi;visibility:=reexport,
+ org.junit;visibility:=reexport
+Bundle-ActivationPolicy: lazy

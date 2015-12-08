@@ -1,0 +1,56 @@
+@namespace(uri="pipeline", prefix="pipeline")
+package pipeline;
+
+@gmf.diagram
+class Pipeline {
+  val PipelineNode[*] nodes;
+  val Flow[*] flows;
+  attr String name = ""; // default for all strings
+  attr Integer numworkers = 1; // default from varModel?
+  attr String artifact = "";
+  attr String constraints = ""; // constraints as text separated by ";"
+  attr Integer debug = 1; // 1 = false in EASy editors :|
+  attr Integer fastSerialization = 1;// 1 = false in EASy editors :|
+}
+
+@gmf.node(label="name", label.icon="false", figure="svg", label.placement="external")
+abstract class PipelineElement {
+  attr String name = "";
+  attr String constraints = ""; // constraints as text separated by ";""
+}
+
+@gmf.link(label="name", source="source", target="destination", target.decoration="arrow")
+class Flow extends PipelineElement{
+  ref PipelineElement source; // not in IVML, required by diagram editor
+  ref PipelineElement destination;
+  attr Integer grouping = 0; // enums become integer holding the ordinal (count+1 = nullValue if supported)
+}
+
+@gmf.node()
+abstract class PipelineNode extends PipelineElement {
+  attr Integer parallelism = 1;
+}
+
+@gmf.node(figure="svg", svg.uri="platform:/plugin/pipelineGEditor/svg/source.svg", size="60,60")
+class Source extends PipelineNode {
+  attr Integer source = -1; // references become integers holding the global index of all defined variables, -1 is unselected, count+1 = nullValue if supported
+}
+
+@gmf.node(figure="svg", svg.uri="platform:/plugin/pipelineGEditor/svg/sink.svg", size="55,55")
+class Sink extends PipelineNode {
+  attr Integer sink = -1; // references become integer (see above)
+}
+
+@gmf.node()
+abstract class ProcessingElement extends PipelineNode {
+}
+
+@gmf.node(figure="svg", svg.uri="platform:/plugin/pipelineGEditor/svg/familyelement.svg", size="60,60")
+class FamilyElement extends ProcessingElement {
+  attr Integer family = -1; // references become integer (see above)
+}
+
+@gmf.node(figure="svg", svg.uri="platform:/plugin/pipelineGEditor/svg/datamanagement.svg", size="60,60")
+class DataManagementElement extends ProcessingElement {
+  attr Integer dataManagement = -1; // references become integer (see above)
+}

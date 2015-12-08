@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/pipelineGEditor/src" modelPluginID="pipelineGEditor"
+    modelName="Pipeline" importerID="org.eclipse.emf.importer.ecore" complianceLevel="6.0"
+    copyrightFields="false">
+  <foreignModel>pipeline.emf</foreignModel>
+  <genPackages prefix="Pipeline" disposableProviderFactory="true" ecorePackage="pipeline.ecore#/">
+    <genClasses ecoreClass="pipeline.ecore#//Pipeline">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference pipeline.ecore#//Pipeline/nodes"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference pipeline.ecore#//Pipeline/flows"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Pipeline/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Pipeline/numworkers"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Pipeline/artifact"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Pipeline/constraints"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Pipeline/debug"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Pipeline/fastSerialization"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="pipeline.ecore#//PipelineElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//PipelineElement/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//PipelineElement/constraints"/>
+    </genClasses>
+    <genClasses ecoreClass="pipeline.ecore#//Flow">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pipeline.ecore#//Flow/source"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pipeline.ecore#//Flow/destination"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Flow/grouping"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="pipeline.ecore#//PipelineNode">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//PipelineNode/parallelism"/>
+    </genClasses>
+    <genClasses ecoreClass="pipeline.ecore#//Source">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Source/source"/>
+    </genClasses>
+    <genClasses ecoreClass="pipeline.ecore#//Sink">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Sink/sink"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="pipeline.ecore#//ProcessingElement"/>
+    <genClasses ecoreClass="pipeline.ecore#//FamilyElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//FamilyElement/family"/>
+    </genClasses>
+    <genClasses ecoreClass="pipeline.ecore#//DataManagementElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//DataManagementElement/dataManagement"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>
