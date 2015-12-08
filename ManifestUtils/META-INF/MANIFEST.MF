@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ManifestUtils
+Bundle-SymbolicName: eu.qualimaster.ManifestUtils
+Bundle-Version: 0.0.1
+Bundle-Vendor: University of Hildesheim - SSE
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ClassPath: .,
+ lib/ivy-2.4.0.jar,
+ lib/bcprov-1.45.jar,
+ lib/ant-1.8.2.jar
+Export-Package: eu.qualimaster.manifestUtils,
+ eu.qualimaster.manifestUtils.data

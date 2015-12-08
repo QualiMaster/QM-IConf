@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ManifestUtils.Test
+Bundle-SymbolicName: eu.qualimaster.ManifestUtils.test
+Bundle-Version: 0.0.1
+Bundle-Vendor: University of Hildesheim - SSE
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Require-Bundle: eu.qualimaster.ManifestUtils;bundle-version="0.0.1",
+ org.junit;bundle-version="4.0.0"
+Import-Package: eu.qualimaster.manifestUtils
