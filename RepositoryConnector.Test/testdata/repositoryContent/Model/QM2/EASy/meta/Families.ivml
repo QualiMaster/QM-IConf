@@ -1,0 +1,15 @@
+project Families {
+	
+	import Algorithms;
+	
+	compound Family {
+		String name;
+		//setOf(Stream) input;  // constrain members
+		//setOf(Stream) output; // constrain members
+		// unclear member properties
+		setOf(refTo(Algorithm)) members; 
+	}
+	
+	setOf(refTo(Family)) families;
+	
+}

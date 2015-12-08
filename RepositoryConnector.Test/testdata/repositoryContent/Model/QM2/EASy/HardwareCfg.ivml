@@ -1,0 +1,37 @@
+project HardwareCfg {
+
+	import Hardware;
+	machines = {
+		Machine {
+			name = "a", 
+			memory = 1000000, 
+			processors = 4, 
+			frequency = 10, 
+			stormThreads = 5, 
+			ports = {
+				6700, 6701, 6702, 6703
+			}
+		}, Machine {
+			name = "b", 
+			memory = 1000000, 
+			processors = 4, 
+			frequency = 10, 
+			stormThreads = 5, 
+			ports = {
+				6700, 6701, 6702, 6703
+			}
+		}, Machine {
+			name = "d", 
+			memory = 1000000, 
+			processors = 4, 
+			frequency = 10, 
+			stormThreads = 5, 
+			ports = {
+				6700, 6701, 6702, 6703
+			}
+		}
+	};
+	freeze {
+		machines;
+	}
+}

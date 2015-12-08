@@ -1,0 +1,47 @@
+
+project AlgorithmsCfgL3S{
+	
+	import Algorithms;
+	
+	//Algorithms	
+	Algorithm aBatchSVM;
+	aBatchSVM={
+		name="batchSVM",
+		artifact="algs.SentimentTwitter_batch_SVM",
+		hwType=CardType.MAX
+	};
+	
+	Algorithm aStreamSVM;
+	aStreamSVM={
+		name="streamSVM",
+		artifact="algs.SentimentTwitter_stream_SVM",
+		hwType=CardType.MAX
+	};
+	
+	Algorithm aBatchDictionary;
+	aBatchDictionary={
+		name="batchDictionary",
+		artifact="algs.SentimentTwitter_batch_dictionary",
+		hwType=CardType.MAX
+	};
+	
+	Algorithm aStreamDictionary;
+	aStreamDictionary={
+		name="streamDictionary",
+		artifact="algs.SentimentTwitter_stream_dictionary",
+		hwType=CardType.MAX
+	};
+	
+	algorithms = {refBy(aBatchSVM), refBy(aStreamSVM), refBy(aBatchDictionary), refBy(aStreamDictionary)};
+	
+	freeze{
+		aBatchSVM;
+		aStreamSVM;
+		aBatchDictionary;
+		aStreamDictionary;
+	}
+		
+}
+
+
+

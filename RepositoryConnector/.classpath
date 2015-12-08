@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/antlr-runtime-3.4.jar"/>
+	<classpathentry kind="lib" path="lib/jaxb-api.jar"/>
+	<classpathentry kind="lib" path="lib/jaxb-core.jar"/>
+	<classpathentry kind="lib" path="lib/jaxb-impl.jar"/>
+	<classpathentry kind="lib" path="lib/jsch.agentproxy.connector-factory-0.0.7.jar"/>
+	<classpathentry kind="lib" path="lib/jsch.agentproxy.core-0.0.7.jar"/>
+	<classpathentry kind="lib" path="lib/jsch.agentproxy.pageant-0.0.7.jar"/>
+	<classpathentry kind="lib" path="lib/jsch.agentproxy.sshagent-0.0.7.jar"/>
+	<classpathentry kind="lib" path="lib/jsch.agentproxy.svnkit-trilead-ssh2-0.0.7.jar"/>
+	<classpathentry kind="lib" path="lib/jsch.agentproxy.usocket-jna-0.0.7.jar"/>
+	<classpathentry kind="lib" path="lib/jsch.agentproxy.usocket-nc-0.0.7.jar"/>
+	<classpathentry kind="lib" path="lib/platform-3.5.2.jar"/>
+	<classpathentry kind="lib" path="lib/sqljet-1.1.10.jar"/>
+	<classpathentry kind="lib" path="lib/trilead-ssh2-1.0.0-build217.jar"/>
+	<classpathentry kind="lib" path="lib/guava-18.0.jar"/>
+	<classpathentry kind="lib" path="lib/bcprov-1.45.jar"/>
+	<classpathentry kind="lib" path="lib/jna-4.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jna-platform-4.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/sequence-library-1.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/svnkit-1.8.7.jar"/>
+	<classpathentry kind="lib" path="lib/svnkit-cli-1.8.7.jar"/>
+	<classpathentry kind="lib" path="lib/svnkit-javahl16-1.8.7.jar"/>
+	<classpathentry kind="lib" path="lib/jsoup-1.6.0.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

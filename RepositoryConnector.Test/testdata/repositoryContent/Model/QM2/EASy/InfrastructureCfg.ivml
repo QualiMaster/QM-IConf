@@ -1,0 +1,16 @@
+project InfrastructureCfg {
+	
+	import Infrastructure;
+	import PipelinesCfg;
+	
+	pipeline = Pipeline {
+		name = "test",
+		sources = {refBy(src)},
+		numworkers=2
+	};
+	
+	freeze {
+	    pipeline;
+	} 
+     
+}

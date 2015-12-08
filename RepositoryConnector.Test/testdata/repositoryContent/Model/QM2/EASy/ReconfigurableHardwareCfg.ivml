@@ -1,0 +1,11 @@
+project ReconfigurableHardwareCfg {
+
+    import ReconfigurableHardware;	
+
+	clusters = {};
+	
+	freeze {
+		clusters;
+	}
+
+}

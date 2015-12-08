@@ -1,0 +1,15 @@
+project InfrastructureCfgTSI {
+	
+	import Infrastructure;
+	import PipelinesCfgTSI;
+	
+	pipeline = Pipeline {
+		name = "TSI",
+		sources = {refBy(src)}
+	};     
+	
+	freeze {
+	    pipeline;
+	}
+
+}

@@ -1,0 +1,7 @@
+project Basics {
+
+	typedef PositiveInteger Integer with (PositiveInteger > 0);
+	typedef NonEmptyString String with (NonEmptyString.size() > 0);
+	enum BindingTime {compile, startup, runtime};
+
+}

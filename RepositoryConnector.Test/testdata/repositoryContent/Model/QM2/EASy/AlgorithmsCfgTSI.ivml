@@ -1,0 +1,45 @@
+project AlgorithmsCfgTSI {
+
+    import ReconfigurableHardware;
+    import Algorithms;
+	
+    // algorithms
+
+    Algorithm aNormalize;
+    aNormalize = {
+    	name = "normalize",
+    	artifact = "integration.algs.Normalize",
+    	hwType = CardType.MAX
+    };
+    
+    Algorithm aAdd10;
+    aAdd10 = {
+    	name = "add10",
+    	artifact = "integration.algs.Add10",
+    	hwType = CardType.MAX
+    };
+  
+    Algorithm aDouble;
+    aDouble = {
+    	name = "double",
+    	artifact = "integration.algs.DoubleMaxeler",
+    	hwType = CardType.MAX2 // just preliminary link to HW
+    };
+	
+    Algorithm aShow;
+    aShow = {
+    	name = "showResult",
+    	artifact = "integration.algs.ShowResult",
+    	hwType = CardType.MAX
+    };
+    
+    algorithms = {refBy(aNormalize), refBy(aAdd10), refBy(aDouble), refBy(aShow)};
+    
+	freeze {
+		aNormalize;
+		aAdd10;
+		aDouble;
+		aShow;
+    }
+	
+}

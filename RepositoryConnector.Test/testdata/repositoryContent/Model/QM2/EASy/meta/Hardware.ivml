@@ -1,0 +1,17 @@
+project Hardware {
+
+    import Basics;
+	
+	compound Machine {
+		NonEmptyString name;
+		PositiveInteger memory;       // open
+		PositiveInteger processors;   // open
+		PositiveInteger frequency;    // open
+		PositiveInteger stormThreads; // from TSI
+		setOf(PositiveInteger) ports;
+	}
+	
+	  
+	setOf(Machine) machines;
+
+}

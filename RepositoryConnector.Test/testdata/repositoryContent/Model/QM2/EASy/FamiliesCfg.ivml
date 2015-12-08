@@ -1,0 +1,26 @@
+project FamiliesCfg {
+
+    import Algorithms;	
+	import Families;
+	import AlgorithmsCfg;
+
+	Family causality;
+    causality = {
+		name = "causality",
+		members = {refBy(alg_c1), refBy(alg_c2), refBy(alg_c3)}
+	};
+
+	Family filter;
+	filter = {
+		name = "filter",
+		members = {refBy(alg_f1), refBy(alg_f2)}
+	};
+
+    families = { refBy(causality), refBy(filter) };
+	
+	freeze {
+		causality;
+		families;
+    }
+	
+}

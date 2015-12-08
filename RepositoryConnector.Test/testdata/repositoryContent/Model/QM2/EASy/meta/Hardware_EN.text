@@ -1,0 +1,6 @@
+Hardware::Machine::name = network name
+Hardware::Machine::memory = total amount of memory
+Hardware::Machine::processors = number of processors
+Hardware::Machine::frequency = maximum processor frequency
+Hardware::Machine::stormThreads = maximum number of storm threads
+Hardware::machines = all available machines for software execution

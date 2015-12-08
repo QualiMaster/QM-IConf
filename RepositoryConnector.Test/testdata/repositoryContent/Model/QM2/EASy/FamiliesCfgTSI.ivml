@@ -1,0 +1,42 @@
+project FamiliesCfgTSI {
+
+    import ReconfigurableHardware;	
+	import Families;
+	import AlgorithmsCfgTSI;
+	
+    // families	
+	
+	Family fNormalize;
+    fNormalize = {
+		name = "normalize",
+		members = {refBy(aNormalize)}
+	};
+
+    Family fAdd10;
+    fAdd10 = {
+		name = "add10",
+		members = {refBy(aAdd10)}
+    };
+    
+    Family fDouble;
+    fDouble = {
+		name = "double",
+		members = {refBy(aDouble)}
+    };
+    
+    Family fShow;
+    fShow = {
+		name = "showResult",
+		members = {refBy(aShow)}
+    };    
+
+    families = { refBy(fNormalize), refBy(fAdd10), refBy(fDouble), refBy(fShow) };
+	
+	freeze {
+		fNormalize;
+		fAdd10;
+		fDouble;
+		fShow;
+    }
+	
+}

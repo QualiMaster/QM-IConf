@@ -1,0 +1,28 @@
+
+project FamiliesCfgL3S{
+	
+	import Families;
+	import AlgorithmsCfgL3S;
+	
+	//Families
+	Family fSentimentTwitterBatch;
+	fSentimentTwitterBatch={
+		name="sentiment_twitter_batch",
+		members={refBy(aBatchSVM),refBy(aBatchDictionary)}
+	};
+	
+	Family fSentimentTwitterStream;
+	fSentimentTwitterStream={
+		name="sentiment_twitter_stream",
+		members={refBy(aStreamSVM),refBy(aStreamDictionary)}
+	};
+	
+	freeze{
+		fSentimentTwitterBatch;
+		fSentimentTwitterStream;
+	}
+		
+}
+
+
+

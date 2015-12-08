@@ -1,0 +1,90 @@
+project PipelinesCfgTSI {
+
+	import Pipelines;
+	import FamiliesCfgTSI;
+
+	Source src;
+    Sink snk;
+	FamilyElement peNormalize;
+	FamilyElement peAdd10;
+	FamilyElement peDouble;
+	FamilyElement peShow;
+
+	Flow f1;
+	f1 = {
+		name = "src-normalize",
+		destination = refBy(peNormalize)
+	};
+	
+	Flow f2;     
+	f2 = {
+		name = "normalize-fAdd",
+		destination = refBy(peAdd10)
+	};
+     
+	Flow f3;
+	f3 = {
+		name = "fAdd-double",
+		destination = refBy(peDouble)
+	};
+	
+	Flow f4;
+	f4 = {
+		name = "double-show",
+		destination = refBy(peShow)
+	};
+	
+	
+	Flow f5;
+	f5 = {
+		name = "show-snk",
+		destination = refBy(snk)
+	};
+
+    src.test = "src";
+	src.output = {refBy(f1)};
+
+	peNormalize.test="peNormalize";
+	peNormalize.family = refBy(fNormalize);
+	peNormalize.output = {refBy(f2)}; 
+
+	peAdd10.test="peAdd10";
+	peAdd10.family = refBy(fAdd10);
+	peAdd10.output = {refBy(f3)}; 
+
+    peDouble.test="peDouble";
+    peDouble.family = refBy(fDouble);
+    peDouble.output = {refBy(f4)};
+    
+    peShow.test="peShow";
+    peShow.family = refBy(fShow);
+    peShow.output = {refBy(f5)};
+
+    snk.test = "snk";
+
+	Pipeline p; // this was a default value :(:(:( 
+	p = Pipeline {
+		name = "TSI",
+		sources = {refBy(src)}
+	};
+	
+
+    pipelines = {refBy(p)};
+	
+	freeze {
+        f1;
+        f2;
+        f3;
+        f4;
+        f5;
+        src;
+        snk;
+        peNormalize;
+        peAdd10;
+        peDouble;
+        peShow;
+        p;
+		pipelines;
+    }
+
+}

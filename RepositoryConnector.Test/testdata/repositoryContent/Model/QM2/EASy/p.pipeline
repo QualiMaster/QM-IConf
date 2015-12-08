@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pipeline:Pipeline xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pipeline="pipeline">
+  <nodes xsi:type="pipeline:Sink" name="test"/>
+  <nodes xsi:type="pipeline:Sink" name="test2"/>
+  <nodes xsi:type="pipeline:DataManagementElement" name="asdfasdf"/>
+</pipeline:Pipeline>

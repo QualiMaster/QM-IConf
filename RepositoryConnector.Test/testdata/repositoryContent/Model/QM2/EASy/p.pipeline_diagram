@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmlns:pipeline="pipeline" xmi:id="_LzhNMCIEEeSuuJuhtw2FQg" type="Pipeline" name="p.pipeline_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Shape" xmi:id="_Y7McwCLCEeSRE88kVjE7FA" type="2002">
+    <children xmi:type="notation:DecorationNode" xmi:id="_Y7U_oCLCEeSRE88kVjE7FA" type="5002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_Y7U_oSLCEeSRE88kVjE7FA" x="-20" y="60"/>
+    </children>
+    <element xmi:type="pipeline:Sink" href="p.pipeline#//@nodes.0"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Y7McwSLCEeSRE88kVjE7FA" x="389" y="113"/>
+  </children>
+  <children xmi:type="notation:Shape" xmi:id="_WG8n8CLMEeSvPciUQozsTQ" type="2002">
+    <children xmi:type="notation:DecorationNode" xmi:id="_WG9PACLMEeSvPciUQozsTQ" type="5002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_WG9PASLMEeSvPciUQozsTQ" y="5"/>
+    </children>
+    <element xmi:type="pipeline:Sink" href="p.pipeline#//@nodes.1"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_WG8n8SLMEeSvPciUQozsTQ" x="391" y="285"/>
+  </children>
+  <children xmi:type="notation:Shape" xmi:id="_eaJNMCLMEeSvPciUQozsTQ" type="2006">
+    <children xmi:type="notation:DecorationNode" xmi:id="_eaJNMiLMEeSvPciUQozsTQ" type="5006">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_eaJNMyLMEeSvPciUQozsTQ" y="5"/>
+    </children>
+    <element xmi:type="pipeline:DataManagementElement" href="p.pipeline#//@nodes.2"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_eaJNMSLMEeSvPciUQozsTQ" x="356" y="76"/>
+  </children>
+  <styles xmi:type="notation:DiagramStyle" xmi:id="_LzhNMSIEEeSuuJuhtw2FQg"/>
+  <element xmi:type="pipeline:Pipeline" href="p.pipeline#/"/>
+</notation:Diagram>
