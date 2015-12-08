@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ConfigurationTool" default="all" basedir=".">	
+	<property file="${user.home}/global-build.properties"/>
+	<property file="${user.home}/qualimaster-build.properties"/>
+	<path id="emma.lib" >    		
+		<pathelement location="${emma.path}/emma.jar" />	
+		<pathelement location="${emma.path}/emma_ant.jar" />	
+	</path>
+	<taskdef resource="emma_ant.properties" classpathref="emma.lib" />
+    
+    <!-- Indivdual properties for this build script -->
+    <property name="test.plugin.instantiation" value="de.uni-hildesheim.sse.easy.instantiatorCore.tests"/>
+    <property name="test.suite.instantiation" value="test.AllTests"/>
+    <property name="test.plugin.instantiation.java" value="de.uni_hildesheim.sse.easy.instantiator.java.test"/>
+    <property name="test.suite.instantiation.java" value="test.de.uni_hildesheim.sse.java.AllTests"/>
+    <property name="test.plugin.vil" value="de.uni_hildesheim.sse.vil.buildlang.tests"/>
+    <property name="test.suite.vil" value="test.de.uni_hildesheim.sse.vil.buildlang.AllTests"/>
+    <property name="test.plugin.template" value="de.uni_hildesheim.sse.vil.templatelang.tests"/>
+    <property name="test.suite.template" value="test.de.uni_hildesheim.sse.vil.templatelang.AllTests"/>
+	<property name="test.plugin.repositoryConnector" value="de.uni_hildesheim.sse.svn.connector.test"/>
+    <property name="test.suite.repositoryConnector" value="de.uni_hildesheim.sse.repositoryConnector.AllTests"/>
+    
+	<target name="init">
+		<!-- Delete generated folders -->
+		<delete dir="junitResults"/>
+		<delete dir="${coverage.base.dir}"/>
+		<delete dir="${doc.dir}"/>
+		
+		<!-- Create folders -->
+		<mkdir dir="junitResults"/>
+		<mkdir dir="${coverage.base.dir}"/>
+		<mkdir dir="${coverage.instr.dir}"/>
+		<mkdir dir="${coverage.results.dir}"/>
+		<mkdir dir="${doc.dir}"/>
+	</target>
+	
+	<target name="compile">
+        <echo>#####################################</echo>
+        <echo>### Compiling Repository Connector ##</echo>
+        <echo>#####################################</echo>
+        <ant dir="${home.RepositoryConnector.java.dir}" antfile="${build.script.name}" />
+        <ant dir="${home.RepositoryConnector.test.dir}" antfile="${build.script.name}" />
+
+        <echo>#####################################</echo>
+        <echo>###    Compiling ManifestUtils     ##</echo>
+        <echo>#####################################</echo>
+        <ant dir="${home.ManifestUtils.java.dir}" antfile="${build.script.name}" />
+        <ant dir="${home.RepositoryConnector.test.dir}" antfile="${build.script.name}" />
+        
+        <echo>#######################################</echo>
+        <echo>###   Compiling PipelineEditor      ###</echo>
+        <echo>#######################################</echo>
+        <ant dir="${home.pipelineGEditor.java.dir}" antfile="${build.script.name}" />
+		<ant dir="${home.pipelineGEditor.edit.java.dir}" antfile="${build.script.name}" />
+		<ant dir="${home.pipelineGEditor.editor.java.dir}" antfile="${build.script.name}" />
+		<ant dir="${home.pipelineGEditor.diagram.java.dir}" antfile="${build.script.name}" />
+		
+        <echo>##############################################</echo>
+        <echo>###  Compiling Configuration Application   ###</echo>
+        <echo>##############################################</echo>
+        <ant dir="${home.QualiMasterApplication.java.dir}" antfile="${build.script.name}" />
+    </target>
+	
+	<!-- FOLLOWING MUST BE ADAPTED -> TESTING -->
+	
+	<target name="instrument">
+		<emma enabled="true" verbosity="verbose">
+			<instr destdir="${coverage.instr.dir}" metadatafile="${coverage.results.dir}/metadata.emma" mode="fullcopy" >
+				<filter includes="*de.uni_hildesheim.sse*"/>
+				<filter excludes="*Activator*"/>
+				<filter excludes="*AllTests*"/>
+				<filter excludes="de.uni_hildesheim.sse.parser.antlr.internal.*"/>
+				<filter excludes="de.uni_hildesheim.sse.vil.templatelang.parser.antlr.internal.*"/>
+				<instrpath>
+				    <fileset dir="${home.RepositoryConnector.java.dir}/${build.jar.dir}/" includes="**/*.jar" />
+				    <fileset dir="${home.RepositoryConnector.test.dir}/${build.jar.dir}/" includes="**/*.jar" />
+				</instrpath>
+			</instr>
+		</emma>
+	</target>
+	
+	<target name="prepareTestEclipse" if="${unzipNewEclipse}">
+		<delete dir="${test.eclipse.name}"/>
+		<mkdir dir="${test.eclipse.name}"/>
+		<mkdir dir="${test.eclipse.workspace.dir}"/>
+		<unzip src="${test.eclipse.zip}" dest="${test.eclipse.name}"/>
+	</target>
+	
+	<target name="copy.to.eclipse">
+		<condition property="test.eclipse.path" value="${basedir}/${test.eclipse.name}">
+			<istrue value="${unzipNewEclipse}"/>
+		</condition>
+		<condition property="test.eclipse.path" value="${alternative.test.eclipse.dir}">
+			<isfalse value="${unzipNewEclipse}"/>
+		</condition>
+		<antcall target="prepareTestEclipse"/>
+		
+        <!-- Copy needed plug-ins and libaries to test eclipse -->
+		<copy todir="${test.eclipse.path}/plugins" failonerror="true" overwrite="true">
+			<fileset dir="${coverage.instr.dir}/lib"/>
+            <!-- Model -->
+            <fileset dir="${home.utils.dir}/${build.jar.dir}" includes="**/*.jar" />
+            <fileset dir="${home.model.dir}/${build.jar.dir}" includes="**/*.jar" />
+            <fileset dir="${home.model.tests.dir}/${build.jar.dir}" includes="**/*.jar" />
+            <!-- Reasoner (Check whether Drools2 is needed) -->
+			<fileset dir="${home.reasonerCore.dir}/${build.jar.dir}" includes="**/*.jar" />
+			<fileset dir="${home.drools2.dir}/${build.jar.dir}" includes="**/*.jar" />
+			<!-- IVML Parser -->
+            <fileset dir="${home.dslCore.dir}/${build.jar.dir}" includes="**/*.jar" />
+            <fileset dir="${home.ivml.dir}/${build.jar.dir}" includes="**/*.jar" />
+            <fileset dir="${home.ivml.tests.dir}/${build.jar.dir}" includes="**/*.jar" />
+		</copy>
+	</target>
+	
+	<target name="coreTestEMMA" depends="instrument, copy.to.eclipse">
+		<property name="eclipse-home" value="${test.eclipse.path}"/>
+		<!-- Repository connector test -->
+        <ant target="core-test" antfile="plugins/${test.eclipse.testFW.dir}/library.xml" dir="${test.eclipse.path}">
+		  <property name="data-dir" value="${test.eclipse.workspace.dir}"/>
+		  <property name="plugin-name" value="${test.plugin.repositoryConnector}"/>
+		  <property name="classname" value="${test.suite.repositoryConnector}"/>
+		  <property name="vmargs" value="-Dbaz=true"/>
+		  <property name="extraVMargs" value="-XX:-UseSplitVerifier -Demma.coverage.out.file=${basedir}/${coverage.results.dir}/${ant.project.name}.emma -Dosgi.dev=${emma.path}/emma.jar -Dde.uni_hildesheim.sse.svn.connector.test.testdata=${home.RepositoryConnector.test.dir}/testdata" />
+		  <property name="os" value="win32"/>
+		  <property name="ws" value="win32"/>
+		  <property name="arch" value="x86"/>
+		  <property name="timeout" value="480000"/>
+		</ant>
+	</target>
+	
+	<target name="emmaReport" depends="coreTestEMMA">
+		<emma enabled="true" verbosity="verbose">
+			<report>
+				<property name="report.html.out.encoding" value="UTF-8"/>
+				<sourcepath>
+                    <pathelement path="${home.RepositoryConnector.test.dir}/src/"/>
+                    <pathelement path="${home.RepositoryConnector.java.dir}/src/"/>
+				</sourcepath>
+		        <fileset dir="${coverage.results.dir}" >
+		          <include name="*.emma" />
+		        </fileset>
+
+		        <xml outfile="${coverage.results.dir}/coverage.xml" depth="method"/>
+		        <html outfile="${coverage.results.dir}/coverage.html" />
+		      </report>
+	    </emma>
+	</target> 
+	
+	<target name="test" depends="emmaReport">
+		<!-- Gather Junit results -->
+		<copy todir="junitResults" failonerror="true" overwrite="true">
+			<fileset dir="${test.eclipse.path}/results/">
+				<include name="**/*.xml" />
+			</fileset>
+		</copy>
+	</target>		
+		
+	<target name="all" depends="init, compile, test"/> <!-- , test is for Aike -->
+	<target name="only.compile" depends="init, compile"/>
+</project>
