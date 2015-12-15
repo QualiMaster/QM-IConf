@@ -6,6 +6,7 @@ import java.util.Set;
 import de.uni_hildesheim.sse.model.confModel.Configuration;
 import de.uni_hildesheim.sse.model.confModel.IConfigurationVisitor;
 import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
+import de.uni_hildesheim.sse.model.cst.AttributeVariable;
 import de.uni_hildesheim.sse.model.cst.Comment;
 import de.uni_hildesheim.sse.model.cst.CompoundAccess;
 import de.uni_hildesheim.sse.model.cst.CompoundInitializer;
@@ -181,6 +182,12 @@ class IsReferencedVisitor implements IConfigurationVisitor, IValueVisitor, ICons
     public void visitVariable(Variable variable) {
         isReferenced |= variable.getVariable() == decl;
     }
+    
+    @Override
+    public void visitAnnotationVariable(AttributeVariable variable) {
+        // TODO Check whether specific method is needed
+        visitVariable(variable);
+    }
 
     @Override
     public void visitParenthesis(Parenthesis parenthesis) {
@@ -246,5 +253,4 @@ class IsReferencedVisitor implements IConfigurationVisitor, IValueVisitor, ICons
     @Override
     public void visitSelf(Self self) {
     }
-
 }
