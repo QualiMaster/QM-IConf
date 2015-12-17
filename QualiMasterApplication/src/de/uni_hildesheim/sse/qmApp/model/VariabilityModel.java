@@ -395,7 +395,7 @@ public class VariabilityModel {
      */
     public static void createConfigurationElements(ConfigurableElements elements) {
         QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.BASICS, "Types");
-        elements.variableToConfigurableElements(Configuration.BASICS, "de.uni_hildesheim.sse.qmApp.TypeEditor");
+        elements.variableToConfigurableElements(Configuration.BASICS, "de.uni_hildesheim.sse.qmApp.TypesEditor");
         
         QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.HARDWARE, 
             "General-purpose Machines");
