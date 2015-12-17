@@ -60,7 +60,8 @@ public class ConfigurableElements {
         
         // ensure that there is an element
         if (null == element) {
-            element = new ConfigurableElement(displayName, modelEditorId, null, modelPart);
+            element = new ConfigurableElement(displayName, modelEditorId,
+                new VarModelEditorInputCreator(modelPart, displayName), modelPart);
             element.setImage(ImageRegistry.INSTANCE.getImage(modelPart));
         }
         elements.add(element);
