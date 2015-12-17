@@ -61,8 +61,10 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
         if (input instanceof DecisionVariableEditorInput) {
             this.input = (DecisionVariableEditorInput) input;
             var = this.input.getVariable();
-            VarModel.INSTANCE.events().addModelListener(var.getConfiguration().getProject(), this);
-            setConfiguration(var.getConfiguration());
+            if (null != var) {
+                VarModel.INSTANCE.events().addModelListener(var.getConfiguration().getProject(), this);
+                setConfiguration(var.getConfiguration());
+            }
         } else {
             throw new PartInitException("wrong editor input");
         }
@@ -70,8 +72,9 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     
     @Override
     public void dispose() {
-        VarModel.INSTANCE.events().removeModelListener(var.getConfiguration().getProject(), this);
-        
+        if (null != var) {
+            VarModel.INSTANCE.events().removeModelListener(var.getConfiguration().getProject(), this);
+        }
         for (Control key: flawedControls.keySet()) {
             ControlDecoration decoration = flawedControls.get(key);
             decoration.hide();
