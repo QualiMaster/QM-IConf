@@ -2,6 +2,7 @@ package de.uni_hildesheim.sse.qmApp.editors;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -46,7 +47,7 @@ public class MultipleLineText {
      * 
      * @author Niko
      */
-    private static class MultiLineComposite extends Composite implements ITextUpdater, IFixedLayout {
+    private static class MultiLineComposite extends Composite implements ITextUpdater, IFixedLayout, IDirtyableEditor {
 
         private Text textField;
         
@@ -112,6 +113,16 @@ public class MultipleLineText {
          */
         public void doSetFocus() {
             textField.setFocus();
+        }
+
+        @Override
+        public void addDirtyListener(SelectionListener listener) {
+            textField.addSelectionListener(listener);
+        }
+
+        @Override
+        public void removeDirtyListener(SelectionListener listener) {
+            textField.removeSelectionListener(listener);
         }
 
     }

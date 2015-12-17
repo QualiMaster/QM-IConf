@@ -4,6 +4,7 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -50,7 +51,7 @@ public class ArtifactEditor {
      * 
      * @author Holger Eichelberger
      */
-    private static class ArtifactComposite extends Composite implements ITextUpdater {
+    private static class ArtifactComposite extends Composite implements ITextUpdater, IDirtyableEditor {
 
         private Text textField;
         private Button button;
@@ -152,6 +153,16 @@ public class ArtifactEditor {
          */
         public Object getValue() {
             return textField.getText();
+        }
+
+        @Override
+        public void addDirtyListener(SelectionListener listener) {
+            textField.addSelectionListener(listener);
+        }
+
+        @Override
+        public void removeDirtyListener(SelectionListener listener) {
+            textField.removeSelectionListener(listener);
         }
 
     }

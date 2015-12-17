@@ -8,11 +8,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -55,40 +50,8 @@ public abstract class AbstractVarModelEditor extends EditorPart implements IChan
     private DelegatingEasyEditorPage parent;
     private List<Control> editors = new ArrayList<Control>();
     private boolean enableChangeEventProcessing = true;
-    private DirtyListener dirtyListener = new DirtyListener();
+    private DirtyListener dirtyListener;
 
-    /**
-     * A listener that turns the editor into the dirty state.
-     * 
-     * @author Holger Eichelberger
-     */
-    private class DirtyListener implements KeyListener, SelectionListener {
-        
-        @Override
-        public void keyReleased(KeyEvent event) {
-            boolean strgS = (SWT.CTRL == (event.stateMask & SWT.CTRL)) && ('s' == event.keyCode);
-            // TODO check
-            boolean prevent = event.keyCode == 262144 && event.stateMask == 262144; // occurs after strg+s, unkown
-            if (!strgS && !prevent) {
-                parent.setDirty(); // this is dirty listener -> fire property change
-            }
-        }
-        
-        @Override
-        public void keyPressed(KeyEvent event) {
-        }
-
-        @Override
-        public void widgetSelected(SelectionEvent event) {
-            parent.setDirty(); // this is dirty listener -> fire property change
-        }
-
-        @Override
-        public void widgetDefaultSelected(SelectionEvent event) {
-        }
-        
-    };
-    
     @Override
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         setSite(site);
@@ -155,6 +118,7 @@ public abstract class AbstractVarModelEditor extends EditorPart implements IChan
     @Override
     public void createPartControl(Composite parent) {
         this.parent = new DelegatingEasyEditorPage(parent, this);
+        this.dirtyListener = new DirtyListener(this.parent);
         uiCfg = ConfigurationTableEditorFactory.createConfiguration(cfg, getParent(), getUiParameter());
         ChangeManager.INSTANCE.addListener(this);
     }
