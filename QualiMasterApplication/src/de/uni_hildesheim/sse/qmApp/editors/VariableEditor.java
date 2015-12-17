@@ -3,12 +3,12 @@ package de.uni_hildesheim.sse.qmApp.editors;
 
 import java.util.HashMap;
 
-import org.eclipse.gmf.runtime.diagram.ui.parts.DiagramEditor;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -23,7 +23,6 @@ import org.eclipse.swt.widgets.ToolTip;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 
 import de.uni_hildesheim.sse.easy_producer.instantiator.Bundle;
 import de.uni_hildesheim.sse.model.confModel.Configuration;
@@ -50,6 +49,8 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     private static HashMap<Control, ControlDecoration> flawedControls = new HashMap<Control, ControlDecoration>();
     
     private static final String COMPOSITE_STRING = "class org.eclipse.swt.widgets.Composite";
+    private static final int PREFERED_WIDTH = 400;
+    
     private DecisionVariableEditorInput input;
     private IDecisionVariable var;
     
@@ -92,7 +93,7 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     public final void createPartControl(Composite parent) {
     
         ScrolledComposite scroll = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
-        scroll.setExpandHorizontal(true);
+        scroll.setExpandHorizontal(false);
         
         final Composite inner = new Composite(scroll, SWT.NONE);
         scroll.setContent(inner);
@@ -117,7 +118,9 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
         collectTextFields(inner);
         applyGridData(inner);
         considerReasoningResults(inner);
-        inner.setSize(inner.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+        Point p = inner.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+        p.x = Math.max(p.x, PREFERED_WIDTH);
+        inner.setSize(p);
         inner.layout();
         
 //        inner.addKeyListener(new KeyAdapter() {
