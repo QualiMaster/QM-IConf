@@ -15,8 +15,6 @@
  */
 package de.uni_hildesheim.sse.qmApp.editors;
 
-import org.eclipse.swt.events.SelectionListener;
-
 /**
  * An editor that notifies others when becoming dirty.
  * 
@@ -25,17 +23,17 @@ import org.eclipse.swt.events.SelectionListener;
 public interface IDirtyableEditor {
     
     /**
-     * Adds a selection listener to be notified if the editor becomes dirty.
+     * Adds a dirty listener to be notified if the editor becomes dirty.
      * 
      * @param listener the listener
      */
-    public void addDirtyListener(SelectionListener listener);
+    public void addDirtyListener(DirtyListener listener);
 
     /**
-     * Removes a selection listener to be notified if the editor becomes dirty.
+     * Removes a dirty listener to be notified if the editor becomes dirty.
      * 
      * @param listener the listener
      */
-    public void removeDirtyListener(SelectionListener listener);
+    public void removeDirtyListener(DirtyListener listener);
 
 }

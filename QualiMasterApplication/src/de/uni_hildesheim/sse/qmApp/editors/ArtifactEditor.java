@@ -4,7 +4,6 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -15,9 +14,14 @@ import org.eclipse.ui.PlatformUI;
 
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.IEditorCreator;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
+import de.uni_hildesheim.sse.easy.ui.productline_editor.IOverridingEditor;
 import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
+import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
+import de.uni_hildesheim.sse.model.varModel.datatypes.StringType;
 import de.uni_hildesheim.sse.model.varModel.values.StringValue;
 import de.uni_hildesheim.sse.model.varModel.values.Value;
+import de.uni_hildesheim.sse.model.varModel.values.ValueDoesNotMatchTypeException;
+import de.uni_hildesheim.sse.model.varModel.values.ValueFactory;
 import de.uni_hildesheim.sse.qmApp.dialogs.MavenArtifactEditor;
 
 /**
@@ -51,12 +55,13 @@ public class ArtifactEditor {
      * 
      * @author Holger Eichelberger
      */
-    private static class ArtifactComposite extends Composite implements ITextUpdater, IDirtyableEditor {
+    private static class ArtifactComposite extends Composite implements ITextUpdater, IDirtyableEditor, 
+        IOverridingEditor {
 
         private Text textField;
         private Button button;
         private UIConfiguration config;
-        private String artifactSpec;
+        private IDecisionVariable variable;
 
         /**
          * Creates an artifact editor instance.
@@ -69,6 +74,7 @@ public class ArtifactEditor {
         ArtifactComposite(UIConfiguration config, IDecisionVariable variable, Composite parent, boolean cell) {
             super(parent, SWT.FILL);
             this.config = config;
+            this.variable = variable;
 
             GridLayout layout = new GridLayout();
             layout.marginRight = -layout.marginWidth;
@@ -89,14 +95,7 @@ public class ArtifactEditor {
                 data.widthHint = 80;
             }
             textField.setLayoutData(data);
-            artifactSpec = null;
-            if (null != variable) {
-                Value value = variable.getValue();
-                if (value instanceof StringValue) { // we know this from the model
-                    artifactSpec = ((StringValue) value).getValue();
-                    textField.setText(artifactSpec);
-                }
-            }
+            updateFromValueText();
              
             button = new Button(this, SWT.NONE);
             button.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
@@ -108,6 +107,7 @@ public class ArtifactEditor {
                 public void widgetSelected(SelectionEvent exc) {
                     MavenArtifactEditor dlg = new MavenArtifactEditor(
                         PlatformUI.getWorkbench().getDisplay().getActiveShell(), ArtifactComposite.this);
+                    String artifactSpec = textField.getText();
                     if (null != artifactSpec) {
                         dlg.setInitialTreePath(artifactSpec);
                     }
@@ -116,6 +116,8 @@ public class ArtifactEditor {
             });
             
         }
+        
+        
 
         /**
          * Update the text.
@@ -136,7 +138,6 @@ public class ArtifactEditor {
          */
         public void setValue(String artifactSpec) {
             updateText(artifactSpec);
-            this.artifactSpec = artifactSpec;
         }
         
         /**
@@ -151,18 +152,59 @@ public class ArtifactEditor {
          * 
          * @return the value of the contained text
          */
+        @Override
         public Object getValue() {
             return textField.getText();
         }
 
         @Override
-        public void addDirtyListener(SelectionListener listener) {
-            textField.addSelectionListener(listener);
+        public void addDirtyListener(DirtyListener listener) {
+            textField.addKeyListener(listener);
         }
 
         @Override
-        public void removeDirtyListener(SelectionListener listener) {
-            textField.removeSelectionListener(listener);
+        public void removeDirtyListener(DirtyListener listener) {
+            textField.removeKeyListener(listener);
+        }
+
+        @Override
+        public Value getValueAssignment(Object value) throws ValueDoesNotMatchTypeException {
+            Value val = null;
+            IDatatype type = variable.getDeclaration().getType();
+            if (null != value && type.isAssignableFrom(StringType.TYPE)) {
+                val = ValueFactory.createValue(type, value);
+            }
+            return val;
+        }
+
+        @Override
+        public String getValueText() {
+            String result = null;
+            if (null != variable) {
+                Value value = variable.getValue();
+                if (value instanceof StringValue) { // we know this from the model
+                    result = ((StringValue) value).getValue();
+                }
+            }
+            return result;
+        }
+
+        /**
+         * Updates the editor from the {@link #getValueText()}.
+         * 
+         * @return the value of {@link #getValueText()}.
+         */
+        private String updateFromValueText() {
+            String val = getValueText();
+            if (null != val) {
+                textField.setText(val);
+            }
+            return val;
+        }
+
+        @Override
+        public void refreshContents() {
+            updateFromValueText();
         }
 
     }

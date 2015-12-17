@@ -654,13 +654,13 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
     }
 
     @Override
-    public void addDirtyListener(SelectionListener listener) {
+    public void addDirtyListener(DirtyListener listener) {
         dirtyListener.add(listener);
         tableViewer.getTable().addSelectionListener(listener);
     }
 
     @Override
-    public void removeDirtyListener(SelectionListener listener) {
+    public void removeDirtyListener(DirtyListener listener) {
         dirtyListener.remove(listener);
         tableViewer.getTable().removeSelectionListener(listener);
     }

@@ -116,12 +116,12 @@ public class MultipleLineText {
         }
 
         @Override
-        public void addDirtyListener(SelectionListener listener) {
+        public void addDirtyListener(DirtyListener listener) {
             textField.addSelectionListener(listener);
         }
 
         @Override
-        public void removeDirtyListener(SelectionListener listener) {
+        public void removeDirtyListener(DirtyListener listener) {
             textField.removeSelectionListener(listener);
         }
 
