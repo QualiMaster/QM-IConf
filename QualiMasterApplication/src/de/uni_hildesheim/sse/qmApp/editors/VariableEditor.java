@@ -31,13 +31,13 @@ import de.uni_hildesheim.sse.model.management.VarModel;
 import de.uni_hildesheim.sse.model.varModel.Project;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.qmApp.model.Reasoning;
-import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElementsView;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
 import de.uni_hildesheim.sse.utils.modelManagement.IModelListener;
 
 /**
  * This class is responsible for providing Editors for given elements which are shown in the 
- * {@link ConfigurableElementsView}. Requires {@link DecisionVariableEditorInput} as input.
+ * {@link de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElementsView}.
+ * Requires {@link DecisionVariableEditorInput} as input.
  * 
  * @author Niko Nowatzki
  * @author Holger Eichelberger
@@ -49,7 +49,7 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     private static HashMap<Control, ControlDecoration> flawedControls = new HashMap<Control, ControlDecoration>();
     
     private static final String COMPOSITE_STRING = "class org.eclipse.swt.widgets.Composite";
-    private static final int PREFERED_WIDTH = 400;
+    private static final int PREFERRED_WIDTH = 400;
     
     private DecisionVariableEditorInput input;
     private IDecisionVariable var;
@@ -119,7 +119,7 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
         applyGridData(inner);
         considerReasoningResults(inner);
         Point p = inner.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-        p.x = Math.max(p.x, PREFERED_WIDTH);
+        p.x = Math.max(p.x, PREFERRED_WIDTH);
         inner.setSize(p);
         inner.layout();
         
