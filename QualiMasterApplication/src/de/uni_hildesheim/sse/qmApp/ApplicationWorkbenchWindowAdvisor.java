@@ -57,6 +57,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         configurer.setShowStatusLine(true);
         configurer.setTitle("QualiMaster Infastructure Configuration Tool (QM-IConf) "
                 + UserContext.INSTANCE.getRoles().toString());
+        
+        try {
+            WorkspaceUtils.enableAutoBuild(false); // disable Java builds
+        } catch (CoreException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
