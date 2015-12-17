@@ -57,7 +57,8 @@ public class ContainerVariableEditorInputCreator extends AbstractVariableEditorI
     @Override
     public IDecisionVariable getVariable() {
         IDecisionVariable var = super.getVariable();
-        return null == var ? null : Configuration.dereference(var.getNestedElement(index));
+        return (null != var && var.getNestedElementsCount() >= 1)
+            ? Configuration.dereference(var.getNestedElement(index)) : null;
     }
     
     @Override
