@@ -29,7 +29,6 @@ import eu.qualimaster.manifestUtils.ManifestConnection;
 import eu.qualimaster.manifestUtils.data.Field;
 import eu.qualimaster.manifestUtils.data.Item;
 import eu.qualimaster.manifestUtils.data.Parameter;
-import eu.qualimaster.manifestUtils.data.Parameter.ParameterType;
 
 /**
  * A specialized editor for algorithms. This editor is not complete
@@ -348,7 +347,7 @@ public abstract class AbstractUploadEditor extends VariableEditor {
      * @param base The base to start from.
      * @param indent The current indent for formation.
      */
-    private void printTree(IDecisionVariable base, int indent) {
+    protected void printTree(IDecisionVariable base, int indent) {
         
         String output = "";
         for (int i = 0; i < indent; i++) {

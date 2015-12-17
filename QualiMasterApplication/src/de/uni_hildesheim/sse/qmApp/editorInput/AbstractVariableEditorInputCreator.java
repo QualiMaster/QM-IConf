@@ -153,6 +153,7 @@ public abstract class AbstractVariableEditorInputCreator implements IVariableEdi
         memento.putString(MODEL_PART_NAME, modelPart.getModelName());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
         return null;

@@ -41,7 +41,7 @@ public class EmptyEditorInputCreator extends AbstractNonVariableEditorInputCreat
     public IEditorInput create() {
         return new IEditorInput() {
                 
-            @SuppressWarnings("rawtypes")
+            @SuppressWarnings({ "rawtypes", "unchecked" })
             @Override
             public Object getAdapter(Class adapter) {
                 return null;

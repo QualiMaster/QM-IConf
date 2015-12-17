@@ -197,7 +197,8 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
         private URI diagramURI;
         private IEditorInput last = null;
         private IDecisionVariable fallback; // not nice, needed for creation
-        private IModelPart modelPart = de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration.PIPELINES;
+        //private IModelPart modelPart = de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration.PIPELINES;
+        
         /**
          * Creates URI editor input creator.
          *  

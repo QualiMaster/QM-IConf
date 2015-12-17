@@ -30,7 +30,7 @@ public class VarModelEditorInput implements IEditorInput {
         exists = null != VarModel.INSTANCE.availableModels().getModelInfo(configuration.getProject());
     }
     
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public Object getAdapter(Class adapter) {
         return null;

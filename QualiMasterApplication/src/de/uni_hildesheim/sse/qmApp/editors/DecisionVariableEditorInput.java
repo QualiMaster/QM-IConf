@@ -55,7 +55,7 @@ public class DecisionVariableEditorInput implements IEditorInput, IPersistableEl
         }
     }
     
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public Object getAdapter(Class adapter) {
         return null;
