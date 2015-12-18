@@ -33,6 +33,7 @@ import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditor
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIParameter;
 import de.uni_hildesheim.sse.model.confModel.AssignmentState;
 import de.uni_hildesheim.sse.model.confModel.CompoundVariable;
+import de.uni_hildesheim.sse.model.confModel.Configuration;
 import de.uni_hildesheim.sse.model.confModel.ConfigurationException;
 import de.uni_hildesheim.sse.model.confModel.DisplayNameProvider;
 import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
@@ -54,11 +55,12 @@ import de.uni_hildesheim.sse.model.varModel.values.StringValue;
 import de.uni_hildesheim.sse.model.varModel.values.Value;
 import de.uni_hildesheim.sse.model.varModel.values.ValueDoesNotMatchTypeException;
 import de.uni_hildesheim.sse.model.varModel.values.ValueFactory;
-import de.uni_hildesheim.sse.qmApp.dialogs.VariableSelectorDialog;
+import de.uni_hildesheim.sse.qmApp.dialogs.ConfigurationVariableSelectorDialog;
+import de.uni_hildesheim.sse.qmApp.dialogs.ConfigurationVariableSelectorDialog.IVariableSelector;
+import de.uni_hildesheim.sse.qmApp.dialogs.ConfigurationVariableSelectorDialog.TypeBasedVariableSelector;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
-import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
-import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
+import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
 import de.uni_hildesheim.sse.utils.modelManagement.ModelManagementException;
@@ -353,7 +355,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
         Project prj = getProject();
         try {
             try {
-                Project basicsCfg = ModelAccess.getModel(Configuration.BASICS);
+                Project basicsCfg = ModelAccess.getModel(VariabilityModel.Configuration.BASICS);
                 ProjectImport imp = new ProjectImport(basicsCfg.getName(), null);
                 imp.setResolved(basicsCfg);
                 tmpModel.addImport(imp);
@@ -606,31 +608,42 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
          * @param tupleSource "input" or "output"
          */
         public CopyTuplesFromAction(String tupleSource) {
-            super("Copy " + tupleSource + " configuration from...");
+            super("Copy " + tupleSource + " field configuration from...");
             this.tupleSource = tupleSource;
         }
         
+        /**
+         * Resolves <code>typeName</code> from <code>cfg</code> and adds it to <code>types</code>.
+         * 
+         * @param cfg the configuration to resolve <code>typeName</code> on
+         * @param typeName the name of the type to resolve
+         * @param types the types list to be modified as a side effect if the type can be resolved
+         */
+        private void addType(Configuration cfg, String typeName, List<IDatatype> types) {
+            try {
+                IDatatype type = ModelQuery.findType(cfg.getProject(), typeName, Compound.class);
+                if (null != type) {
+                    types.add(type);
+                }
+            } catch (ModelQueryException e) {
+                LOGGER.exception(e);
+            }
+        }
+        
+        
         @Override
         public void run() {
-            // shall allow overlaps between DataSource, DataSink, Family
-            IDecisionVariable myVar = getVariable();
-            IModelPart part = null;
-            Configuration[] cfgs = Configuration.values(); 
-            for (int c = 0;  c < cfgs.length && null == part; c++) {
-                Configuration cfg = cfgs[c];
-                if (cfg.getConfiguration() == myVar.getConfiguration()) {
-                    part = cfg;
-                }
-            }
-            if (null == part) {
-                part = Configuration.FAMILIES;
-            }
-            VariableSelectorDialog dlg = new VariableSelectorDialog(getShell(), part, 
-                part.getProvidedTypes()[0], tupleSource + " items");
+            Configuration cfg = VariabilityModel.Definition.TOP_LEVEL.getConfiguration();
+            List<IDatatype> types = new ArrayList<IDatatype>();
+            addType(cfg, "Family", types);
+            addType(cfg, "DataElement", types);
+            IVariableSelector selector = new TypeBasedVariableSelector(types);
+            ConfigurationVariableSelectorDialog dlg = new ConfigurationVariableSelectorDialog(getShell(), 
+                "Select element to copy " + tupleSource + " fields from", cfg, selector);
+            dlg.setInitialPattern("?");
             int res = dlg.open();
-            AbstractVariable var = dlg.getSelected();
-            if (Window.OK == res && null != var) {
-                IDecisionVariable decVar = part.getConfiguration().getDecision(var);
+            IDecisionVariable decVar = dlg.getFirstResult();
+            if (Window.OK == res && null != decVar) {
                 if (decVar instanceof CompoundVariable) {
                     CompoundVariable cVar = (CompoundVariable) decVar;
                     IDecisionVariable nested = cVar.getNestedVariable(tupleSource);
@@ -1126,7 +1139,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
      */
     private static Value dereferenceType(Value value) {
         if (value instanceof ReferenceValue) {
-            IDecisionVariable var = Configuration.BASICS.getConfiguration()
+            IDecisionVariable var = VariabilityModel.Configuration.BASICS.getConfiguration()
                     .getDecision(((ReferenceValue) value).getValue());
             if (null != var) {
                 value = var.getValue();

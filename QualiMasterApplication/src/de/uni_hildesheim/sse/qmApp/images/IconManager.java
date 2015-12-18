@@ -9,6 +9,8 @@ import java.awt.image.DirectColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.WritableRaster;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Device;
@@ -17,6 +19,8 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
+
+import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 
 /**
  * Class for managing icons.
@@ -62,6 +66,18 @@ public class IconManager {
     public static final String MAVEN_DIALOG_ICON = PRE + "mavenEditor.png";
     public static final String OVERLAY_ERROR_SMALL = PRE + "error_small.png";
     
+    private static final Map<String, String> TYPE_MAP = new HashMap<String, String>();
+    
+    static {
+        TYPE_MAP.put("Algorithm", ALGORITHM);
+        TYPE_MAP.put("DataElement", DATA_ELEMENT);
+        TYPE_MAP.put("PersistentDataElement", DATA_ELEMENT);
+        TYPE_MAP.put("DataSource", DATA_SOURCE);
+        TYPE_MAP.put("DataSink", DATA_SINK);
+        TYPE_MAP.put("Family", FAMILY);
+        TYPE_MAP.put("Pipeline", PIPELINE);
+    }
+    
     /**
      * Get icon by path.
      * 
@@ -82,6 +98,20 @@ public class IconManager {
     public static ImageDescriptor retrieveImageDescriptor(String path) {
         URL url = IconManager.class.getClassLoader().getResource(path);
         return ImageDescriptor.createFromURL(url);
+    }
+    
+    /**
+     * Retrieves the (registered) image for a data type.
+     * 
+     * @param type the type
+     * @return the image
+     */
+    public static Image retrieveImage(IDatatype type) {
+        String image = TYPE_MAP.get(type.getName());
+        if (null == image) {
+            image = ERROR;
+        }
+        return retrieveImage(image);
     }
     
     /**
