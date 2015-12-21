@@ -16,6 +16,7 @@
 package de.uni_hildesheim.sse.qmApp.model;
 
 import de.uni_hildesheim.sse.repositoryConnector.maven.MavenFetcher;
+import eu.qualimaster.manifestUtils.ManifestConnection;
 
 /**
  * Utility methods for the connectors.
@@ -37,6 +38,11 @@ public class ConnectorUtils {
         String mavenURL = ModelAccess.getRepositoryUrl();
         if (null != mavenURL && mavenURL.length() > 0) {
             MavenFetcher.setRepositoryUrl(mavenURL);
+            ManifestConnection.clearRepositories();
+            ManifestConnection.addRepository(mavenURL);
+            //ManifestConnection.addRepository("http://nexus.sse.uni-hildesheim.de/releases/Qualimaster/");
+            ManifestConnection.addRepository("http://clojars.org/repo");
+            ManifestConnection.addDefaultRepositories();
         }
     }
 

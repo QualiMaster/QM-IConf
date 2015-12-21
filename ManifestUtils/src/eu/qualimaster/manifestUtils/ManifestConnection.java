@@ -48,10 +48,15 @@ import eu.qualimaster.manifestUtils.data.Parameter.ParameterType;
  */
 public class ManifestConnection {
 
+    private static List<String> repositories = new ArrayList<String>();
     private Ivy ivy = null;
     private File out = null;
     private String output = "";
     private PrintStream sysOut;
+
+    static {
+        addDefaultRepositories();
+    }
     
     /**
      * This class is used to intercept any output of the ivy component.
@@ -128,7 +133,7 @@ public class ManifestConnection {
         ChainResolver chainResolver = new ChainResolver();
         chainResolver.setName("chainResolver");
         
-        List<IBiblioResolver> resolvers = ManifestParserUtils.getResolver(getRepositories());
+        List<IBiblioResolver> resolvers = ManifestParserUtils.getResolver(repositories);
         for (IBiblioResolver resolver : resolvers) {
             System.out.println(resolver.getPattern());
             chainResolver.add(resolver);
@@ -153,20 +158,60 @@ public class ManifestConnection {
                 username, password);
         
     }
+
+    /**
+     * Adds a Maven repository for artifact resolution.
+     * 
+     * @param repository the repository URL (<b>null</b> or empty is ignored) 
+     */
+    public static void addRepository(String repository) {
+        addRepository(repository, repositories.size());
+    }
     
     /**
-     * Returns a List of Strings with the repositories.
-     * @return A List with the repositories.
+     * Returns the number of actual repositories.
+     * 
+     * @return the number of repositories
      */
-    public static List<String> getRepositories() {
-        
-        List<String> reposList = new ArrayList<String>();
-        //reposList.add("https://nexus.sse.uni-hildesheim.de/content/repositories/qualimaster/");
-        reposList.add("http://nexus.sse.uni-hildesheim.de/releases/Qualimaster/");
-        reposList.add("http://clojars.org/repo");
-        reposList.add("http://repo1.maven.org/maven2/");
-        return reposList;
-        
+    public static int getRepositoriesCount() {
+        return repositories.size();
+    }
+    
+    /**
+     * Clears all repositories.
+     */
+    public static void clearRepositories() {
+        repositories.clear();
+    }
+    
+    /**
+     * Adds default Maven repositories.
+     */
+    public static void addDefaultRepositories() {
+        repositories.add("http://repo1.maven.org/maven2/");
+    }
+    
+    /**
+     * Adds a Maven repository for artifact resolution.
+     * 
+     * @param repository the repository URL (<b>null</b> or empty is ignored)
+     * @param index the index where to add the repository
+     */
+    public static void addRepository(String repository, int index) {
+        if (null != repository && repository.length() > 0) {
+            repositories.add(index, repository);
+        }
+    }
+
+    /**
+     * Removes a Maven repository from artifact resolution.
+     * 
+     * @param repository the repository URL (<b>null</b> or empty is ignored) 
+     */
+    public static void removeRepository(String repository) {
+        if (null != repository && repository.length() > 0) {
+            repositories.remove(repository);
+        }
     }
     
     /**

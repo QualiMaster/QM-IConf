@@ -50,22 +50,6 @@ public class ChangeManager {
 
     }
 
-    /**
-     * Defines a listener management class.
-     * 
-     * @author Holger Eichelberger
-     */
-    public class Listeners<T> {
-
-
-        /**
-         * Prevents external creation.
-         */
-        private Listeners() {
-        }
-
-    }
-
     public static final int NO_INDEX = -1;
     public static final ChangeManager INSTANCE = new ChangeManager();
     
