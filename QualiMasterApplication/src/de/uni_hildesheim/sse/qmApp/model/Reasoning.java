@@ -148,8 +148,8 @@ public class Reasoning {
                         }
                     } else if (null != conflicts && conflicts.size() > 0) {
                         for (ModelElement elt: conflicts) {
-                            String text = elt.getComment();
-                            if (null == elt.getComment()) {
+                            String text = ModelAccess.getDescription(elt);
+                            if (null == ModelAccess.getDescription(elt)) {
                                 text = StringProvider.toIvmlString(elt);
                             }
                             createMarker(resource, msg.getStatus(), msg.getDescription() + ":" + text);
@@ -419,10 +419,10 @@ public class Reasoning {
      * Returns the comment of a model element.
      * 
      * @param elt the element to return the comment for
-     * @return the comment or <b>null</b> if there was no explicit commehnt
+     * @return the comment or <b>null</b> if there was no explicit comment
      */
     private static String getComment(IModelElement elt) {
-        String result = elt.getComment();
+        String result = ModelAccess.getDescription(elt);
         if (0 == result.length()) {
             result = null;
         }

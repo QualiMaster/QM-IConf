@@ -39,7 +39,7 @@ public class QualiMasterDisplayNameProvider extends DisplayNameProvider {
             }
         }
         if (null == displayName) {
-            displayName = variable.getComment();
+            displayName = ModelAccess.getDescription(variable);
             if (null == displayName) {
                 displayName = variable.getName(); // fallback
             }
@@ -72,7 +72,7 @@ public class QualiMasterDisplayNameProvider extends DisplayNameProvider {
                 tmp = MODEL_PART_NAMES.get(part);
             }
             if (null == tmp) {
-                tmp = parent.getComment();
+                tmp = ModelAccess.getDescription(parent);
                 if (null == tmp) {
                     tmp = parent.getName();
                 }

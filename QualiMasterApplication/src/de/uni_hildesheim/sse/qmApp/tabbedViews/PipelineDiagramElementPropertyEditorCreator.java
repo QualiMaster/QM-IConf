@@ -21,6 +21,7 @@ import de.uni_hildesheim.sse.model.varModel.ProjectImport;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Compound;
 import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Reference;
+import de.uni_hildesheim.sse.qmApp.editors.EditorUtils;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
@@ -236,6 +237,7 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
                         IUpdateProvider provider = (IUpdateProvider) result;
                         provider.setUpdateListener(new EditorUpdater(provider));
                     }
+                    EditorUtils.assignHelpText(tmpVar, result.getControl());
                 }
             }
         }

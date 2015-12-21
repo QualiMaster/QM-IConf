@@ -492,7 +492,7 @@ public class ModelAccess {
             }
         }
         if (null == displayName && null != var) {
-            displayName = var.getDeclaration().getComment();
+            displayName = getDescription(var.getDeclaration());
             if (null == displayName) {
                 displayName = var.getDeclaration().getName();
             }
@@ -501,6 +501,72 @@ public class ModelAccess {
     }
 
     /**
+     * Returns the help text of <code>var</code>.
+     * 
+     * @param var the variable to return the description for
+     * @return the help text, an empty string or <b>null</b>
+     * @see #getHelpText(IModelElement) 
+     */
+    public static String getHelpText(IDecisionVariable var) {
+        return getHelpText(var.getDeclaration());
+    }
+
+    /**
+     * Returns the description of <code>var</code>.
+     * 
+     * @param var the variable to return the description for
+     * @return the description, an empty string or <b>null</b>
+     * @see #getDescription(IModelElement) 
+     */
+    public static String getDescription(IDecisionVariable var) {
+        return getDescription(var.getDeclaration());
+    }
+
+    /**
+     * Returns the help text of <code>elt</code>.
+     * 
+     * @param elt the model element to return the description for
+     * @return the help text, an empty string or <b>null</b>
+     */
+    public static String getHelpText(IModelElement elt) {
+        String result; 
+        String comment = elt.getComment();
+        if (null != comment) {
+            int pos = comment.indexOf('|');
+            if (pos > 0 && pos + 1 < comment.length()) {
+                result = comment.substring(pos + 1);
+            } else {
+                result = ""; // description is (legacy) default, help text is new and optional
+            }
+        } else {
+            result = null;
+        }
+        return result;
+    }
+
+    /**
+     * Returns the description of <code>elt</code>.
+     * 
+     * @param elt the model element to return the description for
+     * @return the description, an empty string or <b>null</b> 
+     */
+    public static String getDescription(IModelElement elt) {
+        String result; 
+        String comment = elt.getComment();
+        if (null != comment) {
+            int pos = comment.indexOf('|');
+            if (pos > 0) {
+                result = comment.substring(0, pos);
+            } else {
+                result = comment;
+            }
+        } else {
+            result = null;
+        }
+        return result;
+    }
+    
+    /**
      * Returns the label name to be used for <code>var</code>.
      * 
      * @param var
@@ -508,7 +574,7 @@ public class ModelAccess {
      * @return the label name
      */
     public static String getLabelName(AbstractVariable var) {
-        String labelText = var.getComment();
+        String labelText = getDescription(var);
         if (null == labelText || 0 == labelText.length()) {
             labelText = var.getName();
         }

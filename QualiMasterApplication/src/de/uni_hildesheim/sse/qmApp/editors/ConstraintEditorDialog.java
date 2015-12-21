@@ -55,6 +55,7 @@ import de.uni_hildesheim.sse.persistency.ConstraintSplitWriter.IConstraintFilter
 import de.uni_hildesheim.sse.persistency.IVMLWriter;
 import de.uni_hildesheim.sse.persistency.StringProvider;
 import de.uni_hildesheim.sse.qmApp.dialogs.DialogsUtil;
+import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.ui.embed.EditorUtils;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
 import de.uni_hildesheim.sse.utils.modelManagement.ModelInfo;
@@ -200,6 +201,11 @@ class ConstraintEditorDialog extends Dialog implements IValidationStateListener 
         layout.addColumnData(new ColumnWeightData(3, 30, true));
         column.setText("description"); 
         column.setResizable(true);
+        
+        column = new TableColumn(table, SWT.NONE);
+        layout.addColumnData(new ColumnWeightData(3, 30, true));
+        column.setText("help text"); 
+        column.setResizable(true);
 
         AbstractVariable var = context.getParent().getDeclaration();
         Set<AbstractVariable> done = new HashSet<AbstractVariable>();
@@ -216,11 +222,12 @@ class ConstraintEditorDialog extends Dialog implements IValidationStateListener 
 
         for (int i = 0; i < vars.length; i++) {
             AbstractVariable v = vars[i];
-            String comment = v.getComment();
+            String comment = ModelAccess.getDescription(v);
             if (null != comment && comment.trim().length() > 0) {
-                String[] text = new String[2];
+                String[] text = new String[3];
                 text[0] = v.getName();
                 text[1] = comment;
+                text[2] = ModelAccess.getHelpText(v);
                 TableItem item = new TableItem(table, SWT.NONE);
                 item.setText(text);
             }

@@ -371,7 +371,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
                         TUPLE_PREFIX + decl.getName(), decl.getType(), tmpModel);
                 // take over .text information if given - this is a pseudo var
                 // (name)
-                String comment = decl.getComment();
+                String comment = ModelAccess.getDescription(decl);
                 if (null == comment || 0 == comment.length()) {
                     comment = "item name";
                 }

@@ -16,6 +16,7 @@
 package de.uni_hildesheim.sse.qmApp.editors;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
@@ -47,6 +48,21 @@ public class EditorUtils {
         Label label = new Label(uiCfg.getParent().getContentPane(), SWT.NONE);
         label.setText(labelText);
         return label;
+    }
+    
+    /**
+     * Assigns the help text for <code>var</code> to <code>control</code>.
+     * 
+     * @param var the variable to obtain the help text for
+     * @param control the control to assign the help text to 
+     * @return <code>control</code>
+     */
+    public static Control assignHelpText(IDecisionVariable var, Control control) {
+        String helpText = ModelAccess.getHelpText(var);
+        if (null != helpText && helpText.length() > 0) {
+            control.setToolTipText(helpText);
+        }
+        return control;
     }
 
 }
