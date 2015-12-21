@@ -59,8 +59,6 @@ import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.EventKind;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.IChangeListener;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
-import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.ApplicationRole;
-import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.Role;
 import pipeline.diagram.part.PipelineDiagramEditor;
 
 /**
@@ -103,7 +101,7 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
         
         /**
          * Get the original image.
-         * @param errorImage Givne errorImage which is annotated.
+         * @param errorImage Given errorImage which is annotated.
          * @return toReturn the original image.
          */
         public Image getOriginal(Image errorImage) {
@@ -588,9 +586,8 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
      * Initializes the commands according to the user roles.
      */
     private static final void initializeCommands() {
-        Set<Role> roles = UserContext.INSTANCE.getRoles();
-        boolean isAdmin = roles.contains(ApplicationRole.ADMIN);
-        boolean isInfrastructureAdmin = roles.contains(ApplicationRole.INFRASTRUCTURE_ADMIN);
+        boolean isAdmin = UserContext.INSTANCE.isAdmin();
+        boolean isInfrastructureAdmin = UserContext.INSTANCE.isInfrastructureAdmin();
         AbstractConfigurableHandler.setEnabled(InstantiateLocal.class, isAdmin || isInfrastructureAdmin);
     }
     

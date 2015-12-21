@@ -26,6 +26,7 @@ import de.uni_hildesheim.sse.model.varModel.Project;
 import de.uni_hildesheim.sse.model.varModel.ProjectImport;
 import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.persistency.StringProvider;
+import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.IVariableEditorInput;
 import de.uni_hildesheim.sse.qmApp.editorInput.IVariableEditorInputCreator;
@@ -38,6 +39,7 @@ import de.uni_hildesheim.sse.qmApp.model.PipelineDiagramUtils;
 import de.uni_hildesheim.sse.qmApp.model.PipelineTranslationOperations;
 import de.uni_hildesheim.sse.qmApp.model.Utils;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
+import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import de.uni_hildesheim.sse.utils.modelManagement.ModelInfo;
 
 /**
@@ -348,36 +350,44 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
                 
                 @Override
                 public void contributeTo(IMenuManager manager) {
+                    boolean isInfrastructureAdmin = UserContext.INSTANCE.isInfrastructureAdmin();
+                    final String deploymentUrl = ModelAccess.getDeploymentUrl();
                     Action action = new Action() {
                         @Override
                         public void run() {
-                            getVariable(); // take data from
+                            IDecisionVariable var = getVariable(); // take data from
+                            Dialogs.showInfoDialog("In implementation...", "Will deploy '" 
+                                + ModelAccess.getDisplayName(var) + "' to " + deploymentUrl);
                             // TODO deploy
                         }
                     };
-                    action.setEnabled(false);
+                    action.setEnabled(isInfrastructureAdmin && (null != deploymentUrl && deploymentUrl.length() > 0));
                     action.setText("Deploy...");
                     manager.add(action);
 
                     action = new Action() {
                         @Override
                         public void run() {
-                            getVariable(); // take data from
+                            IDecisionVariable var = getVariable(); // take data from
+                            Dialogs.showInfoDialog("In implementation...", "Will start '" 
+                                + ModelAccess.getDisplayName(var) + "'");
                             // TODO call start operation
                         }
                     };
-                    action.setEnabled(false);
+                    action.setEnabled(isInfrastructureAdmin);
                     action.setText("Start...");
                     manager.add(action);
 
                     action = new Action() {
                         @Override
                         public void run() {
-                            getVariable(); // take data from
+                            IDecisionVariable var = getVariable(); // take data from
+                            Dialogs.showInfoDialog("In implementation...", "Will stop '" 
+                                + ModelAccess.getDisplayName(var) + "'");
                             // TODO call stop operation
                         }
                     };
-                    action.setEnabled(false);
+                    action.setEnabled(isInfrastructureAdmin);
                     action.setText("Stop...");
                     manager.add(action);
                 }

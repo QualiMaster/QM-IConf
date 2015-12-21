@@ -1,5 +1,6 @@
 package de.uni_hildesheim.sse.repositoryConnector;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,7 +33,13 @@ public class UserContext {
     
     private static SVNRepository repository;
     
+    private static final Set<Role> DEFAULT_ROLES = new HashSet<Role>();
+    
     private Set<Role> roles;
+    
+    static {
+        DEFAULT_ROLES.add(ApplicationRole.ADMIN);
+    }
 
     /**
      * Private Singleton constructor, should avoid multiple instances.
@@ -115,11 +122,55 @@ public class UserContext {
      * @return {@link Set} with user roles
      */
     public Set<Role> getRoles() {
-        Set<Role> defaultSet = new HashSet<Role>();
-        defaultSet.add(ApplicationRole.ADMIN);
-        return roles == null ? defaultSet : roles;
+        return roles == null ? Collections.unmodifiableSet(DEFAULT_ROLES) : roles;
+    }
+    
+    /**
+     * Returns whether this user is an administrator. [convenience]
+     * 
+     * @return <code>true</code> if this user has the role, <code>false</code> else
+     */
+    public boolean isAdmin() {
+        return hasRole(ApplicationRole.ADMIN);
     }
 
+    /**
+     * Returns whether this user is an infrastructure administrator. [convenience]
+     * 
+     * @return <code>true</code> if this user has the role, <code>false</code> else
+     */
+    public boolean isInfrastructureAdmin() {
+        return hasRole(ApplicationRole.ADMIN);
+    }
+    
+    /**
+     * Returns whether this user is a pipeline designer. [convenience]
+     * 
+     * @return <code>true</code> if this user has the role, <code>false</code> else
+     */
+    public boolean isPipelineDesigner() {
+        return hasRole(ApplicationRole.PIPELINE_DESIGNER);
+    }
+
+    /**
+     * Returns whether this user is an adaptation manager. [convenience]
+     * 
+     * @return <code>true</code> if this user has the role, <code>false</code> else
+     */
+    public boolean isAdaptationManager() {
+        return hasRole(ApplicationRole.PIPELINE_DESIGNER);
+    }
+    
+    /**
+     * Returns whether the current user has a certain role.
+     * 
+     * @param role the role to look for
+     * @return <code>true</code> if the user has the role, <code>false</code> else
+     */
+    public boolean hasRole(Role role) {
+        return getRoles().contains(role);
+    }
+    
     /**
      * Setter for the roles of the user.
      * 

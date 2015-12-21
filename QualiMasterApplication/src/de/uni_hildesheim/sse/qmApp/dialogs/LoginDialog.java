@@ -67,8 +67,9 @@ public class LoginDialog {
     
     private String localDataToolTip = "If this checkbox is selected you will be working with local data only."
             + "\n You will not be able to commit changes to the pipeline repository.";
-    private String localDataUsedMessage = "Last time you used the application you worked with local data. "
-            + "Do you want to keep this changes?";
+    private String localDataUsedMessage = "Last time you used the application you worked with local data and you are "
+            + "about to use the remote repository. This will lead to a synchronization of the configuration and "
+            + "potentially local changes will be overridden. Do you want to go on?";
 
     /**
      * Displays the login dialog.
