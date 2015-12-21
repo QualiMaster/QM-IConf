@@ -126,6 +126,8 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
         inner.setSize(p);
         inner.layout();
         
+        createAdditionalControls(inner);
+        
 //        inner.addKeyListener(new KeyAdapter() {
 //            @Override
 //            public void keyPressed( KeyEvent exc ) {
