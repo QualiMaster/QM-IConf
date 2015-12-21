@@ -23,9 +23,26 @@ import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
 public class MavenFetcher implements Serializable {
 
     private static final long serialVersionUID = -1242761422426313072L;
-    private static String mavenRepositoryURL = "https://projects.sse.uni-hildesheim.de/qm/maven/";
+    private static String mavenRepositoryURL;
     private static List<TreeElement> elementTree = new ArrayList<TreeElement>();
     
+    /**
+     * Defines the repository URL to fetch Maven artifacts from.
+     * 
+     * @param url the URL (use <b>null</b> or empty to disable this mechanism)
+     */
+    public static void setRepositoryUrl(String url) {
+        mavenRepositoryURL = url;
+    }
+    
+    /**
+     * Returns the actual Maven repository URL.
+     * 
+     * @return the actual URL (may be <b>null</b> or empty)
+     */
+    public static String getRepositoryUrl() {
+        return mavenRepositoryURL;
+    }
  
     /**
      * Class which represents a treeElement. Each element has a name and a list of descendants.
@@ -96,32 +113,26 @@ public class MavenFetcher implements Serializable {
      * @throws IOException Exception.
      */
     public static void collectMavenArtifacts() throws IOException {
- 
-        //Connect to the repository
-        Document doc = Jsoup.connect(mavenRepositoryURL).get();
- 
-        for (Element file : doc.select("tr")) {
- 
-            Elements img = file.select("td img");
-            Elements f = file.select("td a");
- 
-            if (1 == img.size() && 1 == f.size()) {
-                String src = img.attr("src");
-      
-                //Take a look at all "folders"
-                if (src.endsWith("folder.gif")) {
-
-                    //Create a TreeElement for each folder.
-                    TreeElement element = new TreeElement(f.attr("href"));
-                    
-                    if (f.attr("href") != null) {
-                        //Add all children to the created TreeElement by recursively calling "getDeeperElements.
-                        getDeeperElements(mavenRepositoryURL + f.attr("href"), element);
+        if (isConfigured()) {
+            //Connect to the repository
+            Document doc = Jsoup.connect(mavenRepositoryURL).get();
+            for (Element file : doc.select("tr")) {
+                Elements img = file.select("td img");
+                Elements f = file.select("td a");
+                if (1 == img.size() && 1 == f.size()) {
+                    String src = img.attr("src");
+                    //Take a look at all "folders"
+                    if (src.endsWith("folder.gif")) {
+                        //Create a TreeElement for each folder.
+                        TreeElement element = new TreeElement(f.attr("href"));
+                        if (f.attr("href") != null) {
+                            //Add all children to the created TreeElement by recursively calling "getDeeperElements.
+                            getDeeperElements(mavenRepositoryURL + f.attr("href"), element);
+                        }
+                        //At last, add each top-level TreeElement to the list.
+                        //The Tree is now complete when the recursion is finished.
+                        elementTree.add(element);
                     }
-
-                    //At last, add each top-level TreeElement to the list.
-                    //The Tree is now complete when the recursion is finished.
-                    elementTree.add(element);
                 }
             }
         }
@@ -134,17 +145,12 @@ public class MavenFetcher implements Serializable {
      * @throws IOException Exception.
      */
     public static void getDeeperElements(String url, TreeElement treeElement) throws IOException {
-
         Document doc = Jsoup.connect(url).get();
-
         for (Element file : doc.select("tr")) {
-
             Elements img = file.select("td img");
             Elements f = file.select("td a");
-
             if (1 == img.size() && 1 == f.size()) {
                 String src = img.attr("src");
-
                 //If it is folder go deeper.
                 if (src.endsWith("folder.gif")) {
                     if (f.attr("href") != null) {
@@ -165,7 +171,6 @@ public class MavenFetcher implements Serializable {
      * @return toReturn List of directories in the maven-repository.s
      */
     public static List<TreeElement> getElementTree() {
-    
         try {
             if (elementTree.isEmpty()) {
                 collectMavenArtifacts();
@@ -182,14 +187,28 @@ public class MavenFetcher implements Serializable {
      * @return whether there is connectivity
      */
     public static boolean checkRepositoryConnectivity() {
-    
         boolean toReturn = true;
-        try {
-            Jsoup.connect(mavenRepositoryURL).get();
-        } catch (IOException exc) {
+        if (!isConfigured()) {
             toReturn = false;
+        } else {
+            try {
+                Jsoup.connect(mavenRepositoryURL).get();
+            } catch (IOException exc) {
+                toReturn = false;
+            }
         }
         return toReturn;
+    }
+    
+    /**
+     * Returns whether the Maven artifact fetcher is configured.
+     * 
+     * @return <code>true</code> if configured, <code>false</code> else
+     * @see #setRepositoryUrl(String)
+     * @see #getRepositoryUrl()
+     */
+    public static boolean isConfigured() {
+        return (null != mavenRepositoryURL && mavenRepositoryURL.length() > 0);
     }
     
 }

@@ -50,6 +50,7 @@ import de.uni_hildesheim.sse.qmApp.dialogs.CloneNumberInputDialog;
 import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator.CloneMode;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
+import de.uni_hildesheim.sse.qmApp.model.ConnectorUtils;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.PipelineDiagramUtils;
@@ -601,6 +602,7 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
         initializeCommands();
         createElements();
         ChangeManager.INSTANCE.addListener(this);
+        ConnectorUtils.configure();
 
         viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 
@@ -622,7 +624,6 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
         
         Menu contextMenu = menuManager.createContextMenu(tree);
         tree.setMenu(contextMenu);
-        
     }
 
     /**

@@ -281,7 +281,7 @@
             id="de.uni_hildesheim.sse.qmApp.DataManagementEditor"
             name="Data Management">
       </editor>
-      <editor class="de.uni_hildesheim.sse.qmApp.editors.ProjectEditor"
+      <editor class="de.uni_hildesheim.sse.qmApp.editors.InfrastructureEditor"
             icon="icons/infrastructure.png"
             id="de.uni_hildesheim.sse.qmApp.InfrastructureEditor"
             name="Infrastructure">

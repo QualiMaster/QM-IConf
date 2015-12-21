@@ -1307,4 +1307,38 @@ public class ModelAccess {
             || !ConstraintType.TYPE.isAssignableFrom(type); 
     }
 
+    /**
+     * Returns the Maven URL where to receive artifacts from.
+     * 
+     * @return the Maven URL
+     */
+    public static String getRepositoryUrl() {
+        String result = null;
+        IDecisionVariable var = obtainVariable(VariabilityModel.Configuration.INFRASTRUCTURE, "repositoryURL");
+        if (null != var) {
+            Value val = var.getValue();
+            if (val instanceof StringValue) {
+                result = ((StringValue) val).getValue();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns the (Nexus) URL where to deploy pipelines to.
+     * 
+     * @return the deployment URL (may be empty, may be {@link #getRepositoryUrl()}
+     */
+    public static String getDeploymentUrl() {
+        String result = null;
+        IDecisionVariable var = obtainVariable(VariabilityModel.Configuration.INFRASTRUCTURE, "deploymentURL");
+        if (null != var) {
+            Value val = var.getValue();
+            if (val instanceof StringValue) {
+                result = ((StringValue) val).getValue();
+            }
+        }
+        return result;
+    }
+
 }

@@ -88,6 +88,15 @@ public class MavenArtifactEditor extends Dialog {
         super(parentShell);
         this.artifactEditorUpdater = artifactEditorUpdater;
     }
+    
+    /**
+     * Returns whether the Maven artifact editor is configured.
+     * 
+     * @return <code>true</code> if configured, <code>false</code> else
+     */
+    public static boolean isConfigured() {
+        return MavenFetcher.isConfigured();
+    }
  
     /**
      * Run.

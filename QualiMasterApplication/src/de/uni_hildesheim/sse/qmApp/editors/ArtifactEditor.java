@@ -100,6 +100,7 @@ public class ArtifactEditor {
             button = new Button(this, SWT.NONE);
             button.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
             button.setText(cell ? "..." : "Browse...");
+            button.setEnabled(MavenArtifactEditor.isConfigured());
 
             button.addSelectionListener(new SelectionAdapter() {
            
