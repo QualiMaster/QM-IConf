@@ -621,7 +621,6 @@ public class VariabilityModel {
      * Registers application specific editors.
      */
     public static void registerEditors() {
-        // TODO String is not nice but sufficient for demo
         ConfigurationTableEditorFactory.registerEditorCreator("Basics::Parameters", 
             ParameterEditor.CREATOR);
         ConfigurationTableEditorFactory.registerEditorCreator("Basics::Tuples", 
@@ -629,6 +628,7 @@ public class VariabilityModel {
         ConfigurationTableEditorFactory.registerEditorCreator("setOf(Constraint)", 
             ConstraintsEditor.CREATOR);
         ConfigurationTableEditorFactory.registerEditorCreator("Basics::ArtifactString", ArtifactEditor.CREATOR);
+        ConfigurationTableEditorFactory.registerEditorCreator("Basics::OptionalArtifactString", ArtifactEditor.CREATOR);
         ConfigurationTableEditorFactory.registerEditorCreator("Basics::Description", MultipleLineText.CREATOR);
     }
 
