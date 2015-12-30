@@ -34,7 +34,6 @@ import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
 import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
-import qualimasterapplication.Activator;
 
 /**
  * Implements a generic variable selector dialog.
@@ -142,12 +141,7 @@ public abstract class AbstractVariableSelectorDialog extends FilteredItemsSelect
 
     @Override
     protected IDialogSettings getDialogSettings() {
-        String dialogSettingsName = getDialogSettingsName();
-        IDialogSettings settings = Activator.getDefault().getDialogSettings().getSection(dialogSettingsName);
-        if (settings == null) {
-            settings = Activator.getDefault().getDialogSettings().addNewSection(dialogSettingsName);
-        }
-        return settings;
+        return DialogsUtil.getDialogSettings(getDialogSettingsName());
     }
 
     @Override

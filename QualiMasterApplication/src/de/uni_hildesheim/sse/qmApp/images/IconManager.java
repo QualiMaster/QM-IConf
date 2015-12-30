@@ -65,6 +65,7 @@ public class IconManager {
     public static final String TREE_FILE = PRE + "treefile.png";
     public static final String MAVEN_DIALOG_ICON = PRE + "mavenEditor.png";
     public static final String OVERLAY_ERROR_SMALL = PRE + "error_small.png";
+    public static final String CLASS = PRE + "class_obj.png";
     
     private static final Map<String, String> TYPE_MAP = new HashMap<String, String>();
     

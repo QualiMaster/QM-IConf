@@ -75,6 +75,7 @@ public class MultipleLineText {
             textField = new Text(this, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
             gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
             textField.setLayoutData(gridData);
+            EditorUtils.assignHelpText(variable, textField);
             if (null != variable) {
                 Value value = variable.getValue();
                 if (value instanceof StringValue) {

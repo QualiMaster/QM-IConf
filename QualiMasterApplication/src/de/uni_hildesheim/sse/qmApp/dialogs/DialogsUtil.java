@@ -1,8 +1,12 @@
 package de.uni_hildesheim.sse.qmApp.dialogs;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
+
+import qualimasterapplication.Activator;
 
 /**
  * This class contains util methods for dialogs that are used throughout the application.
@@ -53,6 +57,30 @@ public class DialogsUtil {
         int y = monitorArea.y + (monitorArea.height - shell.getBounds().height) / 2;
         
         shell.setLocation(x, y);
+    }
+
+    /**
+     * Returns the dialog settings via the activator.
+     * 
+     * @param settingsName the dialog settings name
+     * @return the dialog settings
+     */
+    public static IDialogSettings getDialogSettings(String settingsName) {
+        IDialogSettings root = Activator.getDefault().getDialogSettings();
+        IDialogSettings settings = root.getSection(settingsName);
+        if (settings == null) {
+            settings = root.addNewSection(settingsName);
+        }
+        return settings;
+    }
+    
+    /**
+     * Returns the active shell.
+     * 
+     * @return the active shell
+     */
+    public static Shell getActiveShell() {
+        return PlatformUI.getWorkbench().getDisplay().getActiveShell();
     }
 
 }

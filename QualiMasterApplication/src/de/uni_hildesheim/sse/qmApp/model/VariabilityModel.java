@@ -29,6 +29,7 @@ import de.uni_hildesheim.sse.qmApp.editorInput.RtVilEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.VarModelEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editors.AlgorithmEditor;
 import de.uni_hildesheim.sse.qmApp.editors.ArtifactEditor;
+import de.uni_hildesheim.sse.qmApp.editors.ClassEditor;
 import de.uni_hildesheim.sse.qmApp.editors.ConstraintsEditor;
 import de.uni_hildesheim.sse.qmApp.editors.FamilyEditor;
 import de.uni_hildesheim.sse.qmApp.editors.MultipleLineText;
@@ -630,6 +631,8 @@ public class VariabilityModel {
         ConfigurationTableEditorFactory.registerEditorCreator("Basics::ArtifactString", ArtifactEditor.CREATOR);
         ConfigurationTableEditorFactory.registerEditorCreator("Basics::OptionalArtifactString", ArtifactEditor.CREATOR);
         ConfigurationTableEditorFactory.registerEditorCreator("Basics::Description", MultipleLineText.CREATOR);
+        ConfigurationTableEditorFactory.registerEditorCreator("Basics::ClassString", ClassEditor.CREATOR);
+        ConfigurationTableEditorFactory.registerEditorCreator("Basics::OptionalClassString", ClassEditor.CREATOR);
     }
 
     /**

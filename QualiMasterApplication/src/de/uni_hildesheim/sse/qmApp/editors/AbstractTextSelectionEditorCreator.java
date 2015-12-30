@@ -10,7 +10,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.PlatformUI;
 
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.IEditorCreator;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
@@ -22,76 +21,77 @@ import de.uni_hildesheim.sse.model.varModel.values.StringValue;
 import de.uni_hildesheim.sse.model.varModel.values.Value;
 import de.uni_hildesheim.sse.model.varModel.values.ValueDoesNotMatchTypeException;
 import de.uni_hildesheim.sse.model.varModel.values.ValueFactory;
-import de.uni_hildesheim.sse.qmApp.dialogs.DialogsUtil;
-import de.uni_hildesheim.sse.qmApp.dialogs.MavenArtifactEditor;
 
 /**
- * The {@link ArtifactEditor} specializes {@link AbstractTextSelectionEditorCreator} triggering 
- * the {@link MavenArtifactEditor}.
+ * The {@link AbstractTextSelectionEditorCreator} creates a composite with a text field and a button.
+ * The button within the composite triggers a browse operation.
+ * Subclasses shall not store information in attributes.
  * 
  * @author Niko
+ * @author Holger Eichelberger
  */
-public class ArtifactEditor extends AbstractTextSelectionEditorCreator {
+public abstract class AbstractTextSelectionEditorCreator implements IEditorCreator {
 
-    public static final IEditorCreator CREATOR = new ArtifactEditor();
-    
     /**
      * Prevents external creation.
      */
-    private ArtifactEditor() {
+    protected AbstractTextSelectionEditorCreator() {
     }
     
     @Override
-    protected void browseButtonSelected(String text, IDecisionVariable context, ITextUpdater updater) {
-        MavenArtifactEditor dlg = new MavenArtifactEditor(DialogsUtil.getActiveShell(), updater);
-        if (null != text) {
-            dlg.setInitialTreePath(text);
-        }
-        dlg.open();
+    public Control createEditor(UIConfiguration config, IDecisionVariable variable, Composite parent) {
+        return new ArtifactComposite(config, variable, parent, false);
+    }
+    
+    @Override
+    public CellEditor createCellEditor(UIConfiguration config, IDecisionVariable variable, Composite parent) {
+        return new ArtifactCellEditor(config, variable, parent);
     }
 
-    @Override
-    protected boolean isTextEditorEnabled(boolean cell, IDecisionVariable context) {
-        return true;
-    }
-    
-    @Override
-    protected boolean isBrowseButtonActive(boolean cell, IDecisionVariable context) {
-        return MavenArtifactEditor.isConfigured();
-    }
-    
-}
-    
-/**
- * TEST.
- * @author Holger Eichelberger
- */
-class Test {    
-    public static final IEditorCreator CREATOR = new ArtifactEditorCreator();
     /**
-     * Creature actual editor with Text and Button.
-     * @author Niko
+     * Returns the actual text for the browse button.
+     * 
+     * @param cell whether the button is for the cell editor (<code>true</code>) or the plain editor component
+     * @param context the decision variable providing the context for the selection
+     * @return the browse button text
      */
-    private static class ArtifactEditorCreator implements IEditorCreator {
-      
-        @Override
-        public Control createEditor(UIConfiguration config, IDecisionVariable variable, Composite parent) {
-            return new ArtifactComposite(config, variable, parent, false);
-        }
-        
-        @Override
-        public CellEditor createCellEditor(UIConfiguration config, IDecisionVariable variable, Composite parent) {
-            return new ArtifactCellEditor(config, variable, parent);
-        }
-        
-    };
+    protected String getBrowseButtonText(boolean cell, IDecisionVariable context) {
+        return cell ? "..." : "Browse..."; // default
+    }
 
+    /**
+     * Returns whether the browse button is active.
+     * 
+     * @param cell whether the button is for the cell editor (<code>true</code>) or the plain editor component
+     * @param context the decision variable providing the context for the selection
+     * @return <code>true</code> if active, <code>false</code> else
+     */
+    protected abstract boolean isBrowseButtonActive(boolean cell, IDecisionVariable context);
+
+    /**
+     * Returns whether the text editor is enabled.
+     * 
+     * @param cell whether the button is for the cell editor (<code>true</code>) or the plain editor component
+     * @param context the decision variable providing the context for the selection
+     * @return <code>true</code> if enabled, <code>false</code> else
+     */
+    protected abstract boolean isTextEditorEnabled(boolean cell, IDecisionVariable context);
+
+    /**
+     * Is called when the browse button is selected.
+     * 
+     * @param text the actual text from the text editor of the created editor component
+     * @param context the decision variable providing the context for the selection
+     * @param updater the updater for storing the selectionr result
+     */
+    protected abstract void browseButtonSelected(String text, IDecisionVariable context, ITextUpdater updater);
+    
     /**
      * Implements the artifact editor.
      * 
      * @author Holger Eichelberger
      */
-    private static class ArtifactComposite extends Composite implements ITextUpdater, IDirtyableEditor, 
+    private class ArtifactComposite extends Composite implements ITextUpdater, IDirtyableEditor, 
         IOverridingEditor {
 
         private Text textField;
@@ -131,30 +131,24 @@ class Test {
                 data.widthHint = 80;
             }
             textField.setLayoutData(data);
+            EditorUtils.assignHelpText(variable, textField);
             updateFromValueText();
              
             button = new Button(this, SWT.NONE);
             button.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-            button.setText(cell ? "..." : "Browse...");
-            button.setEnabled(MavenArtifactEditor.isConfigured());
+            button.setText(getBrowseButtonText(cell, variable));
+            button.setEnabled(isBrowseButtonActive(cell, variable));
 
             button.addSelectionListener(new SelectionAdapter() {
            
                 @Override
                 public void widgetSelected(SelectionEvent exc) {
-                    MavenArtifactEditor dlg = new MavenArtifactEditor(
-                        PlatformUI.getWorkbench().getDisplay().getActiveShell(), ArtifactComposite.this);
-                    String artifactSpec = textField.getText();
-                    if (null != artifactSpec) {
-                        dlg.setInitialTreePath(artifactSpec);
-                    }
-                    dlg.open();
+                    AbstractTextSelectionEditorCreator.this.browseButtonSelected(textField.getText(), 
+                        ArtifactComposite.this.variable, ArtifactComposite.this);
                 }
             });
             
         }
-        
-        
 
         /**
          * Update the text.
@@ -251,7 +245,7 @@ class Test {
      * 
      * @author Holger Eichelberger
      */
-    private static class ArtifactCellEditor extends CellEditor {
+    private class ArtifactCellEditor extends CellEditor {
 
         private UIConfiguration config;
         private IDecisionVariable variable;
@@ -302,5 +296,5 @@ class Test {
         }
         
     }
-    
+
 }
