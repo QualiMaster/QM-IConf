@@ -395,6 +395,8 @@ public class VariabilityModel {
      *            the elements data structure to be modified as a side effect
      */
     public static void createConfigurationElements(ConfigurableElements elements) {
+        boolean demoMode = ConfigurationProperties.DEMO_MODE.getBooleanValue();
+
         QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.BASICS, "Types");
         elements.variableToConfigurableElements(Configuration.BASICS, "de.uni_hildesheim.sse.qmApp.TypesEditor");
         
@@ -427,24 +429,25 @@ public class VariabilityModel {
             new VarModelEditorInputCreator(Configuration.INFRASTRUCTURE, "Infrastructure"),
             Configuration.INFRASTRUCTURE);
         
-        QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.OBSERVABLES, "Observables");
-        elements.variableToConfigurableElements(Configuration.OBSERVABLES, 
-                        "de.uni_hildesheim.sse.qmApp.ObservablesEditor");
-
-        QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.OBSERVABLES, "Adaptation");
-        ConfigurableElement elt = elements.variableToConfigurableElements(Configuration.OBSERVABLES, 
-                        "de.uni_hildesheim.sse.qmApp.AdaptationEditor");
-        elt.setImage(IconManager.retrieveImage(IconManager.ADAPTATION));
-        IEditorInputCreator editorInput = new RtVilEditorInputCreator();
-        if (editorInput.isEnabled()) {
-            ConfigurableElement rtVIL = new ConfigurableElement(elt, "rt-VIL", "de.uni_hildesheim.sse.vil.rt.RtVil", 
-                editorInput);
-            rtVIL.setImage(IconManager.retrieveImage(IconManager.RTVIL)); // TODO preliminary - take from rtVIL
-            rtVIL.setMenuContributor(new RtVilMenuContributor());
-            elt.addChild(rtVIL);
-        }
-        boolean demoMode = ConfigurationProperties.DEMO_MODE.getBooleanValue();
         if (!demoMode) {
+            QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.OBSERVABLES, 
+                "Observables");
+            elements.variableToConfigurableElements(Configuration.OBSERVABLES, 
+                            "de.uni_hildesheim.sse.qmApp.ObservablesEditor");
+    
+            QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.OBSERVABLES, 
+                "Adaptation");
+            ConfigurableElement elt = elements.variableToConfigurableElements(Configuration.OBSERVABLES, 
+                            "de.uni_hildesheim.sse.qmApp.AdaptationEditor");
+            elt.setImage(IconManager.retrieveImage(IconManager.ADAPTATION));
+            IEditorInputCreator editorInput = new RtVilEditorInputCreator();
+            if (editorInput.isEnabled()) {
+                ConfigurableElement rtVIL = new ConfigurableElement(elt, "rt-VIL", 
+                    "de.uni_hildesheim.sse.vil.rt.RtVil", editorInput);
+                rtVIL.setImage(IconManager.retrieveImage(IconManager.RTVIL)); // TODO preliminary - take from rtVIL
+                rtVIL.setMenuContributor(new RtVilMenuContributor());
+                elt.addChild(rtVIL);
+            }
             elt = elements.addElement("Runtime", "de.uni_hildesheim.sse.qmApp.RuntimeEditor", 
                     new EmptyEditorInputCreator("Runtime Input"), null);
             elt.setImage(IconManager.retrieveImage(IconManager.RUNTIME));
@@ -622,6 +625,8 @@ public class VariabilityModel {
      * Registers application specific editors.
      */
     public static void registerEditors() {
+        boolean demoMode = ConfigurationProperties.DEMO_MODE.getBooleanValue();
+
         ConfigurationTableEditorFactory.registerEditorCreator("Basics::Parameters", 
             ParameterEditor.CREATOR);
         ConfigurationTableEditorFactory.registerEditorCreator("Basics::Tuples", 
@@ -631,8 +636,11 @@ public class VariabilityModel {
         ConfigurationTableEditorFactory.registerEditorCreator("Basics::ArtifactString", ArtifactEditor.CREATOR);
         ConfigurationTableEditorFactory.registerEditorCreator("Basics::OptionalArtifactString", ArtifactEditor.CREATOR);
         ConfigurationTableEditorFactory.registerEditorCreator("Basics::Description", MultipleLineText.CREATOR);
-        ConfigurationTableEditorFactory.registerEditorCreator("Basics::ClassString", ClassEditor.CREATOR);
-        ConfigurationTableEditorFactory.registerEditorCreator("Basics::OptionalClassString", ClassEditor.CREATOR);
+
+        if (!demoMode) {
+            ConfigurationTableEditorFactory.registerEditorCreator("Basics::ClassString", ClassEditor.CREATOR);
+            ConfigurationTableEditorFactory.registerEditorCreator("Basics::OptionalClassString", ClassEditor.CREATOR);
+        }
     }
 
     /**
