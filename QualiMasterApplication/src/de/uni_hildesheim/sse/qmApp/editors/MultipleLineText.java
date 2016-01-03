@@ -10,9 +10,14 @@ import org.eclipse.swt.widgets.Text;
 
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.IEditorCreator;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
+import de.uni_hildesheim.sse.easy.ui.productline_editor.IOverridingEditor;
 import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
+import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
+import de.uni_hildesheim.sse.model.varModel.datatypes.StringType;
 import de.uni_hildesheim.sse.model.varModel.values.StringValue;
 import de.uni_hildesheim.sse.model.varModel.values.Value;
+import de.uni_hildesheim.sse.model.varModel.values.ValueDoesNotMatchTypeException;
+import de.uni_hildesheim.sse.model.varModel.values.ValueFactory;
 
 /**
  * A {@link Text} with multiple lines. The MultipleLineText provides a {@link Text}-field which can be
@@ -46,9 +51,11 @@ public class MultipleLineText {
      * 
      * @author Niko
      */
-    private static class MultiLineComposite extends Composite implements ITextUpdater, IFixedLayout, IDirtyableEditor {
+    private static class MultiLineComposite extends Composite implements ITextUpdater, IFixedLayout, IDirtyableEditor, 
+        IOverridingEditor {
 
         private Text textField;
+        private IDecisionVariable variable;
         
         /**
          * Constructs a MultiLineComposite aka a multiple-line-Text-field.
@@ -59,6 +66,7 @@ public class MultipleLineText {
          */
         MultiLineComposite(Composite parent, IDecisionVariable variable, boolean cell) {
             super(parent, SWT.NONE);
+            this.variable = variable;
 
             GridLayout layout = new GridLayout();
             layout.marginRight = -layout.marginWidth;
@@ -117,12 +125,52 @@ public class MultipleLineText {
 
         @Override
         public void addDirtyListener(DirtyListener listener) {
-            textField.addSelectionListener(listener);
+            textField.addKeyListener(listener);
         }
 
         @Override
         public void removeDirtyListener(DirtyListener listener) {
-            textField.removeSelectionListener(listener);
+            textField.removeKeyListener(listener);
+        }
+        
+        @Override
+        public Value getValueAssignment(Object value) throws ValueDoesNotMatchTypeException {
+            Value val = null;
+            IDatatype type = variable.getDeclaration().getType();
+            if (null != value && type.isAssignableFrom(StringType.TYPE)) {
+                val = ValueFactory.createValue(type, value);
+            }
+            return val;
+        }
+
+        @Override
+        public String getValueText() {
+            String result = null;
+            if (null != variable) {
+                Value value = variable.getValue();
+                if (value instanceof StringValue) { // we know this from the model
+                    result = ((StringValue) value).getValue();
+                }
+            }
+            return result;
+        }
+
+        /**
+         * Updates the editor from the {@link #getValueText()}.
+         * 
+         * @return the value of {@link #getValueText()}.
+         */
+        private String updateFromValueText() {
+            String val = getValueText();
+            if (null != val) {
+                textField.setText(val);
+            }
+            return val;
+        }
+
+        @Override
+        public void refreshContents() {
+            updateFromValueText();
         }
 
     }
