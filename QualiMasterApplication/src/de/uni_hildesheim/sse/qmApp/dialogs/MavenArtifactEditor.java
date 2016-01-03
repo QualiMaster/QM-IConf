@@ -1,5 +1,6 @@
 package de.uni_hildesheim.sse.qmApp.dialogs;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -7,7 +8,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -19,6 +22,8 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -47,6 +52,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
 
+import de.uni_hildesheim.sse.easy_producer.observer.EclipseProgressObserver;
 import de.uni_hildesheim.sse.qmApp.editors.ITextUpdater;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.repositoryConnector.maven.MavenFetcher;
@@ -60,7 +66,7 @@ import de.uni_hildesheim.sse.repositoryConnector.maven.MavenFetcher.TreeElement;
  */
 public class MavenArtifactEditor extends Dialog {
 
-    //Wenn ok, dann Fenster schlieﬂen!!!
+    private static final long ACTUAL_TREE_TIME_DIFF = 12 * 60 * 60 * 1000; // 12h in ms
     private static final String REGEX = "^\\d+(\\.\\d+)+(\\-([a-zA-Z])*){0,1}?$";
     private List<TreeElement> mavenList = new ArrayList<TreeElement>();
     private Composite treeContainer;
@@ -109,10 +115,14 @@ public class MavenArtifactEditor extends Dialog {
 
     /**
      * Fill the list with all maven artifacts.
+     * 
+     * @param monitor the actual progress monitor
      */
-    private void collectMavenArtifactsOnline() {
-
-        mavenList = MavenFetcher.getElementTree();
+    private void collectMavenArtifactsOnline(IProgressMonitor monitor) {
+        EclipseProgressObserver obs = new EclipseProgressObserver();
+        obs.register(monitor);
+        mavenList = MavenFetcher.getElementTree(obs);
+        obs.unregister(monitor);
     }
 
     /**
@@ -124,12 +134,8 @@ public class MavenArtifactEditor extends Dialog {
         @Override
         public void run(final IProgressMonitor monitor)
             throws InvocationTargetException, InterruptedException {
-            monitor.beginTask("Building Tree Structure",
-                    IProgressMonitor.UNKNOWN);
-
             // time consuming work here
-            collectMavenArtifactsOnline();
-
+            collectMavenArtifactsOnline(monitor);
             monitor.done();
         }
     }
@@ -142,8 +148,7 @@ public class MavenArtifactEditor extends Dialog {
      */
     private void createProgressDialog(Composite parent) {
         try {
-            ProgressMonitorDialog pmd = new ProgressMonitorDialog(
-                    parent.getShell()) {
+            ProgressMonitorDialog pmd = new ProgressMonitorDialog(parent.getShell()) {
 
                 @Override
                 protected void setShellStyle(int newShellStyle) {
@@ -242,20 +247,27 @@ public class MavenArtifactEditor extends Dialog {
      */
     private void setViewerInput(Composite parent) {
         // if online
+        boolean openLocal = false;
         if (MavenFetcher.checkRepositoryConnectivity()) {
-            createProgressDialog(parent);
-            createTreeViewer(treeContainer); // mavenlist is filled and input is
-                                             // set
-            Display.getCurrent().asyncExec(new Runnable() {
-                public void run() {
-                    viewer.setInput(mavenList);
-                    if (null != initialTreePath) {
-                        highlightTreePath(initialTreePath);
+            File file = getTreeFile();
+            if (!file.exists() || System.currentTimeMillis() - file.lastModified() > ACTUAL_TREE_TIME_DIFF) {
+                createProgressDialog(parent);
+                createTreeViewer(treeContainer); // mavenlist is filled and input is set
+                Display.getCurrent().asyncExec(new Runnable() {
+                    public void run() {
+                        viewer.setInput(mavenList);
+                        if (null != initialTreePath) {
+                            highlightTreePath(initialTreePath);
+                        }
                     }
-                }
-            });
-            saveTreeLocally();
-        } else {
+                });
+                saveTreeLocally();
+                openLocal = false;
+            } else {
+                openLocal = true;
+            }
+        } 
+        if (openLocal) {
             // open error dialog
             createTreeViewer(treeContainer);
             loadTreeLocally();
@@ -275,23 +287,15 @@ public class MavenArtifactEditor extends Dialog {
      * be loaded from the saved file.
      */
     private void saveTreeLocally() {
-
         try {
-            String workspace = ResourcesPlugin.getWorkspace().getRoot()
-                    .getLocation().toString();
-            String metadataFolder = workspace + "/.metadata";
-            FileOutputStream fileoutputstream = new FileOutputStream(
-                    metadataFolder + "/MavenTreeSaved.ser");
-            ObjectOutputStream outputstream = new ObjectOutputStream(
-                    fileoutputstream);
+            FileOutputStream fileoutputstream = new FileOutputStream(getTreeFile());
+            ObjectOutputStream outputstream = new ObjectOutputStream(fileoutputstream);
             outputstream.writeObject(mavenList);
             outputstream.close();
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Dialogs.showErrorDialog("Error storing the Maven artifacts tree cache", e.getMessage());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Dialogs.showErrorDialog("Error storing the Maven artifacts tree cache", e.getMessage());
         }
     }
 
@@ -301,25 +305,27 @@ public class MavenArtifactEditor extends Dialog {
      */
     @SuppressWarnings("unchecked")
     private void loadTreeLocally() {
-
-        ArrayList<TreeElement> tree = null;
         try {
-            String workspace = ResourcesPlugin.getWorkspace().getRoot()
-                    .getLocation().toString();
-            String metadataFolder = workspace + "/.metadata";
-            FileInputStream fileIn = new FileInputStream(metadataFolder
-                    + "/MavenTreeSaved.ser");
-
+            FileInputStream fileIn = new FileInputStream(getTreeFile());
             ObjectInputStream in = new ObjectInputStream(fileIn);
-            tree = (ArrayList<TreeElement>) in.readObject();
+            mavenList = (ArrayList<TreeElement>) in.readObject();
             in.close();
             fileIn.close();
-            viewer.setInput(tree);
+            viewer.setInput(mavenList);
         } catch (IOException | ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Dialogs.showErrorDialog("Error loading the Maven artifacts tree cache", e.getMessage());
         }
         viewer.refresh();
+    }
+    
+    /**
+     * Returns the file for storing the Maven tree persistently (offline use).
+     * 
+     * @return the file
+     */
+    private File getTreeFile() {
+        String workspace = ResourcesPlugin.getWorkspace().getRoot().getLocation().toString();
+        return new File(workspace + "/.metadata/MavenTreeSaved.ser");
     }
 
     /**
@@ -426,6 +432,25 @@ public class MavenArtifactEditor extends Dialog {
         groupIDToReturn += treePathString.get(0).toString();
         return groupIDToReturn;
     }
+    
+    /**
+     * Returns the cache update tooltip text.
+     * 
+     * @return the text
+     */
+    private String getLastUpdateToolTipText() {
+        String result = "Last cache update: ";
+        File file = getTreeFile();
+        if (file.exists()) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(file.lastModified());
+            DateFormat format = DateFormat.getDateInstance();
+            result += format.format(cal.getTime());
+        } else {
+            result += "-";
+        }
+        return result;
+    }
 
     /**
      * Create the buttons for the dialog.
@@ -433,9 +458,9 @@ public class MavenArtifactEditor extends Dialog {
      * @param buttonsContainer
      *            Container for the buttons.
      */
-    public void createButtons(Composite buttonsContainer) {
-
-        Button refresh = new Button(buttonsContainer, SWT.RIGHT);
+    public void createButtons(final Composite buttonsContainer) {
+        final Button refresh = new Button(buttonsContainer, SWT.RIGHT);
+        refresh.setToolTipText(getLastUpdateToolTipText());
         refresh.computeSize(SWT.DEFAULT, SWT.DEFAULT);
         refresh.setSize(SWT.DEFAULT, SWT.DEFAULT);
         refresh.setText(" Refresh  ");
@@ -451,18 +476,15 @@ public class MavenArtifactEditor extends Dialog {
                 putIn = groupIDText.getText().replaceAll("/", ".");
 
                 if (putIn.endsWith("/") || putIn.endsWith(".")) {
-                    putIn = putIn.substring(0,
-                            groupIDText.getText().length() - 1);
+                    putIn = putIn.substring(0, groupIDText.getText().length() - 1);
                 }
-                artifactEditorUpdater.updateText(putIn + ":"
-                        + artifactIDText.getText() + ":"
-                        + versionText.getText());
+                artifactEditorUpdater.updateText(putIn + ":" + artifactIDText.getText() + ":" + versionText.getText());
                 
                 closeEditor();
             }
+
             @Override
             public void widgetDefaultSelected(SelectionEvent exc) {
-                // TODO Auto-generated method stub
             }
         });
 
@@ -479,7 +501,6 @@ public class MavenArtifactEditor extends Dialog {
 
             @Override
             public void widgetDefaultSelected(SelectionEvent exc) {
-                // TODO Auto-generated method stub
             }
         });
         refresh.addSelectionListener(new SelectionListener() {
@@ -488,16 +509,17 @@ public class MavenArtifactEditor extends Dialog {
 
                 if (MavenFetcher.checkRepositoryConnectivity()) {
 
-                    collectMavenArtifactsOnline();
+                    createProgressDialog(buttonsContainer);
                     viewer.setInput(mavenList);
                     saveTreeLocally();
+                    refresh.setToolTipText(getLastUpdateToolTipText());
                 } else {
                     loadTreeLocally();
                 }
             }
+
             @Override
             public void widgetDefaultSelected(SelectionEvent exc) {
-                // TODO Auto-generated method stub
             }
         });
     }
@@ -638,6 +660,7 @@ public class MavenArtifactEditor extends Dialog {
         if (treeList != null && treeList.length > 0) {
             viewer.setExpandedElements(treeList);
             viewer.reveal(treeList[treeList.length - 1]);
+            viewer.setSelection(new TreeSelection(new TreePath(treeList)));
         }
     }
     
@@ -667,10 +690,10 @@ public class MavenArtifactEditor extends Dialog {
         List<TreeElement> tmp = new ArrayList<TreeElement>();
         
         boolean found = false;
-        List<TreeElement> mavenTreeList = MavenFetcher.getElementTree();
+        //List<TreeElement> mavenList = MavenFetcher.getElementTree();
         
-        for (int i = 0; !found && i < mavenTreeList.size(); i++) {
-            found = find(mavenTreeList.get(i), searchStrings, 0, tmp);
+        for (int i = 0; !found && i < mavenList.size(); i++) {
+            found = find(mavenList.get(i), searchStrings, 0, tmp);
         }
 
         TreeElement[] result;
@@ -740,12 +763,10 @@ public class MavenArtifactEditor extends Dialog {
 
         @Override
         public void dispose() {
-            // TODO Auto-generated method stub
         }
 
         @Override
         public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-            // TODO Auto-generated method stub
         }
 
         @Override
@@ -773,13 +794,11 @@ public class MavenArtifactEditor extends Dialog {
 
         @Override
         public Object getParent(Object element) {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public boolean hasChildren(Object element) {
-            // TODO Auto-generated method stuburn;
             boolean toReturn;
             if (element instanceof TreeElement) {
                 toReturn = true;
@@ -797,23 +816,19 @@ public class MavenArtifactEditor extends Dialog {
 
         @Override
         public void addListener(ILabelProviderListener listener) {
-            // TODO Auto-generated method stub
         }
 
         @Override
         public void dispose() {
-            // TODO Auto-generated method stub
         }
 
         @Override
         public boolean isLabelProperty(Object element, String property) {
-            // TODO Auto-generated method stub
             return false;
         }
 
         @Override
         public void removeListener(ILabelProviderListener listener) {
-            // TODO Auto-generated method stub
         }
 
         @Override
@@ -840,7 +855,6 @@ public class MavenArtifactEditor extends Dialog {
 
         @Override
         public String getText(Object element) {
-            // TODO Auto-generated method stub
             String toReturn = "";
             if (element instanceof TreeElement) {
                 TreeElement treeElement = (TreeElement) element;

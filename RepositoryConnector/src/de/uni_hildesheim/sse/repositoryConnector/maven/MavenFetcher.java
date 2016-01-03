@@ -12,6 +12,9 @@ import org.jsoup.select.Elements;
 
 import de.uni_hildesheim.sse.repositoryConnector.Bundle;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
+import de.uni_hildesheim.sse.utils.progress.ProgressObserver;
+import de.uni_hildesheim.sse.utils.progress.ProgressObserver.ISubtask;
+import de.uni_hildesheim.sse.utils.progress.ProgressObserver.ITask;
 
 /**
  * Class that collects the directories within the given Maven-Repository
@@ -104,18 +107,21 @@ public class MavenFetcher implements Serializable {
      */
     public static void main(String[] args) throws IOException {
  
-        collectMavenArtifacts();
+        collectMavenArtifacts(ProgressObserver.NO_OBSERVER);
     }
  
     /**
      * Collect directories in maven-repository by using {@link Jsoup}.
      * 
+     * @param observer the progress observer to report progress for
      * @throws IOException Exception.
      */
-    public static void collectMavenArtifacts() throws IOException {
+    public static void collectMavenArtifacts(ProgressObserver observer) throws IOException {
         if (isConfigured()) {
             //Connect to the repository
             Document doc = Jsoup.connect(mavenRepositoryURL).get();
+            
+            List<Elements> files = new ArrayList<Elements>();
             for (Element file : doc.select("tr")) {
                 Elements img = file.select("td img");
                 Elements f = file.select("td a");
@@ -123,18 +129,32 @@ public class MavenFetcher implements Serializable {
                     String src = img.attr("src");
                     //Take a look at all "folders"
                     if (src.endsWith("folder.gif")) {
-                        //Create a TreeElement for each folder.
-                        TreeElement element = new TreeElement(f.attr("href"));
-                        if (f.attr("href") != null) {
-                            //Add all children to the created TreeElement by recursively calling "getDeeperElements.
-                            getDeeperElements(mavenRepositoryURL + f.attr("href"), element);
-                        }
-                        //At last, add each top-level TreeElement to the list.
-                        //The Tree is now complete when the recursion is finished.
-                        elementTree.add(element);
+                        files.add(f);
                     }
                 }
             }
+
+            int filesCount = files.size();
+            ITask task = observer.registerTask("Building Maven artifact tree");
+            observer.notifyStart(task, filesCount);
+            for (int i = 0; i < files.size(); i++) {
+                Elements f = files.get(i);
+                //Create a TreeElement for each folder.
+                String treeName = f.attr("href");
+                TreeElement element = new TreeElement(treeName);
+                if (treeName != null) {
+                    ISubtask subtask = observer.registerSubtask("Loading tree: " + treeName);
+                    observer.notifyStart(task, subtask, 1);
+                    //Add all children to the created TreeElement by recursively calling "getDeeperElements.
+                    getDeeperElements(mavenRepositoryURL + treeName, element);
+                    observer.notifyEnd(task, subtask);
+                }
+                //At last, add each top-level TreeElement to the list.
+                //The Tree is now complete when the recursion is finished.
+                elementTree.add(element);
+                observer.notifyProgress(task, i + 1);
+            }
+            observer.notifyEnd(task);
         }
     }
 
@@ -168,12 +188,14 @@ public class MavenFetcher implements Serializable {
 
     /**
      * Return the directory-tree.
+     * 
+     * @param observer the progress observer to report progress to
      * @return toReturn List of directories in the maven-repository.s
      */
-    public static List<TreeElement> getElementTree() {
+    public static List<TreeElement> getElementTree(ProgressObserver observer) {
         try {
             if (elementTree.isEmpty()) {
-                collectMavenArtifacts();
+                collectMavenArtifacts(observer);
             }
         } catch (IOException e) {
             EASyLoggerFactory.INSTANCE.getLogger(MavenFetcher.class, Bundle.ID).error(e.getMessage());
