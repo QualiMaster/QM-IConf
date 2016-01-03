@@ -1,5 +1,6 @@
 package de.uni_hildesheim.sse.qmApp.editors;
 
+import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
 import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 
 /**
@@ -19,8 +20,11 @@ public class SourceSinkEditor extends AbstractUploadEditor {
     @Override
     protected boolean disableKeyPart() {
         boolean disable = false;
-        IDatatype varType = getVariable().getDeclaration().getType();
-        disable = varType.getName().equals("DataSink"); // not nice
+        IDecisionVariable var = getVariable();
+        if (null != var) {
+            IDatatype varType = var.getDeclaration().getType();
+            disable = varType.getName().equals("DataSink"); // not nice
+        }
         return disable;
     }
 
