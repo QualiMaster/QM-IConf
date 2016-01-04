@@ -83,7 +83,7 @@ public class Reasoning {
         
         /**
          * Constructor.
-         * @param pipelineName pipeline name.
+         * @param pipelineName name of the pipeline.
          * @param variableName variable name.
          * @param conflictMessage conflict message for displaying.
          */
