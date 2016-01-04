@@ -43,6 +43,12 @@ import de.uni_hildesheim.sse.model.varModel.Project;
 import de.uni_hildesheim.sse.qmApp.pipelineUtils.Highlighter;
 import de.uni_hildesheim.sse.qmApp.pipelineUtils.HighlighterParam;
 import de.uni_hildesheim.sse.utils.modelManagement.ModelInfo;
+import pipeline.Pipeline;
+import pipeline.PipelinePackage;
+import pipeline.diagram.part.PipelineDiagramEditorUtil;
+import pipeline.impl.FlowImpl;
+import pipeline.presentation.PipelineModelWizard;
+import qualimasterapplication.Activator;
 
 /**
  * Some helpful methods working with pipeline diagrams.

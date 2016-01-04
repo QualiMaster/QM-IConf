@@ -144,6 +144,14 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     }
 
     /**
+     * Refresh the {@link ScrolledComposite}.
+     */
+    public static void refreshEditor() {
+
+        scroll.redraw();
+    }
+    
+    /**
      * Go through the {@link Text}´s and pair them with a control-Decoration which can be hidden or not.
      * @param ctrl parent control.
      */

@@ -193,6 +193,7 @@ public class RuntimeEditor extends EditorPart implements IDispatcher {
                         InetAddress address = InetAddress.getByName(platform);
                         int port = Integer.parseInt(platformPort.getText());
                         endpoint = new ClientEndpoint(RuntimeEditor.this, address, port);
+                        System.out.println(endpoint);
                         enableButtons();
                         usedClusterMachines.setValid(true);
                     } catch (UnknownHostException e) {

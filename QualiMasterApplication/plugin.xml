@@ -129,6 +129,14 @@
                   visible="false">
             </separator>            
          </menu>
+         
+          <menu label="Monitoring" id="MonitoringMenu">
+ 
+            <command commandId="de.uni_hildesheim.sse.qmApp.commands.ConnectHandler"
+                label="Connect"> 
+            </command>
+         </menu>
+         
          <menu label="Help" id="helpMenu">
          <!--
          	<command commandId="org.eclipse.equinox.p2.ui.sdk.update"
@@ -145,6 +153,11 @@
              <separator name="additions" visible="false"></separator>
              <separator name="about" visible="false"> </separator>
          </menu>
+         
+         
+         
+         
+         
       </menuContribution>
    </extension>
    <extension
@@ -191,6 +204,10 @@
       </command>
       <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.AboutHandler"
           id="de.uni_hildesheim.sse.qmApp.commands.AboutHandler"
+          name="About">
+      </command>
+       <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.ConnectHandler"
+          id="de.uni_hildesheim.sse.qmApp.commands.ConnectHandler"
           name="About">
       </command>
    </extension>   
@@ -240,6 +257,10 @@
            </image>
            <image 
                commandId="de.uni_hildesheim.sse.qmApp.commands.P2UpdateHandler"
+               icon="icons/checkForUpdates.png">
+           </image>
+           <image 
+               commandId="de.uni_hildesheim.sse.qmApp.commands.ConnectHandler"
                icon="icons/checkForUpdates.png">
            </image>
    </extension>

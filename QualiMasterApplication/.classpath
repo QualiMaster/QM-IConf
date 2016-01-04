@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="lib/adaptationLayer-external.jar" sourcepath="/AdaptationLayer"/>
+	<classpathentry exported="true" kind="lib" path="lib/adaptationLayer-external.jar" sourcepath="/AdaptationLayer"/>
 	<classpathentry kind="lib" path="lib/xygraph/org.csstudio.swt.widgets_2.1.0.201209121549.jar"/>
 	<classpathentry kind="lib" path="lib/xygraph/org.csstudio.swt.xygraph_2.1.0.201209121540.jar" sourcepath="lib/xygraph/org.csstudio.swt.xygraph.source_2.1.0.201209121540.jar"/>
 	<classpathentry kind="lib" path="lib/xygraph/org.csstudio.swt.widgets.source_2.1.0.201209121549.jar"/>
 	<classpathentry kind="lib" path="lib/xygraph/org.csstudio.swt.xygraph.source_2.1.0.201209121540.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/RepositoryConnector"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

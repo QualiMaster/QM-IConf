@@ -250,6 +250,7 @@ public class Reasoning {
                             CompoundVariable failedVariable = (CompoundVariable) confElement;
                             String name = failedVariable.getNestedVariable("name").toString();
                             
+                            //Extract the actual name.
                             name = name.substring(name.indexOf("="), name.indexOf(":"));
                             name = name.replaceAll("[^a-zA-Z0-9]", "");
                             name = name.trim();
@@ -268,6 +269,8 @@ public class Reasoning {
         ConfigurableElementsView.saveReasosiningInfoInTreeElements(configurableElementsViewMapping);
         ConfigurableElementsView.saveReasosiningInfoInTreeElementsForPipelines(
                 configurableElementsViewMappingForPipelines);
+        
+        VariableEditor.refreshEditor();
       
     }
     
@@ -302,7 +305,6 @@ public class Reasoning {
 
                 IDecisionVariable innerVariable = pipelineVariable.getNestedElement(k);
                 
-                //TODO: Not that elegant
                 if (innerVariable.toString().contains("name")) {
                     String name = pipelineVariable.getNestedElement(k).getValue().toString();
 
@@ -329,7 +331,6 @@ public class Reasoning {
                 if (name != null && !"".equals(name)) {
                     configurableElementsViewMappingForPipelines.add(pipelineName);
                 }
-                //configurableELementsViewMapping.add(pipelineName);
             }
         }
     }
