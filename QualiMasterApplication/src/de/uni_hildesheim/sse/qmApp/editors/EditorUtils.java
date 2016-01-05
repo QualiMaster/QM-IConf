@@ -47,6 +47,7 @@ public class EditorUtils {
         String labelText = ModelAccess.getLabelName(var.getDeclaration());
         Label label = new Label(uiCfg.getParent().getContentPane(), SWT.NONE);
         label.setText(labelText);
+        assignHelpText(var, label);
         return label;
     }
     
