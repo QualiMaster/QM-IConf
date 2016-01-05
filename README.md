@@ -22,6 +22,7 @@ Build Status
 |---|---|
 | ConfigurationApplication | ![Build Status](http://jenkins.sse.uni-hildesheim.de/buildStatus/icon?job=ConfigurationApplication) |
 | ConfigurationApplication Nightly Update Site | ![Build Status](http://jenkins.sse.uni-hildesheim.de/buildStatus/icon?job=ConfigurationApplication.Nightly) |
+| QualiMaster-Extension for EASy-Producer | ![Build Status](http://jenkins.sse.uni-hildesheim.de/buildStatus/icon?job=QualiMaster.Extension) |
 | EASy-Producer | ![Build Status of EASy-Producer](http://jenkins.sse.uni-hildesheim.de/buildStatus/icon?job=EASy-Producer) |
 | Instantiation | ![Build Status of Instantiation](http://jenkins.sse.uni-hildesheim.de/buildStatus/icon?job=Instantiation) |
 | SSE-Reasoner | ![Build Status of SSE-Reasoner](http://jenkins.sse.uni-hildesheim.de/buildStatus/icon?job=SSEreasoner) |
