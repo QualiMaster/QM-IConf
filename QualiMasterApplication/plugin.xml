@@ -130,10 +130,13 @@
             </separator>            
          </menu>
          
-          <menu label="Monitoring" id="MonitoringMenu">
+          <menu label="Runtime" id="RuntimeMenu">
  
             <command commandId="de.uni_hildesheim.sse.qmApp.commands.ConnectHandler"
                 label="Connect"> 
+            </command>
+            <command commandId="de.uni_hildesheim.sse.qmApp.commands.DisconnectHandler"
+                label="Disconnect"> 
             </command>
          </menu>
          

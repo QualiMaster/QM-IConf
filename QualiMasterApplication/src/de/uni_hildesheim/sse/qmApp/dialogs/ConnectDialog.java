@@ -1,5 +1,6 @@
 package de.uni_hildesheim.sse.qmApp.dialogs;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -133,26 +134,28 @@ public class ConnectDialog extends AbstractDialog implements Serializable {
      * @param port connections port.
      */
     private void savePluginSettings(InetAddress address, String port) {
-    
         ConnectionWrapper wrapper = new ConnectionWrapper(address.toString(), port);
-        
         try {
-            String workspace = ResourcesPlugin.getWorkspace().getRoot()
-                    .getLocation().toString();
-            String metadataFolder = workspace + "/.metadata";
-            FileOutputStream fileoutputstream = new FileOutputStream(
-                    metadataFolder + "/RuntimeConnection.ser");
-            ObjectOutputStream outputstream = new ObjectOutputStream(
-                    fileoutputstream);
+            File file = getConnectionSettingsFile();
+            FileOutputStream fileoutputstream = new FileOutputStream(file);
+            ObjectOutputStream outputstream = new ObjectOutputStream(fileoutputstream);
             outputstream.writeObject(wrapper);
             outputstream.close();
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Dialogs.showErrorDialog("Storing connection settings", e.getMessage());
         }
+    }
+
+    /**
+     * Returns the connection settings file.
+     * 
+     * @return the connection settings file
+     */
+    private File getConnectionSettingsFile() {
+        String workspace = ResourcesPlugin.getWorkspace().getRoot()
+            .getLocation().toString();
+        String metadataFolder = workspace + "/.metadata";
+        return new File(metadataFolder, "RuntimeConnection.ser");
     }
 
     /**
@@ -161,27 +164,22 @@ public class ConnectDialog extends AbstractDialog implements Serializable {
      *  @throws FileNotFoundException e If file with info about the latest connection is not found.
      */
     private void loadPluginSettings() throws FileNotFoundException {
-
         ConnectionWrapper wrapper = null;
         try {
-            String workspace = ResourcesPlugin.getWorkspace().getRoot()
-                    .getLocation().toString();
-            String metadataFolder = workspace + "/.metadata";
-            FileInputStream fileIn = new FileInputStream(metadataFolder
-                    + "/RuntimeConnection.ser");
-
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            wrapper = (ConnectionWrapper) in.readObject();
-            in.close();
-            fileIn.close();
-
-            if (wrapper != null) {
-                platformIP.setText(wrapper.ip);
-                platformPort.setText(wrapper.port);
+            File file = getConnectionSettingsFile();
+            if (file.exists()) {
+                FileInputStream fileIn = new FileInputStream(file);
+                ObjectInputStream in = new ObjectInputStream(fileIn);
+                wrapper = (ConnectionWrapper) in.readObject();
+                in.close();
+    
+                if (wrapper != null) {
+                    platformIP.setText(wrapper.ip);
+                    platformPort.setText(wrapper.port);
+                }
             }
         } catch (IOException | ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Dialogs.showErrorDialog("Loading connection settings", e.getMessage());
         }
     }
       
@@ -241,7 +239,7 @@ public class ConnectDialog extends AbstractDialog implements Serializable {
 
     @Override
     protected String getTitle() {
-        return "Connection";
+        return "Infrastructure connection";
     }
 
 }

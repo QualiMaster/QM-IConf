@@ -1,8 +1,5 @@
 package de.uni_hildesheim.sse.qmApp.editors;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,7 +32,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -46,11 +42,10 @@ import de.uni_hildesheim.sse.model.varModel.values.CompoundValue;
 import de.uni_hildesheim.sse.model.varModel.values.ContainerValue;
 import de.uni_hildesheim.sse.model.varModel.values.EnumValue;
 import de.uni_hildesheim.sse.model.varModel.values.Value;
-import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
+import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
 import eu.qualimaster.adaptation.external.AlgorithmChangedMessage;
-import eu.qualimaster.adaptation.external.ClientEndpoint;
 import eu.qualimaster.adaptation.external.DisconnectMessage;
 import eu.qualimaster.adaptation.external.HardwareAliveMessage;
 import eu.qualimaster.adaptation.external.IDispatcher;
@@ -81,12 +76,6 @@ public class RuntimeEditor extends EditorPart implements IDispatcher {
     
     private static final String EMPTY_ALG_LABEL = "---------";
     private static final String CHANGE_ALG_LABEL = "---------";
-    
-    private ClientEndpoint endpoint;
-    private Button connect;
-    private Button disconnect;
-    private Text platformIP;
-    private Text platformPort;
     
     private Button enact;
     private Button startPipeline;
@@ -143,16 +132,11 @@ public class RuntimeEditor extends EditorPart implements IDispatcher {
      * Enables or disables the buttons on this editor.
      */
     private void enableButtons() {
-        if (null != connect) {
-            connect.setEnabled(null == endpoint);
-        }
-        if (null != disconnect) {
-            disconnect.setEnabled(null != endpoint);
-        }
         if (null != enact) {
             enact.setEnabled(null != correlation || null != sentiment);
         }
-        if (null != endpoint) {
+        if (Infrastructure.isConnected()) {
+            usedClusterMachines.setValid(true);
             pipelineLatencyDataProvider.clearTrace();
         }
     }
@@ -168,61 +152,6 @@ public class RuntimeEditor extends EditorPart implements IDispatcher {
         GridLayout layout = new GridLayout(2, false);
         panel.setLayout(layout);
 
-        Label label = new Label(panel, SWT.NONE);
-        label.setText("QM platform interface IP (internal):");
-
-        platformIP = new Text(panel, SWT.BORDER);
-        platformIP.setText("snf-618466.vm.okeanos.grnet.gr"); // localhost
-
-        label = new Label(panel, SWT.NONE);
-        label.setText("QM platform interface port (internal):");
-
-        platformPort = new Text(panel, SWT.BORDER);
-        platformPort.setText("7012"); // TODO take from configuration
-
-        
-        connect = new Button(panel, SWT.PUSH);
-        connect.setText("Connect");
-        connect.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                if (null == endpoint) {
-                    try {
-                        String platform = platformIP.getText();
-                        //String platform = "192.168.91.129"; // local VM fallback
-                        InetAddress address = InetAddress.getByName(platform);
-                        int port = Integer.parseInt(platformPort.getText());
-                        endpoint = new ClientEndpoint(RuntimeEditor.this, address, port);
-                        System.out.println(endpoint);
-                        enableButtons();
-                        usedClusterMachines.setValid(true);
-                    } catch (UnknownHostException e) {
-                        Dialogs.showErrorDialog("Cannot connect to QM infrastructure", e.getMessage());
-                    } catch (SecurityException e) {
-                        Dialogs.showErrorDialog("Cannot connect to QM infrastructure", e.getMessage());
-                    } catch (NumberFormatException e) {
-                        Dialogs.showErrorDialog("Port number", e.getMessage());
-                    } catch (IOException e) {
-                        Dialogs.showErrorDialog("Cannot connect to QM infrastructure", e.getMessage());
-                    }
-                }
-            }
-        });
-        
-        disconnect = new Button(panel, SWT.PUSH);
-        disconnect.setText("Disconnect");
-        disconnect.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                ClientEndpoint ep = endpoint;
-                endpoint = null; // -> message
-                ep.schedule(new DisconnectMessage());
-                ep.stop();
-                enableButtons();
-                invalidateGauges();
-            }
-        });
-        
         enableButtons();
     }
     
@@ -310,7 +239,7 @@ public class RuntimeEditor extends EditorPart implements IDispatcher {
         
         @Override
         public void widgetSelected(SelectionEvent event) {
-            endpoint.schedule(new PipelineMessage(PIPELINE_NAME, status));
+            Infrastructure.send(new PipelineMessage(PIPELINE_NAME, status));
             if (PipelineMessage.Status.STOP == status) {
                 corrState.setText(EMPTY_ALG_LABEL);
                 sentState.setText(EMPTY_ALG_LABEL);
@@ -375,7 +304,7 @@ public class RuntimeEditor extends EditorPart implements IDispatcher {
                     algo = null;
                     break;
                 }
-                endpoint.schedule(new SwitchAlgorithmMessage(PIPELINE_NAME, PIPELINE_ELEMENT_SENTIMENT, algo));
+                Infrastructure.send(new SwitchAlgorithmMessage(PIPELINE_NAME, PIPELINE_ELEMENT_SENTIMENT, algo));
                 sentState.setText(CHANGE_ALG_LABEL);
                 sentiment = null;
             }
@@ -392,7 +321,7 @@ public class RuntimeEditor extends EditorPart implements IDispatcher {
                     algo = null;
                     break;
                 }
-                endpoint.schedule(new SwitchAlgorithmMessage(PIPELINE_NAME, PIPELINE_ELEMENT_CORRELATION, algo));
+                Infrastructure.send(new SwitchAlgorithmMessage(PIPELINE_NAME, PIPELINE_ELEMENT_CORRELATION, algo));
                 corrState.setText(CHANGE_ALG_LABEL);
                 correlation = null;
             }
@@ -636,11 +565,6 @@ public class RuntimeEditor extends EditorPart implements IDispatcher {
 
     @Override
     public void handleDisconnect(DisconnectMessage message) {
-        // server side message, just for sure
-        if (null != endpoint) {
-            endpoint.stop();
-            endpoint = null;
-        }
         enableButtons();
         invalidateGauges();
     }

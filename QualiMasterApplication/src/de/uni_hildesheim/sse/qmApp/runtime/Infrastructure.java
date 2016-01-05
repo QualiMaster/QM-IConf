@@ -32,8 +32,9 @@ import eu.qualimaster.adaptation.external.PipelineMessage;
 import eu.qualimaster.adaptation.external.SwitchAlgorithmMessage;
 
 /**
- * Represents the actual connection to the infrastructure. Infrastructure events 
- * are dispatched further to the registered dispatchers.
+ * Represents the actual connection to the infrastructure. Infrastructure messages
+ * are dispatched further to the registered dispatchers. The reception of a disconnect message causes the 
+ * active infrastructure to be disconnected.
  * 
  * @author Holger Eichelberger
  */
@@ -68,6 +69,7 @@ public class Infrastructure {
             for (int d = 0; d < dispatchers.size(); d++) {
                 dispatchers.get(d).handleDisconnect(message);
             }
+            disconnect(false);
         }
 
         @Override
@@ -115,12 +117,12 @@ public class Infrastructure {
     }
     
     /**
-     * Schedules a message for sending if there is an active endpoint. The message
+     * Sends the given <code>msg</code> if there is an active endpoint. The message
      * will be ignored if there is no active endpoint.
      * 
      * @param msg the message to be scheduled
      */
-    public static void schedule(Message msg) {
+    public static void send(Message msg) {
         if (null != endpoint) {
             endpoint.schedule(msg);
         }
@@ -130,8 +132,22 @@ public class Infrastructure {
      * Releases the actual endpoint. Nothing happens if there is no actual endpoint. 
      */
     public static void disconnect() {
+        disconnect(true);
+    }
+    
+    /**
+     * Releases the actual endpoint. Nothing happens if there is no actual endpoint.
+     * 
+     * @param sendMsg whether a {@link DisconnectMessage} shall be sent
+     */
+    public static void disconnect(boolean sendMsg) {
         if (null != endpoint) {
-            endpoint.stop();
+            ClientEndpoint ep = endpoint;
+            endpoint = null; // -> message
+            if (sendMsg) {
+                ep.schedule(new DisconnectMessage());
+            }
+            ep.stop();
         }
     }
 

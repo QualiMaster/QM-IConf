@@ -50,7 +50,6 @@ import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.PipelineDiagramUtils;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
-import de.uni_hildesheim.sse.qmApp.pipelineUtils.IPipelineEditorListener;
 import de.uni_hildesheim.sse.qmApp.pipelineUtils.PipelineEditorListener;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.EventKind;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.IChangeListener;
@@ -337,7 +336,6 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
      * Listen on changes in the emf-based model.
      * @param diagram Diagram which we listen to.
      */
-    @SuppressWarnings("restriction")
     private void listenOnDiagrm(DiagramEditor diagram) {
    
 //        listener = new IPipelineEditorListener() {

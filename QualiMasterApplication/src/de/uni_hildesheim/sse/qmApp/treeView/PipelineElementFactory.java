@@ -39,8 +39,10 @@ import de.uni_hildesheim.sse.qmApp.model.PipelineDiagramUtils;
 import de.uni_hildesheim.sse.qmApp.model.PipelineTranslationOperations;
 import de.uni_hildesheim.sse.qmApp.model.Utils;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
+import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import de.uni_hildesheim.sse.utils.modelManagement.ModelInfo;
+import eu.qualimaster.adaptation.external.PipelineMessage;
 
 /**
  * Implements the configuration element factory for pipelines.
@@ -368,10 +370,14 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
                     action = new Action() {
                         @Override
                         public void run() {
-                            IDecisionVariable var = getVariable(); // take data from
-                            Dialogs.showInfoDialog("In implementation...", "Will start '" 
-                                + ModelAccess.getDisplayName(var) + "'");
-                            // TODO call start operation
+                            if (Infrastructure.isConnected()) { // TODO via event
+                                IDecisionVariable var = getVariable();
+                                Infrastructure.send(new PipelineMessage(ModelAccess.getDisplayName(var), 
+                                    PipelineMessage.Status.START));
+                            } else {
+                                Dialogs.showInfoDialog("Infrastructure not connected...", 
+                                    "Please connect to a running infrastructure first'");
+                            }
                         }
                     };
                     action.setEnabled(isInfrastructureAdmin);
@@ -381,10 +387,14 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
                     action = new Action() {
                         @Override
                         public void run() {
-                            IDecisionVariable var = getVariable(); // take data from
-                            Dialogs.showInfoDialog("In implementation...", "Will stop '" 
-                                + ModelAccess.getDisplayName(var) + "'");
-                            // TODO call stop operation
+                            if (Infrastructure.isConnected()) { // TODO via event
+                                IDecisionVariable var = getVariable();
+                                Infrastructure.send(new PipelineMessage(ModelAccess.getDisplayName(var), 
+                                    PipelineMessage.Status.STOP));
+                            } else {
+                                Dialogs.showInfoDialog("Infrastructure not connected...", 
+                                    "Please connect to a running infrastructure first'");
+                            }
                         }
                     };
                     action.setEnabled(isInfrastructureAdmin);
