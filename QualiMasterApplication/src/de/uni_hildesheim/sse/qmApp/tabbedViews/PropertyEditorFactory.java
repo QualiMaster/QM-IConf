@@ -114,6 +114,25 @@ public class PropertyEditorFactory {
         }
         return result;
     }
+
+    /**
+     * Returns the description for the given property.
+     * 
+     * @param data the data object identifying the {@link IPropertyEditorCreator}
+     * @param propertyIdentifier an identifier specifying the property the display name shall be returned for 
+     *   inside of <code>data</code>
+     * @return the description
+     */
+    public static String getDescription(Object data, String propertyIdentifier) {
+        String result = null;
+        if (null != data && null != propertyIdentifier) {
+            IPropertyEditorCreator creator = CREATORS.get(data.getClass());
+            if (null != creator) {
+                result = creator.getDescription(data, propertyIdentifier);
+            }
+        }
+        return result;
+    }
     
     /**
      * Returns the label provider, i.e., the label describing the actual object value.

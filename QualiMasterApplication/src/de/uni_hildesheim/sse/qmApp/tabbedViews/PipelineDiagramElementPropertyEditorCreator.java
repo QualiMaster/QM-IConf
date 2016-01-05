@@ -202,6 +202,16 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
     }
     
     @Override
+    public String getDescription(Object data, String propertyIdentifier) {
+        String result = null;
+        DecisionVariableDeclaration decl = getVariableDeclaration(propertyIdentifier);
+        if (null != decl) {
+            result = ModelAccess.getHelpText(decl);
+        }
+        return result;
+    }
+    
+    @Override
     public CellEditor createPropertyEditor(Composite composite, Object data, String propertyIdentifier, 
         IFallbackEditorCreator fallback) {
         CellEditor result = null;

@@ -370,34 +370,24 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
                     action = new Action() {
                         @Override
                         public void run() {
-                            if (Infrastructure.isConnected()) { // TODO via event
-                                IDecisionVariable var = getVariable();
-                                Infrastructure.send(new PipelineMessage(ModelAccess.getDisplayName(var), 
-                                    PipelineMessage.Status.START));
-                            } else {
-                                Dialogs.showInfoDialog("Infrastructure not connected...", 
-                                    "Please connect to a running infrastructure first'");
-                            }
+                            IDecisionVariable var = getVariable();
+                            Infrastructure.send(new PipelineMessage(ModelAccess.getDisplayName(var), 
+                                PipelineMessage.Status.START));
                         }
                     };
-                    action.setEnabled(isInfrastructureAdmin);
+                    action.setEnabled(isInfrastructureAdmin && Infrastructure.isConnected()); // TODO pipeline !started
                     action.setText("Start...");
                     manager.add(action);
 
                     action = new Action() {
                         @Override
                         public void run() {
-                            if (Infrastructure.isConnected()) { // TODO via event
-                                IDecisionVariable var = getVariable();
-                                Infrastructure.send(new PipelineMessage(ModelAccess.getDisplayName(var), 
-                                    PipelineMessage.Status.STOP));
-                            } else {
-                                Dialogs.showInfoDialog("Infrastructure not connected...", 
-                                    "Please connect to a running infrastructure first'");
-                            }
+                            IDecisionVariable var = getVariable();
+                            Infrastructure.send(new PipelineMessage(ModelAccess.getDisplayName(var), 
+                                PipelineMessage.Status.STOP));
                         }
                     };
-                    action.setEnabled(isInfrastructureAdmin);
+                    action.setEnabled(isInfrastructureAdmin && Infrastructure.isConnected()); // TODO pipeline started
                     action.setText("Stop...");
                     manager.add(action);
                 }

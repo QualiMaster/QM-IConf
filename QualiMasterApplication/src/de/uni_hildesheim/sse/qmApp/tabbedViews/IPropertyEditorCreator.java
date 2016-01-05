@@ -33,6 +33,16 @@ public interface IPropertyEditorCreator {
      * @return the display name (or <b>null</b> if the default one shall be used)
      */
     public String getDisplayName(Object data, String propertyIdentifier);
+
+    /**
+     * Returns the description for the given property.
+     * 
+     * @param data the data object complying to {@link #reactsOn()}
+     * @param propertyIdentifier an identifier specifying the property the display name shall be returned for 
+     *   inside of <code>data</code>
+     * @return the description (or <b>null</b> if the default one shall be used)
+     */
+    public String getDescription(Object data, String propertyIdentifier);
     
     /**
      * The actual data class this creator reacts on (static information, must not change dynamically).

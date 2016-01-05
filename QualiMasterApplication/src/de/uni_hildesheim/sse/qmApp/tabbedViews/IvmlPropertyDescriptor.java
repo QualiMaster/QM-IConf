@@ -53,6 +53,15 @@ public class IvmlPropertyDescriptor extends PropertyDescriptor
         }
         return name;
     }
+    
+    @Override
+    public String getDescription() {
+        String description = PropertyEditorFactory.getDescription(object, getFieldIdentifier());
+        if (null == description) {
+            description = super.getDescription();
+        }
+        return description;
+    }
 
     @Override
     public CellEditor createPropertyEditor(Composite composite) {
