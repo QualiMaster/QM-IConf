@@ -23,14 +23,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import eu.qualimaster.adaptation.external.AlgorithmChangedMessage;
-import eu.qualimaster.adaptation.external.ClientEndpoint;
-import eu.qualimaster.adaptation.external.DisconnectMessage;
-import eu.qualimaster.adaptation.external.HardwareAliveMessage;
-import eu.qualimaster.adaptation.external.IDispatcher;
-import eu.qualimaster.adaptation.external.MonitoringDataMessage;
-import eu.qualimaster.adaptation.external.PipelineMessage;
-import eu.qualimaster.adaptation.external.SwitchAlgorithmMessage;
+import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
 
 /**
  * Dialog asks the user for ip, port and creates a connection.
@@ -38,10 +31,9 @@ import eu.qualimaster.adaptation.external.SwitchAlgorithmMessage;
  * 
  * @author Niko Nowatzki
  */
-public class ConnectDialog extends AbstractDialog implements IDispatcher, Serializable {
+public class ConnectDialog extends AbstractDialog implements Serializable {
 
     private static final long serialVersionUID = -2643903468689003241L;
-    private ClientEndpoint endpoint;
     private Button connect;
     private Button disconnect;
     private Text platformIP;
@@ -206,7 +198,7 @@ public class ConnectDialog extends AbstractDialog implements IDispatcher, Serial
     
     @Override
     protected void okPressed() {
-        if (null == endpoint) {
+        if (!Infrastructure.isConnected()) {
             try {
                 if (!platformIP.isDisposed() && platformPort != null) {
                     String platform = platformIP.getText();
@@ -216,11 +208,9 @@ public class ConnectDialog extends AbstractDialog implements IDispatcher, Serial
                     
                     savePluginSettings(address, Integer.toString(port));
                     
-                    endpoint = new ClientEndpoint(ConnectDialog.this, address, port);
-                    System.out.println(endpoint);
+                    Infrastructure.connect(address, port);
                     enableButtons();
                 }
-
             } catch (UnknownHostException e) {
                 Dialogs.showErrorDialog("Cannot connect to QM infrastructure", e.getMessage());
             } catch (SecurityException e) {
@@ -237,10 +227,10 @@ public class ConnectDialog extends AbstractDialog implements IDispatcher, Serial
      */
     private void enableButtons() {
         if (null != connect) {
-            connect.setEnabled(null == endpoint);
+            connect.setEnabled(!Infrastructure.isConnected());
         }
         if (null != disconnect) {
-            disconnect.setEnabled(null != endpoint);
+            disconnect.setEnabled(Infrastructure.isConnected());
         }
     }
     
@@ -254,34 +244,4 @@ public class ConnectDialog extends AbstractDialog implements IDispatcher, Serial
         return "Connection";
     }
 
-    @Override
-    public void handleAlgorithmChangedMessage(AlgorithmChangedMessage msg) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void handleDisconnect(DisconnectMessage arg0) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void handleHardwareAliveMessage(HardwareAliveMessage msg) {
-        // TODO Auto-generated method stub 
-    }
-
-    @Override
-    public void handleMonitoringData(MonitoringDataMessage arg0) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void handlePipelineMessage(PipelineMessage msg) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void handleSwitchAlgorithm(SwitchAlgorithmMessage arg0) {
-        // TODO Auto-generated method stub
-    }
 }
-
