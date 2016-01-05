@@ -64,7 +64,7 @@ import de.uni_hildesheim.sse.repositoryConnector.maven.MavenFetcher.TreeElement;
  * 
  * @author Niko
  */
-public class MavenArtifactEditor extends Dialog {
+public class MavenArtifactSelectionDialog extends Dialog {
 
     private static final long ACTUAL_TREE_TIME_DIFF = 12 * 60 * 60 * 1000; // 12h in ms
     private static final String REGEX = "^\\d+(\\.\\d+)+(\\-([a-zA-Z])*){0,1}?$";
@@ -90,7 +90,7 @@ public class MavenArtifactEditor extends Dialog {
      * @param artifactEditorUpdater updates the textfield.
      *
      */
-    public MavenArtifactEditor(Shell parentShell, ITextUpdater artifactEditorUpdater) {
+    public MavenArtifactSelectionDialog(Shell parentShell, ITextUpdater artifactEditorUpdater) {
         super(parentShell);
         this.artifactEditorUpdater = artifactEditorUpdater;
     }
