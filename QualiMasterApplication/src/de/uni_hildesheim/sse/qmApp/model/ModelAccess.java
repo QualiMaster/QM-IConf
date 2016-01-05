@@ -508,7 +508,7 @@ public class ModelAccess {
      * @see #getHelpText(IModelElement) 
      */
     public static String getHelpText(IDecisionVariable var) {
-        return getHelpText(var.getDeclaration());
+        return null == var ? null : getHelpText(var.getDeclaration());
     }
 
     /**
