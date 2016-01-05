@@ -22,6 +22,7 @@ import de.uni_hildesheim.sse.model.varModel.FreezeBlock;
 import de.uni_hildesheim.sse.model.varModel.IFreezable;
 import de.uni_hildesheim.sse.model.varModel.Project;
 import de.uni_hildesheim.sse.model.varModel.ProjectImport;
+import de.uni_hildesheim.sse.model.varModel.datatypes.ConstraintType;
 import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.model.varModel.datatypes.IntegerType;
 import de.uni_hildesheim.sse.model.varModel.datatypes.OclKeyWords;
@@ -249,14 +250,23 @@ public class QualiMasterConfigurationSaver extends de.uni_hildesheim.sse.model.c
         // avoid that all imported config is saved over and over again
         // role separation
         boolean enabled;
-        String decisionNamespace = var.getDeclaration().getNameSpace();
-        String dstProjectNamespace = destProject.getName();
-        enabled = dstProjectNamespace.equals(decisionNamespace);
+        AbstractVariable decl = var.getDeclaration();
+        IDatatype type = decl.getType();
         // QualiMaster convention
-        if (!enabled && dstProjectNamespace.endsWith(VariabilityModel.CFG_POSTFIX)) {
-            String defProjectNamespace = dstProjectNamespace.substring(0, 
-                dstProjectNamespace.length() - VariabilityModel.CFG_POSTFIX.length());
-            enabled = defProjectNamespace.equals(decisionNamespace);
+        if (type == ConstraintType.TYPE || type instanceof ConstraintType) {
+            enabled = false;
+        } else if (var.getParent() instanceof Configuration) {
+            String decisionNamespace = var.getDeclaration().getNameSpace();
+            String dstProjectNamespace = destProject.getName();
+            enabled = dstProjectNamespace.equals(decisionNamespace);
+    
+            if (!enabled && dstProjectNamespace.endsWith(VariabilityModel.CFG_POSTFIX)) {
+                String defProjectNamespace = dstProjectNamespace.substring(0, 
+                    dstProjectNamespace.length() - VariabilityModel.CFG_POSTFIX.length());
+                enabled = defProjectNamespace.equals(decisionNamespace);
+            }
+        } else {
+            enabled = true;
         }
         return enabled;
     }
