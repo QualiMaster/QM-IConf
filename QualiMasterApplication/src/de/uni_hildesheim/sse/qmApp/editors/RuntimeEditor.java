@@ -126,6 +126,12 @@ public class RuntimeEditor extends EditorPart implements IDispatcher {
         GridData data = new GridData(GridData.FILL_BOTH);
         data.horizontalSpan = 2;
         panel.setLayoutData(data);
+        Infrastructure.registerDispatcher(this);
+    }
+    
+    @Override
+    public void dispose() {
+        Infrastructure.unregisterDispatcher(this);
     }
 
     /**
