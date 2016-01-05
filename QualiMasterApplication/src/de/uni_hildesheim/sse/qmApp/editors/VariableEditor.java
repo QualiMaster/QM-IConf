@@ -50,6 +50,7 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     
     private static final String COMPOSITE_STRING = "class org.eclipse.swt.widgets.Composite";
     private static final int PREFERRED_WIDTH = 400;
+    private static ScrolledComposite scroll;
     
     private DecisionVariableEditorInput input;
     private IDecisionVariable var;
@@ -95,7 +96,7 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     @Override
     public final void createPartControl(Composite parent) {
     
-        ScrolledComposite scroll = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+        scroll = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
         scroll.setExpandHorizontal(false);
         
         final Composite inner = new Composite(scroll, SWT.NONE);
@@ -143,6 +144,16 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
 //        });
     }
 
+    /**
+     * Refresh the {@link ScrolledComposite}.
+     */
+    public static void refreshEditor() {
+
+        if (scroll != null) { 
+            scroll.redraw();
+        }
+    }
+    
     /**
      * Go through the {@link Text}´s and pair them with a control-Decoration which can be hidden or not.
      * @param ctrl parent control.

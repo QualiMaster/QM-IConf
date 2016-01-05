@@ -215,7 +215,7 @@ public class QualiMasterConfigurationSaver extends de.uni_hildesheim.sse.model.c
         }
         if (null == rightSide) {
             // fallback
-            rightSide = new ConstantValue(toSaveableValue(value));
+            rightSide = new ConstantValue(toSaveableValue(var, value));
         }
         ConstraintSyntaxTree constraint = new OCLFeatureCall(deriveOperand(dstDecl, var), 
             OclKeyWords.ASSIGNMENT, rightSide);

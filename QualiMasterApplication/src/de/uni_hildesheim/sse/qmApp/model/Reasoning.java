@@ -28,6 +28,7 @@ import de.uni_hildesheim.sse.model.varModel.datatypes.Compound;
 import de.uni_hildesheim.sse.model.varModel.datatypes.ConstraintType;
 import de.uni_hildesheim.sse.persistency.StringProvider;
 import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
+import de.uni_hildesheim.sse.qmApp.editors.VariableEditor;
 import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElementsView;
 import de.uni_hildesheim.sse.reasoning.core.frontend.ReasonerFrontend;
 import de.uni_hildesheim.sse.reasoning.core.reasoner.Message;
@@ -72,6 +73,7 @@ public class Reasoning {
     /**
      * Wrapper-class which binds the name of pipeline, a failing variable within this pipeline together with
      * a corresponding errormessage. Pipeline - Variable - ErrorMessage.
+     * 
      * @author Niko
      */
     public class PipelineWrapperObject {
@@ -81,7 +83,7 @@ public class Reasoning {
         
         /**
          * Constructor.
-         * @param pipelineName pipeline name.
+         * @param pipelineName name of the pipeline.
          * @param variableName variable name.
          * @param conflictMessage conflict message for displaying.
          */
@@ -92,7 +94,7 @@ public class Reasoning {
         }
         /**
          * Get pipelines name.
-         * @return name of the pipeline.
+         * @return pipelines name.
          */
         public String getPipelineName() {
             return pipelineName;
@@ -250,6 +252,7 @@ public class Reasoning {
                             CompoundVariable failedVariable = (CompoundVariable) confElement;
                             String name = failedVariable.getNestedVariable("name").toString();
                             
+                            //Extract the actual name.
                             name = name.substring(name.indexOf("="), name.indexOf(":"));
                             name = name.replaceAll("[^a-zA-Z0-9]", "");
                             name = name.trim();
@@ -268,6 +271,8 @@ public class Reasoning {
         ConfigurableElementsView.saveReasosiningInfoInTreeElements(configurableElementsViewMapping);
         ConfigurableElementsView.saveReasosiningInfoInTreeElementsForPipelines(
                 configurableElementsViewMappingForPipelines);
+        
+        VariableEditor.refreshEditor();
       
     }
     
@@ -302,7 +307,6 @@ public class Reasoning {
 
                 IDecisionVariable innerVariable = pipelineVariable.getNestedElement(k);
                 
-                //TODO: Not that elegant
                 if (innerVariable.toString().contains("name")) {
                     String name = pipelineVariable.getNestedElement(k).getValue().toString();
 
@@ -329,7 +333,6 @@ public class Reasoning {
                 if (name != null && !"".equals(name)) {
                     configurableElementsViewMappingForPipelines.add(pipelineName);
                 }
-                //configurableELementsViewMapping.add(pipelineName);
             }
         }
     }

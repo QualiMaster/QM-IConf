@@ -1,18 +1,12 @@
 package de.uni_hildesheim.sse.qmApp.treeView;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.transaction.ResourceSetChangeEvent;
 import org.eclipse.emf.transaction.ResourceSetListenerImpl;
 import org.eclipse.gmf.runtime.diagram.ui.parts.DiagramEditor;
-import org.eclipse.gmf.runtime.emf.core.util.EMFCoreUtil;
-import org.eclipse.gmf.runtime.notation.impl.ConnectorImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -56,6 +50,8 @@ import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.PipelineDiagramUtils;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
+import de.uni_hildesheim.sse.qmApp.pipelineUtils.IPipelineEditorListener;
+import de.uni_hildesheim.sse.qmApp.pipelineUtils.PipelineEditorListener;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.EventKind;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.IChangeListener;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
@@ -72,13 +68,14 @@ import pipeline.diagram.part.PipelineDiagramEditor;
 public class ConfigurableElementsView extends ViewPart implements IChangeListener {
     public static final String ID = "QualiMasterApplication.view";
     private static final boolean DIAGRAM_STATUS_LISTENER = false;
-
+    //private static final String NODE_IDENTIFIER = "name: nodes";
+    //private static final String FLOW_IDENTIFIER = "name: nodes";
     private static HashMap<Image, Image> originalIconReminder = new HashMap<Image, Image>();
     private static ConfigurableElements elements = new ConfigurableElements();
     private static TreeViewer viewer;
     private boolean enableChangeEventProcessing = true;
     private MenuManager menuManager;
-    
+    //private IPipelineEditorListener listener;
     /**
      * Mapping for icons in the {@link ConfigurableElementsView}. The original-image is not annotated.
      * The errorImage is marked with a little image indicating an error.
@@ -335,61 +332,79 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
         }
     }
     
+    
     /**
      * Listen on changes in the emf-based model.
      * @param diagram Diagram which we listen to.
      */
+    @SuppressWarnings("restriction")
     private void listenOnDiagrm(DiagramEditor diagram) {
-        //JUST FOR TESTING.
-    
+   
+//        listener = new IPipelineEditorListener() {
+//            @Override
+//            public void nodeRemoved(String name) {
+//                // TODO Auto-generated method stub
+//            }
+//            @Override
+//            public void nodeAdded(String name) {
+//                // TODO Auto-generated method stub
+//            }
+//            @Override
+//            public void flowRemoved(String node1, String node2) {
+//                // TODO Auto-generated method stub
+//            }
+//            @Override
+//            public void flowAdded(String node1, String node2) {
+//                // TODO Auto-generated method stub
+//            }
+//        };  
         diagram.getEditingDomain().addResourceSetListener(new ResourceSetListenerImpl() {
             
             public void resourceSetChanged(ResourceSetChangeEvent event) {
-                for (Iterator<?> iter = event.getNotifications().iterator(); iter.hasNext();) {
-                    Notification notification = (Notification) iter.next();
-                    Object notifier = notification.getNotifier();
-                    
-                    if (notifier instanceof EObject) {
-                        EObject eObject = (EObject) notifier;
-                
-                        // only respond to changes to structural features of the object
-                        if (notification.getFeature() instanceof EStructuralFeature) {
-
-                            if (notification.getFeature().toString().contains("name: nodes")) {
-                            
-                                if (Integer.compare(notification.getEventType(), Notification.REMOVE) == 0) {
-                                    System.out.println("node entfernt");
-                                }
-                                if (Integer.compare(notification.getEventType(), Notification.ADD) == 0) {
-                                    System.out.println("node hinzugefügt");
-                                }
-                            }
-                       
-                            if (notification.getFeature().toString().contains("name: flows")) {
-                                
-                                if (Integer.compare(notification.getEventType(), Notification.ADD) == 0) {
-                                    System.out.println("flow hinzugefügt");
-                                }
-                            }
-                            if (eObject instanceof ConnectorImpl && Integer.compare(notification.getEventType(),
-                                     Notification.UNSET) == 0) {
-                                    System.out.println("Flow entfernt");
-                            }
-
-                            //Turn on Reasoning? Or is it too early
-                            //Reasoning.reasonOn(VariabilityModel.Configuration.PIPELINES, false);
-                            //PipelineDiagramUtils.highlightDiagram();
-
-                            EStructuralFeature feature = (EStructuralFeature) notification.getFeature();
-                            
-                            // get the name of the changed feature and the qualified name of
-                            //    the object, substituting <type> for any element that has no name
-                            System.out.println("The " + feature.getName() + " of the object \""
-                                    + EMFCoreUtil.getQualifiedName(eObject, true) + "\" has changed.");
-
-                        }
-                    }
-                }
+            
+                @SuppressWarnings("unused")
+                PipelineEditorListener listener = new PipelineEditorListener(event);
+//            
+//                for (Iterator<?> iter = event.getNotifications().iterator(); iter.hasNext();) {
+//                    Notification notification = (Notification) iter.next();
+//                    Object notifier = notification.getNotifier();
+//                    
+//                    if (notifier instanceof EObject) {
+//                        EObject eObject = (EObject) notifier;
+//                
+//                        EStructuralFeature feature = (EStructuralFeature) notification.getFeature();
+//                        
+//                        // only respond to changes to structural features of the object
+//                        if (feature instanceof EStructuralFeature) {
+//                            if (notification.getFeature().toString().contains(NODE_IDENTIFIER)) {       
+//                                if (Integer.compare(notification.getEventType(), Notification.REMOVE) == 0) {
+//                                    //listener.nodeRemoved(feature.getName());
+//                                    System.out.println("node removed");
+//                                }
+//                                if (Integer.compare(notification.getEventType(), Notification.ADD) == 0) {
+//                                    //listener.nodeAdded(feature.getName());
+//                                    System.out.println("node added");
+//                                }
+//                            }
+//                            if (notification.getFeature().toString().contains(FLOW_IDENTIFIER)) {
+//                                if (Integer.compare(notification.getEventType(), Notification.ADD) == 0) {
+//                                    //add nodes which are connected to the newly added flow to the listener
+//                                    //listener.flowAdded();
+//                                    System.out.println("flow added");
+//                                }
+//                            }
+//                            if (eObject instanceof ConnectorImpl && Integer.compare(notification.getEventType(),
+//                                     Notification.UNSET) == 0) {
+//                                    //listener.flowRemoved();
+//                                    System.out.println("Flow removed");
+//                            }
+//                            // get the name of the changed feature and the qualified name of
+//                            //    the object, substituting <type> for any element that has no name
+//                            System.out.println("The " + feature.getName() + " of the object \""
+//                                    + EMFCoreUtil.getQualifiedName(eObject, true) + "\" has changed.");
+//                        }
+//                    }
+//                }
             }
         });
     }
