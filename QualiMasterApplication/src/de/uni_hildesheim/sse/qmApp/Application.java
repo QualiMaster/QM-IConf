@@ -14,6 +14,7 @@ import de.uni_hildesheim.sse.easy_producer.persistency.ResourcesMgmt;
 import de.uni_hildesheim.sse.qmApp.commands.ResetModel;
 import de.uni_hildesheim.sse.qmApp.dialogs.LoginDialog;
 import de.uni_hildesheim.sse.qmApp.model.Utils.ConfigurationProperties;
+import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
 import de.uni_hildesheim.sse.utils.logger.AdvancedJavaLogger;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
 import de.uni_hildesheim.sse.utils.logger.ILogger;
@@ -93,6 +94,9 @@ public class Application implements IApplication {
 
     @Override
     public void stop() {
+        if (Infrastructure.isConnected()) {
+            Infrastructure.disconnect();
+        }
         if (!PlatformUI.isWorkbenchRunning()) {
             return;
         }

@@ -15,6 +15,8 @@
  */
 package de.uni_hildesheim.sse.qmApp;
 
+import java.io.File;
+
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -49,6 +51,24 @@ public class WorkspaceUtils {
             workspace.setDescription(desc);
         }
         return isAutoBuilding;
+    }
+    
+    /**
+     * Returns the workspace root.
+     * 
+     * @return the workspace root
+     */
+    public static File getWorkspaceRoot() {
+        return new File(ResourcesPlugin.getWorkspace().getRoot().getLocation().toString());
+    }
+    
+    /**
+     * Returns the metadata folder within {@link #getWorkspaceRoot() the workspace}.
+     * 
+     * @return the metadata folder
+     */
+    public static File getMetadataFolder() {
+        return new File(getWorkspaceRoot(), ".metadata");
     }
     
 }

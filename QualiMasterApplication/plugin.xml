@@ -211,8 +211,12 @@
       </command>
        <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.ConnectHandler"
           id="de.uni_hildesheim.sse.qmApp.commands.ConnectHandler"
-          name="About">
+          name="Connect">
       </command>
+       <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.DisconnectHandler"
+          id="de.uni_hildesheim.sse.qmApp.commands.DisconnectHandler"
+          name="Disconnect">
+      </command>      
    </extension>   
    
    <extension

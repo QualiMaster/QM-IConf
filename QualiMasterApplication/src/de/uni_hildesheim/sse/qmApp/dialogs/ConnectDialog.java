@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -24,6 +23,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import de.uni_hildesheim.sse.qmApp.WorkspaceUtils;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
 
 /**
@@ -35,14 +35,8 @@ import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
 public class ConnectDialog extends AbstractDialog implements Serializable {
 
     private static final long serialVersionUID = -2643903468689003241L;
-    private Button connect;
-    private Button disconnect;
     private Text platformIP;
     private Text platformPort;
-    @SuppressWarnings("unused")
-    private Label ipLabel;
-    @SuppressWarnings("unused")
-    private Label portLabel;
     
     /**
      * Wrapps ip and port of a connection.
@@ -110,11 +104,11 @@ public class ConnectDialog extends AbstractDialog implements Serializable {
         GridLayout layout = new GridLayout(2, false);
         panel.setLayout(layout);
 
-        ipLabel = createLabel(panel, "QM platform interface IP (internal):");
+        createLabel(panel, "Host:");
  
         platformIP = createTextField(panel);
         
-        portLabel = createLabel(panel, "QM platform interface port (internal):");
+        createLabel(panel, "Port:");
         
         platformPort = createTextField(panel);
         
@@ -124,7 +118,6 @@ public class ConnectDialog extends AbstractDialog implements Serializable {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        enableButtons();
         return panel;
     };
     
@@ -134,7 +127,7 @@ public class ConnectDialog extends AbstractDialog implements Serializable {
      * @param port connections port.
      */
     private void savePluginSettings(InetAddress address, String port) {
-        ConnectionWrapper wrapper = new ConnectionWrapper(address.toString(), port);
+        ConnectionWrapper wrapper = new ConnectionWrapper(address.getHostName(), port);
         try {
             File file = getConnectionSettingsFile();
             FileOutputStream fileoutputstream = new FileOutputStream(file);
@@ -152,10 +145,7 @@ public class ConnectDialog extends AbstractDialog implements Serializable {
      * @return the connection settings file
      */
     private File getConnectionSettingsFile() {
-        String workspace = ResourcesPlugin.getWorkspace().getRoot()
-            .getLocation().toString();
-        String metadataFolder = workspace + "/.metadata";
-        return new File(metadataFolder, "RuntimeConnection.ser");
+        return new File(WorkspaceUtils.getMetadataFolder(), "RuntimeConnection.ser");
     }
 
     /**
@@ -188,9 +178,8 @@ public class ConnectDialog extends AbstractDialog implements Serializable {
         super.createButtonsForButtonBar(parent);
         
         Button ok = getButton(IDialogConstants.OK_ID);
-        ok.setText("Connect/Disconnect");
-        setButtonLayoutData(ok);
-
+        ok.setText("Connect");
+        ok.setEnabled(!Infrastructure.isConnected());
         setButtonLayoutData(ok);
     }
     
@@ -200,17 +189,14 @@ public class ConnectDialog extends AbstractDialog implements Serializable {
             try {
                 if (!platformIP.isDisposed() && platformPort != null) {
                     String platform = platformIP.getText();
-                    //String platform = "192.168.91.129"; // local VM fallback
                     InetAddress address = InetAddress.getByName(platform);
-                    int port = Integer.parseInt(platformPort.getMessage());
-                    
+                    int port = Integer.parseInt(platformPort.getText());
                     savePluginSettings(address, Integer.toString(port));
-                    
                     Infrastructure.connect(address, port);
-                    enableButtons();
+                    Dialogs.showInfoDialog("QM infrastructure connection", "Connection established");
                 }
             } catch (UnknownHostException e) {
-                Dialogs.showErrorDialog("Cannot connect to QM infrastructure", e.getMessage());
+                Dialogs.showErrorDialog("Cannot connect to QM infrastructure", "Unknown host: " + e.getMessage());
             } catch (SecurityException e) {
                 Dialogs.showErrorDialog("Cannot connect to QM infrastructure", e.getMessage());
             } catch (NumberFormatException e) {
@@ -219,17 +205,7 @@ public class ConnectDialog extends AbstractDialog implements Serializable {
                 Dialogs.showErrorDialog("Cannot connect to QM infrastructure", e.getMessage());
             }
         }
-    }
-    /**
-     * Enables or disables the buttons on this editor.
-     */
-    private void enableButtons() {
-        if (null != connect) {
-            connect.setEnabled(!Infrastructure.isConnected());
-        }
-        if (null != disconnect) {
-            disconnect.setEnabled(Infrastructure.isConnected());
-        }
+        super.okPressed();
     }
     
     @Override

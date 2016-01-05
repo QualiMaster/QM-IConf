@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -53,6 +52,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
 
 import de.uni_hildesheim.sse.easy_producer.observer.EclipseProgressObserver;
+import de.uni_hildesheim.sse.qmApp.WorkspaceUtils;
 import de.uni_hildesheim.sse.qmApp.editors.ITextUpdater;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.repositoryConnector.maven.MavenFetcher;
@@ -324,8 +324,7 @@ public class MavenArtifactEditor extends Dialog {
      * @return the file
      */
     private File getTreeFile() {
-        String workspace = ResourcesPlugin.getWorkspace().getRoot().getLocation().toString();
-        return new File(workspace + "/.metadata/MavenTreeSaved.ser");
+        return new File(WorkspaceUtils.getMetadataFolder(), "MavenTreeSaved.ser");
     }
 
     /**

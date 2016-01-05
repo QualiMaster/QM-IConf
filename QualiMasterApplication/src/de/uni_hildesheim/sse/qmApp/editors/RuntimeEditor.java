@@ -44,6 +44,7 @@ import de.uni_hildesheim.sse.model.varModel.values.EnumValue;
 import de.uni_hildesheim.sse.model.varModel.values.Value;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
+import de.uni_hildesheim.sse.qmApp.runtime.IInfrastructureListener;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
 import eu.qualimaster.adaptation.external.AlgorithmChangedMessage;
 import eu.qualimaster.adaptation.external.DisconnectMessage;
@@ -59,7 +60,7 @@ import eu.qualimaster.adaptation.external.SwitchAlgorithmMessage;
  * 
  * @author Holger Eichelberger
  */
-public class RuntimeEditor extends EditorPart implements IDispatcher {
+public class RuntimeEditor extends EditorPart implements IDispatcher, IInfrastructureListener {
 
     private static int counter = 0;
     private static final String CORRELATION_SOFTWARE = "Software";
@@ -127,23 +128,29 @@ public class RuntimeEditor extends EditorPart implements IDispatcher {
         data.horizontalSpan = 2;
         panel.setLayoutData(data);
         Infrastructure.registerDispatcher(this);
+        Infrastructure.registerListener(this);
+        enableButtons();
     }
     
     @Override
     public void dispose() {
         Infrastructure.unregisterDispatcher(this);
+        Infrastructure.unregisterListener(this);
     }
 
     /**
      * Enables or disables the buttons on this editor.
      */
     private void enableButtons() {
-        if (null != enact) {
-            enact.setEnabled(null != correlation || null != sentiment);
+        boolean connected = Infrastructure.isConnected();
+        if (null != startPipeline) {
+            startPipeline.setEnabled(connected);
         }
-        if (Infrastructure.isConnected()) {
-            usedClusterMachines.setValid(true);
-            pipelineLatencyDataProvider.clearTrace();
+        if (null != stopPipeline) {
+            stopPipeline.setEnabled(connected);
+        }
+        if (null != enact) {
+            enact.setEnabled(connected && (null != correlation || null != sentiment));
         }
     }
 
@@ -157,8 +164,6 @@ public class RuntimeEditor extends EditorPart implements IDispatcher {
 
         GridLayout layout = new GridLayout(2, false);
         panel.setLayout(layout);
-
-        enableButtons();
     }
     
     /**
@@ -657,6 +662,15 @@ public class RuntimeEditor extends EditorPart implements IDispatcher {
     public void handleHardwareAliveMessage(HardwareAliveMessage msg) {
         System.out.println("HwAlive: " + msg.getIdentifier());
         updateLabel(corrState, "HW-run");
+    }
+
+    @Override
+    public void infrastructureConnectionStateChanged(boolean hasConnection) {
+        usedClusterMachines.setValid(hasConnection);
+        if (hasConnection) {
+            pipelineLatencyDataProvider.clearTrace();
+        }
+        enableButtons();
     }
 
 }

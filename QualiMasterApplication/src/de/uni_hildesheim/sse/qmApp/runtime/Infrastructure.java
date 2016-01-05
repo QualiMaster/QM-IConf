@@ -41,7 +41,10 @@ import eu.qualimaster.adaptation.external.SwitchAlgorithmMessage;
 public class Infrastructure {
 
     private static ClientEndpoint endpoint;
-    private static List<IDispatcher> dispatchers = Collections.synchronizedList(new ArrayList<IDispatcher>());
+    private static List<IDispatcher> dispatchers 
+        = Collections.synchronizedList(new ArrayList<IDispatcher>());
+    private static List<IInfrastructureListener> listeners 
+        = Collections.synchronizedList(new ArrayList<IInfrastructureListener>());
 
     /**
      * Prevents external creation.
@@ -113,6 +116,7 @@ public class Infrastructure {
     public static void connect(InetAddress address, int port) throws IOException {
         if (null == endpoint) {
             endpoint = new ClientEndpoint(new DelegatingDispatcher(), address, port);
+            notifyConnectionChange(true);
         }
     }
     
@@ -148,6 +152,7 @@ public class Infrastructure {
                 ep.schedule(new DisconnectMessage());
             }
             ep.stop();
+            notifyConnectionChange(false);
         }
     }
 
@@ -179,6 +184,39 @@ public class Infrastructure {
     public static void unregisterDispatcher(IDispatcher dispatcher) {
         if (null != dispatcher) {
             dispatchers.remove(dispatcher);
+        }
+    }
+    
+    /**
+     * Registers a listener. Already registered listeners are ignored.
+     * 
+     * @param listener the listener to be registered (may be <b>null</b>, ignored then)
+     */
+    public static void registerListener(IInfrastructureListener listener) {
+        if (null != listener && !listeners.contains(listener)) {
+            listeners.add(listener);
+        }
+    }
+    
+    /**
+     * Unregisters a listener.
+     * 
+     * @param listener the listener to be unregistered (may be <b>null</b>, ignored then)
+     */
+    public static void unregisterListener(IInfrastructureListener listener) {
+        if (null != listener) {
+            listeners.remove(listener);
+        }
+    }
+
+    /**
+     * Notifies listeners about a connection state change.
+     * 
+     * @param hasConnection whether the new connection state is connected or not
+     */
+    private static void notifyConnectionChange(boolean hasConnection) {
+        for (int l = 0; l < listeners.size(); l++) {
+            listeners.get(l).infrastructureConnectionStateChanged(hasConnection);
         }
     }
     
