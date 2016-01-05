@@ -107,6 +107,15 @@
                   visible="false">
             </separator>            
          </menu>
+          <menu label="Runtime" id="RuntimeMenu">
+ 
+            <command commandId="de.uni_hildesheim.sse.qmApp.commands.ConnectHandler"
+                label="Connect"> 
+            </command>
+            <command commandId="de.uni_hildesheim.sse.qmApp.commands.DisconnectHandler"
+                label="Disconnect"> 
+            </command>
+         </menu>
          <menu label="Window" id="window">
             <command commandId="de.uni_hildesheim.sse.qmApp.switchToInitialPerspective"
                   label="Switch to configuration perspective">
@@ -129,17 +138,6 @@
                   visible="false">
             </separator>            
          </menu>
-         
-          <menu label="Runtime" id="RuntimeMenu">
- 
-            <command commandId="de.uni_hildesheim.sse.qmApp.commands.ConnectHandler"
-                label="Connect"> 
-            </command>
-            <command commandId="de.uni_hildesheim.sse.qmApp.commands.DisconnectHandler"
-                label="Disconnect"> 
-            </command>
-         </menu>
-         
          <menu label="Help" id="helpMenu">
          <!--
          	<command commandId="org.eclipse.equinox.p2.ui.sdk.update"
