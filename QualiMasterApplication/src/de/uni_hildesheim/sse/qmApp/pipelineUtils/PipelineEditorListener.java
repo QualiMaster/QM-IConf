@@ -9,23 +9,23 @@ import org.eclipse.gmf.runtime.emf.core.util.EMFCoreUtil;
 import org.eclipse.gmf.runtime.notation.impl.ConnectorImpl;
 
 /**
- * Gets a ResourceSetChangeEvent and calls the suited method according to the event.
+ * Gets a ResourceSetChangeEvent and calls the suited method of {@link IPipelineEditorListener} according to the event.
  * ->node added/removed
  * ->flow added/removed.
  * 
  * @author Niko Nowatzki
  */
-public class PipelineEditorListener implements IPipelineEditorListener {
+public class PipelineEditorListener {
 
     private static final String NODE_IDENTIFIER = "name: nodes";
     private static final String FLOW_IDENTIFIER = "name: nodes";
+    private static IPipelineEditorListener listener = NullPipelineEditorListener.INSTANCE;
     
     /**
-     * Contrcuts a object which listens on the model changes and calls suited methods in order to react properly.
+     * Constructs an object which listens on the model changes and calls suited methods in order to react properly.
      * @param event Event that indicates a model-change like a added or removed node or flow.
      */
     public PipelineEditorListener(ResourceSetChangeEvent event) {
-    
         for (Iterator<?> iter = event.getNotifications().iterator(); iter.hasNext();) {
             Notification notification = (Notification) iter.next();
             Object notifier = notification.getNotifier();
@@ -39,25 +39,23 @@ public class PipelineEditorListener implements IPipelineEditorListener {
                 if (feature instanceof EStructuralFeature) {
                     if (notification.getFeature().toString().contains(NODE_IDENTIFIER)) {       
                         if (Integer.compare(notification.getEventType(), Notification.REMOVE) == 0) {
-                            //listener.nodeRemoved(feature.getName());
-                            System.out.println("node removed");
+                            listener.nodeRemoved(feature.getName());
                         }
                         if (Integer.compare(notification.getEventType(), Notification.ADD) == 0) {
-                            //listener.nodeAdded(feature.getName());
-                            System.out.println("node added");
+                            listener.nodeAdded(feature.getName());
                         }
                     }
                     if (notification.getFeature().toString().contains(FLOW_IDENTIFIER)) {
                         if (Integer.compare(notification.getEventType(), Notification.ADD) == 0) {
                             //add nodes which are connected to the newly added flow to the listener
-                            //listener.flowAdded();
-                            System.out.println("flow added");
+                            //listener.flowAdded(node1, node2);
+                            System.out.println("flow added " + feature.getName()); // TODO from flow to nodes??
                         }
                     }
                     if (eObject instanceof ConnectorImpl && Integer.compare(notification.getEventType(),
-                             Notification.UNSET) == 0) {
-                            //listener.flowRemoved();
-                        System.out.println("flow removed");
+                         Notification.UNSET) == 0) {
+                        //listener.flowRemoved(node1, node2);
+                        System.out.println("flow removed " + feature.getName()); // TODO from flow to nodes??
                     }
                     // get the name of the changed feature and the qualified name of
                     //    the object, substituting <type> for any element that has no name
@@ -67,24 +65,18 @@ public class PipelineEditorListener implements IPipelineEditorListener {
             }
         }
     }
-
-    @Override
-    public void nodeAdded(String name) {
-        // TODO Auto-generated method stub
+    
+    /**
+     * Sets the listener to translate to.
+     * 
+     * @param li the pipeline listener (may be <b>null</b> for no listener)
+     */
+    public static void setListener(IPipelineEditorListener li) {
+        if (null == li) {
+            listener = NullPipelineEditorListener.INSTANCE;
+        } else {
+            listener = li;
+        }
     }
-
-    @Override
-    public void nodeRemoved(String name) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void flowAdded(String node1, String node2) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void flowRemoved(String node1, String node2) {
-        // TODO Auto-generated method stub
-    }
+    
 }
