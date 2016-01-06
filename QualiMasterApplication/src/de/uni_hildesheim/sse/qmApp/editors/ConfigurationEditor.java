@@ -1,7 +1,13 @@
 package de.uni_hildesheim.sse.qmApp.editors;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -11,6 +17,29 @@ import org.eclipse.ui.part.EditorPart;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.DelegatingEasyEditorPage;
 import de.uni_hildesheim.sse.model.confModel.Configuration;
+import de.uni_hildesheim.sse.model.varModel.AbstractVisitor;
+import de.uni_hildesheim.sse.model.varModel.Attribute;
+import de.uni_hildesheim.sse.model.varModel.AttributeAssignment;
+import de.uni_hildesheim.sse.model.varModel.Comment;
+import de.uni_hildesheim.sse.model.varModel.CompoundAccessStatement;
+import de.uni_hildesheim.sse.model.varModel.Constraint;
+import de.uni_hildesheim.sse.model.varModel.DecisionVariableDeclaration;
+import de.uni_hildesheim.sse.model.varModel.FreezeBlock;
+import de.uni_hildesheim.sse.model.varModel.OperationDefinition;
+import de.uni_hildesheim.sse.model.varModel.PartialEvaluationBlock;
+import de.uni_hildesheim.sse.model.varModel.Project;
+import de.uni_hildesheim.sse.model.varModel.ProjectImport;
+import de.uni_hildesheim.sse.model.varModel.ProjectInterface;
+import de.uni_hildesheim.sse.model.varModel.datatypes.Compound;
+import de.uni_hildesheim.sse.model.varModel.datatypes.DerivedDatatype;
+import de.uni_hildesheim.sse.model.varModel.datatypes.EnumLiteral;
+import de.uni_hildesheim.sse.model.varModel.datatypes.Reference;
+import de.uni_hildesheim.sse.model.varModel.datatypes.Sequence;
+import de.uni_hildesheim.sse.model.varModel.datatypes.Set;
+import de.uni_hildesheim.sse.qmApp.model.IModelPart;
+import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
+import de.uni_hildesheim.sse.qmApp.model.Utils;
+import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 
 /**
  * This class is responsible for providing Editors for given elements which are shown in the 
@@ -21,6 +50,7 @@ import de.uni_hildesheim.sse.model.confModel.Configuration;
  */
 public class ConfigurationEditor extends EditorPart {
 
+    private static final boolean SHOW_CONFIGURATION = false; // for demos
     private Configuration cfg;
     private DelegatingEasyEditorPage parent;
     private TreeViewer treeViewer;
@@ -55,12 +85,40 @@ public class ConfigurationEditor extends EditorPart {
     public boolean isSaveAsAllowed() {
         return false;
     }
-
+    
     @Override
     public void createPartControl(Composite parent) {
-        this.parent = new DelegatingEasyEditorPage(parent);
-        treeViewer = ConfigurationTableEditorFactory.createConfigurationTableEditor(cfg, this.parent);
-        treeViewer.getTree().setEnabled(false);
+        if (SHOW_CONFIGURATION) {
+            this.parent = new DelegatingEasyEditorPage(parent);
+            treeViewer = ConfigurationTableEditorFactory.createConfigurationTableEditor(cfg, this.parent);
+            treeViewer.getTree().setEnabled(false);
+        } else {
+            Browser browser = new Browser(parent, SWT.NONE);
+            String html = "<html><body>";
+            Project project = input.getConfiguration().getProject();
+            Project defProject = null;
+            if (project.getName().endsWith("Cfg")) {
+                String prjName = project.getName();
+                if (prjName.length() > 3) {
+                    prjName = prjName.substring(0, prjName.length() - 3);
+                }
+                for (int i = 0; null == defProject && i < project.getImportsCount(); i++) {
+                    ProjectImport imp = project.getImport(i);
+                    if (imp.getName().equals(prjName)) {
+                        defProject = imp.getResolved();
+                    }
+                }
+            }
+            if (null != defProject) {
+                HtmlVisitor vis = new HtmlVisitor();
+                defProject.accept(vis);
+                html += vis.getHtml();
+            } else {
+                html += "Sorry. There is no documentation available for this Section.";
+            }
+            html += "</body></html>";
+            browser.setText(html);
+        }
         setPartName(input.getName());
     }
 
@@ -69,6 +127,241 @@ public class ConfigurationEditor extends EditorPart {
         if (null != treeViewer) {
             treeViewer.getTree().setFocus();
         }
+    }
+
+    /**
+     * Implements a visitor, which turns an IVML project into a simple HTML documentation.
+     * 
+     * @author Holger Eichelberger
+     */
+    private static class HtmlVisitor extends AbstractVisitor {
+
+        private StringBuilder actualCompound;
+        private List<String> compounds = new ArrayList<String>();
+        private List<String> variables = new ArrayList<String>();
+        private String indentation = "";
+        private IModelPart part;
+        
+        /**
+         * Returns the visiting result in HTML.
+         * 
+         * @return the result
+         */
+        public String getHtml() {
+            StringBuilder html = new StringBuilder();
+            if (compounds.size() > 1) {
+                html.append("In this section, you can configure the following structures:\n");
+                html.append("<ul>\n");
+                for (int c = 0; c < compounds.size(); c++) {
+                    html.append(" <li>\n");
+                    html.append(compounds.get(c));
+                    html.append(" </li>\n");        
+                }
+                html.append("</ul>\n");
+            } else if (1 == compounds.size()) {
+                html.append("In this section you can configure the structure ");
+                html.append(compounds.get(0));
+                html.append("\n");
+            }
+            if (!variables.isEmpty()) {
+                if (compounds.size() > 0) {
+                    html.append("In addition,");
+                } else {
+                    html.append("In this section,");
+                }
+                html.append(" you can configure");
+                if (variables.size() > 1) {
+                    html.append(" the following settings:\n");
+                    html.append("<ul>\n");
+                    for (int v = 0; v < variables.size(); v++) {
+                        html.append(" <li>\n");
+                        html.append(variables.get(v));
+                        html.append(" </li>\n");        
+                    }
+                    html.append("</ul>\n");
+                } else if (1 == variables.size()) {
+                    html.append(" the setting ");
+                    html.append(variables.get(0));
+                    html.append("\n");
+                }
+            }
+            return html.toString();
+        }
+     
+        @Override
+        public void visitProject(Project project) {
+            part = VariabilityModel.findModelPart(project.getName());
+            super.visitProject(project);
+        }
+
+        @Override
+        public void visitProjectImport(ProjectImport pImport) {
+        }
+        
+        /**
+         * Returns a safe string, i.e., an empty string instead of <b>null</b>.
+         * 
+         * @param string the string to be considered
+         * @return the safe string of <code>string</code>
+         */
+        private String safeString(String string) {
+            return null == string ? "" : string;
+        }
+
+        @Override
+        public void visitDecisionVariableDeclaration(DecisionVariableDeclaration decl) {
+            if (!Utils.contains(part.getTopLevelVariables(), decl.getName())) {            
+                if (!ModelAccess.isConstraint(decl.getType())) {
+                    String displayName = safeString(ModelAccess.getDisplayName(decl)).trim();
+                    String helpText = safeString(ModelAccess.getHelpText(decl)).trim();
+                    if (displayName.length() > 0 && helpText.length() > 0) {
+                        StringBuilder tmp;
+                        if (null != actualCompound) {
+                            tmp = actualCompound;
+                            appendIndentation(tmp);
+                            tmp.append("<li>\n");
+                            appendIndentation(tmp);
+                        } else {
+                            tmp = new StringBuilder();
+                        }
+                        tmp.append("<b>");
+                        tmp.append(ModelAccess.getDisplayName(decl));
+                        tmp.append("</b>: ");
+                        tmp.append(ModelAccess.getHelpText(decl));
+                        tmp.append("\n");
+                        if (null == actualCompound) {
+                            appendIndentation(tmp);
+                            tmp.append("</li>\n");
+                            variables.add(tmp.toString());
+                        }
+                    } else {
+                        Logger.getLogger(ConfigurationEditor.class).info("Display name or help text missing for " 
+                            + decl.getQualifiedName() + ", display name: " + displayName + ", help text:" + helpText);
+                    }
+                }
+            }
+        }
+        
+        @Override
+        public void visitCompound(Compound compound) {
+            if (Utils.contains(part.getProvidedTypes(), compound)) {
+                boolean topLevel = false;
+                if (null == actualCompound) {
+                    topLevel = true;
+                    actualCompound = new StringBuilder();
+                }
+                appendIndentation(actualCompound);
+                actualCompound.append("<b>");
+                actualCompound.append(compound.getName()); // TODO preliminary
+                actualCompound.append("</b>:\n");
+                appendIndentation(actualCompound);
+                actualCompound.append("<ul>\n");
+                increaseIndentation();
+                Compound iter = compound.getRefines();
+                while (null != iter) {
+                    super.visitCompound(iter);
+                    iter = iter.getRefines();
+                }
+                super.visitCompound(compound);
+                decreaseIndentation();
+                appendIndentation(actualCompound);
+                actualCompound.append("</ul>\n");
+                if (topLevel) {
+                    compounds.add(actualCompound.toString());
+                    actualCompound = null;
+                }
+            }
+        }
+
+        @Override
+        public void visitAttribute(Attribute attribute) {
+        }
+
+        @Override
+        public void visitConstraint(Constraint constraint) {
+        }
+
+        @Override
+        public void visitFreezeBlock(FreezeBlock freeze) {
+        }
+
+        @Override
+        public void visitOperationDefinition(OperationDefinition opdef) {
+        }
+
+        @Override
+        public void visitPartialEvaluationBlock(PartialEvaluationBlock block) {
+        }
+
+        @Override
+        public void visitProjectInterface(ProjectInterface iface) {
+        }
+
+        @Override
+        public void visitComment(Comment comment) {
+        }
+
+        @Override
+        public void visitAttributeAssignment(AttributeAssignment assignment) {
+            // heuristic... these are runtime variables or shall not be visible
+            /*for (int e = 0; e < assignment.getElementCount(); e++) {
+                assignment.getElement(e).accept(this);
+            }
+            for (int a = 0; a < assignment.getAssignmentCount(); a++) {
+                assignment.getAssignment(a).accept(this);
+            }*/
+        }
+
+        @Override
+        public void visitCompoundAccessStatement(CompoundAccessStatement access) {
+        }
+
+        @Override
+        public void visitDerivedDatatype(DerivedDatatype datatype) {
+        }
+
+        @Override
+        public void visitEnumLiteral(EnumLiteral literal) {
+            // not so far
+        }
+
+        @Override
+        public void visitReference(Reference reference) {
+        }
+
+        @Override
+        public void visitSequence(Sequence sequence) {
+        }
+
+        @Override
+        public void visitSet(Set set) {
+        }
+        
+        /**
+         * Increases the indentation for formatting the HTML code.
+         */
+        private void increaseIndentation() {
+            indentation += " ";
+        }
+
+        /**
+         * Decreases the indentation for formatting the HTML code.
+         */
+        private void decreaseIndentation() {
+            if (indentation.length() > 0) {
+                indentation = indentation.substring(0, indentation.length() - 1);
+            }
+        }
+        
+        /**
+         * Appends the actual indentation to <code>builder</code> for formatting the HTML code.
+         * 
+         * @param builder the builder to append the indentation to
+         */
+        private void appendIndentation(StringBuilder builder) {
+            builder.append(indentation);
+        }
+        
     }
 
 }

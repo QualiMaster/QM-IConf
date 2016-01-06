@@ -472,8 +472,7 @@ public class ModelAccess {
      * compound and one of its nested elements is called <code>name</code> and is of type String, the value of that
      * variable is taken as display name, else the name of <code>var</code>.
      * 
-     * @param var
-     *            the variable to return the display name for
+     * @param var the variable to return the display name for
      * @return the display name
      */
     public static String getDisplayName(IDecisionVariable var) {
@@ -492,14 +491,35 @@ public class ModelAccess {
             }
         }
         if (null == displayName && null != var) {
-            displayName = getDescription(var.getDeclaration());
-            if (null == displayName) {
-                displayName = var.getDeclaration().getName();
-            }
+            displayName = getDisplayName(var);
         }
         return displayName;
     }
 
+    /**
+     * Returns the display name of <code>var</code>.
+     * 
+     * @param var the variable declaration
+     * @return the display name
+     */
+    public static String getDisplayName(AbstractVariable var) {
+        String displayName = getDescription(var);
+        if (null == displayName) {
+            displayName = var.getName();
+        }
+        return displayName;
+    }
+
+    /**
+     * Returns whether <code>type</code> is a constraint.
+     * 
+     * @param type the type
+     * @return <code>true</code> in case of a constraint <code>false</code> else
+     */
+    public static boolean isConstraint(IDatatype type) {
+        return (type == ConstraintType.TYPE || type instanceof ConstraintType);
+    }
+    
     /**
      * Returns the help text of <code>var</code>.
      * 
