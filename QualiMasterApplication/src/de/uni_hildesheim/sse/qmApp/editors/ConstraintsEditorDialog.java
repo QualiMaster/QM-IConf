@@ -7,9 +7,12 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -90,17 +93,43 @@ class ConstraintsEditorDialog extends Dialog {
     @Override
     protected Control createDialogArea(Composite parent) {
         final Composite composite = (Composite) super.createDialogArea(parent);
+        composite.setLayout(new GridLayout(2, false));
         
-        composite.setLayout(new GridLayout(1, false));
-        Label label = new Label(composite, SWT.NONE);
-        label.setText("constraints (use context menu):");
-        tableViewer = ConstraintsEditor.createTableViewer(composite, false);
+        Composite tablePanel = new Composite(composite, SWT.NONE);
+        tablePanel.setLayout(new GridLayout(1, false));
+        Label label = new Label(tablePanel, SWT.NONE);
+        label.setText("constraints:");
+        tableViewer = ConstraintsEditor.createTableViewer(tablePanel, false);
         GridData gridData = new GridData();
         gridData.widthHint = 400;
+        gridData.heightHint = 150;
         gridData.verticalAlignment = SWT.FILL;
         gridData.grabExcessVerticalSpace = true;
         tableViewer.getTable().setLayoutData(gridData);
         ConstraintsEditor.fillTable(splitConstraints(constraints), tableViewer);
+
+        Composite buttonPanel = new Composite(composite, SWT.NONE);
+        buttonPanel.setLayout(new GridLayout(1, false));
+        Button add = new Button(buttonPanel, SWT.PUSH);
+        add.setText("Add constraint");
+        add.addSelectionListener(new SelectionAdapter() {
+            
+            @Override
+            public void widgetSelected(SelectionEvent evt) {
+                addConstraint();
+            }
+            
+        });
+        Button remove = new Button(buttonPanel, SWT.PUSH);
+        remove.setText("Remove constraint");
+        remove.addSelectionListener(new SelectionAdapter() {
+            
+            @Override
+            public void widgetSelected(SelectionEvent evt) {
+                removeSelectedConstraint();
+            }
+            
+        });
 
         tableViewer.addDoubleClickListener(new IDoubleClickListener() {
             
