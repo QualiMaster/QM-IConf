@@ -93,7 +93,7 @@ public class ConfigurationEditor extends EditorPart {
             treeViewer = ConfigurationTableEditorFactory.createConfigurationTableEditor(cfg, this.parent);
             treeViewer.getTree().setEnabled(false);
         } else {
-            Browser browser = new Browser(parent, SWT.NONE);
+            Browser browser = new Browser(parent, SWT.H_SCROLL | SWT.V_SCROLL);
             String html = "<html><body>";
             Project project = input.getConfiguration().getProject();
             Project defProject = null;
