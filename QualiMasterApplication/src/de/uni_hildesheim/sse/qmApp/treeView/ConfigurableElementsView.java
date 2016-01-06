@@ -417,19 +417,21 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
             String editorId = elt.getEditorId();
             if (null != input && null != editorId) {
                 IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-                boolean found = false;
+                IEditorReference foundRef = null;
                 for (IEditorReference ref : page.getEditorReferences()) {
                     if (ref.getId().equals(editorId) && elt.getDisplayName().equals(ref.getName())) {
-                        found = true;
+                        foundRef = ref;
                         break;
                     }
                 }
-                if (!found) {
+                if (null == foundRef) {
                     try {
                         page.openEditor(input, editorId);
                     } catch (PartInitException e) {
                         Dialogs.showErrorDialog(getSite().getShell(), "Opening editor", getClass(), e);
                     }
+                } else {
+                    foundRef.getPage().bringToTop(foundRef.getPart(true));
                 }
             }
         }
