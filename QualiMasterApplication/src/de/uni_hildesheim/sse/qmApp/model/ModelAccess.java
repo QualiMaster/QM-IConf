@@ -511,16 +511,6 @@ public class ModelAccess {
     }
 
     /**
-     * Returns whether <code>type</code> is a constraint.
-     * 
-     * @param type the type
-     * @return <code>true</code> in case of a constraint <code>false</code> else
-     */
-    public static boolean isConstraint(IDatatype type) {
-        return (type == ConstraintType.TYPE || type instanceof ConstraintType);
-    }
-    
-    /**
      * Returns the help text of <code>var</code>.
      * 
      * @param var the variable to return the description for

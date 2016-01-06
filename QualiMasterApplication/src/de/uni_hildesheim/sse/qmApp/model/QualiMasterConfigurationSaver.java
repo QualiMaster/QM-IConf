@@ -22,6 +22,7 @@ import de.uni_hildesheim.sse.model.varModel.FreezeBlock;
 import de.uni_hildesheim.sse.model.varModel.IFreezable;
 import de.uni_hildesheim.sse.model.varModel.Project;
 import de.uni_hildesheim.sse.model.varModel.ProjectImport;
+import de.uni_hildesheim.sse.model.varModel.datatypes.ConstraintType;
 import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.model.varModel.datatypes.IntegerType;
 import de.uni_hildesheim.sse.model.varModel.datatypes.OclKeyWords;
@@ -252,7 +253,7 @@ public class QualiMasterConfigurationSaver extends de.uni_hildesheim.sse.model.c
         AbstractVariable decl = var.getDeclaration();
         IDatatype type = decl.getType();
         // QualiMaster convention
-        if (ModelAccess.isConstraint(type)) {
+        if (ConstraintType.isConstraint(type)) {
             enabled = false;
         } else if (var.getParent() instanceof Configuration) {
             String decisionNamespace = var.getDeclaration().getNameSpace();

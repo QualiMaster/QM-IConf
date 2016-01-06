@@ -31,6 +31,7 @@ import de.uni_hildesheim.sse.model.varModel.Project;
 import de.uni_hildesheim.sse.model.varModel.ProjectImport;
 import de.uni_hildesheim.sse.model.varModel.ProjectInterface;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Compound;
+import de.uni_hildesheim.sse.model.varModel.datatypes.ConstraintType;
 import de.uni_hildesheim.sse.model.varModel.datatypes.DerivedDatatype;
 import de.uni_hildesheim.sse.model.varModel.datatypes.EnumLiteral;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Reference;
@@ -211,7 +212,7 @@ public class ConfigurationEditor extends EditorPart {
         @Override
         public void visitDecisionVariableDeclaration(DecisionVariableDeclaration decl) {
             if (!Utils.contains(part.getTopLevelVariables(), decl.getName())) {            
-                if (!ModelAccess.isConstraint(decl.getType())) {
+                if (!ConstraintType.isConstraint(decl.getType())) {
                     String displayName = safeString(ModelAccess.getDisplayName(decl)).trim();
                     String helpText = safeString(ModelAccess.getHelpText(decl)).trim();
                     if (displayName.length() > 0 && helpText.length() > 0) {
