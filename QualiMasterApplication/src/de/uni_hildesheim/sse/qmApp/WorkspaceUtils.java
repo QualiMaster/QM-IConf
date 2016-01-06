@@ -21,6 +21,14 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.jface.action.SubStatusLineManager;
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Some workspace utilities.
@@ -69,6 +77,86 @@ public class WorkspaceUtils {
      */
     public static File getMetadataFolder() {
         return new File(getWorkspaceRoot(), ".metadata");
+    }
+
+    /**
+     * Returns the active workbench window.
+     * 
+     * @return the active workbench window (may be <b>null</b> if there is none)
+     */
+    public static IWorkbenchWindow getActiveWorkbenchWindow() {
+        return PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+    }
+    
+    /**
+     * Returns the active editor part.
+     * 
+     * @return the active editor part (may be <b>null</b> if there is none)
+     * @see #getActiveWorkbenchWindow()
+     */
+    public static IEditorPart getActiveEditorPart() {
+        IEditorPart editorPart = null;
+        IWorkbenchPage wPage = null;
+        IWorkbenchWindow wWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        if (null != wWindow) {
+            wPage = wWindow.getActivePage();
+        }
+        if (null != wPage) {
+            editorPart = wPage.getActiveEditor();
+        }
+        return editorPart;
+    }
+
+    /**
+     * Returns the editor site of the active editor.
+     * 
+     * @return the editor site (may be <b>null</b> if there is none)
+     * @see #getActiveEditorPart()
+     */
+    public static IEditorSite getActiveEditorSite() {
+        IEditorSite editorSite = null;
+        IEditorPart editorPart = getActiveEditorPart();
+        if (null != editorPart) {
+            editorSite = editorPart.getEditorSite();
+        }
+        return editorSite;
+    }
+
+    /**
+     * Returns the action bars of the active editor.
+     * 
+     * @return the action bars (may be <b>null</b> if there is none)
+     * @see #getActiveEditorSite()
+     */
+    public static IActionBars getActiveActionBars() {
+        IActionBars actionBars = null;
+        IEditorSite editorSite = getActiveEditorSite();
+        if (null != editorSite) {
+            actionBars = editorSite.getActionBars();
+        }
+        return actionBars;
+    }
+
+    /**
+     * Returns the status line manager of the active editor.
+     * 
+     * @param setVisible turns the status line manager visible if needed
+     * @return the status line manager (may be <b>null</b> if there is none)
+     * @see #getActiveActionBars()
+     */
+    public static IStatusLineManager getActiveStatusLineManager(boolean setVisible) {
+        IStatusLineManager statusManager = null;
+        IActionBars actionBars = getActiveActionBars();
+        if (null != actionBars) {
+            statusManager = actionBars.getStatusLineManager();
+            if (setVisible && statusManager instanceof SubStatusLineManager) {
+                SubStatusLineManager mgr = (SubStatusLineManager) statusManager;
+                if (!mgr.isVisible()) {
+                    mgr.setVisible(true);
+                }
+            }
+        }
+        return statusManager;
     }
     
 }

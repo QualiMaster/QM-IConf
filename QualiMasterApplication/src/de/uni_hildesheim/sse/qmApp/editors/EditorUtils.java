@@ -15,12 +15,16 @@
  */
 package de.uni_hildesheim.sse.qmApp.editors;
 
+import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
 import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
+import de.uni_hildesheim.sse.qmApp.WorkspaceUtils;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 
 /**
@@ -59,9 +63,29 @@ public class EditorUtils {
      * @return <code>control</code>
      */
     public static Control assignHelpText(IDecisionVariable var, Control control) {
-        String helpText = ModelAccess.getHelpText(var);
+        final String helpText = ModelAccess.getHelpText(var);
         if (null != helpText && helpText.length() > 0) {
-            control.setToolTipText(helpText);
+            // pipeline editor does not support tool tips in properties view, switch to status line manager
+            //control.setToolTipText(helpText);
+            control.addMouseTrackListener(new MouseTrackAdapter() {
+
+                @Override
+                public void mouseHover(MouseEvent evt) {
+                    IStatusLineManager manager = WorkspaceUtils.getActiveStatusLineManager(true);
+                    if (null != manager) {
+                        manager.setMessage(helpText);
+                    }
+                }
+                
+                @Override
+                public void mouseExit(MouseEvent evt) {
+                    IStatusLineManager manager = WorkspaceUtils.getActiveStatusLineManager(true);
+                    if (null != manager) {
+                        manager.setMessage(""); // we do not have the actual message before...
+                    }
+                }
+            
+            });
         }
         return control;
     }
