@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Label;
 
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
 import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
+import de.uni_hildesheim.sse.model.varModel.filter.mandatoryVars.VariableContainer;
 import de.uni_hildesheim.sse.qmApp.WorkspaceUtils;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 
@@ -45,10 +46,16 @@ public class EditorUtils {
      * 
      * @param uiCfg the (UI) configuration.
      * @param var the decision variable to create the parent for
+     * @param importances optional information whether variables are required to be configured, may be <b>null</b>
      * @return the created label
      */
-    public static Label createLabel(UIConfiguration uiCfg, IDecisionVariable var) {
+    public static Label createLabel(UIConfiguration uiCfg, IDecisionVariable var, VariableContainer importances) {
         String labelText = ModelAccess.getLabelName(var.getDeclaration());
+        if (null != importances) {
+            if (importances.isMandatory(var)) {
+                labelText += "*";
+            }
+        }
         Label label = new Label(uiCfg.getParent().getContentPane(), SWT.NONE);
         label.setText(labelText);
         assignHelpText(var, label);

@@ -160,7 +160,7 @@ public class ProjectEditor extends AbstractVarModelEditor {
         public void visitDecisionVariableDeclaration(DecisionVariableDeclaration decl) {
             IDecisionVariable var = cfg.getDecision(decl); 
             if (null != var && !ConstraintType.TYPE.isAssignableFrom(decl.getType())) {
-                EditorUtils.createLabel(uiCfg, var);
+                EditorUtils.createLabel(uiCfg, var, getImportances());
                 addEditor(createEditorInstance(var));
             }
         }

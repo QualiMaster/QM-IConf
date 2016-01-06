@@ -30,6 +30,9 @@ import de.uni_hildesheim.sse.model.varModel.AbstractVariable;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Compound;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Container;
 import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
+import de.uni_hildesheim.sse.model.varModel.filter.FilterType;
+import de.uni_hildesheim.sse.model.varModel.filter.mandatoryVars.MandatoryDeclarationClassifier;
+import de.uni_hildesheim.sse.model.varModel.filter.mandatoryVars.VariableContainer;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager;
@@ -51,11 +54,21 @@ public abstract class AbstractVarModelEditor extends EditorPart implements IChan
     private List<Control> editors = new ArrayList<Control>();
     private boolean enableChangeEventProcessing = true;
     private DirtyListener dirtyListener;
+    private VariableContainer importances;
 
     @Override
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         setSite(site);
         setInput(input);
+    }
+    
+    /**
+     * The variability importances, i.e., whether variables shall be configured.
+     * 
+     * @return the importances, may be <b>null</b>
+     */
+    protected VariableContainer getImportances() {
+        return importances;
     }
     
     /**
@@ -69,13 +82,13 @@ public abstract class AbstractVarModelEditor extends EditorPart implements IChan
             for (int n = 0; n < nCount; n++) {
                 IDecisionVariable nVar = var.getNestedElement(n);
                 if (ModelAccess.isVisible(nVar)) {
-                    EditorUtils.createLabel(uiCfg, nVar);
+                    EditorUtils.createLabel(uiCfg, nVar, importances);
                     addEditor(createEditorInstance(nVar));
                 }
             }
         } else {
             if (ModelAccess.isVisible(var)) {
-                EditorUtils.createLabel(uiCfg, var);
+                EditorUtils.createLabel(uiCfg, var, importances);
                 addEditor(createEditorInstance(var));
             }
         }
@@ -122,6 +135,10 @@ public abstract class AbstractVarModelEditor extends EditorPart implements IChan
         this.dirtyListener = new DirtyListener(this.parent);
         uiCfg = ConfigurationTableEditorFactory.createConfiguration(cfg, getParent(), getUiParameter());
         ChangeManager.INSTANCE.addListener(this);
+        
+        MandatoryDeclarationClassifier finder = new MandatoryDeclarationClassifier(cfg, FilterType.ALL);
+        cfg.getProject().accept(finder);
+        importances = finder.getImportances();
     }
     
     /**
