@@ -31,6 +31,7 @@ import de.uni_hildesheim.sse.model.varModel.datatypes.Compound;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Container;
 import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.model.varModel.filter.FilterType;
+import de.uni_hildesheim.sse.model.varModel.filter.mandatoryVars.MandatoryClassifierSettings;
 import de.uni_hildesheim.sse.model.varModel.filter.mandatoryVars.MandatoryDeclarationClassifier;
 import de.uni_hildesheim.sse.model.varModel.filter.mandatoryVars.VariableContainer;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
@@ -136,7 +137,9 @@ public abstract class AbstractVarModelEditor extends EditorPart implements IChan
         uiCfg = ConfigurationTableEditorFactory.createConfiguration(cfg, getParent(), getUiParameter());
         ChangeManager.INSTANCE.addListener(this);
         
-        MandatoryDeclarationClassifier finder = new MandatoryDeclarationClassifier(cfg, FilterType.ALL);
+        MandatoryClassifierSettings settings = new MandatoryClassifierSettings();
+        settings.setDefaultValueConsideration(false);
+        MandatoryDeclarationClassifier finder = new MandatoryDeclarationClassifier(cfg, FilterType.ALL, settings);
         cfg.getProject().accept(finder);
         importances = finder.getImportances();
     }
