@@ -422,8 +422,10 @@ public class LoginDialog {
             roles.add(ApplicationRole.PIPELINE_DESIGNER);
         }
         UserContext.INSTANCE.setRoles(roles);
-        Location.setModelLocation(Utils.getDestinationFileForModel(
-            prefs.get(repositoryUrlPreferenceKey, null)).getAbsolutePath());
+        String repoURL = prefs.get(repositoryUrlPreferenceKey, null);
+        if (null != repoURL) {
+            Location.setModelLocation(Utils.getDestinationFileForModel(repoURL).getAbsolutePath());
+        }
         // add preference entry that local data was used
         prefs.put(localDataPreferenceKey, "true");
         savePreferences();
