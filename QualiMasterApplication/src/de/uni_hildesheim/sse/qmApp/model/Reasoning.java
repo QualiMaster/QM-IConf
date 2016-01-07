@@ -132,7 +132,7 @@ public class Reasoning {
         Configuration cfg = modelPart.getConfiguration();
         Project project = cfg.getProject();      
         ReasoningResult result = ReasonerFrontend.getInstance().check(project, cfg, CONFIGURATION, 
-            ProgressObserver.NO_OBSERVER); // currently same as propagate, ...           
+            ProgressObserver.NO_OBSERVER); // currently same as propagate, ... 
         if (result.hasConflict()) {
             IResource resource = ResourcesPlugin.getWorkspace().getRoot();
             StringBuilder message = new StringBuilder();
@@ -162,7 +162,6 @@ public class Reasoning {
                 } catch (CoreException e) {
                     markerException = e;
                 }
-                
                 if (message.length() > 0) {
                     message.append("\n- ");
                 }
@@ -186,6 +185,7 @@ public class Reasoning {
             }
             success = false;
         } else {
+            ConfigurableElementsView.revertConfigurableElementsViewMarking();
             if (showSuccessDialog) {
                 Dialogs.showInfoDialog("Validation successful", "Model is valid.");
             }
@@ -272,7 +272,7 @@ public class Reasoning {
         ConfigurableElementsView.saveReasosiningInfoInTreeElementsForPipelines(
                 configurableElementsViewMappingForPipelines);
         
-        VariableEditor.refreshEditor();
+        //VariableEditor.refreshEditor();
       
     }
     

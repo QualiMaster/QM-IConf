@@ -66,7 +66,7 @@ import pipeline.diagram.part.PipelineDiagramEditor;
  */
 public class ConfigurableElementsView extends ViewPart implements IChangeListener {
     public static final String ID = "QualiMasterApplication.view";
-    private static final boolean DIAGRAM_STATUS_LISTENER = false;
+    private static final boolean DIAGRAM_STATUS_LISTENER = true;
     //private static final String NODE_IDENTIFIER = "name: nodes";
     //private static final String FLOW_IDENTIFIER = "name: nodes";
     private static HashMap<Image, Image> originalIconReminder = new HashMap<Image, Image>();
@@ -317,14 +317,16 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                     
                         DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench().
                                 getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-                                             
+                               
+                        if (DIAGRAM_STATUS_LISTENER) {
+                            listenOnDiagrm(diagram);
+                        }
+                        
                         if (diagram instanceof PipelineDiagramEditor) {
                             PipelineDiagramUtils.highlightDiagram();
                         }
                         
-                        if (DIAGRAM_STATUS_LISTENER) {
-                            listenOnDiagrm(diagram);
-                        }
+                       
                     }
                 }
             }
@@ -722,6 +724,23 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
         }
     }
 
+    /**
+     * Change all icons to standard with no red markers.
+     */
+    public static void revertConfigurableElementsViewMarking() {
+        for (int i = 0; i < elements.elements().length; i++) {
+
+            ConfigurableElement treeElement = elements.elements()[i];
+
+            for (int k = 0; k < treeElement.getChildCount(); k++) {
+                
+                ConfigurableElement innerTreeElement = treeElement.getChild(k);
+                innerTreeElement.setFlawedIndicator(false);
+                viewer.refresh();
+            }
+        }
+    }
+    
     /**
      * Show errors for Pipelines in Treeviewer.
      * @param configurableElementsViewMappingForPipelines pipelines-errors.

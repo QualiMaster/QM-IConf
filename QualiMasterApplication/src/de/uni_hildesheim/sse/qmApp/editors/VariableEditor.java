@@ -149,8 +149,10 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
      */
     public static void refreshEditor() {
 
-        if (scroll != null) { 
-            scroll.redraw();
+        if (scroll != null) {
+            if (!scroll.isDisposed()) {
+                scroll.redraw();
+            }
         }
     }
     
@@ -192,6 +194,16 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
             }
         }
     }
+    
+//    /**
+//     * Hide all decorators in the editor.
+//     */
+//    private void hideAllDecorators() {
+//        for (int i = 0; i < flawedControls.size(); i++) {
+//            flawedControls.get(i).hide();
+//        }
+//    }
+//    
     /**
      * Start reasoning for this editor.
      * @param parent editors parent.
@@ -204,6 +216,8 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
  
         if (keys != null && keys.length > 0) {
         
+            //hideAllDecorators();
+        
             for (int i = 0; i < keys.length; i++) {
 
                 IDecisionVariable variable = (IDecisionVariable) keys[i];
@@ -211,7 +225,7 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
                 Control failedControl = getUIConfiguration().getEditorFor(variable);
                             
                 final String errorMessage = errors.get(keys[i]);
-                            
+                           
                 if (failedControl != null) {
                     ControlDecoration declaration = flawedControls.get(failedControl);
                     declaration.show();
