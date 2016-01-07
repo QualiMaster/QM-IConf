@@ -48,23 +48,24 @@ public class BootstrappingDialog {
 
     private static EASyLogger logger = EASyLoggerFactory.INSTANCE.getLogger(BootstrappingDialog.class, Bundle.ID);
 
-    private static final String APPLICATION_NAME = "QualiMaster Infrastructure Configuration";
+    private static final String APPLICATION_NAME = "QualiMaster Infrastructure Configuration (QM-IConf)";
 
-    private static final String INIT_INFO_TEXT = "Welcome to the " + APPLICATION_NAME + " Bootstrapping. This guide "
+    private static final String INIT_INFO_TEXT = "Welcome to the " + APPLICATION_NAME + " bootstrapping. This guide "
             + "will help you to set up the application.";
 
-    private static final String REPO_CONNECTOR_INFO_TEXT = "If you have access to the svn repository all configuration "
-            + "will be done automaticly. Please choose how you want to configure the application";
+    private static final String REPO_CONNECTOR_INFO_TEXT = "If you have access to a SVN repository containing the "
+            + "model, all the remainder of QM-IConf configuration will be done automatically. Please choose how you "
+            + "want to configure QM-IConf.";
 
-    private static final String MODEL_LOCATION_INFO_TEXT = "Please provide the source location of the model. Upon "
-            + "application start the model will be copied to the working copy. The default model location in the "
-            + "working copy will be " + Utils.getDestinationFileForModel();
+    private static final String MODEL_LOCATION_INFO_TEXT = "Please provide the source location of the unzipped model. "
+            + "Upon application start the model will be copied into the work space of QM-IConf. The default model "
+            + "location in the work space will be\n\n " + Utils.getDestinationFileForModel();
 
     private static final String BUTTON_NEXT = "Next";
 
     private static final String BUTTON_REPOSITORY = "Repository";
 
-    private static final String BUTTON_MANUAL = "Manually (I downloaded the model)";
+    private static final String BUTTON_MANUAL = "Manually (I downloaded and unzipped the model)";
 
     private static final String BUTTON_SET_LOCATION = "Select model";
 
@@ -81,9 +82,9 @@ public class BootstrappingDialog {
     private static final String MODEL_LINK = "http://jenkins.sse.uni-hildesheim.de/job/QM-Pipelines/lastSuccessfulBuild"
             + "/artifact/QM_Model.zip";
 
-    private static final String INIT_MODEL_LINK_TEXT = "This application need a working copy of the model. If you have "
-            + "access to the SVN repository you dont have to download the model manually. Otherwise you can get a copy "
-            + "of the model from ";
+    private static final String INIT_MODEL_LINK_TEXT = "This application needs a working copy of the model. If you "
+            + "have access to a SVN repository with the model you want to use, you don't have to download, unzip and "
+            + "install an initially empty model. Otherwise you can get an actual copy of an empty model from ";
 
     private static final int SHELL_WIDTH = 500;
 
