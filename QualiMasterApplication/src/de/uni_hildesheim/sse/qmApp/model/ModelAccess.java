@@ -491,7 +491,7 @@ public class ModelAccess {
             }
         }
         if (null == displayName && null != var) {
-            displayName = getDisplayName(var);
+            displayName = getDisplayName(var.getDeclaration());
         }
         return displayName;
     }
