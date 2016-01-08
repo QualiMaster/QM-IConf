@@ -11,6 +11,10 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.gmf.runtime.diagram.ui.parts.DiagramEditor;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
@@ -29,6 +33,7 @@ import de.uni_hildesheim.sse.model.varModel.datatypes.ConstraintType;
 import de.uni_hildesheim.sse.persistency.StringProvider;
 import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.editors.VariableEditor;
+import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager;
 import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElementsView;
 import de.uni_hildesheim.sse.reasoning.core.frontend.ReasonerFrontend;
 import de.uni_hildesheim.sse.reasoning.core.reasoner.Message;
@@ -138,8 +143,7 @@ public class Reasoning {
             StringBuilder message = new StringBuilder();
             CoreException markerException = null;
             for (int m = 0; m < result.getMessageCount(); m++) {
-                Message msg = result.getMessage(m);
-                //Save reasoner-results in Hashmap
+                Message msg = result.getMessage(m); //Save reasoner-results in Hashmap
                 saveErrors(msg);
                 try {
                     List<String> labels = msg.getConflictLabels();
@@ -191,8 +195,39 @@ public class Reasoning {
             }
             success = true;
         }
+        updateOpenEditors();
         return success;
-    } 
+    }
+
+    /**
+     * Part of the {@link #reasonOn(IModelPart, boolean)} method: Forces all open {@link VariableEditor}s to update.
+     */
+    private static void updateOpenEditors() {
+        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        IEditorReference[] allOpenEditors = page.getEditorReferences();
+        for (int i = 0; i < allOpenEditors.length; i++) {
+            IEditorPart editor = allOpenEditors[i].getEditor(false);
+            if (editor instanceof VariableEditor) {
+                VariableEditor varEditor = (VariableEditor) editor;
+                informEditor(varEditor);
+            }
+        }
+    }
+    
+    /**
+     * Forces the given {@link VariableEditor} to refresh.
+     * This is necessary for updating the reasoning marker.
+     * @param editor An open {@link VariableEditor}, which shall be updated. Must not be <tt>null</tt>.
+     */
+    private static void informEditor(final VariableEditor editor) {
+        Display.getDefault().syncExec(new Runnable() {
+            
+            @Override
+            public void run() {
+                editor.refreshEditor();
+            }
+        });
+    }
     
     /**
      * Clears the marking of TreeItems in ConfigurableElementsView.
@@ -215,6 +250,7 @@ public class Reasoning {
                 Set<IDecisionVariable> setdecisionVariable = msg.getProblemVariables().get(i);
                
                 IDecisionVariable variable = (IDecisionVariable) setdecisionVariable.toArray()[j];
+                ChangeManager.INSTANCE.variableChanged(msg, variable);
             
                 String errorMessage = msg.getProblemVariables().get(i).toString();
                 String conflictMessage = msg.getConflictComments().get(i).toString();
