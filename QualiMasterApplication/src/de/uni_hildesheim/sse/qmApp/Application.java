@@ -12,6 +12,7 @@ import org.eclipse.ui.PlatformUI;
 import de.uni_hildesheim.sse.easy_producer.instantiator.Bundle;
 import de.uni_hildesheim.sse.easy_producer.persistency.ResourcesMgmt;
 import de.uni_hildesheim.sse.qmApp.commands.ResetModel;
+import de.uni_hildesheim.sse.qmApp.dialogs.BootstrappingDialog;
 import de.uni_hildesheim.sse.qmApp.dialogs.LoginDialog;
 import de.uni_hildesheim.sse.qmApp.model.Utils.ConfigurationProperties;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
@@ -34,6 +35,9 @@ public class Application implements IApplication {
 //        P2Utils.ensureUpdateURI();
         try {
             Object toReturn = null;
+            // Bootstrapping
+            BootstrappingDialog.INSTANCE.init(display);
+            
             // Enable repository auth
             if (authenticate(display)) {
                 int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());

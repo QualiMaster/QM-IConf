@@ -200,6 +200,7 @@ public class Reasoning {
     }
 
     /**
+<<<<<<< HEAD
      * Reset marking in tree and possibly opened Pipeline-Editor.
      */
     private static void resetReasoningMarkers() {
@@ -225,6 +226,8 @@ public class Reasoning {
 
     
     /**
+=======
+>>>>>>> branch 'master' of https://github.com/QualiMaster/QM-IConf.git
      * Part of the {@link #reasonOn(IModelPart, boolean)} method: Forces all open {@link VariableEditor}s to update.
      */
     private static void updateOpenEditors() {

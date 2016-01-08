@@ -50,7 +50,6 @@ import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.PipelineDiagramUtils;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
-import de.uni_hildesheim.sse.qmApp.pipelineUtils.PipelineEditorListener;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.EventKind;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.IChangeListener;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
@@ -362,8 +361,8 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
             
             public void resourceSetChanged(ResourceSetChangeEvent event) {
             
-                @SuppressWarnings("unused")
-                PipelineEditorListener listener = new PipelineEditorListener(event);
+                //@SuppressWarnings("unused")
+                //PipelineEditorListener listener = new PipelineEditorListener(event);
 //            
 //                for (Iterator<?> iter = event.getNotifications().iterator(); iter.hasNext();) {
 //                    Notification notification = (Notification) iter.next();

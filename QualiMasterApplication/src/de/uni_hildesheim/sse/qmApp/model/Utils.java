@@ -97,6 +97,14 @@ public class Utils {
         public boolean getBooleanValue() {
             return Boolean.valueOf(getValue());
         }
+        
+        /**
+         * Stores a property.
+         * @param value the value of the property
+         */
+        public void store(Object value) {
+            Utils.addProperty(key, value);
+        }
     }
     
     private static EASyLogger logger = EASyLoggerFactory.INSTANCE.getLogger(Utils.class, "");
@@ -336,6 +344,15 @@ public class Utils {
             }
         }
         return contains;
+    }
+    
+    /**
+     * Adds a property to the properties. Use with care!
+     * @param key the key to be added
+     * @param value the value of the key
+     */
+    private static void addProperty(Object key, Object value) {
+        getProperties().put(key, value);
     }
     
 }

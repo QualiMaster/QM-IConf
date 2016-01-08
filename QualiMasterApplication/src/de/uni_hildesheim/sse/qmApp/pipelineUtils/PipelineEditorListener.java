@@ -6,6 +6,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.transaction.ResourceSetChangeEvent;
 import org.eclipse.gmf.runtime.emf.core.util.EMFCoreUtil;
+import org.eclipse.gmf.runtime.notation.Connector;
 import org.eclipse.gmf.runtime.notation.impl.ConnectorImpl;
 
 /**
@@ -18,7 +19,7 @@ import org.eclipse.gmf.runtime.notation.impl.ConnectorImpl;
 public class PipelineEditorListener {
 
     private static final String NODE_IDENTIFIER = "name: nodes";
-    private static final String FLOW_IDENTIFIER = "name: nodes";
+    private static final String FLOW_IDENTIFIER = "name: flows";
     private static IPipelineEditorListener listener = NullPipelineEditorListener.INSTANCE;
     
     /**
@@ -50,10 +51,30 @@ public class PipelineEditorListener {
                             //add nodes which are connected to the newly added flow to the listener
                             //listener.flowAdded(node1, node2);
                             System.out.println("flow added " + feature.getName()); // TODO from flow to nodes??
+                            
+                            ConnectorImpl connector = (ConnectorImpl) eObject;
+                            Object object = connector.getSource();
+                            
+//                            FlowImpl flow = (FlowImpl) eObject;
+//                            System.out.println(flow);
+                            
                         }
                     }
                     if (eObject instanceof ConnectorImpl && Integer.compare(notification.getEventType(),
                          Notification.UNSET) == 0) {
+                    
+                        Connector connector = (Connector) eObject;
+                        System.out.println(connector);
+                    
+                        Object object = connector.getSource();
+                        System.out.println(object);
+                    
+                        ConnectorImpl connector2 = (ConnectorImpl) eObject;
+                        Object object2 = connector2.getSource();
+//                        ConnectorImpl connector = (ConnectorImpl) eObject;
+//                      View source = connector.getSource();
+//                      View target = connector.getTarget();
+                    
                         //listener.flowRemoved(node1, node2);
                         System.out.println("flow removed " + feature.getName()); // TODO from flow to nodes??
                     }
