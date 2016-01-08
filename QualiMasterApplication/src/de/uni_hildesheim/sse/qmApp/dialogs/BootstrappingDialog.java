@@ -61,7 +61,7 @@ public class BootstrappingDialog {
     private static final String REPO_URL_CONNECTOR_INFO_TEXT = "Please provide the url of the repository. "
             + "You can either use the default repository (" + ConfigurationProperties.REPOSITORY_URL.getValue() + ") "
             + "or you can configure your own repository url. If the field is left blank the default repository will "
-            + "be used. \n\nIf you have configured the model location in the previous step you can skip this step.";
+            + "be used.";
 
     private static final String MODEL_LOCATION_INFO_TEXT = "Please provide the source location of the unzipped model. "
             + "Upon application start the model will be copied into the work space of QM-IConf. The default model "
