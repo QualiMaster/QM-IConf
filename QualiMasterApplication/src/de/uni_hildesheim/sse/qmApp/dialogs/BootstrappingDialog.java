@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.osgi.service.prefs.BackingStoreException;
 
 import de.uni_hildesheim.sse.easy_producer.instantiator.Bundle;
@@ -43,7 +44,7 @@ import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
  *
  */
 public class BootstrappingDialog {
-    
+
     public static final BootstrappingDialog INSTANCE = new BootstrappingDialog();
 
     private static EASyLogger logger = EASyLoggerFactory.INSTANCE.getLogger(BootstrappingDialog.class, Bundle.ID);
@@ -57,6 +58,11 @@ public class BootstrappingDialog {
             + "model, all the remainder of QM-IConf configuration will be done automatically. Please choose how you "
             + "want to configure QM-IConf.";
 
+    private static final String REPO_URL_CONNECTOR_INFO_TEXT = "Please provide the url of the repository. "
+            + "You can either use the default repository (" + ConfigurationProperties.REPOSITORY_URL.getValue() + ") "
+            + "or you can configure your own repository url. If the field is left blank the default repository will "
+            + "be used. \n\nIf you have configured the model location in the previous step you can skip this step.";
+
     private static final String MODEL_LOCATION_INFO_TEXT = "Please provide the source location of the unzipped model. "
             + "Upon application start the model will be copied into the work space of QM-IConf. The default model "
             + "location in the work space will be\n\n " + Utils.getDestinationFileForModel();
@@ -65,17 +71,23 @@ public class BootstrappingDialog {
 
     private static final String BUTTON_REPOSITORY = "Repository";
 
+    private static final String BUTTON_DEFAULT_REPOSITORY = "Use the default repository";
+
+    private static final String BUTTON_OWN_REPOSITORY = "Configure own repository url";
+
     private static final String BUTTON_MANUAL = "Manually (I downloaded and unzipped the model)";
 
     private static final String BUTTON_SET_LOCATION = "Select model";
 
     private static final String BUTTON_BACK = "Back";
-    
+
     private static final String BUTTON_CANCEL = "Cancel";
 
     private static final String INIT_TITLE = "Configuration assistant";
 
     private static final String REPO_CONNECTOR_TITLE = "Repository connector";
+
+    private static final String REPO_URL_CONNECTOR_TITLE = "Configure repository url";
 
     private static final String MODEL_LOCATION_TITLE = "Set model location";
 
@@ -90,14 +102,20 @@ public class BootstrappingDialog {
 
     private static final int SHELL_HEIGHT = 350;
 
-    private static final int NUMBER_OF_COMPOSITES = 3;
+    private static final int NUMBER_OF_COMPOSITES = 4;
 
     private Button repo = null;
-    
+
     private Button manual = null;
-    
+
     private Button next = null;
+
+    private Button defaultRepo = null;
+
+    private Button ownRepo = null;
     
+    private Text urlField = null;
+
     private boolean sourceLocationConfigured = false;
     private boolean modelLocationConfigured = false;
     private String applicationConfiguredPreferenceKey = "app-configured";
@@ -125,14 +143,17 @@ public class BootstrappingDialog {
                 ConfigurationProperties.MODEL_LOCATION.store(Utils.getDestinationFileForModel().getAbsolutePath());
             }
         } else {
-            createDialog(display);
+            if (!ConfigurationProperties.DEMO_MODE.getBooleanValue()) {
+                createDialog(display);
+            }
         }
     }
 
     /**
      * Creates the bootstrapping dialog.
      * 
-     * @param display Display
+     * @param display
+     *            Display
      */
     private void createDialog(final Display display) {
         final Shell shell = new Shell(display);
@@ -152,10 +173,11 @@ public class BootstrappingDialog {
         createWelcomeContent(shell, display, parent, compositeArray);
         createConnectorContent(shell, display, parent, compositeArray);
         createModelLocationContent(shell, parent, compositeArray);
+        createRepositoryURLContent(shell, parent, compositeArray);
         // Set first page to be shown
         layout.topControl = compositeArray[0];
         new Label(shell, SWT.NONE);
-        // Navigation 
+        // Navigation
         createNavigation(shell, root, parent, layout, compositeArray);
         shell.setLocation(DialogsUtil.getXPosition(shell, display), DialogsUtil.getYPosition(shell, display));
         shell.open();
@@ -167,16 +189,22 @@ public class BootstrappingDialog {
     }
 
     /**
-     * Creates the navigation buttons and handles the navigation between the pages.
+     * Creates the navigation buttons and handles the navigation between the
+     * pages.
      * 
-     * @param shell  Shell
-     * @param root  root composite
-     * @param parent    parent composite
-     * @param layout    layout
-     * @param compositeArray    array with composites
+     * @param shell
+     *            Shell
+     * @param root
+     *            root composite
+     * @param parent
+     *            parent composite
+     * @param layout
+     *            layout
+     * @param compositeArray
+     *            array with composites
      */
-    private void createNavigation(final Shell shell, final Composite root,
-            final Composite parent, final StackLayout layout, final Composite[] compositeArray) {
+    private void createNavigation(final Shell shell, final Composite root, final Composite parent,
+            final StackLayout layout, final Composite[] compositeArray) {
         final Composite navigation = createComposite(shell);
         Button back = createButton(navigation, BUTTON_BACK);
         next = createButton(navigation, BUTTON_NEXT);
@@ -190,25 +218,13 @@ public class BootstrappingDialog {
                 }
                 if (indexNextButton[0] == 0) { // Close when last composite is reached.
                     // Validate settings.
-                    if (validateConfiguration()) {
-                        prefs.put(applicationConfiguredPreferenceKey, "true");
-                        prefs.put(manualConfiguredPreferenceKey, "true");
-                        savePreferences();
-                        shell.dispose();
-                    } else {
-                        next.setEnabled(false);
-                        indexNextButton[0] = 2;
+                    validateSettings(shell, root, parent, layout, compositeArray, indexNextButton);
+                } else {
+                    if (repo.getSelection()) {
+                        indexNextButton[0] = 3;
                         layout.topControl = compositeArray[indexNextButton[0]];
                         highlightLeftNavigation(shell.getDisplay(), root, indexNextButton);
                         parent.layout();
-                        createMessage(shell);
-                    }
-                } else {
-                    if (repo.getSelection()) {
-                        prefs.put(applicationConfiguredPreferenceKey, "true");
-                        prefs.put(manualConfiguredPreferenceKey, "false");
-                        savePreferences();
-                        shell.dispose();
                     } else {
                         layout.topControl = compositeArray[indexNextButton[0]];
                         highlightLeftNavigation(shell.getDisplay(), root, indexNextButton);
@@ -221,7 +237,11 @@ public class BootstrappingDialog {
             public void handleEvent(Event event) {
                 if (indexNextButton[0] > 0) {
                     next.setEnabled(true);
-                    indexNextButton[0] = indexNextButton[0] - 1;
+                    if (indexNextButton[0] == 3) {
+                        indexNextButton[0] = indexNextButton[0] - 2;
+                    } else {
+                        indexNextButton[0] = indexNextButton[0] - 1;
+                    }
                     highlightLeftNavigation(shell.getDisplay(), root, indexNextButton);
                     layout.topControl = compositeArray[indexNextButton[0]];
                     parent.layout();
@@ -235,23 +255,67 @@ public class BootstrappingDialog {
         });
         repo.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
+                ownRepo.setEnabled(true);
+                defaultRepo.setEnabled(true);
                 manual.setSelection(false);
                 next.setEnabled(true);
             }
         });
         manual.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
+                ownRepo.setSelection(false);
+                ownRepo.setEnabled(false);
+                defaultRepo.setSelection(false);
+                defaultRepo.setEnabled(false);
                 repo.setSelection(false);
                 next.setEnabled(true);
             }
         });
     }
-
+    
+    /**
+     * Validates the settings made by the user.
+     * 
+     * @param shell Shell
+     * @param root root Composite
+     * @param parent parent Composite
+     * @param layout StockLayout
+     * @param compositeArray array containing the stocks for the stock layout
+     * @param indexNextButton index of the page
+     */
+    // checkstyle: stop parameter number check
+    private void validateSettings(final Shell shell, final Composite root, final Composite parent,
+            final StackLayout layout, final Composite[] compositeArray, final int[] indexNextButton) {
+        if (validateConfiguration()) {
+            prefs.put(applicationConfiguredPreferenceKey, "true");
+            if (defaultRepo.getSelection() || ownRepo.getSelection()) {
+                prefs.put(manualConfiguredPreferenceKey, "false");
+                if (ownRepo.getSelection() && null != urlField.getText() && !urlField.getText().isEmpty()) {
+                    ConfigurationProperties.REPOSITORY_URL.store(urlField.getText());
+                }
+            } else {
+                prefs.put(manualConfiguredPreferenceKey, "true");
+            }
+            savePreferences();
+            shell.dispose();
+        } else {
+            next.setEnabled(false);
+            indexNextButton[0] = 2;
+            layout.topControl = compositeArray[indexNextButton[0]];
+            highlightLeftNavigation(shell.getDisplay(), root, indexNextButton);
+            parent.layout();
+            createMessage(shell);
+        }
+    }
+    // checkstyle: resume parameter number check
+    
     /**
      * Creates a button.
      * 
-     * @param navigation parent composite
-     * @param text  button text
+     * @param navigation
+     *            parent composite
+     * @param text
+     *            button text
      * @return created button
      */
     private Button createButton(final Composite navigation, String text) {
@@ -263,7 +327,8 @@ public class BootstrappingDialog {
     /**
      * Creates a composite.
      * 
-     * @param shell Shell
+     * @param shell
+     *            Shell
      * @return created composite
      */
     private Composite createComposite(final Shell shell) {
@@ -272,31 +337,35 @@ public class BootstrappingDialog {
         navigation.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, true, false, 1, 1));
         return navigation;
     }
-    
+
     /**
      * Creates a message dialog.
      * 
-     * @param shell parent shell
+     * @param shell
+     *            parent shell
      */
     private void createMessage(final Shell shell) {
         MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
         dialog.setText("Configuration not valid");
-        dialog.setMessage("Your configuration seems to be invalid. Please check that you provided "
-                + "the model correctly.");
+        dialog.setMessage(
+                "Your configuration seems to be invalid. Please check that you provided " + "the model correctly.");
         dialog.open();
     }
 
     /**
      * Creates the left side navigation.
      * 
-     * @param display Display
-     * @param shell Shell
+     * @param display
+     *            Display
+     * @param shell
+     *            Shell
      * @return Composite
      */
     private Composite createLeftNavigation(final Display display, final Shell shell) {
         final Composite root = new Composite(shell, SWT.NONE);
         root.setLayout(new GridLayout(1, true));
-        String[] labels = new String[] {INIT_TITLE, REPO_CONNECTOR_TITLE, MODEL_LOCATION_TITLE};
+        String[] labels = new String[] {INIT_TITLE, REPO_CONNECTOR_TITLE, MODEL_LOCATION_TITLE,
+            REPO_URL_CONNECTOR_TITLE };
         for (String string : labels) {
             Label label = new Label(root, SWT.WRAP);
             if (string.equals(INIT_TITLE)) {
@@ -308,7 +377,7 @@ public class BootstrappingDialog {
         }
         return root;
     }
-    
+
     /**
      * Saves the preferences.
      */
@@ -320,16 +389,19 @@ public class BootstrappingDialog {
             logger.exception(e);
         }
     }
-    
+
     /**
-     * Highlights the left side navigation. The background of the labels and the text color will change.
+     * Highlights the left side navigation. The background of the labels and the
+     * text color will change.
      * 
-     * @param display Display
-     * @param root Composite
-     * @param indexNextButton index on which page we are at
+     * @param display
+     *            Display
+     * @param root
+     *            Composite
+     * @param indexNextButton
+     *            index on which page we are at
      */
-    private void highlightLeftNavigation(final Display display, final Composite root,
-            final int[] indexNextButton) {
+    private void highlightLeftNavigation(final Display display, final Composite root, final int[] indexNextButton) {
         Control[] children = root.getChildren();
         for (int i = 0; i < children.length; i++) {
             if (children[indexNextButton[0]] instanceof Label) {
@@ -337,7 +409,7 @@ public class BootstrappingDialog {
                 if (i == indexNextButton[0]) {
                     currentLabel.setBackground(display.getSystemColor(SWT.COLOR_BLUE));
                     currentLabel.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
-                } else { 
+                } else {
                     // reset colors
                     currentLabel.setBackground(null);
                     currentLabel.setForeground(null);
@@ -345,6 +417,56 @@ public class BootstrappingDialog {
                 root.layout();
             }
         }
+    }
+    
+    /**
+     * Creates the content for inserting the repository url.
+     * 
+     * @param shell
+     *            Shell
+     * @param parent
+     *            Composite
+     * @param compositeArray
+     *            array containing all composites
+     */
+    private void createRepositoryURLContent(Shell shell, final Composite parent, final Composite[] compositeArray) {
+        shell.setText("QualiMaster Infrastructure Configuration - " + REPO_URL_CONNECTOR_TITLE);
+        compositeArray[3] = new Composite(parent, SWT.NONE);
+        compositeArray[3].setLayout(new GridLayout(1, true));
+        Label infoRepoConnector = new Label(compositeArray[3], SWT.WRAP);
+        infoRepoConnector.setText(REPO_URL_CONNECTOR_INFO_TEXT);
+        infoRepoConnector.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+        new Label(compositeArray[3], SWT.NONE);
+        defaultRepo = new Button(compositeArray[3], SWT.CHECK);
+        defaultRepo.setText(BUTTON_DEFAULT_REPOSITORY);
+        defaultRepo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+        ownRepo = new Button(compositeArray[3], SWT.CHECK);
+        ownRepo.setText(BUTTON_OWN_REPOSITORY);
+        ownRepo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+        urlField = new Text(compositeArray[3], SWT.SINGLE | SWT.BORDER);
+        GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        urlField.setLayoutData(data);
+        urlField.setEnabled(false);
+        ownRepo.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                if (ownRepo.getSelection()) {
+                    defaultRepo.setSelection(false);
+                    urlField.setEnabled(true);
+                } else {
+                    urlField.setEnabled(false);
+                }
+            }
+        });
+        defaultRepo.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                if (defaultRepo.getSelection()) {
+                    ownRepo.setSelection(false);
+                    urlField.setEnabled(false);
+                }
+            }
+        });
     }
 
     /**
@@ -357,8 +479,8 @@ public class BootstrappingDialog {
      * @param compositeArray
      *            array containing all composites
      */
-    private void createModelLocationContent(final Shell shell, final Composite parent, 
-        final Composite[] compositeArray) {
+    private void createModelLocationContent(final Shell shell, final Composite parent,
+            final Composite[] compositeArray) {
         shell.setText("QualiMaster Infrastructure Configuration - " + MODEL_LOCATION_TITLE);
         compositeArray[2] = new Composite(parent, SWT.NONE);
         compositeArray[2].setLayout(new GridLayout(1, true));
@@ -458,7 +580,7 @@ public class BootstrappingDialog {
             }
         });
     }
-    
+
     /**
      * Validates the configuration.
      * 
@@ -466,7 +588,9 @@ public class BootstrappingDialog {
      */
     private boolean validateConfiguration() {
         boolean result = false;
-        if (modelLocationConfigured && sourceLocationConfigured) {
+        if (defaultRepo.getSelection() || ownRepo.getSelection()) {
+            result = true;
+        } else if (modelLocationConfigured && sourceLocationConfigured) {
             result = true;
         }
         return result;
