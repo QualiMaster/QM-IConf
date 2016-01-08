@@ -84,6 +84,27 @@ public class Highlighter implements IHighlighter {
             figure.revalidate();
         }
     }
+    
+    /**
+     * Highlight given object in the diagram.
+     * 
+     * @param semanticElement
+     *            Given element {@link EObject}.
+     * @param parameters
+     *            paramters which specify how elements will be adapted.
+     */
+    public void resetNode(EObject semanticElement, HighlighterParam parameters) {
+
+        IGraphicalEditPart editPartForSemanticElement = getEditPartForSemanticElement(semanticElement);
+
+        if (editPartForSemanticElement != null) {
+
+            IFigure figure = getTargetFigure(editPartForSemanticElement);
+            
+            figure.setBorder(new LineBorder(parameters.getDiagramStandardNodeColor()));
+            figure.revalidate();
+        }
+    }
 
     /**
     * Highlight given object in the diagram.
@@ -111,7 +132,7 @@ public class Highlighter implements IHighlighter {
     }
 
     /**
-    * Highlight given flow in pipeline-diagram.
+    * Reset given flow in pipeline-diagram.
     * 
     * @param semanticElement
     *            Given element which will be highlighted.
@@ -133,6 +154,30 @@ public class Highlighter implements IHighlighter {
             }
         }
     }
+    
+    /**
+     * Reset given flow in pipeline-diagram.
+     * 
+     * @param semanticElement
+     *            Given element which will be highlighted.
+     * @param parameters
+     *            Given paramters which determine the specific highlight.
+     */
+    public void resetFlow(EObject semanticElement, HighlighterParam parameters) {
+
+        IGraphicalEditPart editPartForSemanticElement = getEditPartForSemanticElement(semanticElement);
+
+        if (editPartForSemanticElement != null) {
+
+            IFigure figure = getTargetFigure(editPartForSemanticElement);
+
+            if (parameters != null) {
+
+                figure.setForegroundColor(parameters.getDiagramStandardFlowColor());
+                figure.invalidate();
+            }
+        }
+    }
 
     /**
     * Highlight given flow in pipline-diagram.
@@ -147,10 +192,10 @@ public class Highlighter implements IHighlighter {
             HighlighterParam parameters, String errorMessage) {
 
         IGraphicalEditPart editPartForSemanticElement = getEditPartForSemanticElement(semanticElement);
-
+    
         if (editPartForSemanticElement != null) {
             IFigure figure = getTargetFigure(editPartForSemanticElement);
-
+        
             figure.setForegroundColor(parameters.getDiagramErrorColor());
             CustomTextFigure customFigure = new CustomTextFigure();
             customFigure.setText(errorMessage);

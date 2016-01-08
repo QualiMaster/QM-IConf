@@ -11,6 +11,8 @@ public class HighlighterParam {
     public static final HighlighterParam DEFAULT = new HighlighterParam();
     
     private Color diagramErrorColor = ColorConstants.red;
+    private Color diagramStandardColor = ColorConstants.white;
+    private Color standardFlowColor = ColorConstants.lightGray;
 
     /**
      * Constructor.
@@ -32,5 +34,21 @@ public class HighlighterParam {
      */
     public Color getDiagramErrorColor() {
         return diagramErrorColor;
+    }
+    
+    /**
+     * Return the standard color for Pipeline-Editor.
+     * @return Color black.
+     */
+    public Color getDiagramStandardNodeColor() {
+        return diagramStandardColor;
+    }
+    
+    /**
+     * Return the standard color for Pipeline-Editor.
+     * @return Color black.
+     */
+    public Color getDiagramStandardFlowColor() {
+        return standardFlowColor;
     }
 }

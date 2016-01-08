@@ -29,12 +29,6 @@ import org.eclipse.gmf.runtime.emf.core.util.EMFCoreUtil;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.xtext.util.StringInputStream;
 
-import pipeline.Pipeline;
-import pipeline.PipelinePackage;
-import pipeline.diagram.part.PipelineDiagramEditorUtil;
-import pipeline.impl.FlowImpl;
-import pipeline.presentation.PipelineModelWizard;
-import qualimasterapplication.Activator;
 import de.uni_hildesheim.sse.ModelUtility;
 import de.uni_hildesheim.sse.model.confModel.Configuration;
 import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
@@ -501,10 +495,12 @@ public class PipelineDiagramUtils {
      */
     public static void highlightDiagram() {
 
+        resetDiagramMarkings();
+    
         // Get diagram.
         DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-
+        
         List<Reasoning.PipelineWrapperObject> errors = Reasoning
                 .getPipelineErrors();
 
@@ -540,6 +536,33 @@ public class PipelineDiagramUtils {
                         }
                     }
                 }
+            }
+        }
+    }
+    
+    /**
+     * Reset the marking of an opened Pipeline-Editor by changingthe color of all
+     * contained {@link EObject} to black.
+     */
+    public static void resetDiagramMarkings() {
+    
+        // Get diagram.
+        DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+
+        // highlightAdapter for highlighting diagram-elements.
+        Highlighter adapter = new Highlighter(diagram);
+        HighlighterParam param = new HighlighterParam();
+        
+        EObject element = diagram.getDiagram().getElement();
+        EList<EObject> eContents = element.eContents();
+        
+        for (int j = 0; j < eContents.size(); j++) {
+        
+            if (eContents.get(j) instanceof FlowImpl) {
+                adapter.resetFlow(eContents.get(j), param);
+            } else {
+                adapter.resetNode(eContents.get(j), param);
             }
         }
     }

@@ -46,11 +46,13 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
 
     public static final String ID = "de.uni_hildesheim.sse.qmApp.VariableEditor";
     
-    private static HashMap<Control, ControlDecoration> flawedControls = new HashMap<Control, ControlDecoration>();
     
     private static final String COMPOSITE_STRING = "class org.eclipse.swt.widgets.Composite";
     private static final int PREFERRED_WIDTH = 400;
-    private static ScrolledComposite scroll;
+    
+    private HashMap<Control, ControlDecoration> flawedControls = new HashMap<Control, ControlDecoration>();
+    private ScrolledComposite scroll;
+    private Composite inner;
     
     private DecisionVariableEditorInput input;
     private IDecisionVariable var;
@@ -99,7 +101,7 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
         scroll = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
         scroll.setExpandHorizontal(false);
         
-        final Composite inner = new Composite(scroll, SWT.NONE);
+        inner = new Composite(scroll, SWT.NONE);
         scroll.setContent(inner);
         super.createPartControl(inner);
         
@@ -129,6 +131,7 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
         
         createAdditionalControls(inner);
         
+        
 //        inner.addKeyListener(new KeyAdapter() {
 //            @Override
 //            public void keyPressed( KeyEvent exc ) {
@@ -147,10 +150,12 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     /**
      * Refresh the {@link ScrolledComposite}.
      */
-    public static void refreshEditor() {
+    public void refreshEditor() {
 
         if (scroll != null) {
             if (!scroll.isDisposed()) {
+                considerReasoningResults(inner);
+                scroll.layout();
                 scroll.redraw();
             }
         }
@@ -209,6 +214,11 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
      * @param parent editors parent.
      */
     private void considerReasoningResults(Control parent) {
+        // Reset all decorators -> set invisible
+        for (ControlDecoration decorator : flawedControls.values()) {
+            decorator.hide();
+        }
+        
         
         //Get map which contains errors(variables and messages)
         HashMap<IDecisionVariable, String> errors = Reasoning.getErrors();
