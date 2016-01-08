@@ -195,12 +195,11 @@ public class Reasoning {
             }
             success = true;
         }
-        updateOpenEditors();
+        updateEditors();
         return success;
     }
 
     /**
-<<<<<<< HEAD
      * Reset marking in tree and possibly opened Pipeline-Editor.
      */
     private static void resetReasoningMarkers() {
@@ -226,11 +225,13 @@ public class Reasoning {
 
     
     /**
-=======
->>>>>>> branch 'master' of https://github.com/QualiMaster/QM-IConf.git
      * Part of the {@link #reasonOn(IModelPart, boolean)} method: Forces all open {@link VariableEditor}s to update.
      */
-    private static void updateOpenEditors() {
+    private static void updateEditors() {
+        // Annotate opened Pipeline-Editor
+        annotateOpenedPipelineEditor();
+
+        // Update VariableEditors
         IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         IEditorReference[] allOpenEditors = page.getEditorReferences();
         for (int i = 0; i < allOpenEditors.length; i++) {
@@ -328,9 +329,6 @@ public class Reasoning {
                 }
             }
         }
-        //annotate opened Pipeline-Editor
-        annotateOpenedPipelineEditor();
-        //highlight?
         
         ConfigurableElementsView.saveReasosiningInfoInTreeElements(configurableElementsViewMapping);
         ConfigurableElementsView.saveReasosiningInfoInTreeElementsForPipelines(
