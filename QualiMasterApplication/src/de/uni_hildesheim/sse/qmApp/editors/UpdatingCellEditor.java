@@ -22,7 +22,8 @@ import de.uni_hildesheim.sse.easy.ui.productline_editor.IUpdateListener;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.IUpdateProvider;
 
 /**
- * Implements a cell editor with basic update provider capabilities.
+ * Implements a cell editor with basic update provider capabilities. Intended as a base class for implementing
+ * cell editors for specific model types.
  * When overriding {@link #doSetValue(Object)}, please call the super class method,i.e., transitively the one of 
  * this class.
  * 
