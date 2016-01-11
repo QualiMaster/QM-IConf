@@ -69,7 +69,8 @@ public class LoginDialog {
             + "\n You will not be able to commit changes to the pipeline repository.";
     private String localDataUsedMessage = "Last time you used the application you worked with local data and you are "
             + "about to use the remote repository. This will lead to a synchronization of the configuration and "
-            + "potentially local changes will be overridden. Do you want to go on?";
+            + "if you press 'No', local changes will be overridden with more recent settings from the repository. "
+            + "Do you want to go on?";
 
     /**
      * Displays the login dialog.
