@@ -40,7 +40,7 @@ public abstract class AbstractTextSelectionEditorCreator implements IEditorCreat
     
     @Override
     public Control createEditor(UIConfiguration config, IDecisionVariable variable, Composite parent) {
-        return new ArtifactComposite(config, variable, parent, false);
+        return new ArtifactComposite(config, variable, parent, null);
     }
     
     @Override
@@ -98,6 +98,7 @@ public abstract class AbstractTextSelectionEditorCreator implements IEditorCreat
         private Button button;
         private UIConfiguration config;
         private IDecisionVariable variable;
+        private ArtifactCellEditor cellEditor;
 
         /**
          * Creates an artifact editor instance.
@@ -105,13 +106,16 @@ public abstract class AbstractTextSelectionEditorCreator implements IEditorCreat
          * @param config the UI configuration
          * @param variable the decision variable to create the editor for
          * @param parent the UI parent element
-         * @param cell is this composite a standalone editor or a cell editor
+         * @param cellEditor the cell editor instance in case that this class is used in a cell editor
          */
-        ArtifactComposite(UIConfiguration config, IDecisionVariable variable, Composite parent, boolean cell) {
+        ArtifactComposite(UIConfiguration config, IDecisionVariable variable, Composite parent, 
+            ArtifactCellEditor cellEditor) {
             super(parent, SWT.FILL);
             this.config = config;
             this.variable = variable;
+            this.cellEditor = cellEditor;
 
+            final boolean cell = null != cellEditor;
             GridLayout layout = new GridLayout();
             layout.marginRight = -layout.marginWidth;
             layout.marginWidth = 0;
@@ -159,6 +163,9 @@ public abstract class AbstractTextSelectionEditorCreator implements IEditorCreat
             textField.setText(message);
             if (null != config && null != config.getParent()) {
                 config.getParent().setDirty();
+            }
+            if (null != cellEditor) {
+                cellEditor.notifyValueChanged();
             }
         }
 
@@ -245,7 +252,7 @@ public abstract class AbstractTextSelectionEditorCreator implements IEditorCreat
      * 
      * @author Holger Eichelberger
      */
-    private class ArtifactCellEditor extends CellEditor {
+    private class ArtifactCellEditor extends UpdatingCellEditor {
 
         private UIConfiguration config;
         private IDecisionVariable variable;
@@ -266,7 +273,7 @@ public abstract class AbstractTextSelectionEditorCreator implements IEditorCreat
         
         @Override
         protected Control createControl(Composite parent) {
-            this.composite = new ArtifactComposite(config, variable, parent, true);
+            this.composite = new ArtifactComposite(config, variable, parent, this);
             return composite;
         }
 
@@ -292,7 +299,13 @@ public abstract class AbstractTextSelectionEditorCreator implements IEditorCreat
         protected void doSetValue(Object value) {
             if (null != value && null != composite) {
                 composite.setValue(value.toString());
+                super.doSetValue(value);
             }
+        }
+
+        @Override
+        public IDecisionVariable getVariable() {
+            return variable;
         }
         
     }

@@ -77,6 +77,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
     private TreeViewer viewer;
     private List<String> treePathString = new ArrayList<String>();
     private ITextUpdater artifactEditorUpdater;
+    private transient boolean updatingTreeSelection = false;
 
     private String[] initialTreePath;
     private String initialGroupId;
@@ -358,7 +359,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
                 // at least one dot
 
                 if (selectionNew.matches(REGEX)) {
-
+                    updatingTreeSelection = true;
                     // Fill textfields
                     String groupID = "";
                     String artifactID = "";
@@ -380,6 +381,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
                     groupIDText.setText(groupID);
                     artifactIDText.setText(artifactID);
                     versionText.setText(version);
+                    updatingTreeSelection = false;
                 }
             }
         });
@@ -581,43 +583,49 @@ public class MavenArtifactSelectionDialog extends Dialog {
         groupIDText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent exc) {
-                String text = groupIDText.getText().replaceAll("/", ".");
-                String[] selectedItemPath = text.split("\\.");
-                highlightTreePath(selectedItemPath);
+                if (!updatingTreeSelection) {
+                    String text = groupIDText.getText().replaceAll("/", ".");
+                    String[] selectedItemPath = text.split("\\.");
+                    highlightTreePath(selectedItemPath);
+                }
             }
         });
         artifactIDText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent exc) {
-                String groupText = groupIDText.getText().replaceAll("/", ".");
-                String artifactText = artifactIDText.getText().replaceAll("/", ".");
-                
-                if (groupText.endsWith(".")) {
-                    groupText = cutOfflastCharacter(groupText);
+                if (!updatingTreeSelection) {
+                    String groupText = groupIDText.getText().replaceAll("/", ".");
+                    String artifactText = artifactIDText.getText().replaceAll("/", ".");
+                    
+                    if (groupText.endsWith(".")) {
+                        groupText = cutOfflastCharacter(groupText);
+                    }
+                    if (artifactText.endsWith(".")) {
+                        artifactText = cutOfflastCharacter(artifactText); 
+                    }
+                    String itemPath = groupText + "." + artifactText;
+                    String[] selectedItemPath = itemPath.split("\\.");
+                    highlightTreePath(selectedItemPath);
                 }
-                if (artifactText.endsWith(".")) {
-                    artifactText = cutOfflastCharacter(artifactText); 
-                }
-                String itemPath = groupText + "." + artifactText;
-                String[] selectedItemPath = itemPath.split("\\.");
-                highlightTreePath(selectedItemPath);
             }
         });
         versionText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent exc) {
-                String groupText = groupIDText.getText().replaceAll("/", ".");
-                String artifactText = artifactIDText.getText().replaceAll("/", ".");
-                String verText = versionText.getText().replaceAll("/", ".");               
-                if (groupText.endsWith(".")) {
-                    groupText = cutOfflastCharacter(groupText);
+                if (!updatingTreeSelection) {
+                    String groupText = groupIDText.getText().replaceAll("/", ".");
+                    String artifactText = artifactIDText.getText().replaceAll("/", ".");
+                    String verText = versionText.getText().replaceAll("/", ".");               
+                    if (groupText.endsWith(".")) {
+                        groupText = cutOfflastCharacter(groupText);
+                    }
+                    if (artifactText.endsWith(".")) {
+                        artifactText = cutOfflastCharacter(artifactText); 
+                    } //use _ as separator because the versionid contains dots. 
+                    String itemPath = groupText + "_" + artifactText + "_" + verText;
+                    String[] selectedItemPath = itemPath.split("\\_");
+                    highlightTreePath(selectedItemPath);
                 }
-                if (artifactText.endsWith(".")) {
-                    artifactText = cutOfflastCharacter(artifactText); 
-                } //use _ as separator because the versionid contains dots. 
-                String itemPath = groupText + "_" + artifactText + "_" + verText;
-                String[] selectedItemPath = itemPath.split("\\_");
-                highlightTreePath(selectedItemPath);
             }
         });
     }

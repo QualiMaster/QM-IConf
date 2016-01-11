@@ -180,7 +180,7 @@ public class MultipleLineText {
      * 
      * @author Holger Eichelberger
      */
-    private static class MultiLineCellEditor extends CellEditor {
+    private static class MultiLineCellEditor extends UpdatingCellEditor {
 
         private IDecisionVariable variable;
         private MultiLineComposite composite;
@@ -225,7 +225,13 @@ public class MultipleLineText {
         protected void doSetValue(Object value) {
             if (null != value && null != composite) {
                 composite.setValue(value.toString());
+                super.doSetValue(value);
             }
+        }
+
+        @Override
+        public IDecisionVariable getVariable() {
+            return variable;
         }
         
     }

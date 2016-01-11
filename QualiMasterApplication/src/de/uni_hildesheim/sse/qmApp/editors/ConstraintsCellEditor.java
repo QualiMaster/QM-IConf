@@ -1,6 +1,5 @@
 package de.uni_hildesheim.sse.qmApp.editors;
 
-import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -22,7 +21,7 @@ import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
  * 
  * @author Holger Eichelberger
  */
-class ConstraintsCellEditor extends CellEditor {
+class ConstraintsCellEditor extends UpdatingCellEditor {
 
     private Label text;
     private Shell shell;
@@ -96,7 +95,13 @@ class ConstraintsCellEditor extends CellEditor {
     protected void doSetValue(Object value) {
         if (null != text && null != value) {
             text.setText(value.toString());
+            super.doSetValue(value);
         }
+    }
+
+    @Override
+    public IDecisionVariable getVariable() {
+        return context;
     }
 
 }
