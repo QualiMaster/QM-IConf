@@ -70,7 +70,7 @@ public class LoginDialog {
     private String localDataUsedMessage = "Last time you used the application you worked with local data and you are "
             + "about to use the remote repository. This will lead to a synchronization of the configuration and "
             + "if you press 'No', local changes will be overridden with more recent settings from the repository. "
-            + "Do you want to go on?";
+            + "Do you want to stay in local mode?";
 
     /**
      * Displays the login dialog.
