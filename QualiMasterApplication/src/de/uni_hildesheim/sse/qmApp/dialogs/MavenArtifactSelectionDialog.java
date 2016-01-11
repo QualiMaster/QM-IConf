@@ -247,7 +247,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
      */
     private void setViewerInput(Composite parent) {
         // if online
-        boolean openLocal = false;
+        boolean openLocal = true;
         if (MavenFetcher.checkRepositoryConnectivity()) {
             File file = getTreeFile();
             if (!file.exists() || System.currentTimeMillis() - file.lastModified() > ACTUAL_TREE_TIME_DIFF) {
