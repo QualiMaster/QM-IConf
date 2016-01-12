@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 import de.uni_hildesheim.sse.easy.ui.productline_editor.EclipseConsole;
 import de.uni_hildesheim.sse.easy_producer.instantiator.model.common.VilException;
@@ -53,6 +54,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
         EclipseConsole.INSTANCE.clearConsole();
         EclipseConsole.INSTANCE.displayConsole();
         final String targetLocation = selectTargetFolder(getMessage());
+        final Shell shell = Dialogs.getDefaultShell(); 
         if (null != targetLocation) {
             Job job = new Job("QualiMaster Infrastructure Instantiation Process") {
                 
@@ -70,6 +72,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                         }
                         TracerFactory.setInstance(UiTracerFactory.INSTANCE);
                         executor.execute();
+                        notifyInstantiationCompleted(shell);
                     } catch (ModelManagementException e) {
                         showExceptionDialog("Model resolution problem", e);
                     } catch (VilException e) {
@@ -80,6 +83,24 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
             };
             job.schedule();
         }
+    }
+    
+    /**
+     * Notifies about a completed instantiation.
+     * 
+     * @param shell the parent shell
+     */
+    private static void notifyInstantiationCompleted(final Shell shell) {
+        shell.getDisplay().asyncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                Dialogs.showInfoDialog(shell, "Platform instantiation", 
+                    "Platform instantiation completed successfully");
+            }
+            
+        });
+        
     }
     
     /**
