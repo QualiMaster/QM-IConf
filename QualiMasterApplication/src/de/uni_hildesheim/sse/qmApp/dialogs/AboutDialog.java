@@ -47,7 +47,10 @@ public class AboutDialog extends Dialog {
             + "\n" + "30411 Hildesheim"
             + "\n" + "Germany"
             + "\n\n" + "in the QualiMaster project <a href=\"http://qualimaster.eu\">qualimaster.eu</a>"
-            + " under Apache 2.0 license."
+            + " under Apache 2.0 license. This program \nuses open source software such as Svnkit, Apache Ivy, "
+            + " Apache Ant, Apache Maven,\n JSoup, Eclipe xyGraph, Bouncy Castle Cryptographic Provider, and "
+            + " libraries used by\n these programs. In particular, this product includes software developed by\n"
+            + " SyntEvo GmbH, Ainring."
             + "\n" + "The research leading to these results has received funding from the European Union"
             + "\n" + "Seventh Framework Programme [FP7/2007-2013] under grant agreement nr. 619525.";
     
@@ -69,6 +72,7 @@ public class AboutDialog extends Dialog {
             + "\n" + "Dennis Konoppa,"
             + "\n" + "Bartu Dernek,"
             + "\n" + "Patrik Pastuschek,"
+            + "\n" + "Sascha El-Sharkawy,"
             + "\n" + "Holger Eichelberger";
     
     private Label versionNumber;
@@ -206,7 +210,7 @@ public class AboutDialog extends Dialog {
     protected void configureShell(Shell newShell) {
     
         newShell.pack();
-        newShell.setSize(800, 450);
+        newShell.setSize(800, 500);
         
         super.configureShell(newShell);
         newShell.setText("About QM-IConf");
