@@ -96,11 +96,11 @@
             <separator name="find.ext" visible="false"/>            
          </menu>
          <menu label="Instantiate" id="additions">
-            <command commandId="de.uni_hildesheim.sse.qmApp.instantiateLocal"
-                  label="Instantiate local">
-            </command>
             <command commandId="de.uni_hildesheim.sse.qmApp.instantiateInterfacesLocal"
                   label="Instantiate interfaces">
+            </command>
+            <command commandId="de.uni_hildesheim.sse.qmApp.instantiateLocal"
+                  label="Instantiate platform">
             </command>
             <separator
                   name="additions"
