@@ -1,0 +1,5 @@
+According to the licenses, we provide the URLs to download the following used software:
+
+- SVNKit: http://svnkit.com/download.php
+- SqlJet: http://sqljet.com/
+- jaxb: https://jaxb.java.net/
