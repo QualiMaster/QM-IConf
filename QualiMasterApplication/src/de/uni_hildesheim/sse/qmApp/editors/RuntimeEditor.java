@@ -47,12 +47,16 @@ import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
 import de.uni_hildesheim.sse.qmApp.runtime.IInfrastructureListener;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
 import eu.qualimaster.adaptation.external.AlgorithmChangedMessage;
-import eu.qualimaster.adaptation.external.DisconnectMessage;
+import eu.qualimaster.adaptation.external.ChangeParameterRequest;
+import eu.qualimaster.adaptation.external.DisconnectRequest;
+import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
 import eu.qualimaster.adaptation.external.HardwareAliveMessage;
 import eu.qualimaster.adaptation.external.IDispatcher;
+import eu.qualimaster.adaptation.external.LoggingFilterRequest;
+import eu.qualimaster.adaptation.external.LoggingMessage;
 import eu.qualimaster.adaptation.external.MonitoringDataMessage;
 import eu.qualimaster.adaptation.external.PipelineMessage;
-import eu.qualimaster.adaptation.external.SwitchAlgorithmMessage;
+import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
 
 /**
  * The preliminary editor for runtime settings. Will be replaced by an appropriate
@@ -315,7 +319,7 @@ public class RuntimeEditor extends EditorPart implements IDispatcher, IInfrastru
                     algo = null;
                     break;
                 }
-                Infrastructure.send(new SwitchAlgorithmMessage(PIPELINE_NAME, PIPELINE_ELEMENT_SENTIMENT, algo));
+                Infrastructure.send(new SwitchAlgorithmRequest(PIPELINE_NAME, PIPELINE_ELEMENT_SENTIMENT, algo));
                 sentState.setText(CHANGE_ALG_LABEL);
                 sentiment = null;
             }
@@ -332,7 +336,7 @@ public class RuntimeEditor extends EditorPart implements IDispatcher, IInfrastru
                     algo = null;
                     break;
                 }
-                Infrastructure.send(new SwitchAlgorithmMessage(PIPELINE_NAME, PIPELINE_ELEMENT_CORRELATION, algo));
+                Infrastructure.send(new SwitchAlgorithmRequest(PIPELINE_NAME, PIPELINE_ELEMENT_CORRELATION, algo));
                 corrState.setText(CHANGE_ALG_LABEL);
                 correlation = null;
             }
@@ -575,13 +579,13 @@ public class RuntimeEditor extends EditorPart implements IDispatcher, IInfrastru
     }
 
     @Override
-    public void handleDisconnect(DisconnectMessage message) {
+    public void handleDisconnectRequest(DisconnectRequest message) {
         enableButtons();
         invalidateGauges();
     }
 
     @Override
-    public void handleMonitoringData(MonitoringDataMessage message) {
+    public void handleMonitoringDataMessage(MonitoringDataMessage message) {
         String part = message.getPart();
         // not nice, but we do not put the QM.events dependency in here by now; Names taken from resource descriptors / 
         // monitoring layer system state
@@ -619,7 +623,7 @@ public class RuntimeEditor extends EditorPart implements IDispatcher, IInfrastru
     }
 
     @Override
-    public void handleSwitchAlgorithm(SwitchAlgorithmMessage message) {
+    public void handleSwitchAlgorithmRequest(SwitchAlgorithmRequest message) {
         // server side - nothing to do
     }
 
@@ -671,6 +675,26 @@ public class RuntimeEditor extends EditorPart implements IDispatcher, IInfrastru
             pipelineLatencyDataProvider.clearTrace();
         }
         enableButtons();
+    }
+
+    @Override
+    public void handleChangeParameterRequest(ChangeParameterRequest<?> arg0) {
+        // server side - nothing to do
+    }
+
+    @Override
+    public void handleExecutionResponseMessage(ExecutionResponseMessage arg0) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void handleLoggingFilterRequest(LoggingFilterRequest arg0) {
+        // server side - nothing to do
+    }
+
+    @Override
+    public void handleLoggingMessage(LoggingMessage arg0) {
+        // server side - nothing to do
     }
 
 }

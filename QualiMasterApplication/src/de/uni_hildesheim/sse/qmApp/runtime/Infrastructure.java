@@ -22,14 +22,18 @@ import java.util.Collections;
 import java.util.List;
 
 import eu.qualimaster.adaptation.external.AlgorithmChangedMessage;
+import eu.qualimaster.adaptation.external.ChangeParameterRequest;
 import eu.qualimaster.adaptation.external.ClientEndpoint;
-import eu.qualimaster.adaptation.external.DisconnectMessage;
+import eu.qualimaster.adaptation.external.DisconnectRequest;
+import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
 import eu.qualimaster.adaptation.external.HardwareAliveMessage;
 import eu.qualimaster.adaptation.external.IDispatcher;
+import eu.qualimaster.adaptation.external.LoggingFilterRequest;
+import eu.qualimaster.adaptation.external.LoggingMessage;
 import eu.qualimaster.adaptation.external.Message;
 import eu.qualimaster.adaptation.external.MonitoringDataMessage;
 import eu.qualimaster.adaptation.external.PipelineMessage;
-import eu.qualimaster.adaptation.external.SwitchAlgorithmMessage;
+import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
 
 /**
  * Represents the actual connection to the infrastructure. Infrastructure messages
@@ -68,9 +72,9 @@ public class Infrastructure {
         }
 
         @Override
-        public void handleDisconnect(DisconnectMessage message) {
+        public void handleDisconnectRequest(DisconnectRequest message) {
             for (int d = 0; d < dispatchers.size(); d++) {
-                dispatchers.get(d).handleDisconnect(message);
+                dispatchers.get(d).handleDisconnectRequest(message);
             }
             disconnect(false);
         }
@@ -83,9 +87,9 @@ public class Infrastructure {
         }
 
         @Override
-        public void handleMonitoringData(MonitoringDataMessage message) {
+        public void handleMonitoringDataMessage(MonitoringDataMessage message) {
             for (int d = 0; d < dispatchers.size(); d++) {
-                dispatchers.get(d).handleMonitoringData(message);
+                dispatchers.get(d).handleMonitoringDataMessage(message);
             }
         }
 
@@ -97,9 +101,37 @@ public class Infrastructure {
         }
 
         @Override
-        public void handleSwitchAlgorithm(SwitchAlgorithmMessage message) {
+        public void handleSwitchAlgorithmRequest(SwitchAlgorithmRequest message) {
             for (int d = 0; d < dispatchers.size(); d++) {
-                dispatchers.get(d).handleSwitchAlgorithm(message);
+                dispatchers.get(d).handleSwitchAlgorithmRequest(message);
+            }
+        }
+
+        @Override
+        public void handleChangeParameterRequest(ChangeParameterRequest<?> message) {
+            for (int d = 0; d < dispatchers.size(); d++) {
+                dispatchers.get(d).handleChangeParameterRequest(message);
+            }
+        }
+
+        @Override
+        public void handleExecutionResponseMessage(ExecutionResponseMessage message) {
+            for (int d = 0; d < dispatchers.size(); d++) {
+                dispatchers.get(d).handleExecutionResponseMessage(message);
+            }
+        }
+
+        @Override
+        public void handleLoggingFilterRequest(LoggingFilterRequest message) {
+            for (int d = 0; d < dispatchers.size(); d++) {
+                dispatchers.get(d).handleLoggingFilterRequest(message);
+            }
+        }
+
+        @Override
+        public void handleLoggingMessage(LoggingMessage message) {
+            for (int d = 0; d < dispatchers.size(); d++) {
+                dispatchers.get(d).handleLoggingMessage(message);
             }
         }
         
@@ -149,7 +181,7 @@ public class Infrastructure {
             ClientEndpoint ep = endpoint;
             endpoint = null; // -> message
             if (sendMsg) {
-                ep.schedule(new DisconnectMessage());
+                ep.schedule(new DisconnectRequest());
             }
             ep.stop();
             notifyConnectionChange(false);
