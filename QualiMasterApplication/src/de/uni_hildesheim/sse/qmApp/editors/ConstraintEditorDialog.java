@@ -54,6 +54,7 @@ import de.uni_hildesheim.sse.model.varModel.values.Value;
 import de.uni_hildesheim.sse.persistency.ConstraintSplitWriter.IConstraintFilter;
 import de.uni_hildesheim.sse.persistency.IVMLWriter;
 import de.uni_hildesheim.sse.persistency.StringProvider;
+import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.dialogs.DialogsUtil;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.ui.embed.EditorUtils;
@@ -301,8 +302,16 @@ class ConstraintEditorDialog extends Dialog implements IValidationStateListener 
 
     @Override
     protected void okPressed() {
-        constraint = editor.getConstraint();
-        super.okPressed();
+        try {
+            String tmp = editor.getConstraint();
+            ModelUtility.INSTANCE.createExpression(tmp, context.getDeclaration());
+            constraint = tmp; // if ok, no exception
+            super.okPressed();
+        } catch (CSTSemanticException e) {
+            Dialogs.showErrorDialog("Constraint error", e.getMessage());
+        } catch (ConstraintSyntaxException e) {
+            Dialogs.showErrorDialog("Constraint error", e.getMessage());
+        }
     }
     
     @Override
