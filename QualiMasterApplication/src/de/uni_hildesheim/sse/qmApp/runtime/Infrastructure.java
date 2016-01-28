@@ -66,14 +66,14 @@ public class Infrastructure {
 
         @Override
         public void handleAlgorithmChangedMessage(AlgorithmChangedMessage message) {
-            for (int d = 0; d < dispatchers.size(); d++) {
+            for (int d = 0, n = dispatchers.size(); d < n; d++) {
                 dispatchers.get(d).handleAlgorithmChangedMessage(message);
             }
         }
 
         @Override
         public void handleDisconnectRequest(DisconnectRequest message) {
-            for (int d = 0; d < dispatchers.size(); d++) {
+            for (int d = 0, n = dispatchers.size(); d < n; d++) {
                 dispatchers.get(d).handleDisconnectRequest(message);
             }
             disconnect(false);
@@ -81,43 +81,46 @@ public class Infrastructure {
 
         @Override
         public void handleHardwareAliveMessage(HardwareAliveMessage message) {
-            for (int d = 0; d < dispatchers.size(); d++) {
+            for (int d = 0, n = dispatchers.size(); d < n; d++) {
                 dispatchers.get(d).handleHardwareAliveMessage(message);
             }
         }
 
         @Override
         public void handleMonitoringDataMessage(MonitoringDataMessage message) {
-            for (int d = 0; d < dispatchers.size(); d++) {
+            for (int d = 0, n = dispatchers.size(); d < n; d++) {
                 dispatchers.get(d).handleMonitoringDataMessage(message);
             }
         }
 
         @Override
         public void handlePipelineMessage(PipelineMessage message) {
-            for (int d = 0; d < dispatchers.size(); d++) {
+            for (int d = 0, n = dispatchers.size(); d < n; d++) {
                 dispatchers.get(d).handlePipelineMessage(message);
             }
         }
 
         @Override
         public void handleSwitchAlgorithmRequest(SwitchAlgorithmRequest message) {
-            for (int d = 0; d < dispatchers.size(); d++) {
+            for (int d = 0, n = dispatchers.size(); d < n; d++) {
                 dispatchers.get(d).handleSwitchAlgorithmRequest(message);
             }
         }
 
         @Override
         public void handleChangeParameterRequest(ChangeParameterRequest<?> message) {
-            for (int d = 0; d < dispatchers.size(); d++) {
+            for (int d = 0, n = dispatchers.size(); d < n; d++) {
                 dispatchers.get(d).handleChangeParameterRequest(message);
             }
         }
 
         @Override
         public void handleExecutionResponseMessage(ExecutionResponseMessage message) {
-            for (int d = 0; d < dispatchers.size(); d++) {
+            for (int d = 0, n = dispatchers.size(); d < n; d++) {
                 dispatchers.get(d).handleExecutionResponseMessage(message);
+            }
+            for (int l = 0, n = listeners.size(); l < n; l++) {
+                listeners.get(l).handleExecutionResponseMessage(message);
             }
         }
 

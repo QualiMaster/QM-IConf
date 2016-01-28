@@ -10,7 +10,6 @@ import org.csstudio.swt.widgets.figures.GaugeFigure;
 import org.csstudio.swt.widgets.figures.MeterFigure;
 import org.csstudio.swt.widgets.figures.TankFigure;
 import org.csstudio.swt.xygraph.dataprovider.CircularBufferDataProvider;
-import org.csstudio.swt.xygraph.dataprovider.Sample;
 import org.csstudio.swt.xygraph.figures.Axis;
 import org.csstudio.swt.xygraph.figures.Trace;
 import org.csstudio.swt.xygraph.figures.Trace.PointStyle;
@@ -21,8 +20,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.SchemeBorder;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -67,20 +64,9 @@ import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
 public class RuntimeEditor extends EditorPart implements IDispatcher, IInfrastructureListener {
 
     private static int counter = 0;
-    private static final String CORRELATION_SOFTWARE = "Software";
-    private static final String CORRELATION_HARDWARE = "Hardware";
-    private static final String SENTIMENT_SUPERVISED = "SVM";
-    private static final String SENTIMENT_SENTIWORD = "Sentiworld";
-    
-    private static final String PIPELINE_NAME = "PriorityPip";
-    private static final String PIPELINE_ELEMENT_CORRELATION = "fCorrelationFinancial";
-    private static final String PIPELINE_ELEMENT_SENTIMENT = "fSentimentAnalysis";
     
     private static final int PIPELINE_DISPLAY_BUFFER_SIZE = 50;
     private static final int PIPELINE_DISPLAY_DELAY = 100;
-    
-    private static final String EMPTY_ALG_LABEL = "---------";
-    private static final String CHANGE_ALG_LABEL = "---------";
     
     private Button enact;
     private Button startPipeline;
@@ -93,7 +79,7 @@ public class RuntimeEditor extends EditorPart implements IDispatcher, IInfrastru
     private MeterFigure usedClusterMachines;
     private CircularBufferDataProvider pipelineLatencyDataProvider;
     private CircularBufferDataProvider pipelineThroughputDataProvider;
-    private int observationTime = 0;
+    //private int observationTime = 0;
     
     @Override
     public void doSave(IProgressMonitor monitor) {
@@ -126,7 +112,6 @@ public class RuntimeEditor extends EditorPart implements IDispatcher, IInfrastru
         GridLayout layout = new GridLayout(2, false);
         parent.setLayout(layout);
         createConnectionPanel(parent);
-        createAdaptationPanel(parent);
         Composite panel = createMonitoringPanel(parent);
         GridData data = new GridData(GridData.FILL_BOTH);
         data.horizontalSpan = 2;
@@ -176,7 +161,7 @@ public class RuntimeEditor extends EditorPart implements IDispatcher, IInfrastru
      * @param combo the combo to return the selected for
      * @return the selected name or <b>null</b> if nothing (valid) was selected
      */
-    private String getComboSelected(Combo combo) {
+    protected String getComboSelected(Combo combo) {
         String result = combo.getText();
         if (null == result || 0 == result.length()) {
             result = null;
@@ -184,167 +169,6 @@ public class RuntimeEditor extends EditorPart implements IDispatcher, IInfrastru
         return result;
     }
     
-    /**
-     * Creates the panel for controlling the adaptation.
-     * 
-     * @param parent the parent panel
-     */
-    private void createAdaptationPanel(Composite parent) {
-        Composite panel = new Composite(parent, SWT.NONE);
-        
-        GridLayout layout = new GridLayout(4, false);
-        panel.setLayout(layout);
-        
-        startPipeline = new Button(panel, SWT.PUSH);
-        startPipeline.setText("Start pipeline");
-        startPipeline.addSelectionListener(new PipelineSelectionListener(PipelineMessage.Status.START));
-        
-        Label label = new Label(panel, SWT.NONE);
-        label.setText("Correlation computation");
-        Combo combo = new Combo(panel, SWT.DROP_DOWN | SWT.READ_ONLY);
-        combo.add(CORRELATION_SOFTWARE);
-        combo.add(CORRELATION_HARDWARE);
-        combo.select(0);
-        correlation = getComboSelected(combo);
-        combo.addSelectionListener(new AdaptationSelectionListener(true));
-
-        corrState = new Label(panel, SWT.NONE);
-        corrState.setText(EMPTY_ALG_LABEL);
-        
-        stopPipeline = new Button(panel, SWT.PUSH);
-        stopPipeline.setText("Stop pipeline");
-        stopPipeline.addSelectionListener(new PipelineSelectionListener(PipelineMessage.Status.STOP));
-
-        label = new Label(panel, SWT.NONE);
-        label.setText("Sentiment computation");
-        combo = new Combo(panel, SWT.DROP_DOWN | SWT.READ_ONLY);
-        combo.add(SENTIMENT_SUPERVISED);
-        combo.add(SENTIMENT_SENTIWORD);
-        combo.select(0);
-        sentiment = getComboSelected(combo);
-        combo.addSelectionListener(new AdaptationSelectionListener(false));
-                
-        sentState = new Label(panel, SWT.NONE);
-        sentState.setText(EMPTY_ALG_LABEL);
-        
-        new Label(panel, SWT.NONE);
-        new Label(panel, SWT.NONE);
-        enact = new Button(panel, SWT.PUSH);
-        enact.setText("Enact");
-        enact.addSelectionListener(new EnactmentSelectionListener());
-    }
-    
-    /**
-     * Implements status changes of the pipeline.
-     * 
-     * @author Holger Eichelberger
-     */
-    private class PipelineSelectionListener extends SelectionAdapter {
-
-        private PipelineMessage.Status status;
-        
-        /**
-         * Creates a pipeline selection listener.
-         * 
-         * @param status the intended status
-         */
-        private PipelineSelectionListener(PipelineMessage.Status status) {
-            this.status = status;
-        }
-        
-        @Override
-        public void widgetSelected(SelectionEvent event) {
-            Infrastructure.send(new PipelineMessage(PIPELINE_NAME, status));
-            if (PipelineMessage.Status.STOP == status) {
-                corrState.setText(EMPTY_ALG_LABEL);
-                sentState.setText(EMPTY_ALG_LABEL);
-            }
-        }
-
-    }
-    
-    
-    /**
-     * Implements a selection listener for the choice of adaptation.
-     * 
-     * @author Holger Eichelberger
-     */
-    private class AdaptationSelectionListener extends SelectionAdapter {
-        
-        private boolean isCorrelation;
-        
-        /**
-         * Creates the listener.
-         * 
-         * @param isCorrelation correlation (<code>true</code>) or sentiment (<code>false</code>)
-         */
-        private AdaptationSelectionListener(boolean isCorrelation) {
-            this.isCorrelation = isCorrelation;
-        }
-        
-        @Override
-        public void widgetSelected(SelectionEvent event) {
-            if (event.getSource() instanceof Combo) {
-                String selection = getComboSelected((Combo) event.getSource());
-                if (isCorrelation) {
-                    correlation = selection;
-                } else {
-                    sentiment = selection;
-                }
-                enableButtons();
-            }
-        }
-        
-    }
-
-    /**
-     * Implements the listener for the enactment button.
-     * 
-     * @author Holger Eichelberger
-     */
-    private class EnactmentSelectionListener extends SelectionAdapter {
-
-        @Override
-        public void widgetSelected(SelectionEvent event) {
-            if (null != sentiment) {
-                String algo;
-                switch (sentiment) {
-                case SENTIMENT_SENTIWORD:
-                    algo = "SentimentAnaylsisSentiWordNetTopology";
-                    break;
-                case SENTIMENT_SUPERVISED:
-                    algo = "SentimentAnaylsisSVMTopology";
-                    break;
-                default:
-                    algo = null;
-                    break;
-                }
-                Infrastructure.send(new SwitchAlgorithmRequest(PIPELINE_NAME, PIPELINE_ELEMENT_SENTIMENT, algo));
-                sentState.setText(CHANGE_ALG_LABEL);
-                sentiment = null;
-            }
-            if (null != correlation) {
-                String algo;
-                switch (correlation) {
-                case CORRELATION_HARDWARE:
-                    algo = "TopoHardwareCorrelationFinancial";
-                    break;
-                case CORRELATION_SOFTWARE:
-                    algo = "TopoSoftwareCorrelationFinancial";
-                    break;
-                default:
-                    algo = null;
-                    break;
-                }
-                Infrastructure.send(new SwitchAlgorithmRequest(PIPELINE_NAME, PIPELINE_ELEMENT_CORRELATION, algo));
-                corrState.setText(CHANGE_ALG_LABEL);
-                correlation = null;
-            }
-            enableButtons();
-        }
-
-    }
-
     /**
      * Create meter-widget for monitoring panel.
      * @param parent parent composite on which the widgets are placed.
@@ -602,7 +426,7 @@ public class RuntimeEditor extends EditorPart implements IDispatcher, IInfrastru
                     }
                 });
             }
-        } else if (PIPELINE_NAME.equals(part)) {
+        } /*else if (PIPELINE_NAME.equals(part)) {
             final Double latency = observations.get("LATENCY");
             final Double items = observations.get("THROUGHPUT_ITEMS");
             if (null != latency || null != items) {
@@ -619,7 +443,7 @@ public class RuntimeEditor extends EditorPart implements IDispatcher, IInfrastru
                     }
                 });
             }
-        }
+        }*/
     }
 
     @Override
@@ -684,7 +508,7 @@ public class RuntimeEditor extends EditorPart implements IDispatcher, IInfrastru
 
     @Override
     public void handleExecutionResponseMessage(ExecutionResponseMessage arg0) {
-        // TODO Auto-generated method stub
+        // may show executed commands
     }
 
     @Override

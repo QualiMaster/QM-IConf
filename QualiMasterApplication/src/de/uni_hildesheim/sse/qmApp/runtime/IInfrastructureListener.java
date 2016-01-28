@@ -15,6 +15,8 @@
  */
 package de.uni_hildesheim.sse.qmApp.runtime;
 
+import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
+
 /**
  * A listener for changing infrastructure states.
  * 
@@ -28,5 +30,12 @@ public interface IInfrastructureListener {
      * @param hasConnection boolean whether the new connection state is connected or not
      */
     public void infrastructureConnectionStateChanged(boolean hasConnection);
+
+    /**
+     * Handles a command execution message.
+     * 
+     * @param msg the message
+     */
+    public void handleExecutionResponseMessage(ExecutionResponseMessage msg);
 
 }

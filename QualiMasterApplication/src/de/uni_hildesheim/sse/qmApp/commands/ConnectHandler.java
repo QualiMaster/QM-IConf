@@ -9,6 +9,7 @@ import de.uni_hildesheim.sse.qmApp.dialogs.ConnectDialog;
 import de.uni_hildesheim.sse.qmApp.model.Utils.ConfigurationProperties;
 import de.uni_hildesheim.sse.qmApp.runtime.IInfrastructureListener;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
+import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
 
 /**
  * Handler which opens up the Connect-Dialog.
@@ -43,6 +44,10 @@ public class ConnectHandler extends AbstractHandler implements IInfrastructureLi
     @Override
     public void infrastructureConnectionStateChanged(boolean hasConnection) {
         setBaseEnabled(!hasConnection);
+    }
+
+    @Override
+    public void handleExecutionResponseMessage(ExecutionResponseMessage msg) {
     }
 
 }

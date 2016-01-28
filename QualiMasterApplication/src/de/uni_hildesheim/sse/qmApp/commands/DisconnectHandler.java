@@ -7,6 +7,7 @@ import org.eclipse.core.commands.ExecutionException;
 import de.uni_hildesheim.sse.qmApp.model.Utils.ConfigurationProperties;
 import de.uni_hildesheim.sse.qmApp.runtime.IInfrastructureListener;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
+import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
 
 /**
  * Handler which disconnects the infrastructure connection.
@@ -39,6 +40,10 @@ public class DisconnectHandler extends AbstractHandler implements IInfrastructur
     @Override
     public void infrastructureConnectionStateChanged(boolean hasConnection) {
         setBaseEnabled(hasConnection);
+    }
+
+    @Override
+    public void handleExecutionResponseMessage(ExecutionResponseMessage msg) {
     }
     
 }

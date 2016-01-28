@@ -6,6 +6,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 
@@ -13,19 +14,23 @@ import de.uni_hildesheim.sse.easy_producer.instantiator.Bundle;
 import de.uni_hildesheim.sse.easy_producer.persistency.ResourcesMgmt;
 import de.uni_hildesheim.sse.qmApp.commands.ResetModel;
 import de.uni_hildesheim.sse.qmApp.dialogs.BootstrappingDialog;
+import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.dialogs.LoginDialog;
 import de.uni_hildesheim.sse.qmApp.model.Utils.ConfigurationProperties;
+import de.uni_hildesheim.sse.qmApp.runtime.IInfrastructureListener;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
 import de.uni_hildesheim.sse.utils.logger.AdvancedJavaLogger;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
 import de.uni_hildesheim.sse.utils.logger.ILogger;
+import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
+import eu.qualimaster.adaptation.external.ExecutionResponseMessage.Status;
 
 /**
  * This class controls all aspects of the application's execution.
  * 
  * @author Holger Eichelberger
  */
-public class Application implements IApplication {
+public class Application implements IApplication, IInfrastructureListener {
 
     @Override
     public Object start(IApplicationContext context) {
@@ -116,6 +121,32 @@ public class Application implements IApplication {
                 }
             }
         });
+    }
+
+    @Override
+    public void infrastructureConnectionStateChanged(boolean hasConnection) {
+    }
+
+    @Override
+    public void handleExecutionResponseMessage(ExecutionResponseMessage msg) {
+        final Status status = msg.getStatus();
+        final String description = msg.getDescription();
+        if (null != description && description.length() > 0) {
+            final IWorkbench workbench = PlatformUI.getWorkbench();
+            final Display display = workbench.getDisplay();
+            display.syncExec(new Runnable() {
+                public void run() {
+                    if (!display.isDisposed()) {
+                        Shell shell = display.getActiveShell();
+                        if (Status.FAILED == status) {
+                            Dialogs.showErrorDialog(shell, "Command execution failed", description);
+                        } else {
+                            Dialogs.showInfoDialog(shell, "Command execution succeeded", description);
+                        }
+                    }
+                }
+            });
+        }
     }
 
 }
