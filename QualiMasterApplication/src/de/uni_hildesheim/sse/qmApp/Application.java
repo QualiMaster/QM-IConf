@@ -23,7 +23,7 @@ import de.uni_hildesheim.sse.utils.logger.AdvancedJavaLogger;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
 import de.uni_hildesheim.sse.utils.logger.ILogger;
 import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
-import eu.qualimaster.adaptation.external.ExecutionResponseMessage.Status;
+import eu.qualimaster.adaptation.external.ExecutionResponseMessage.ResultType;
 
 /**
  * This class controls all aspects of the application's execution.
@@ -129,7 +129,7 @@ public class Application implements IApplication, IInfrastructureListener {
 
     @Override
     public void handleExecutionResponseMessage(ExecutionResponseMessage msg) {
-        final Status status = msg.getStatus();
+        final ResultType result = msg.getResult();
         final String description = msg.getDescription();
         if (null != description && description.length() > 0) {
             final IWorkbench workbench = PlatformUI.getWorkbench();
@@ -138,7 +138,7 @@ public class Application implements IApplication, IInfrastructureListener {
                 public void run() {
                     if (!display.isDisposed()) {
                         Shell shell = display.getActiveShell();
-                        if (Status.FAILED == status) {
+                        if (ResultType.FAILED == result) {
                             Dialogs.showErrorDialog(shell, "Command execution failed", description);
                         } else {
                             Dialogs.showInfoDialog(shell, "Command execution succeeded", description);
