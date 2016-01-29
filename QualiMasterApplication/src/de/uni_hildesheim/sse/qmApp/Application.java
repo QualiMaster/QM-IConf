@@ -126,27 +126,33 @@ public class Application implements IApplication, IInfrastructureListener {
     @Override
     public void infrastructureConnectionStateChanged(boolean hasConnection) {
     }
-
+    
     @Override
     public void handleExecutionResponseMessage(ExecutionResponseMessage msg) {
         final ResultType result = msg.getResult();
         final String description = msg.getDescription();
-        if (null != description && description.length() > 0) {
-            final IWorkbench workbench = PlatformUI.getWorkbench();
-            final Display display = workbench.getDisplay();
-            display.syncExec(new Runnable() {
-                public void run() {
-                    if (!display.isDisposed()) {
-                        Shell shell = display.getActiveShell();
-                        if (ResultType.FAILED == result) {
-                            Dialogs.showErrorDialog(shell, "Command execution failed", description);
-                        } else {
-                            Dialogs.showInfoDialog(shell, "Command execution succeeded", description);
+        final IWorkbench workbench = PlatformUI.getWorkbench();
+        final Display display = workbench.getDisplay();
+        display.syncExec(new Runnable() {
+            public void run() {
+                if (!display.isDisposed()) {
+                    Shell shell = display.getActiveShell();
+                    if (ResultType.FAILED == result) {
+                        String desc = description;
+                        if (null == desc || 0 == desc.length()) {
+                            desc = "<unknown reason>";
                         }
+                        Dialogs.showErrorDialog(shell, "Command execution failed", desc);
+                    } else {
+                        String desc = description;
+                        if (null == desc || 0 == desc.length()) {
+                            desc = "Successful.";
+                        }
+                        Dialogs.showInfoDialog(shell, "Command execution succeeded", desc);
                     }
                 }
-            });
-        }
+            }
+        });
     }
 
 }
