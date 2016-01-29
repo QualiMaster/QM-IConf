@@ -372,10 +372,10 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
                         public void run() {
                             IDecisionVariable var = getVariable();
                             Infrastructure.send(new PipelineMessage(ModelAccess.getDisplayName(var), 
-                                PipelineMessage.Status.START));
+                                PipelineMessage.Status.START).elevate()); // admin permission, elevate implicit
                         }
                     };
-                    action.setEnabled(isInfrastructureAdmin && Infrastructure.isConnected()); // TODO pipeline !started
+                    action.setEnabled(isInfrastructureAdmin && Infrastructure.isConnected());
                     action.setText("Start...");
                     manager.add(action);
 
@@ -384,10 +384,10 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
                         public void run() {
                             IDecisionVariable var = getVariable();
                             Infrastructure.send(new PipelineMessage(ModelAccess.getDisplayName(var), 
-                                PipelineMessage.Status.STOP));
+                                PipelineMessage.Status.STOP).elevate()); // admin permission, elevate implicit
                         }
                     };
-                    action.setEnabled(isInfrastructureAdmin && Infrastructure.isConnected()); // TODO pipeline started
+                    action.setEnabled(isInfrastructureAdmin && Infrastructure.isConnected());
                     action.setText("Stop...");
                     manager.add(action);
                 }

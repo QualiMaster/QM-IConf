@@ -36,6 +36,7 @@ import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.qmApp.model.Location;
 import de.uni_hildesheim.sse.qmApp.model.Utils;
 import de.uni_hildesheim.sse.qmApp.model.Utils.ConfigurationProperties;
+import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
 import de.uni_hildesheim.sse.repositoryConnector.IRepositoryConnector;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.ApplicationRole;
@@ -601,6 +602,7 @@ public class LoginDialog {
             result = true;
         } else {
             result = repositoryConnector.authenticate(username, password);
+            Infrastructure.setUserName(username);
         }
         return result;
     }

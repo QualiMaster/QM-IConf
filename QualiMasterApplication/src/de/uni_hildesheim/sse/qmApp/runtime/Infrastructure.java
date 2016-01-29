@@ -21,7 +21,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import de.uni_hildesheim.sse.easy.maven.Activator;
+import de.uni_hildesheim.sse.repositoryConnector.UserContext;
+import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
+import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
 import eu.qualimaster.adaptation.external.AlgorithmChangedMessage;
+import eu.qualimaster.adaptation.external.AuthenticateMessage;
 import eu.qualimaster.adaptation.external.ChangeParameterRequest;
 import eu.qualimaster.adaptation.external.ClientEndpoint;
 import eu.qualimaster.adaptation.external.DisconnectRequest;
@@ -45,6 +50,7 @@ import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
 public class Infrastructure {
 
     private static ClientEndpoint endpoint;
+    private static String user;
     private static List<IDispatcher> dispatchers 
         = Collections.synchronizedList(new ArrayList<IDispatcher>());
     private static List<IInfrastructureListener> listeners 
@@ -144,15 +150,39 @@ public class Infrastructure {
      * Creates a client endpoint if necessary. Does not overwrite an existing endpoint.
      * 
      * @param address the IP address of the infrastructure (adaptation layer)
-     * @param port the port numger 
+     * @param port the port number
      * @throws IOException in case that the endpoint cannot be created
      * @see #releaseEndpoint()
      */
     public static void connect(InetAddress address, int port) throws IOException {
         if (null == endpoint) {
             endpoint = new ClientEndpoint(new DelegatingDispatcher(), address, port);
+            boolean isInfrastructureAdmin = UserContext.INSTANCE.isInfrastructureAdmin();
+            if (!isInfrastructureAdmin) {
+                if (null != user) {
+                    byte[] passphrase = obtainPassphrase(user);
+                    if (null != passphrase) {
+                        endpoint.schedule(new AuthenticateMessage(user, passphrase));
+                    } else {
+                        getLogger().info("No passphrase for user '" + user + "'. Connecting without authentication.");
+                    }
+                } else {
+                    getLogger().info("No user name given to infrastructure. Connecting without authentication.");
+                }
+            } else {
+                getLogger().info("Not running with admin permissions. Connecting without authentication.");
+            }
             notifyConnectionChange(true);
         }
+    }
+    
+    /**
+     * Returns the logger.
+     * 
+     * @return the logger
+     */
+    private static EASyLogger getLogger() {
+        return EASyLoggerFactory.INSTANCE.getLogger(Infrastructure.class, Activator.BUNDLE_ID);
     }
     
     /**
@@ -253,6 +283,32 @@ public class Infrastructure {
         for (int l = 0; l < listeners.size(); l++) {
             listeners.get(l).infrastructureConnectionStateChanged(hasConnection);
         }
+    }
+    
+    /**
+     * Sets the user name. This may cause reading a connection key/certificate for implicit authentication 
+     * with the server / infrastructure.
+     * 
+     * @param userName the user name
+     */
+    public static void setUserName(String userName) {
+        user = userName;
+    }
+    
+    /**
+     * Obtains the passphrase for <code>userName</code>.
+     * 
+     * @param userName the user name to obtain the passphrase for
+     * @return the passphrase (may be <b>null</b>)
+     */
+    private static byte[] obtainPassphrase(String userName) {
+        // this follows the actual hilarious authentication of the infrastructure ;)
+        int hash = 0;
+        if (null != user) {
+            hash = user.hashCode();
+        }
+        String tmp = String.valueOf(hash);
+        return tmp.getBytes();
     }
     
 }

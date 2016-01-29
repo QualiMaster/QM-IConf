@@ -100,23 +100,15 @@ public class ConnectDialog extends AbstractDialog implements Serializable {
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite panel = new Composite(parent, SWT.NONE);
-
         GridLayout layout = new GridLayout(2, false);
         panel.setLayout(layout);
-
         createLabel(panel, "Host:");
- 
         platformIP = createTextField(panel);
-        
         createLabel(panel, "Port:");
-        
         platformPort = createTextField(panel);
-        
         try {
             loadPluginSettings();
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
         return panel;
     };
@@ -193,7 +185,7 @@ public class ConnectDialog extends AbstractDialog implements Serializable {
                     int port = Integer.parseInt(platformPort.getText());
                     savePluginSettings(address, Integer.toString(port));
                     Infrastructure.connect(address, port);
-                    Dialogs.showInfoDialog("QM infrastructure connection", "Connection established");
+                    Dialogs.showInfoDialog("QM infrastructure connection", "Establishing connection");
                 }
             } catch (UnknownHostException e) {
                 Dialogs.showErrorDialog("Cannot connect to QM infrastructure", "Unknown host: " + e.getMessage());
