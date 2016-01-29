@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.uni_hildesheim.sse.easy.maven.Activator;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
@@ -39,6 +38,7 @@ import eu.qualimaster.adaptation.external.Message;
 import eu.qualimaster.adaptation.external.MonitoringDataMessage;
 import eu.qualimaster.adaptation.external.PipelineMessage;
 import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
+import qualimasterapplication.Activator;
 
 /**
  * Represents the actual connection to the infrastructure. Infrastructure messages
@@ -182,7 +182,7 @@ public class Infrastructure {
      * @return the logger
      */
     private static EASyLogger getLogger() {
-        return EASyLoggerFactory.INSTANCE.getLogger(Infrastructure.class, Activator.BUNDLE_ID);
+        return EASyLoggerFactory.INSTANCE.getLogger(Infrastructure.class, Activator.PLUGIN_ID);
     }
     
     /**
