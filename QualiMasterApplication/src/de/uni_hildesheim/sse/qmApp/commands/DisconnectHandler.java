@@ -4,6 +4,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
+import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.model.Utils.ConfigurationProperties;
 import de.uni_hildesheim.sse.qmApp.runtime.IInfrastructureListener;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
@@ -34,6 +35,7 @@ public class DisconnectHandler extends AbstractHandler implements IInfrastructur
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         Infrastructure.disconnect();
+        Dialogs.showInfoDialog("Infrastructure connection", "Disconnected.");
         return null; // see API
     }
 

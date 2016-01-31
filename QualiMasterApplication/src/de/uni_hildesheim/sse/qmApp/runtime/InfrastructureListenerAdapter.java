@@ -22,7 +22,7 @@ import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
  * 
  * @author Holger Eichelberger
  */
-public class InfrastructureAdapter implements IInfrastructureListener {
+public class InfrastructureListenerAdapter implements IInfrastructureListener {
 
     @Override
     public void infrastructureConnectionStateChanged(boolean hasConnection) {

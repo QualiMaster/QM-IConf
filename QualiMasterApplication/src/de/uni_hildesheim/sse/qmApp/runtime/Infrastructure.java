@@ -28,6 +28,7 @@ import eu.qualimaster.adaptation.external.AlgorithmChangedMessage;
 import eu.qualimaster.adaptation.external.AuthenticateMessage;
 import eu.qualimaster.adaptation.external.ChangeParameterRequest;
 import eu.qualimaster.adaptation.external.ClientEndpoint;
+import eu.qualimaster.adaptation.external.ConnectedMessage;
 import eu.qualimaster.adaptation.external.DisconnectRequest;
 import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
 import eu.qualimaster.adaptation.external.HardwareAliveMessage;
@@ -50,6 +51,7 @@ import qualimasterapplication.Activator;
 public class Infrastructure {
 
     private static ClientEndpoint endpoint;
+    private static boolean isAuthenticated;
     private static String user;
     private static List<IDispatcher> dispatchers 
         = Collections.synchronizedList(new ArrayList<IDispatcher>());
@@ -156,13 +158,17 @@ public class Infrastructure {
      */
     public static void connect(InetAddress address, int port) throws IOException {
         if (null == endpoint) {
+            isAuthenticated = false;
             endpoint = new ClientEndpoint(new DelegatingDispatcher(), address, port);
             boolean isInfrastructureAdmin = UserContext.INSTANCE.isInfrastructureAdmin();
-            if (!isInfrastructureAdmin) {
+            boolean simpleConnect = true;
+            if (isInfrastructureAdmin) {
                 if (null != user) {
                     byte[] passphrase = obtainPassphrase(user);
                     if (null != passphrase) {
                         endpoint.schedule(new AuthenticateMessage(user, passphrase));
+                        simpleConnect = false;
+                        isAuthenticated = true;
                     } else {
                         getLogger().info("No passphrase for user '" + user + "'. Connecting without authentication.");
                     }
@@ -171,6 +177,10 @@ public class Infrastructure {
                 }
             } else {
                 getLogger().info("Not running with admin permissions. Connecting without authentication.");
+            }
+            if (simpleConnect) {
+                // send a ping so that we can show a dialog
+                endpoint.schedule(new ConnectedMessage());
             }
             notifyConnectionChange(true);
         }
@@ -217,17 +227,28 @@ public class Infrastructure {
                 ep.schedule(new DisconnectRequest());
             }
             ep.stop();
+            isAuthenticated = false;
             notifyConnectionChange(false);
         }
     }
 
     /**
-     * Returns whether the infrastructure is connected, i.e., there is an actual endpoint.
+     * Returns whether there is an established connection to the QM infrastructure , i.e., there is an actual endpoint.
      * 
      * @return <code>true</code> if connected, <code>false</code> else
      */
     public static boolean isConnected() {
         return null != endpoint;
+    }
+    
+    /**
+     * Returns whether there is an established authenticated connection to the QM infrastructure , i.e., there is an 
+     * actual endpoint.
+     * 
+     * @return <code>true</code> if authenticated, <code>false</code> else
+     */
+    public static boolean isAuthenticated() {
+        return null != endpoint && isAuthenticated;
     }
     
     /**
@@ -296,6 +317,15 @@ public class Infrastructure {
     }
     
     /**
+     * Returns the actual user name set by {@link #setUserName(String)}.
+     * 
+     * @return the user name (may be <b>null</b>)
+     */
+    public static String getUserName() {
+        return user;
+    }
+    
+    /**
      * Obtains the passphrase for <code>userName</code>.
      * 
      * @param userName the user name to obtain the passphrase for
@@ -311,4 +341,18 @@ public class Infrastructure {
         return tmp.getBytes();
     }
     
+    /**
+     * Registers default listeners.
+     */
+    public static void registerDefaultListeners() {
+        registerListener(ExecutionMessageHandler.INSTANCE);
+    }
+
+    /**
+     * Unregisters default listeners.
+     */
+    public static void unregisterDefaultListeners() {
+        unregisterListener(ExecutionMessageHandler.INSTANCE);
+    }
+
 }

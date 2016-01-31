@@ -39,9 +39,9 @@ public class ConnectDialog extends AbstractDialog implements Serializable {
     private Text platformPort;
     
     /**
-     * Wrapps ip and port of a connection.
-     * @author User
-     *
+     * Wraps ip and port of a connection.
+     * 
+     * @author Nowatzki
      */
     private static class ConnectionWrapper implements Serializable {
 
@@ -106,6 +106,17 @@ public class ConnectDialog extends AbstractDialog implements Serializable {
         platformIP = createTextField(panel);
         createLabel(panel, "Port:");
         platformPort = createTextField(panel);
+        String user = Infrastructure.getUserName();
+        createLabel(panel, "");
+        String text;
+        if (null == user || 0 == user.length()) {
+            text = "Will try a basic connection.";
+        } else {
+            text = "Will try an admin connection.";
+        }
+        createLabel(panel, text).setToolTipText("A basic connection allows receiving monitoring data / sending low "
+            + "priority commands.\n An admin connection requires administrative permissions and a login into QM-IConf "
+            + "via user name / password.");
         try {
             loadPluginSettings();
         } catch (FileNotFoundException e) {
@@ -185,7 +196,6 @@ public class ConnectDialog extends AbstractDialog implements Serializable {
                     int port = Integer.parseInt(platformPort.getText());
                     savePluginSettings(address, Integer.toString(port));
                     Infrastructure.connect(address, port);
-                    Dialogs.showInfoDialog("QM infrastructure connection", "Establishing connection");
                 }
             } catch (UnknownHostException e) {
                 Dialogs.showErrorDialog("Cannot connect to QM infrastructure", "Unknown host: " + e.getMessage());

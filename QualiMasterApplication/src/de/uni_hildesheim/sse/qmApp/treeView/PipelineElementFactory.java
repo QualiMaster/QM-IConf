@@ -40,6 +40,7 @@ import de.uni_hildesheim.sse.qmApp.model.PipelineTranslationOperations;
 import de.uni_hildesheim.sse.qmApp.model.Utils;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
+import de.uni_hildesheim.sse.qmApp.runtime.UIUtils;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import de.uni_hildesheim.sse.utils.modelManagement.ModelInfo;
 import eu.qualimaster.adaptation.external.PipelineMessage;
@@ -375,8 +376,7 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
                                 PipelineMessage.Status.START).elevate()); // admin permission, elevate implicit
                         }
                     };
-                    action.setEnabled(isInfrastructureAdmin && Infrastructure.isConnected());
-                    action.setText("Start...");
+                    UIUtils.customizeAdminInfraAction(action, "Start...");
                     manager.add(action);
 
                     action = new Action() {
@@ -387,8 +387,7 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
                                 PipelineMessage.Status.STOP).elevate()); // admin permission, elevate implicit
                         }
                     };
-                    action.setEnabled(isInfrastructureAdmin && Infrastructure.isConnected());
-                    action.setText("Stop...");
+                    UIUtils.customizeAdminInfraAction(action, "Stop...");
                     manager.add(action);
                 }
             };

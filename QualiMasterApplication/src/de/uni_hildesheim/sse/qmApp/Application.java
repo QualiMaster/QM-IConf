@@ -6,7 +6,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 
@@ -14,28 +13,25 @@ import de.uni_hildesheim.sse.easy_producer.instantiator.Bundle;
 import de.uni_hildesheim.sse.easy_producer.persistency.ResourcesMgmt;
 import de.uni_hildesheim.sse.qmApp.commands.ResetModel;
 import de.uni_hildesheim.sse.qmApp.dialogs.BootstrappingDialog;
-import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.dialogs.LoginDialog;
 import de.uni_hildesheim.sse.qmApp.model.Utils.ConfigurationProperties;
-import de.uni_hildesheim.sse.qmApp.runtime.IInfrastructureListener;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
 import de.uni_hildesheim.sse.utils.logger.AdvancedJavaLogger;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
 import de.uni_hildesheim.sse.utils.logger.ILogger;
-import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
-import eu.qualimaster.adaptation.external.ExecutionResponseMessage.ResultType;
 
 /**
  * This class controls all aspects of the application's execution.
  * 
  * @author Holger Eichelberger
  */
-public class Application implements IApplication, IInfrastructureListener {
+public class Application implements IApplication {
 
     @Override
     public Object start(IApplicationContext context) {
         ResourcesMgmt.INSTANCE.enableBackgroundTasks(false);
         Display display = PlatformUI.createDisplay();
+        Infrastructure.registerDefaultListeners();
      // Commented out due to issues with new Eclipse and Java 64bit
 //        P2Utils.ensureUpdateURI();
         try {
@@ -103,6 +99,7 @@ public class Application implements IApplication, IInfrastructureListener {
 
     @Override
     public void stop() {
+        Infrastructure.unregisterDefaultListeners();
         if (Infrastructure.isConnected()) {
             Infrastructure.disconnect();
         }
@@ -118,38 +115,6 @@ public class Application implements IApplication, IInfrastructureListener {
 
                 if (!display.isDisposed()) {
                     workbench.close();
-                }
-            }
-        });
-    }
-
-    @Override
-    public void infrastructureConnectionStateChanged(boolean hasConnection) {
-    }
-    
-    @Override
-    public void handleExecutionResponseMessage(ExecutionResponseMessage msg) {
-        final ResultType result = msg.getResult();
-        final String description = msg.getDescription();
-        final IWorkbench workbench = PlatformUI.getWorkbench();
-        final Display display = workbench.getDisplay();
-        display.syncExec(new Runnable() {
-            public void run() {
-                if (!display.isDisposed()) {
-                    Shell shell = display.getActiveShell();
-                    if (ResultType.FAILED == result) {
-                        String desc = description;
-                        if (null == desc || 0 == desc.length()) {
-                            desc = "<unknown reason>";
-                        }
-                        Dialogs.showErrorDialog(shell, "Command execution failed", desc);
-                    } else {
-                        String desc = description;
-                        if (null == desc || 0 == desc.length()) {
-                            desc = "Successful.";
-                        }
-                        Dialogs.showInfoDialog(shell, "Command execution succeeded", desc);
-                    }
                 }
             }
         });
