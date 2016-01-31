@@ -51,7 +51,6 @@ import qualimasterapplication.Activator;
 public class Infrastructure {
 
     private static ClientEndpoint endpoint;
-    private static boolean isAuthenticated;
     private static String user;
     private static List<IDispatcher> dispatchers 
         = Collections.synchronizedList(new ArrayList<IDispatcher>());
@@ -158,7 +157,6 @@ public class Infrastructure {
      */
     public static void connect(InetAddress address, int port) throws IOException {
         if (null == endpoint) {
-            isAuthenticated = false;
             endpoint = new ClientEndpoint(new DelegatingDispatcher(), address, port);
             boolean isInfrastructureAdmin = UserContext.INSTANCE.isInfrastructureAdmin();
             boolean simpleConnect = true;
@@ -168,7 +166,6 @@ public class Infrastructure {
                     if (null != passphrase) {
                         endpoint.schedule(new AuthenticateMessage(user, passphrase));
                         simpleConnect = false;
-                        isAuthenticated = true;
                     } else {
                         getLogger().info("No passphrase for user '" + user + "'. Connecting without authentication.");
                     }
@@ -227,7 +224,6 @@ public class Infrastructure {
                 ep.schedule(new DisconnectRequest());
             }
             ep.stop();
-            isAuthenticated = false;
             notifyConnectionChange(false);
         }
     }
@@ -248,7 +244,7 @@ public class Infrastructure {
      * @return <code>true</code> if authenticated, <code>false</code> else
      */
     public static boolean isAuthenticated() {
-        return null != endpoint && isAuthenticated;
+        return null != endpoint && endpoint.isAuthenticated();
     }
     
     /**
