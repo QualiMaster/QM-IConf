@@ -46,6 +46,7 @@ import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElements;
 import de.uni_hildesheim.sse.qmApp.treeView.DecisionVariableElementFactory;
 import de.uni_hildesheim.sse.qmApp.treeView.IConfigurableElementFactory;
 import de.uni_hildesheim.sse.qmApp.treeView.PipelineElementFactory;
+import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElements.IElementReferrer;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.ApplicationRole;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.Role;
@@ -78,6 +79,7 @@ public class VariabilityModel {
     static final String BINDING_TIME_LITERAL_VISIBLE = "compile";
 
     private static final Map<IModelPart, CloneMode> CLONEABLES;
+    private static final boolean DISPLAY_ALGORITHMS_NESTED = true;
    
     static {
         CLONEABLES = new HashMap<IModelPart, CloneMode>();
@@ -387,6 +389,36 @@ public class VariabilityModel {
         PropertyEditorFactory.registerCreator(new PipelineDiagramElementPropertyEditorCreator(FlowImpl.class));
         PropertyEditorFactory.registerCreator(new PipelineDiagramElementPropertyEditorCreator(PipelineImpl.class));
     }
+    
+    /**
+     * A subgrouping referrer for algorithms in their families.
+     *  
+     * @author Holger Eichelberger
+     */
+    private static class FamilyAlgorithmReferrer implements IElementReferrer {
+
+        private static final IModelPart PART = Configuration.ALGORITHMS; 
+        
+        @Override
+        public IModelPart getSubModelPart() {
+            return PART;
+        }
+
+        @Override
+        public void variableToConfigurableElements(IDecisionVariable var, ConfigurableElement parent) {
+            IDecisionVariable members = var.getNestedElement("members");
+            if (null != members) {
+                for (int m = 0; m < members.getNestedElementsCount(); m++) {
+                    IDecisionVariable member = members.getNestedElement(m);
+                    member = de.uni_hildesheim.sse.model.confModel.Configuration.dereference(member);
+                    AbstractVariable decl = member.getDeclaration();
+                    ConfigurableElements.variableToConfigurableElements(PART, decl.getName(), member, parent, 
+                        PART.getElementFactory(), null);
+                }
+            }
+        }
+        
+    }
 
     /**
      * Creates the configurable elements.
@@ -417,8 +449,14 @@ public class VariabilityModel {
             "Algorithm Families");
         elements.variableToConfigurableElements(Configuration.FAMILIES, "de.uni_hildesheim.sse.qmApp.FamiliesEditor");
         QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.ALGORITHMS, "Algorithms");
-        elements.variableToConfigurableElements(Configuration.ALGORITHMS, 
-             "de.uni_hildesheim.sse.qmApp.AlgorithmsEditor");
+        if (DISPLAY_ALGORITHMS_NESTED) {
+            // start with families and use referrer to attach algorithms
+            elements.variableToConfigurableElements(Configuration.FAMILIES, 
+                "de.uni_hildesheim.sse.qmApp.FamiliesEditor", new FamilyAlgorithmReferrer());
+        } else {
+            elements.variableToConfigurableElements(Configuration.ALGORITHMS, 
+                "de.uni_hildesheim.sse.qmApp.AlgorithmsEditor");
+        }
 
         QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.PIPELINES, "Pipelines");
         elements.variableToConfigurableElements(Configuration.PIPELINES, "de.uni_hildesheim.sse.qmApp.PipelinesEditor");
@@ -678,6 +716,10 @@ public class VariabilityModel {
             IconManager.retrieveImage(IconManager.ALGORITHMS));
         registry.registerImage(Configuration.ALGORITHMS, 0, 
             IconManager.retrieveImage(IconManager.ALGORITHM));
+        if (DISPLAY_ALGORITHMS_NESTED) {
+            registry.registerImage(Configuration.ALGORITHMS, "Family", 
+                IconManager.retrieveImage(IconManager.FAMILY));
+        }
         
         registry.registerImage(Configuration.FAMILIES, 
             IconManager.retrieveImage(IconManager.FAMILIES));

@@ -30,6 +30,30 @@ public class ConfigurableElements {
     private List<ConfigurableElement> elements = new ArrayList<ConfigurableElement>();
 
     /**
+     * An element referrer, which may create a subgrouping of configurable elements.
+     * 
+     * @author Holger Eichelberger
+     */
+    public interface IElementReferrer {
+
+        /**
+         * Returns the sub grouping model part.
+         * 
+         * @return the model part
+         */
+        public IModelPart getSubModelPart();
+        
+        /**
+         * Turns the contents of <code>var</code> into configurable elements below <code>parent</code>.
+         * 
+         * @param var the variable to retrieve the elements from
+         * @param parent the parent configurable element
+         */
+        public void variableToConfigurableElements(IDecisionVariable var, ConfigurableElement parent);
+
+    }
+       
+    /**
      * Turns a <code>modelPart</code> into a sub-hierarchy of configurable elements.
      * The display name is taken form {@link QualiMasterDisplayNameProvider}.
      * 
@@ -38,22 +62,43 @@ public class ConfigurableElements {
      * @return the parent element created for <code>modelName</code>
      */
     public ConfigurableElement variableToConfigurableElements(IModelPart modelPart, String modelEditorId) {
+        return variableToConfigurableElements(modelPart, modelEditorId, null);
+    }
+    
+    /**
+     * Turns a <code>modelPart</code> into a sub-hierarchy of configurable elements.
+     * The display name is taken form {@link QualiMasterDisplayNameProvider}.
+     * 
+     * @param modelPart the model part to iterate over
+     * @param modelEditorId the editor id for the entire model
+     * @param referrer an instance which leads to a subgrouping according to <code>modelPart</code>, but contained
+     *   elements based on the elements returned by the referrer
+     * @return the parent element created for <code>modelName</code>
+     */
+    public ConfigurableElement variableToConfigurableElements(IModelPart modelPart, String modelEditorId, 
+        IElementReferrer referrer) {
         ConfigurableElement element = null;
 
-        String displayName = QualiMasterDisplayNameProvider.INSTANCE.getModelPartDisplayName(modelPart);
-        if (VariabilityModel.isReadable(modelPart)) {
+        boolean readable = VariabilityModel.isReadable(modelPart); 
+        IModelPart headPart = modelPart;
+        if (null != referrer) {
+            headPart = referrer.getSubModelPart();
+            readable &= VariabilityModel.isReadable(headPart);
+        }
+        String displayName = QualiMasterDisplayNameProvider.INSTANCE.getModelPartDisplayName(headPart);
+        if (readable) {
             List<AbstractVariable> decls = modelPart.getPossibleValues();
             Configuration cfg = modelPart.getConfiguration();
             for (AbstractVariable decl : decls) {
                 if (null == element) {
                     element = new ConfigurableElement(displayName, modelEditorId, 
-                        new VarModelEditorInputCreator(modelPart, displayName), modelPart);
-                    element.setImage(ImageRegistry.INSTANCE.getImage(modelPart));
+                        new VarModelEditorInputCreator(headPart, displayName), headPart);
+                    element.setImage(ImageRegistry.INSTANCE.getImage(headPart));
                 }
                 IDecisionVariable var = cfg.getDecision(decl);
                 if (null != var) {
                     variableToConfigurableElements(modelPart, decl.getName(), var, element, 
-                        modelPart.getElementFactory());
+                        modelPart.getElementFactory(), referrer);
                 }
             }
         }
@@ -81,8 +126,10 @@ public class ConfigurableElements {
     public ConfigurableElement variableToConfigurableElements(IModelPart modelPart, String variableName, 
         ConfigurableElement elt, IConfigurableElementFactory factory) {
         IDecisionVariable var = ModelAccess.obtainVariable(modelPart, variableName);
-        return variableToConfigurableElements(modelPart, variableName, var, elt, factory);
+        return variableToConfigurableElements(modelPart, variableName, var, elt, factory, null);
     }
+    
+    // checkstyle: stop parameter number check
     
     /**
      * Turns a variable into a sub-hierarchy of configurable elements below <code>elt</code>.
@@ -92,23 +139,32 @@ public class ConfigurableElements {
      * @param var the variable to start the iteration
      * @param elt the parent configurable element to attach the sub-hierarchy to
      * @param factory the factory for the individual elements
+     * @param referrer an instance which leads to a subgrouping according to <code>modelPart</code>, but contained
+     *   elements based on the elements returned by the referrer
      * @return the parent element created for <code>modelName</code>
      */
-    private static ConfigurableElement variableToConfigurableElements(IModelPart modelPart, String varName, 
-        IDecisionVariable var, ConfigurableElement elt, IConfigurableElementFactory factory) {
+    public static ConfigurableElement variableToConfigurableElements(IModelPart modelPart, String varName, 
+        IDecisionVariable var, ConfigurableElement elt, IConfigurableElementFactory factory, 
+        IElementReferrer referrer) {
         if (var instanceof ContainerVariable) {
             //Fill create the configurable elements and relate the editor/editor input to them
             for (int i = 0; i < var.getNestedElementsCount(); i++) {
                 ContainerVariableEditorInputCreator creator 
                     = new ContainerVariableEditorInputCreator(modelPart, varName, i);
                 IDecisionVariable nested = creator.getVariable();
-                elt.addChild(factory.createElement(elt, nested, creator));
+                ConfigurableElement nestedElement = factory.createElement(elt, nested, creator);
+                elt.addChild(nestedElement);
+                if (null != referrer) {
+                    referrer.variableToConfigurableElements(nested, nestedElement);
+                }
             }
         } else if (var instanceof CompoundVariable) {
             elt.addChild(factory.createElement(elt, var, new CompoundVariableEditorInputCreator(modelPart, varName)));
         }
         return elt;
     }
+    
+    // checkstyle: resume parameter number check
     
     /**
      * Get the elements.
