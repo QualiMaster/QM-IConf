@@ -85,15 +85,12 @@ public class ConfigurableElements {
             headPart = referrer.getSubModelPart();
             readable &= VariabilityModel.isReadable(headPart);
         }
-        String displayName = QualiMasterDisplayNameProvider.INSTANCE.getModelPartDisplayName(headPart);
         if (readable) {
             List<AbstractVariable> decls = modelPart.getPossibleValues();
             Configuration cfg = modelPart.getConfiguration();
             for (AbstractVariable decl : decls) {
                 if (null == element) {
-                    element = new ConfigurableElement(displayName, modelEditorId, 
-                        new VarModelEditorInputCreator(headPart, displayName), headPart);
-                    element.setImage(ImageRegistry.INSTANCE.getImage(headPart));
+                    element = createParent(headPart, modelEditorId);
                 }
                 IDecisionVariable var = cfg.getDecision(decl);
                 if (null != var) {
@@ -105,12 +102,50 @@ public class ConfigurableElements {
         
         // ensure that there is an element
         if (null == element) {
-            element = new ConfigurableElement(displayName, modelEditorId,
-                new VarModelEditorInputCreator(modelPart, displayName), modelPart);
-            element.setImage(ImageRegistry.INSTANCE.getImage(modelPart));
+            element = createParent(headPart, modelEditorId);
         }
         elements.add(element);
         
+        return element;
+    }
+    
+    /**
+     * Turns a list of <code>variables</code> into configurable elements.
+     * 
+     * @param modelPart the model part
+     * @param modelEditorId the editor id
+     * @param parent the parent element to add the elements below 
+     * @param variables the variables to add
+     * @return <code>parent</code> or the created parent element
+     */
+    public ConfigurableElement variableToConfigurableElements(IModelPart modelPart, String modelEditorId, 
+        ConfigurableElement parent, List<IDecisionVariable> variables) {
+        if (null != variables && variables.size() > 0) {
+            if (null == parent) {
+                parent = createParent(modelPart, modelEditorId);
+            }
+            for (int v = 0; v < variables.size(); v++) {
+                IDecisionVariable var = variables.get(v);
+                AbstractVariable decl = var.getDeclaration();
+                variableToConfigurableElements(modelPart, decl.getName(), var, parent, 
+                    modelPart.getElementFactory(), null);
+            }
+        }
+        return parent;
+    }
+
+    /**
+     * Creates a parent element.
+     * 
+     * @param modelPart the model part
+     * @param modelEditorId the editor id
+     * @return the configurable element
+     */
+    private ConfigurableElement createParent(IModelPart modelPart, String modelEditorId) {
+        String displayName = QualiMasterDisplayNameProvider.INSTANCE.getModelPartDisplayName(modelPart);
+        ConfigurableElement element = new ConfigurableElement(displayName, modelEditorId, 
+                new VarModelEditorInputCreator(modelPart, displayName), modelPart);
+        element.setImage(ImageRegistry.INSTANCE.getImage(modelPart));
         return element;
     }
 

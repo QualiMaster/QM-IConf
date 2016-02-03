@@ -2,6 +2,7 @@ package de.uni_hildesheim.sse.qmApp.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -409,8 +410,7 @@ public class VariabilityModel {
             IDecisionVariable members = var.getNestedElement("members");
             if (null != members) {
                 for (int m = 0; m < members.getNestedElementsCount(); m++) {
-                    IDecisionVariable member = members.getNestedElement(m);
-                    member = de.uni_hildesheim.sse.model.confModel.Configuration.dereference(member);
+                    IDecisionVariable member = dereference(members.getNestedElement(m));
                     AbstractVariable decl = member.getDeclaration();
                     ConfigurableElements.variableToConfigurableElements(PART, decl.getName(), member, parent, 
                         PART.getElementFactory(), null);
@@ -450,9 +450,12 @@ public class VariabilityModel {
         elements.variableToConfigurableElements(Configuration.FAMILIES, "de.uni_hildesheim.sse.qmApp.FamiliesEditor");
         QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.ALGORITHMS, "Algorithms");
         if (DISPLAY_ALGORITHMS_NESTED) {
+            List<IDecisionVariable> unattached = unreferencedAlgorithms();
             // start with families and use referrer to attach algorithms
-            elements.variableToConfigurableElements(Configuration.FAMILIES, 
-                "de.uni_hildesheim.sse.qmApp.FamiliesEditor", new FamilyAlgorithmReferrer());
+            ConfigurableElement elt = elements.variableToConfigurableElements(Configuration.FAMILIES, 
+                "de.uni_hildesheim.sse.qmApp.AlgorithmsEditor", new FamilyAlgorithmReferrer());
+            elements.variableToConfigurableElements(Configuration.ALGORITHMS, 
+                "de.uni_hildesheim.sse.qmApp.AlgorithmsEditor", elt, unattached);
         } else {
             elements.variableToConfigurableElements(Configuration.ALGORITHMS, 
                 "de.uni_hildesheim.sse.qmApp.AlgorithmsEditor");
@@ -773,6 +776,71 @@ public class VariabilityModel {
             }
         }
         return visible;
+    }
+    
+    /**
+     * Dereferences a variable.
+     * 
+     * @param var the variable to be dereferenced (may be <b>null</b>)
+     * @return the dereferenced variable (<b>null</b> if <code>var</code> was <b>null</b>)
+     */
+    private static IDecisionVariable dereference(IDecisionVariable var) {
+        return de.uni_hildesheim.sse.model.confModel.Configuration.dereference(var);
+    }
+    
+    /**
+     * Returns the instance name of a decision variable. This name is composed 
+     * from the names of the given variable and its parent variables. Please note
+     * that the instance name is typically different from the qualified name of 
+     * the declaration, which, in case of compound slots, leads to the variable
+     * in the compound definition. The result is unqualified regarding the top-level
+     * variable.
+     * 
+     * @param var the variable to return the name for (may be <b>null</b>)
+     * @return the instance name (may be empty if <code>var == <b>null</b></code>
+     */
+    private static String getInstanceName(IDecisionVariable var) {
+        return de.uni_hildesheim.sse.model.confModel.Configuration.getInstanceName(var);
+    }
+
+    /**
+     * Identifies unreferenced algorithms, i.e., algorithms not used as members in families.
+     * 
+     * @return unreferenced algorithms
+     */
+    public static List<IDecisionVariable> unreferencedAlgorithms() {
+        List<IDecisionVariable> result = new ArrayList<IDecisionVariable>();
+        Set<String> referencedAlgs = new HashSet<String>();
+        final IModelPart families = Configuration.FAMILIES;
+        List<AbstractVariable> decls = families.getPossibleValues();
+        de.uni_hildesheim.sse.model.confModel.Configuration cfg = families.getConfiguration();
+        for (AbstractVariable decl : decls) {
+            IDecisionVariable var = cfg.getDecision(decl);
+            for (int n = 0; n < var.getNestedElementsCount(); n++) {
+                IDecisionVariable nested = dereference(var.getNestedElement(n));
+                IDecisionVariable members = nested.getNestedElement("members");
+                if (null != members) {
+                    for (int m = 0; m < members.getNestedElementsCount(); m++) {
+                        IDecisionVariable algorithm = dereference(members.getNestedElement(m));
+                        referencedAlgs.add(getInstanceName(algorithm));
+                    }
+                }
+            }
+        }
+        
+        final IModelPart algorithms = Configuration.ALGORITHMS;
+        decls = algorithms.getPossibleValues();
+        cfg = algorithms.getConfiguration();
+        for (AbstractVariable decl : decls) {
+            IDecisionVariable var = cfg.getDecision(decl);
+            for (int n = 0; n < var.getNestedElementsCount(); n++) {
+                IDecisionVariable algorithm = dereference(var.getNestedElement(n));
+                if (!referencedAlgs.contains(getInstanceName(algorithm))) {
+                    result.add(algorithm);
+                }
+            }
+        }
+        return result;
     }
 
 }
