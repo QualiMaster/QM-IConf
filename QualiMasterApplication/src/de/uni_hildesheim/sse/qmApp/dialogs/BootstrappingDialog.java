@@ -222,7 +222,7 @@ public class BootstrappingDialog {
         next.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
                 indexNextButton[0] = (indexNextButton[0] + 1) % NUMBER_OF_COMPOSITES;
-                if (indexNextButton[0] == 1 && !manual.getSelection()) {
+                if ((indexNextButton[0] == 1 && !manual.getSelection()) || !defaultRepo.getSelection()) {
                     next.setEnabled(false);
                 }
                 if (indexNextButton[0] == 0) { // Close when last composite is reached.
@@ -476,7 +476,9 @@ public class BootstrappingDialog {
                 if (ownRepo.getSelection()) {
                     defaultRepo.setSelection(false);
                     urlField.setEnabled(true);
+                    next.setEnabled(true);
                 } else {
+                    next.setEnabled(false);
                     urlField.setEnabled(false);
                 }
             }
@@ -487,6 +489,9 @@ public class BootstrappingDialog {
                 if (defaultRepo.getSelection()) {
                     ownRepo.setSelection(false);
                     urlField.setEnabled(false);
+                    next.setEnabled(true);
+                } else {
+                    next.setEnabled(false);
                 }
             }
         });
@@ -551,10 +556,12 @@ public class BootstrappingDialog {
         infoRepoConnector.setText(REPO_CONNECTOR_INFO_TEXT);
         infoRepoConnector.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
         new Label(compositeArray[1], SWT.NONE);
-        repo = new Button(compositeArray[1], SWT.CHECK);
+        repo = new Button(compositeArray[1], SWT.CHECK | SWT.WRAP);
         repo.setText(BUTTON_REPOSITORY);
-        manual = new Button(compositeArray[1], SWT.CHECK);
+        repo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+        manual = new Button(compositeArray[1], SWT.CHECK | SWT.WRAP);
         manual.setText(BUTTON_MANUAL);
+        manual.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
     }
 
     /**

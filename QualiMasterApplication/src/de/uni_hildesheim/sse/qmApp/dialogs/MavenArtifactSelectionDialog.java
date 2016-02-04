@@ -460,15 +460,15 @@ public class MavenArtifactSelectionDialog extends Dialog {
      *            Container for the buttons.
      */
     public void createButtons(final Composite buttonsContainer) {
-        final Button refresh = new Button(buttonsContainer, SWT.RIGHT);
+        final Button refresh = new Button(buttonsContainer, SWT.PUSH);
         refresh.setToolTipText(getLastUpdateToolTipText());
         refresh.computeSize(SWT.DEFAULT, SWT.DEFAULT);
         refresh.setSize(SWT.DEFAULT, SWT.DEFAULT);
-        refresh.setText(" Refresh  ");
-        Button ok = new Button(buttonsContainer, SWT.RIGHT);
+        refresh.setText("Refresh");
+        Button ok = new Button(buttonsContainer, SWT.PUSH);
         ok.computeSize(SWT.DEFAULT, SWT.DEFAULT);
         ok.setSize(SWT.DEFAULT, SWT.DEFAULT);
-        ok.setText("   OK     ");
+        ok.setText("OK");
         ok.addSelectionListener(new SelectionListener() {
 
             @Override
@@ -489,10 +489,10 @@ public class MavenArtifactSelectionDialog extends Dialog {
             }
         });
 
-        Button cancel = new Button(buttonsContainer, SWT.RIGHT);
+        Button cancel = new Button(buttonsContainer, SWT.PUSH);
         cancel.computeSize(SWT.DEFAULT, SWT.DEFAULT);
         cancel.setSize(SWT.DEFAULT, SWT.DEFAULT);
-        cancel.setText("  Cancel    ");
+        cancel.setText("Cancel");
 
         cancel.addSelectionListener(new SelectionListener() {
             @Override
