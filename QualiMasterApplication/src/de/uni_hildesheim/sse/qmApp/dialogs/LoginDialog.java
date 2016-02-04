@@ -353,9 +353,10 @@ public class LoginDialog {
      *            The select button to check if user wants to work with local data
      * 
      */
-    private void addButtonListener(Button button, final Shell shell, final Button selectButton) {
+    private void addButtonListener(final Button button, final Shell shell, final Button selectButton) {
         button.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
+                button.setEnabled(false);
                 if (selectButton.getSelection()) {
                     // Load Roles and set location
                     loadRoles();
@@ -368,6 +369,7 @@ public class LoginDialog {
                     } else {
                         showLoginError(shell);
                         logger.warn("Login failed");
+                        button.setEnabled(true);
                     }
                 }
             }
