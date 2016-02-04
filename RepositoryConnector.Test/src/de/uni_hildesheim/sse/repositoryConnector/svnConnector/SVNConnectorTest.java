@@ -375,4 +375,53 @@ public class SVNConnectorTest extends AbstractRepositoryConnectorTest {
         FileUtils.deleteQuietly(secondWorkingCopy);
     }
     
+    /**
+     * Test if the changes count is computed correctly.
+     */
+    @Test
+    public void testGetChangesCount() {
+        // Load model and check that the changescount is 0;
+        getSvnConnector().loadModel(TEMP_DIR);
+        int remoteChangesCount = getSvnConnector().getChangesCount(TEMP_DIR, true);
+        int localChangesCount = getSvnConnector().getChangesCount(TEMP_DIR, false);
+        Assert.assertEquals(0, remoteChangesCount);
+        Assert.assertEquals(0, localChangesCount);
+        // Create local file and check the changescount
+        File localFile = createLocalFile(TEMP_DIR, "testGetChangesCount");
+        remoteChangesCount = getSvnConnector().getChangesCount(TEMP_DIR, true);
+        localChangesCount = getSvnConnector().getChangesCount(TEMP_DIR, false);
+        Assert.assertEquals(1, localChangesCount);
+        Assert.assertEquals(0, remoteChangesCount);
+        // Delete the local file
+        FileUtils.deleteQuietly(localFile);
+        Assert.assertFalse(localFile.exists());
+        remoteChangesCount = getSvnConnector().getChangesCount(TEMP_DIR, true);
+        localChangesCount = getSvnConnector().getChangesCount(TEMP_DIR, false);
+        Assert.assertEquals(0, localChangesCount);
+        Assert.assertEquals(0, remoteChangesCount);
+        // Create second working copy, create new file and upload it to the repository
+        SVNConnector svnConnector = new SVNConnector();
+        svnConnector.setRepositoryURL(COMMIT_URL);
+        svnConnector.authenticate("abc", "def");
+        svnConnector.loadModel(TEMP_DIR2);
+        localFile = createLocalFile(TEMP_DIR2, "testGetChangesCount");
+        remoteChangesCount = getSvnConnector().getChangesCount(TEMP_DIR2, true);
+        localChangesCount = getSvnConnector().getChangesCount(TEMP_DIR2, false);
+        Assert.assertEquals(1, localChangesCount);
+        Assert.assertEquals(0, remoteChangesCount);
+        svnConnector.storeModel(TEMP_DIR2);
+        // Now check the remote changes count for the TEMP_DIR working copy
+        remoteChangesCount = getSvnConnector().getChangesCount(TEMP_DIR, true);
+        localChangesCount = getSvnConnector().getChangesCount(TEMP_DIR, false);
+        Assert.assertEquals(0, localChangesCount);
+        Assert.assertEquals(2, remoteChangesCount);
+        // // Create local file and check the changescount
+        localFile = createLocalFile(TEMP_DIR, "testGetChangesCount");
+        remoteChangesCount = getSvnConnector().getChangesCount(TEMP_DIR, true);
+        localChangesCount = getSvnConnector().getChangesCount(TEMP_DIR, false);
+        Assert.assertEquals(1, localChangesCount);
+        Assert.assertEquals(2, remoteChangesCount);
+        FileUtils.deleteQuietly(TEMP_DIR2);
+    }
+    
 }

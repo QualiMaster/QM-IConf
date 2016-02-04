@@ -381,13 +381,15 @@ public class SVNConnector implements IRepositoryConnector {
                             if (isRemote) {
                                 SVNStatusType statusType = status.getRemoteContentsStatus();
                                 if (statusType != SVNStatusType.STATUS_NORMAL
-                                        && statusType != SVNStatusType.STATUS_IGNORED) {
+                                        && statusType != SVNStatusType.STATUS_IGNORED 
+                                        && statusType != SVNStatusType.STATUS_NONE) {
                                     changeLists.add(status.getFile());
                                 }
                             } else {
                                 SVNStatusType statusType = status.getNodeStatus();
                                 if (statusType != SVNStatusType.STATUS_NONE && statusType != SVNStatusType.STATUS_NORMAL
-                                        && statusType != SVNStatusType.STATUS_IGNORED) {
+                                        && statusType != SVNStatusType.STATUS_IGNORED
+                                        && statusType != SVNStatusType.STATUS_MISSING) {
                                     changeLists.add(status.getFile());
                                 }
                                 if (SVNStatusType.STATUS_UNVERSIONED.equals(status.getNodeStatus())) {
