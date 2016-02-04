@@ -63,6 +63,8 @@ public class UpdateModel extends AbstractHandler {
      * @author Sass
      */
     private class ModelUpdate implements Runnable, RepositoryEventHandler {
+        
+        private boolean restart = false;
 
         /**
          * Creates a model updater.
@@ -79,6 +81,7 @@ public class UpdateModel extends AbstractHandler {
             progress.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
             if (repositoryConnector.getChangesCount(Location.getModelLocationFile(), true) > 0) {
                 shell.open();
+                restart = true;
             } else {
                 MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
                 dialog.setText("Info");
@@ -106,6 +109,10 @@ public class UpdateModel extends AbstractHandler {
                 public void run() {
                     progress.done();
                     shell.dispose();
+                    // Only restart if there were actual changes
+                    if (restart) {
+                        PlatformUI.getWorkbench().restart();
+                    }
                 }
             });
         }
