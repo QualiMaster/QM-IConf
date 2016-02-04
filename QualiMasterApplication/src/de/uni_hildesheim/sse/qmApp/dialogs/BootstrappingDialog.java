@@ -14,6 +14,8 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -31,6 +33,7 @@ import org.eclipse.swt.widgets.Text;
 import org.osgi.service.prefs.BackingStoreException;
 
 import de.uni_hildesheim.sse.easy_producer.instantiator.Bundle;
+import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.qmApp.model.Location;
 import de.uni_hildesheim.sse.qmApp.model.Utils;
 import de.uni_hildesheim.sse.qmApp.model.Utils.ConfigurationProperties;
@@ -98,9 +101,9 @@ public class BootstrappingDialog {
             + "have access to a SVN repository with the model you want to use, you don't have to download, unzip and "
             + "install an initially empty model. Otherwise you can get an actual copy of an empty model from ";
 
-    private static final int SHELL_WIDTH = 500;
+    private static final int PARENT_WIDTH = 400;
 
-    private static final int SHELL_HEIGHT = 350;
+    private static final int PARENT_HEIGHT = 350;
 
     private static final int NUMBER_OF_COMPOSITES = 4;
 
@@ -157,7 +160,9 @@ public class BootstrappingDialog {
      */
     private void createDialog(final Display display) {
         final Shell shell = new Shell(display);
-        shell.setSize(SHELL_WIDTH, SHELL_HEIGHT);
+        Image icon = IconManager.retrieveImage(IconManager.QUALIMASTER_SMALL);
+        shell.setImage(icon);
+        shell.setText(APPLICATION_NAME);
         shell.setLayout(new GridLayout(2, false));
         shell.addListener(SWT.Close, new Listener() {
             public void handleEvent(Event event) {
@@ -166,7 +171,10 @@ public class BootstrappingDialog {
         });
         final Composite root = createLeftNavigation(display, shell);
         final Composite parent = new Composite(shell, SWT.NONE);
-        parent.setLayoutData(new GridData(GridData.FILL_BOTH));
+        GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
+        gridData.widthHint = PARENT_WIDTH;
+        gridData.minimumHeight = PARENT_HEIGHT;
+        parent.setLayoutData(gridData);
         final StackLayout layout = new StackLayout();
         parent.setLayout(layout);
         final Composite[] compositeArray = new Composite[NUMBER_OF_COMPOSITES];
@@ -179,6 +187,7 @@ public class BootstrappingDialog {
         new Label(shell, SWT.NONE);
         // Navigation
         createNavigation(shell, root, parent, layout, compositeArray);
+        shell.pack();
         shell.setLocation(DialogsUtil.getXPosition(shell, display), DialogsUtil.getYPosition(shell, display));
         shell.open();
         while (shell != null && !shell.isDisposed()) {
@@ -255,20 +264,35 @@ public class BootstrappingDialog {
         });
         repo.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                ownRepo.setEnabled(true);
-                defaultRepo.setEnabled(true);
-                manual.setSelection(false);
-                next.setEnabled(true);
+                if (repo.getSelection()) {
+                    ownRepo.setEnabled(true);
+                    defaultRepo.setEnabled(true);
+                    manual.setSelection(false);
+                    next.setEnabled(true);
+                } else {
+                    next.setEnabled(false);                
+                }
             }
         });
+        createManualSelectionListener();
+    }
+
+    /**
+     * Creates the {@link SelectionListener} for manual.
+     */
+    private void createManualSelectionListener() {
         manual.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent event) {
-                ownRepo.setSelection(false);
-                ownRepo.setEnabled(false);
-                defaultRepo.setSelection(false);
-                defaultRepo.setEnabled(false);
-                repo.setSelection(false);
-                next.setEnabled(true);
+                if (manual.getSelection()) {
+                    ownRepo.setSelection(false);
+                    ownRepo.setEnabled(false);
+                    defaultRepo.setSelection(false);
+                    defaultRepo.setEnabled(false);
+                    repo.setSelection(false);
+                    next.setEnabled(true);
+                } else {
+                    next.setEnabled(false);
+                }
             }
         });
     }
@@ -430,7 +454,6 @@ public class BootstrappingDialog {
      *            array containing all composites
      */
     private void createRepositoryURLContent(Shell shell, final Composite parent, final Composite[] compositeArray) {
-        shell.setText("QualiMaster Infrastructure Configuration - " + REPO_URL_CONNECTOR_TITLE);
         compositeArray[3] = new Composite(parent, SWT.NONE);
         compositeArray[3].setLayout(new GridLayout(1, true));
         Label infoRepoConnector = new Label(compositeArray[3], SWT.WRAP);
@@ -481,7 +504,6 @@ public class BootstrappingDialog {
      */
     private void createModelLocationContent(final Shell shell, final Composite parent,
             final Composite[] compositeArray) {
-        shell.setText("QualiMaster Infrastructure Configuration - " + MODEL_LOCATION_TITLE);
         compositeArray[2] = new Composite(parent, SWT.NONE);
         compositeArray[2].setLayout(new GridLayout(1, true));
         Label infoModelLocation = new Label(compositeArray[2], SWT.WRAP);
@@ -523,7 +545,6 @@ public class BootstrappingDialog {
      */
     private void createConnectorContent(Shell shell, final Display display, final Composite parent,
             final Composite[] compositeArray) {
-        shell.setText("QualiMaster Infrastructure Configuration - " + REPO_CONNECTOR_TITLE);
         compositeArray[1] = new Composite(parent, SWT.NONE);
         compositeArray[1].setLayout(new GridLayout(1, true));
         Label infoRepoConnector = new Label(compositeArray[1], SWT.WRAP);
@@ -550,7 +571,6 @@ public class BootstrappingDialog {
      */
     private void createWelcomeContent(Shell shell, final Display display, final Composite parent,
             final Composite[] compositeArray) {
-        shell.setText("QualiMaster Infrastructure Configuration - " + INIT_TITLE);
         compositeArray[0] = new Composite(parent, SWT.NONE);
         compositeArray[0].setLayout(new GridLayout(1, true));
         Label info = new Label(compositeArray[0], SWT.WRAP);
