@@ -12,6 +12,7 @@ import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.qmApp.editorInput.CompoundVariableEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.ContainerVariableEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator;
+import de.uni_hildesheim.sse.qmApp.editorInput.IVariableEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.VarModelEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.images.ImageRegistry;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
@@ -51,6 +52,15 @@ public class ConfigurableElements {
          */
         public void variableToConfigurableElements(IDecisionVariable var, ConfigurableElement parent);
 
+        /**
+         * Returns the actual parent of the element <code>name</code> to be inserted.
+         * 
+         * @param name the name of the element
+         * @param parent the current parent
+         * @return <code>parent</code> or the actual parent
+         */
+        public ConfigurableElement getActualParent(String name, ConfigurableElement parent);
+        
     }
        
     /**
@@ -187,19 +197,42 @@ public class ConfigurableElements {
                 ContainerVariableEditorInputCreator creator 
                     = new ContainerVariableEditorInputCreator(modelPart, varName, i);
                 IDecisionVariable nested = creator.getVariable();
-                ConfigurableElement nestedElement = factory.createElement(elt, nested, creator);
-                elt.addChild(nestedElement);
+                ConfigurableElement nestedElement = createElement(elt, nested, factory, creator, referrer);
+                //ConfigurableElement nestedElement = factory.createElement(elt, nested, creator);
+                //elt.addChild(nestedElement);
                 if (null != referrer) {
                     referrer.variableToConfigurableElements(nested, nestedElement);
                 }
             }
         } else if (var instanceof CompoundVariable) {
-            elt.addChild(factory.createElement(elt, var, new CompoundVariableEditorInputCreator(modelPart, varName)));
+            //elt.addChild(factory.createElement(elt, var, new CompoundVariableEditorInputCreator(modelPart, varName)));
+            createElement(elt, var, factory, new CompoundVariableEditorInputCreator(modelPart, varName), referrer);
         }
         return elt;
     }
-    
+
     // checkstyle: resume parameter number check
+    
+    /**
+     * Creates a configurable element.
+     * 
+     * @param parent the parent element
+     * @param var the decision variable
+     * @param factory the element factory
+     * @param creator the editor input creator
+     * @param referrer the optional referrer for sub-grouping (may be <b>null</b>)
+     * @return the created element
+     */
+    public static ConfigurableElement createElement(ConfigurableElement parent, IDecisionVariable var, 
+        IConfigurableElementFactory factory, IVariableEditorInputCreator creator, IElementReferrer referrer) {
+        if (null != referrer) {
+            String displayName = QualiMasterDisplayNameProvider.INSTANCE.getDisplayName(var);
+            parent = referrer.getActualParent(displayName, parent);
+        }
+        ConfigurableElement nestedElement = factory.createElement(parent, var, creator);
+        parent.addChild(nestedElement);
+        return nestedElement;
+    }
     
     /**
      * Get the elements.

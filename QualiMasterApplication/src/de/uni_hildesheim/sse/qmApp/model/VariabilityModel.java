@@ -417,7 +417,72 @@ public class VariabilityModel {
                 }
             }
         }
+
+        @Override
+        public ConfigurableElement getActualParent(String name, ConfigurableElement parent) {
+            return parent;
+        }
         
+    }
+
+    /**
+     * A name-based subgrouping referrer for hardware elements. This referrer is based on 
+     * grouping according to IP prefixes or domain name suffixes.
+     * 
+     * @author Holger Eichelberger
+     */
+    private static class HardwareReferrer implements IElementReferrer {
+
+        private static final IModelPart PART = Configuration.HARDWARE; 
+        private Map<String, ConfigurableElement> parents = new HashMap<String, ConfigurableElement>();
+
+        @Override
+        public IModelPart getSubModelPart() {
+            return PART;
+        }
+
+        @Override
+        public void variableToConfigurableElements(IDecisionVariable var, ConfigurableElement parent) {
+        }
+
+        @Override
+        public ConfigurableElement getActualParent(String name, ConfigurableElement parent) {
+            ConfigurableElement result = parent;
+            int firstDot = -1;
+            int lastDot = -1;
+            int dotCount = 0;
+            int digitCount = 0;
+            for (int i = 0; i < name.length(); i++) {
+                char c = name.charAt(i);
+                if ('.' == c) {
+                    dotCount++;
+                    lastDot = i;
+                    firstDot = firstDot < 0 ? i : firstDot;
+                } else if (Character.isDigit(c)) {
+                    digitCount++;
+                }
+            }
+            if (dotCount > 0 && lastDot < name.length() - 1) {
+                String pName = null;
+                if (3 == dotCount && digitCount + dotCount == name.length()) { // it's an IP
+                    pName = name.substring(0, lastDot);
+                } else if (dotCount > 0) { // its a qualified name
+                    pName = name.substring(firstDot + 1, name.length());
+                }
+                if (null != pName) {
+                    pName = "*." + pName;
+                    result = parents.get(pName);
+                    if (null == result) {
+                        result = new ConfigurableElement(pName, null, null, PART);
+                        result.setImage(ImageRegistry.INSTANCE.getImage(PART));
+                        parent.addChild(result);
+                        parents.put(pName, result);
+                    }
+                }
+            }
+            return result;
+        }
+
     }
 
     /**
@@ -434,7 +499,8 @@ public class VariabilityModel {
         
         QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.HARDWARE, 
             "General-purpose Machines");
-        elements.variableToConfigurableElements(Configuration.HARDWARE, "de.uni_hildesheim.sse.qmApp.HardwareEditor");
+        elements.variableToConfigurableElements(Configuration.HARDWARE, "de.uni_hildesheim.sse.qmApp.HardwareEditor", 
+            DISPLAY_ALGORITHMS_NESTED ? new HardwareReferrer() : null);
 
         QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.RECONFIG_HARDWARE, 
             "Reconfigurable Hardware Machines");
