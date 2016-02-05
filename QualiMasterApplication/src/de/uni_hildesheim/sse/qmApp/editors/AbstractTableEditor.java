@@ -30,6 +30,7 @@ import de.uni_hildesheim.sse.model.varModel.ContainableModelElement;
 import de.uni_hildesheim.sse.model.varModel.DecisionVariableDeclaration;
 import de.uni_hildesheim.sse.model.varModel.Project;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Compound;
+import de.uni_hildesheim.sse.model.varModel.datatypes.ConstraintType;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Container;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Enum;
 import de.uni_hildesheim.sse.model.varModel.datatypes.EnumLiteral;
@@ -161,7 +162,7 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
      * @return <code>true</code> if <code>decl</code> shall be displayed, <code>false</code> else
      */
     protected static boolean display(DecisionVariableDeclaration decl) {
-        return ModelAccess.isVisibleType(decl.getType());
+        return ModelAccess.isVisibleType(decl.getType()) && !ConstraintType.isConstraint(decl.getType());
     }
 
     /**

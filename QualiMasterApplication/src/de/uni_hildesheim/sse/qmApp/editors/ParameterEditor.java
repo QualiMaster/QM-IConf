@@ -558,6 +558,9 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
                     DecisionVariableDeclaration decl = compound.getInheritedElement(e);
                     if (display(decl)) {
                         row[i++] = getCompoundSlot(v, decl.getName());
+                        if (i >= cols) { // just to be sure
+                            break;
+                        }
                     }
                 }
                 // get the parameter value for the VALUE colum

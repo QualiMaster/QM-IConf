@@ -1089,6 +1089,9 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
                                 row[i++] = "";
                             }
                         }
+                        if (i >= DATAINDEX_COUNT) { // just to be sure
+                            break;
+                        }
                     }
                 }
             }
