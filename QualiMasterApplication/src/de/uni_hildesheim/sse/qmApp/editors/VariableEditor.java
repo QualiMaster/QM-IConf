@@ -231,38 +231,39 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
             for (int i = 0; i < keys.length; i++) {
 
                 IDecisionVariable variable = (IDecisionVariable) keys[i];
-          
                 Control failedControl = getUIConfiguration().getEditorFor(variable);
                             
                 final String errorMessage = errors.get(keys[i]);
                            
                 if (failedControl != null) {
                     ControlDecoration declaration = flawedControls.get(failedControl);
-                    declaration.show();
-
-                    final ToolTip tip = new ToolTip(Display.getCurrent().getActiveShell(), SWT.BALLOON);
-                    tip.setMessage(errorMessage);
-                    tip.setAutoHide(false);
-                        
-                    failedControl.addListener(SWT.MouseHover, new Listener() {
-                          
-                        public void handleEvent(Event exc) {
-                            //Set tooltip
-                            tip.setVisible(true);
-                        }
-                    });  
-//                    failedControl.addFocusListener(new FocusListener() {
-//
-//                        @Override
-//                        public void focusLost(FocusEvent exp) {
-//                            tip.setVisible(false);
-//                        }
-//
-//                        @Override
-//                        public void focusGained(FocusEvent exp) {
-//                            tip.setVisible(true);
-//                        }
-//                    });
+                    if (null != declaration) {
+                        declaration.show();
+    
+                        final ToolTip tip = new ToolTip(Display.getCurrent().getActiveShell(), SWT.BALLOON);
+                        tip.setMessage(errorMessage);
+                        tip.setAutoHide(false);
+                            
+                        failedControl.addListener(SWT.MouseHover, new Listener() {
+                              
+                            public void handleEvent(Event exc) {
+                                //Set tooltip
+                                tip.setVisible(true);
+                            }
+                        });  
+    //                    failedControl.addFocusListener(new FocusListener() {
+    //
+    //                        @Override
+    //                        public void focusLost(FocusEvent exp) {
+    //                            tip.setVisible(false);
+    //                        }
+    //
+    //                        @Override
+    //                        public void focusGained(FocusEvent exp) {
+    //                            tip.setVisible(true);
+    //                        }
+    //                    });
+                    }
                 }
             }
         }
