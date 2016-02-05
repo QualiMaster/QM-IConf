@@ -392,7 +392,7 @@ public class ConfigurableElement { // unsure whether this shall be a resource
      */
     public ConfigurableElement findElement(IDecisionVariable variable) {
         ConfigurableElement result = null;
-        if (input.holds(variable)) {
+        if (null != input && input.holds(variable)) {
             result = this;
         }
         if (null != children) {
