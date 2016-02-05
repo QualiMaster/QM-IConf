@@ -139,10 +139,9 @@ public abstract class AbstractVarModelEditor extends EditorPart implements IChan
         
         MandatoryClassifierSettings settings = new MandatoryClassifierSettings();
         settings.setDefaultValueConsideration(false);
-        // as decided with Sascha - disabled for now -> #39
-        /*MandatoryDeclarationClassifier finder = new MandatoryDeclarationClassifier(cfg, FilterType.ALL, settings);
+        MandatoryDeclarationClassifier finder = new MandatoryDeclarationClassifier(cfg, FilterType.ALL, settings);
         cfg.getProject().accept(finder);
-        importances = finder.getImportances();*/
+        importances = finder.getImportances();
     }
     
     /**
