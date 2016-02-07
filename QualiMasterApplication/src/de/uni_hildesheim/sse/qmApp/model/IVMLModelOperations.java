@@ -43,6 +43,7 @@ import de.uni_hildesheim.sse.model.varModel.values.ValueFactory;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
+import eu.qualimaster.easy.extension.QmConstants;
 
 /**
  * The methods to operate the IVML model for obtaining IVML elements information.
@@ -74,7 +75,7 @@ public class IVMLModelOperations {
 
         DecisionVariableDeclaration decisionVariable = null;
         String projectName = destination.getName();
-        String givenName = projectName.substring(0, projectName.indexOf(VariabilityModel.CFG_POSTFIX));
+        String givenName = projectName.substring(0, projectName.indexOf(QmConstants.CFG_POSTFIX));
         if (suffix != null) {
             givenName += "_" + variableName + suffix;
         }

@@ -287,7 +287,7 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
             IDecisionVariable variable = getVariable();
             // delete pipeline element                
             String pName = variable.getDeclaration().getName();
-            String projectName = pName + VariabilityModel.CFG_POSTFIX;
+            String projectName = pName + QmConstants.CFG_POSTFIX;
             ModelAccess.removeConfiguration(projectName);
             Configuration cfg = modelPart.getConfiguration();
             ModelInfo<Project> info = VarModel.INSTANCE.availableModels()

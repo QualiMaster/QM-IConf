@@ -43,6 +43,7 @@ import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
 import de.uni_hildesheim.sse.utils.modelManagement.ModelManagementException;
+import eu.qualimaster.easy.extension.QmConstants;
 
 /**
  * The operations of translating the Ecore pipeline diagram to IVML project.
@@ -121,7 +122,7 @@ public class PipelineTranslationOperations {
         flows = new ArrayList<Flow>();
         processedflows = new ArrayList<Flow>();
         // create a temporary IVML project (not registered with VarModel, no model listeners)
-        Project newProject = new Project(PipelineDiagramUtils.getModelName(fileURI) + VariabilityModel.CFG_POSTFIX);
+        Project newProject = new Project(PipelineDiagramUtils.getModelName(fileURI) + QmConstants.CFG_POSTFIX);
         // get pipeline list - one editor for one pipeline
         List<Pipeline> pipelineList = PipelineDiagramUtils.getPipeline(fileURI);
         // for collecting all freezables

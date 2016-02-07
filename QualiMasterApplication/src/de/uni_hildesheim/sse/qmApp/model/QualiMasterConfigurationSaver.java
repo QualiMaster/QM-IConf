@@ -36,6 +36,7 @@ import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
 import de.uni_hildesheim.sse.utils.modelManagement.IVersionRestriction;
 import de.uni_hildesheim.sse.utils.modelManagement.ModelManagementException;
 import de.uni_hildesheim.sse.utils.modelManagement.RestrictionEvaluationException;
+import eu.qualimaster.easy.extension.QmConstants;
 
 /**
  * Specializes the default configuration saver. Create an instance and call {@link #getSavedConfiguration()}
@@ -260,9 +261,9 @@ public class QualiMasterConfigurationSaver extends de.uni_hildesheim.sse.model.c
             String dstProjectNamespace = destProject.getName();
             enabled = dstProjectNamespace.equals(decisionNamespace);
     
-            if (!enabled && dstProjectNamespace.endsWith(VariabilityModel.CFG_POSTFIX)) {
+            if (!enabled && dstProjectNamespace.endsWith(QmConstants.CFG_POSTFIX)) {
                 String defProjectNamespace = dstProjectNamespace.substring(0, 
-                    dstProjectNamespace.length() - VariabilityModel.CFG_POSTFIX.length());
+                    dstProjectNamespace.length() - QmConstants.CFG_POSTFIX.length());
                 enabled = defProjectNamespace.equals(decisionNamespace);
             }
         } else {

@@ -122,7 +122,7 @@ public class ChangeManager {
 
     /**
      * Notifies interested listeners about a changed variable. Filters
-     * for {@link VariabilityModel#DISPLAY_NAME_SLOT} and container variables.
+     * for {@link eu.qualimaster.easy.extension.QmConstants#SLOT_NAME} and container variables.
      * 
      * @param source the source of the event, required to avoid cycles among {@link IChangeListener listeners}
      * @param variable the changed variable

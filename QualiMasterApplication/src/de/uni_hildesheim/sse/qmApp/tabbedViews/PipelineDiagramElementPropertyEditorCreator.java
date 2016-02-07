@@ -29,6 +29,7 @@ import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.EventKind;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.IChangeListener;
+import eu.qualimaster.easy.extension.QmConstants;
 
 /**
  * Implements a generic property editor creator for pipeline diagram elements.
@@ -252,7 +253,7 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
                 }
             }
         }
-        if (null == result && VariabilityModel.DISPLAY_NAME_SLOT.equals(normalizeIdentifier(propertyIdentifier))) {
+        if (null == result && QmConstants.SLOT_NAME.equals(normalizeIdentifier(propertyIdentifier))) {
             result = fallback.createFallbackPropertyEditor(composite);
         }
         return result;

@@ -51,6 +51,7 @@ import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElements.IElementReferre
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.ApplicationRole;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.Role;
+import eu.qualimaster.easy.extension.QmConstants;
 
 /**
  * Defines and initializes model-specific data and functionality. 
@@ -63,22 +64,7 @@ import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.Role;
  */
 public class VariabilityModel {
 
-    /**
-     * The slot name denoting the display name in the IVML model. Empty string if no display name slot is provided by
-     * the IVML model.
-     */
-    public static final String DISPLAY_NAME_SLOT = "name";
-
-    /**
-     * Model name postfix to distinguish model definition and configuration model parts.
-     */
-    public static final String CFG_POSTFIX = "Cfg";
     public static final boolean DISPLAY_ALGORITHMS_NESTED = true;
-
-    static final String BINDING_TIME_NAME = "bindingTime";
-    static final String USER_VISIBLE_NAME = "userVisible";
-
-    static final String BINDING_TIME_LITERAL_VISIBLE = "compile";
 
     private static final Map<IModelPart, CloneMode> CLONEABLES;
    
@@ -301,7 +287,7 @@ public class VariabilityModel {
 
         @Override
         public String getModelName() {
-            return definition.getModelName() + CFG_POSTFIX;
+            return definition.getModelName() + QmConstants.CFG_POSTFIX;
         }
 
         @Override
@@ -617,7 +603,7 @@ public class VariabilityModel {
      * @return <code>true</code> if it is a name slot, <code>false</code> else
      */
     public static boolean isNameSlot(AbstractVariable decl) {
-        return DISPLAY_NAME_SLOT.equals(decl.getName()) && StringType.TYPE.isAssignableFrom(decl.getType());
+        return QmConstants.SLOT_NAME.equals(decl.getName()) && StringType.TYPE.isAssignableFrom(decl.getType());
     }
 
     /**
@@ -836,15 +822,15 @@ public class VariabilityModel {
         for (int a = 0; visible && a < variable.getAttributesCount(); a++) {
             IDecisionVariable attribute = variable.getAttribute(a);
             String name = attribute.getDeclaration().getName();
-            if (BINDING_TIME_NAME.equals(name)) {
+            if (QmConstants.ANNOTATION_BINDING_TIME.equals(name)) {
                 Value value = attribute.getValue();
                 if (null != value && value instanceof EnumValue) {
                     EnumLiteral lit = ((EnumValue) value).getValue();
-                    if (null != lit && !lit.getName().equals(VariabilityModel.BINDING_TIME_LITERAL_VISIBLE)) {
+                    if (null != lit && !lit.getName().equals(QmConstants.CONST_BINDING_TIME_COMPILE)) {
                         visible = false;
                     }
                 }
-            } else if (USER_VISIBLE_NAME.equals(name)) { // restrict only if given an false
+            } else if (QmConstants.ANNOTATION_USER_VISIBLE.equals(name)) { // restrict only if given an false
                 Value value = attribute.getValue();
                 if (null != value && value instanceof BooleanValue) {
                     Boolean val = ((BooleanValue) value).getValue();

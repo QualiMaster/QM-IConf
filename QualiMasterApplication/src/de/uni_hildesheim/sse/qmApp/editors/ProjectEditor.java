@@ -31,7 +31,7 @@ import de.uni_hildesheim.sse.model.varModel.datatypes.OrderedEnum;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Reference;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Sequence;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Set;
-import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
+import eu.qualimaster.easy.extension.QmConstants;
 
 /**
  * This class is responsible for providing Editors for given elements which are shown in the 
@@ -63,9 +63,9 @@ public class ProjectEditor extends AbstractVarModelEditor {
         Configuration cfg = getConfiguration();
         UIConfiguration uiCfg = getUIConfiguration();
         Project project = cfg.getProject();
-        if (project.getName().endsWith(VariabilityModel.CFG_POSTFIX)) {
+        if (project.getName().endsWith(QmConstants.CFG_POSTFIX)) {
             String pName = project.getName();
-            pName = pName.substring(0, pName.length() - VariabilityModel.CFG_POSTFIX.length());
+            pName = pName.substring(0, pName.length() - QmConstants.CFG_POSTFIX.length());
             Project imp = null;
             for (int i = 0; null == imp && i < project.getImportsCount(); i++) {
                 ProjectImport tmp = project.getImport(i);

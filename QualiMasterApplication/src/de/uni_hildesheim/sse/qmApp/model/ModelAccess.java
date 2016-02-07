@@ -75,6 +75,7 @@ import de.uni_hildesheim.sse.utils.modelManagement.ModelManagementException;
 import de.uni_hildesheim.sse.utils.progress.ProgressObserver;
 import de.uni_hildesheim.sse.vil.rt.RtVilModelUtility;
 import de.uni_hildesheim.sse.vil.templatelang.TemplateLangModelUtility;
+import eu.qualimaster.easy.extension.QmConstants;
 
 /**
  * Provides generic access to EASy models.
@@ -366,8 +367,8 @@ public class ModelAccess {
         String modelName = "";
         if (null != pElt) {
             modelName = pElt.getName();
-            if (!modelName.endsWith(VariabilityModel.CFG_POSTFIX)) {
-                modelName = modelName + VariabilityModel.CFG_POSTFIX;
+            if (!modelName.endsWith(QmConstants.CFG_POSTFIX)) {
+                modelName = modelName + QmConstants.CFG_POSTFIX;
             }
         }
         return getConfiguration(modelName);
@@ -920,7 +921,7 @@ public class ModelAccess {
                 String varName = obtainVarName(elementType, container);
                 Configuration containerConfiguration = container.getConfiguration();
                 Configuration newElementConfiguration = containerConfiguration;
-                String modelName = varName + VariabilityModel.CFG_POSTFIX;
+                String modelName = varName + QmConstants.CFG_POSTFIX;
                 AvailableModels<Project> avail = VarModel.INSTANCE.availableModels();
                 Project targetProject;
                 if (createProject) {
@@ -1056,7 +1057,7 @@ public class ModelAccess {
      */
     private static void setNameSlot(IDecisionVariable var, String name) {
         if (var instanceof CompoundVariable) {
-            IDecisionVariable nameVar = ((CompoundVariable) var).getNestedVariable(VariabilityModel.DISPLAY_NAME_SLOT);
+            IDecisionVariable nameVar = ((CompoundVariable) var).getNestedVariable(QmConstants.SLOT_NAME);
             if (null != nameVar) {
                 try {
                     Value nameVal = ValueFactory.createValue(StringType.TYPE, name);
@@ -1216,7 +1217,7 @@ public class ModelAccess {
                     Value value = variable.getValue().clone();
                     if (value instanceof CompoundValue) {
                         String newName = obtainVarName(elementType, con);
-                        ((CompoundValue) value).configureValue(VariabilityModel.DISPLAY_NAME_SLOT, newName);
+                        ((CompoundValue) value).configureValue(QmConstants.SLOT_NAME, newName);
                     }
                     return value;
                 }
