@@ -291,11 +291,14 @@ public class ConfigurableElement { // unsure whether this shall be a resource
      * Deletes <code>child</code> from the children of this element.
      * 
      * @param child the child to be deleted
+     * @return <code>true</code> if removed, <code>false</code> else
      */
-    private void deleteFromChildren(ConfigurableElement child) {
+    public boolean deleteFromChildren(ConfigurableElement child) {
+        boolean done = false;
         if (null != children) {
-            children.remove(child);
+            done = children.remove(child);
         }
+        return done;
     }
 
     /**

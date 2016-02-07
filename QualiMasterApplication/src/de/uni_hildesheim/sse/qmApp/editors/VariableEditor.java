@@ -67,9 +67,14 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
             if (null != var) {
                 VarModel.INSTANCE.events().addModelListener(var.getConfiguration().getProject(), this);
                 setConfiguration(var.getConfiguration());
+            } else {
+                throw new PartInitException("Configurable element does not exist anymore. This may occur when this "
+                    + "editor was open, QM-IConf was closed and stored the editor state, the model was changed outside "
+                    + "QM-IConf, e.g., by a SVN revert, and then QM-IConf was then started again. Please close the "
+                    + "editor.");
             }
         } else {
-            throw new PartInitException("wrong editor input");
+            throw new PartInitException("Implementation problem. Wrong editor input instance.");
         }
     }
     

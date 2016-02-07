@@ -73,6 +73,7 @@ public class VariabilityModel {
      * Model name postfix to distinguish model definition and configuration model parts.
      */
     public static final String CFG_POSTFIX = "Cfg";
+    public static final boolean DISPLAY_ALGORITHMS_NESTED = true;
 
     static final String BINDING_TIME_NAME = "bindingTime";
     static final String USER_VISIBLE_NAME = "userVisible";
@@ -80,7 +81,6 @@ public class VariabilityModel {
     static final String BINDING_TIME_LITERAL_VISIBLE = "compile";
 
     private static final Map<IModelPart, CloneMode> CLONEABLES;
-    private static final boolean DISPLAY_ALGORITHMS_NESTED = true;
    
     static {
         CLONEABLES = new HashMap<IModelPart, CloneMode>();
@@ -448,41 +448,54 @@ public class VariabilityModel {
         @Override
         public ConfigurableElement getActualParent(String name, ConfigurableElement parent) {
             ConfigurableElement result = parent;
-            int firstDot = -1;
-            int lastDot = -1;
-            int dotCount = 0;
-            int digitCount = 0;
-            for (int i = 0; i < name.length(); i++) {
-                char c = name.charAt(i);
-                if ('.' == c) {
-                    dotCount++;
-                    lastDot = i;
-                    firstDot = firstDot < 0 ? i : firstDot;
-                } else if (Character.isDigit(c)) {
-                    digitCount++;
-                }
-            }
-            if (dotCount > 0 && lastDot < name.length() - 1) {
-                String pName = null;
-                if (3 == dotCount && digitCount + dotCount == name.length()) { // it's an IP
-                    pName = name.substring(0, lastDot);
-                } else if (dotCount > 0) { // its a qualified name
-                    pName = name.substring(firstDot + 1, name.length());
-                }
-                if (null != pName) {
-                    pName = "*." + pName;
-                    result = parents.get(pName);
-                    if (null == result) {
-                        result = new ConfigurableElement(pName, null, null, PART);
-                        result.setImage(ImageRegistry.INSTANCE.getImage(PART));
-                        parent.addChild(result);
-                        parents.put(pName, result);
-                    }
+            String pName = getHardwareGroup(name);
+            if (null != pName) {
+                result = parents.get(pName);
+                if (null == result) {
+                    result = new ConfigurableElement(pName, null, null, PART);
+                    result.setImage(ImageRegistry.INSTANCE.getImage(PART));
+                    parent.addChild(result);
+                    parents.put(pName, result);
                 }
             }
             return result;
         }
 
+    }
+    
+    /**
+     * Returns the hardware group for the given machine <code>name</code>.
+     * 
+     * @param name the machine name
+     * @return the hardware group based on qualified domain name or IP, <b>null</b> if no group was found
+     */
+    public static String getHardwareGroup(String name) {
+        String result = null;
+        int firstDot = -1;
+        int lastDot = -1;
+        int dotCount = 0;
+        int digitCount = 0;
+        for (int i = 0; i < name.length(); i++) {
+            char c = name.charAt(i);
+            if ('.' == c) {
+                dotCount++;
+                lastDot = i;
+                firstDot = firstDot < 0 ? i : firstDot;
+            } else if (Character.isDigit(c)) {
+                digitCount++;
+            }
+        }
+        if (dotCount > 0 && lastDot < name.length() - 1) {
+            if (3 == dotCount && digitCount + dotCount == name.length()) { // it's an IP
+                result = name.substring(0, lastDot);
+            } else if (dotCount > 0) { // its a qualified name
+                result = name.substring(firstDot + 1, name.length());
+            }
+            if (null != result) {
+                result = "*." + result;
+            }
+        }
+        return result;
     }
 
     /**
@@ -850,7 +863,7 @@ public class VariabilityModel {
      * @param var the variable to be dereferenced (may be <b>null</b>)
      * @return the dereferenced variable (<b>null</b> if <code>var</code> was <b>null</b>)
      */
-    private static IDecisionVariable dereference(IDecisionVariable var) {
+    public static IDecisionVariable dereference(IDecisionVariable var) {
         return de.uni_hildesheim.sse.model.confModel.Configuration.dereference(var);
     }
     
@@ -865,7 +878,7 @@ public class VariabilityModel {
      * @param var the variable to return the name for (may be <b>null</b>)
      * @return the instance name (may be empty if <code>var == <b>null</b></code>
      */
-    private static String getInstanceName(IDecisionVariable var) {
+    public static String getInstanceName(IDecisionVariable var) {
         return de.uni_hildesheim.sse.model.confModel.Configuration.getInstanceName(var);
     }
 

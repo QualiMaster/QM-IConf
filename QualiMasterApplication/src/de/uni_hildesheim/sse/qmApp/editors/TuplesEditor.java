@@ -1,6 +1,7 @@
 package de.uni_hildesheim.sse.qmApp.editors;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
@@ -64,6 +65,7 @@ import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
 import de.uni_hildesheim.sse.utils.modelManagement.ModelManagementException;
+import eu.qualimaster.easy.extension.QmConstants;
 
 /**
  * Implements a specific editor for collections of tuples. The tables content
@@ -119,6 +121,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
     private static final int DATAINDEX_FIELD_NAME = 2;
     private static final int DATAINDEX_TYPE = 3;
     private static final int DATAINDEX_KEYPART = 4;
+    
     private static final int DATAINDEX_COUNT = 5;
     
     private static final int TUPLEINDEX_CONTAINER_POS = 0;
@@ -141,7 +144,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
             Integer pos = getPosition(key);
             if (null != pos) {
                 CompoundValue tuple = tupleAccessor.getValue(key);
-                Value fields = tuple.getNestedValue("fields");
+                Value fields = tuple.getNestedValue(QmConstants.SLOT_TUPLE_FIELDS);
                 if (fields instanceof ContainerValue) {
                     ContainerValue cVal = (ContainerValue) fields;
                     if (0 <= pos && pos < cVal.getElementSize()) {
@@ -214,7 +217,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
          */
         private void setTupleName(String tupleName) {
             this.tupleName = tupleName;
-            setValue(getTuple(), "name", tupleName);
+            setValue(getTuple(), QmConstants.SLOT_FIELD_NAME, tupleName);
         }
 
         /**
@@ -239,7 +242,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
          */
         private void setKeyPart(Boolean keyPart) {
             this.keyPart = keyPart;
-            setValue(getCompoundValue(), "keyPart", keyPart);
+            setValue(getCompoundValue(), QmConstants.SLOT_FIELD_KEYPART, keyPart);
         }
     }
 
@@ -312,7 +315,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
      * @throws ModelQueryException in case that the access fails
      */
     private Compound getTupleType() throws ModelQueryException {
-        IDatatype tType = ModelQuery.findType(getProject(), "Tuple", null);
+        IDatatype tType = ModelQuery.findType(getProject(), QmConstants.TYPE_TUPLE, null);
         if (tType instanceof Compound) {
             return (Compound) tType;
         } else {
@@ -330,7 +333,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
             try {
                 IDatatype tType = getTupleType();
                 if (tType.isAssignableFrom(contained)) {
-                    IDatatype fType = ModelQuery.findType(prj, "Field", null);
+                    IDatatype fType = ModelQuery.findType(prj, QmConstants.TYPE_FIELD, null);
                     result = (Compound) fType;
                 }
             } catch (ModelQueryException e) {
@@ -363,9 +366,8 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
                 EASyLoggerFactory.INSTANCE.getLogger(getClass(),
                         Activator.PLUGIN_ID).exception(e);
             }
-            IDatatype tType = ModelQuery.findType(prj, "Tuple", null);
-            DecisionVariableDeclaration decl = ((Compound) tType)
-                    .getElement("name");
+            IDatatype tType = ModelQuery.findType(prj, QmConstants.TYPE_TUPLE, null);
+            DecisionVariableDeclaration decl = ((Compound) tType).getElement(QmConstants.SLOT_TUPLE_NAME);
             if (null != decl) { // legacy NPE??
                 DecisionVariableDeclaration tmpDecl = new DecisionVariableDeclaration(
                         TUPLE_PREFIX + decl.getName(), decl.getType(), tmpModel);
@@ -488,15 +490,15 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
         if (selectedIndex >= 0) {
             try {
                 Project prj = getProject();
-                IDatatype tupleType = ModelQuery.findType(prj, "Tuple", null);
+                IDatatype tupleType = ModelQuery.findType(prj, QmConstants.TYPE_TUPLE, null);
                 int minFieldPos = 0;
                 int maxFieldPos = 0;
                 ContainerValue container = getContainer();
                 for (int i = 0; containerPos < 0 && i < container.getElementSize(); i++) {
                     Value value = container.getElement(i);
                     if (tupleType.isAssignableFrom(value.getType())) {
-                        Value fields = ((CompoundValue) value).getNestedValue("fields");
-                        IDatatype fieldsType = ModelQuery.findType(prj, "Fields", null);
+                        Value fields = ((CompoundValue) value).getNestedValue(QmConstants.SLOT_TUPLE_FIELDS);
+                        IDatatype fieldsType = ModelQuery.findType(prj, QmConstants.TYPE_FIELDS, null);
                         if (fieldsType.isAssignableFrom(fields.getType())) {
                             ContainerValue fContainer = (ContainerValue) fields;
                             maxFieldPos = minFieldPos + fContainer.getElementSize();
@@ -635,8 +637,8 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
         public void run() {
             Configuration cfg = VariabilityModel.Definition.TOP_LEVEL.getConfiguration();
             List<IDatatype> types = new ArrayList<IDatatype>();
-            addType(cfg, "Family", types);
-            addType(cfg, "DataElement", types);
+            addType(cfg, QmConstants.TYPE_FAMILY, types);
+            addType(cfg, QmConstants.TYPE_DATAELEMENT, types);
             IVariableSelector selector = new TypeBasedVariableSelector(types);
             ConfigurationVariableSelectorDialog dlg = new ConfigurationVariableSelectorDialog(getShell(), 
                 "Select element to copy " + tupleSource + " fields from", cfg, selector);
@@ -660,17 +662,6 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
         }
         
     }
-    
-    /*private String tupleSource() {
-        String result;
-        String varName = getVariable().getDeclaration().getName();
-        if ("input".equals(varName)) {
-            result = "output";
-        } else {
-            result = "input";
-        }
-        return result;
-    }*/
 
     /**
      * Delete selected field.
@@ -695,10 +686,10 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
                 int fieldIndex = tupleIndex[TUPLEINDEX_FIELD_POS];
                 Project prj = getProject();
                 try {
-                    IDatatype tupleType = ModelQuery.findType(prj, "Tuple", null);
+                    IDatatype tupleType = ModelQuery.findType(prj, QmConstants.TYPE_TUPLE, null);
                     if (tupleType.isAssignableFrom(value.getType())) {
-                        Value fields = ((CompoundValue) value).getNestedValue("fields");
-                        IDatatype fieldsType = ModelQuery.findType(prj, "Fields", null);
+                        Value fields = ((CompoundValue) value).getNestedValue(QmConstants.SLOT_TUPLE_FIELDS);
+                        IDatatype fieldsType = ModelQuery.findType(prj, QmConstants.TYPE_FIELDS, null);
                         if (fieldsType.isAssignableFrom(fields.getType())) {
                             ContainerValue fContainer = (ContainerValue) fields;
                             fContainer.removeElement(fieldIndex);
@@ -750,12 +741,12 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
                     }
                     Project prj = getProject();
                     try {
-                        IDatatype tupleType = ModelQuery.findType(prj, "Tuple", null);
+                        IDatatype tupleType = ModelQuery.findType(prj, QmConstants.TYPE_TUPLE, null);
                         if (tupleType.isAssignableFrom(value.getType())) {
-                            Value fields = ((CompoundValue) value).getNestedValue("fields");
-                            IDatatype fieldsType = ModelQuery.findType(prj, "Fields", null);
+                            Value fields = ((CompoundValue) value).getNestedValue(QmConstants.SLOT_TUPLE_FIELDS);
+                            IDatatype fieldsType = ModelQuery.findType(prj, QmConstants.TYPE_FIELDS, null);
                             if (fieldsType.isAssignableFrom(fields.getType())) {
-                                IDatatype fieldType = ModelQuery.findType(prj, "Field", null);
+                                IDatatype fieldType = ModelQuery.findType(prj, QmConstants.TYPE_FIELD, null);
                                 ContainerValue fContainer = (ContainerValue) fields;
                                 fContainer.addElement(fieldIndex,
                                     ValueFactory.createValue(fieldType, (Object[]) null));
@@ -789,23 +780,24 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
         public void run() {
             try {
                 Project prj = getProject();
-                IDatatype fieldTypeType = ModelQuery.findType(prj, "FieldType", null);
-                IDatatype fieldType = ModelQuery.findType(prj, "Field", null);
-                IDatatype fieldsType = ModelQuery.findType(prj, "Fields", null);
-                IDatatype tupleType = ModelQuery.findType(prj, "Tuple", null);
+                IDatatype fieldTypeType = ModelQuery.findType(prj, QmConstants.TYPE_FIELDTYPE, null);
+                IDatatype fieldType = ModelQuery.findType(prj, QmConstants.TYPE_FIELD, null);
+                IDatatype fieldsType = ModelQuery.findType(prj, QmConstants.TYPE_FIELDS, null);
+                IDatatype tupleType = ModelQuery.findType(prj, QmConstants.TYPE_TUPLE, null);
 
                 List<Object> fieldValueEntries = new ArrayList<Object>();
-                fieldValueEntries.add("name");
+                fieldValueEntries.add(QmConstants.SLOT_FIELD_NAME);
                 fieldValueEntries.add("");
                 List<AbstractVariable> possibleTypes = ReferenceValuesFinder.findPossibleValues(prj, fieldTypeType);
                 if (null != possibleTypes && !possibleTypes.isEmpty()) {
                     AbstractVariable initialType = possibleTypes.get(0);
-                    fieldValueEntries.add("type");
+                    fieldValueEntries.add(QmConstants.SLOT_FIELD_TYPE);
                     fieldValueEntries.add(ValueFactory.createValue(new Reference("", fieldTypeType, prj), initialType));
                 }
                 Value fieldValue = ValueFactory.createValue(fieldType, fieldValueEntries.toArray());
                 Value fieldsValue = ValueFactory.createValue(fieldsType, new Object[] {fieldValue});
-                Value tupleValue = ValueFactory.createValue(tupleType, new Object[] {"fields", fieldsValue});
+                Value tupleValue = ValueFactory.createValue(tupleType, 
+                    new Object[] {QmConstants.SLOT_TUPLE_FIELDS, fieldsValue});
                 ContainerValue container = getContainer();
                 if (null == container) {
                     IDecisionVariable variable = getVariable();
@@ -971,7 +963,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
                 if (null == name) {
                     name = decl.getName();
                 }
-                if (name.equals("name")) {
+                if (name.equals(QmConstants.SLOT_FIELD_NAME)) {
                     tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
                     layout.addColumnData(new ColumnWeightData(3, 100, true));
                     tableViewerColumn.getColumn().setText("field name");
@@ -979,7 +971,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
                     tableViewerColumn.setEditingSupport(new NameEditingSupport(tableViewer));
                 }
 
-                if (name.equals("type")) {
+                if (name.equals(QmConstants.SLOT_FIELD_TYPE)) {
                     tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
                     layout.addColumnData(new ColumnWeightData(3, 100, true));
                     tableViewerColumn.getColumn().setText("field type");
@@ -988,7 +980,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
                 }
 
                 if (showKeyPart()) {
-                    if (name.equals("keyPart")) {
+                    if (name.equals(QmConstants.SLOT_FIELD_KEYPART)) {
                         tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
                         layout.addColumnData(new ColumnWeightData(3, 100, true));
                         tableViewerColumn.getColumn().setText("Is retrieval key?");
@@ -1037,11 +1029,11 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
             if (tVal instanceof CompoundValue) {
                 CompoundValue tuple = (CompoundValue) tVal;
                 String tupleName = String.valueOf(t + 1);
-                Value tNameVal = tuple.getNestedValue("name");
+                Value tNameVal = tuple.getNestedValue(QmConstants.SLOT_TUPLE_NAME);
                 if (tNameVal instanceof StringValue) {
                     tupleName = ((StringValue) tNameVal).getValue();
                 }
-                Value fVal = tuple.getNestedValue("fields");
+                Value fVal = tuple.getNestedValue(QmConstants.SLOT_TUPLE_FIELDS);
                 if (fVal instanceof ContainerValue) {
                     ContainerValue fields = (ContainerValue) fVal;
                     createFieldRows(tupleName, t, fields, tab, fieldCompound);
@@ -1069,34 +1061,26 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
         for (int f = 0; f < fieldCount; f++) {
             Value fVal = fields.getElement(f);
             String[] row = new String[DATAINDEX_COUNT]; // due to dynamics, not table.getColumnCount
+            Arrays.fill(row, "");
             CompoundValue v = null;
 
-            int i = 0;
-            row[i++] = (0 == f) ? tupleName : "";
-            row[i++] = (0 == f) ? "item + 1st field" : nrToText(f + 1) + " field";
+            row[DATAINDEX_TUPLE_NAME] = (0 == f) ? tupleName : "";
+            row[DATAINDEX_ENTRY_KIND] = (0 == f) ? "item + 1st field" : nrToText(f + 1) + " field";
             if (fVal instanceof CompoundValue) {
                 v = (CompoundValue) fVal;
                 for (int e = 0; e < fieldCompound.getElementCount(); e++) {
                     DecisionVariableDeclaration decl = fieldCompound.getElement(e);
                     if (display(decl)) {
-                        Value nVal = dereferenceType(v.getNestedValue(decl.getName()));
-                        if (null != nVal) {
-                            row[i++] = toString(nVal);
-                        } else {
-                            if ("keyPart".equals(decl.getName())) {
-                                row[i++] = getCompoundSlot(v, "keyPart");
-                            } else {
-                                row[i++] = "";
-                            }
-                        }
-                        if (i >= DATAINDEX_COUNT) { // just to be sure
-                            break;
+                        String fieldName = decl.getName();
+                        if (QmConstants.SLOT_FIELD_NAME.equals(fieldName)) {
+                            row[DATAINDEX_FIELD_NAME] = compoundSlotValue(v, fieldName);
+                        } else if (QmConstants.SLOT_FIELD_TYPE.equals(fieldName)) {
+                            row[DATAINDEX_TYPE] = compoundSlotValue(v, fieldName);
+                        } else if (QmConstants.SLOT_FIELD_KEYPART.equals(fieldName)) {
+                            row[DATAINDEX_KEYPART] = getCompoundSlot(v, QmConstants.SLOT_FIELD_KEYPART);
                         }
                     }
                 }
-            }
-            while (i < DATAINDEX_COUNT) {
-                row[i++] = "";
             }
             // Create tuple and put in list.
             TupleObject tuple = new TupleObject(row, fieldAccessor, tupleAccessor);
@@ -1104,6 +1088,24 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
             fieldAccessor.associate(tuple, f);
             valueList.add(tuple);
         }
+    }
+    
+    /**
+     * Returns the value of a (dereferenced) compound slot.
+     * 
+     * @param compoundValue the compound value
+     * @param fieldName the field/slot name
+     * @return the value as string or an empty string
+     */
+    private static String compoundSlotValue(CompoundValue compoundValue, String fieldName) {
+        String result;
+        Value nVal = dereferenceType(compoundValue.getNestedValue(fieldName));
+        if (null != nVal) {
+            result = toString(nVal);
+        } else {
+            result = "";
+        }
+        return result;
     }
 
     // checkstyle: resume parameter number check
@@ -1147,7 +1149,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
             if (null != var) {
                 value = var.getValue();
                 if (value instanceof CompoundValue) {
-                    value = ((CompoundValue) value).getNestedValue("name");
+                    value = ((CompoundValue) value).getNestedValue(QmConstants.SLOT_NAME);
                 }
             } // TODO in case of a valueEx??
         }

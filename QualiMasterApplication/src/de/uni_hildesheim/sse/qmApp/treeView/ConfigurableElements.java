@@ -284,5 +284,25 @@ public class ConfigurableElements {
         }
         return result;
     }
+    
+    /**
+     * Returns the number of (top-level) elements.
+     * 
+     * @return the number of elements
+     */
+    public int getElementsCount() {
+        return elements.size();
+    }
+    
+    /**
+     * Returns the specified (top-level) element.
+     * 
+     * @param index the index of the element to return
+     * @return the element
+     * @throws ArrayIndexOutOfBoundsException if <code>index&lt;0 || index&gt;={@link #getElementsCount()}</code>
+     */
+    public ConfigurableElement getElement(int index) {
+        return elements.get(index);
+    }
 
 }

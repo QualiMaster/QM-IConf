@@ -9,6 +9,7 @@ import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditor
 import de.uni_hildesheim.sse.easy.ui.productline_editor.DelegatingEasyEditorPage;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.IUpdateListener;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.IUpdateProvider;
+import de.uni_hildesheim.sse.model.confModel.AssignmentState;
 import de.uni_hildesheim.sse.model.confModel.CompoundVariable;
 import de.uni_hildesheim.sse.model.confModel.Configuration;
 import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
@@ -234,7 +235,7 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
                     "tmp", compound.getType(), tmpModel);
                 tmpDecl.setComment(compound.getComment()); // take over .text information
                 tmpModel.add(tmpDecl);
-                Configuration tmpConfig = new Configuration(tmpModel);
+                Configuration tmpConfig = new Configuration(tmpModel, AssignmentState.ASSIGNED);
                 IDecisionVariable tmpVar = tmpConfig.getDecision(tmpDecl);
                 if (null != tmpVar) {
                     CompoundVariable cVar = (CompoundVariable) tmpVar;

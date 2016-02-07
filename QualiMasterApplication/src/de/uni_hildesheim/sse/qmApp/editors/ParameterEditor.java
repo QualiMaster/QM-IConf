@@ -1,6 +1,7 @@
 package de.uni_hildesheim.sse.qmApp.editors;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,7 @@ import de.uni_hildesheim.sse.model.varModel.values.ValueDoesNotMatchTypeExceptio
 import de.uni_hildesheim.sse.model.varModel.values.ValueFactory;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
+import eu.qualimaster.easy.extension.QmConstants;
 
 /**
  * Implements a specific editor for collections of compounds. No cell editor
@@ -81,6 +83,13 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
         
     };
 
+    private static final int DATAINDEX_NAME = 0;
+    private static final int DATAINDEX_TYPE = 1;
+    private static final int DATAINDEX_VALUE = 2;
+    
+    private static final int DATAINDEX_COUNT = 3;
+
+    
     private static final EASyLogger LOGGER = EASyLoggerFactory.INSTANCE
             .getLogger(ParameterEditor.class, Activator.PLUGIN_ID);
 
@@ -97,10 +106,11 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
     private static final List<String> TYPE_LIST = new ArrayList<String>();
 
     static {
-        addNameMapping("IntegerParameter", "INTEGER");
-        addNameMapping("BooleanParameter", "BOOLEAN");
-        addNameMapping("RealParameter", "REAL");
-        addNameMapping("StringParameter", "STRING");
+        addNameMapping(QmConstants.TYPE_INTEGERPARAMETER, "INTEGER");
+        addNameMapping(QmConstants.TYPE_BOOLEANPARAMETER, "BOOLEAN");
+        addNameMapping(QmConstants.TYPE_REALPARAMETER, "REAL");
+        addNameMapping(QmConstants.TYPE_STRINGPARAMETER, "STRING");
+        addNameMapping(QmConstants.TYPE_LONGPARAMETER, "LONG");
     }
 
     // List which covers the ParameterObjects which are presented in table
@@ -152,7 +162,8 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
                         if (!TypeQueries.sameTypes(cValue.getType(), targetType)) {
                             Value tValue = ValueFactory.createValue(targetType, ValueFactory.EMPTY);
                             if (tValue instanceof CompoundValue) {
-                                ((CompoundValue) tValue).configureValue("name", cValue.getNestedValue("name"));
+                                ((CompoundValue) tValue).configureValue(QmConstants.SLOT_PARAMETER_NAME, 
+                                    cValue.getNestedValue(QmConstants.SLOT_PARAMETER_NAME));
                             }
                             ContainerValue container = getContainer();
                             int pos = container.indexOf(cValue);
@@ -184,7 +195,7 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
          */
         public void setParaValue(String paraValue) {
             this.paraValue = paraValue;
-            setValue(getCompoundValue(), "defaultValue", paraValue);
+            setValue(getCompoundValue(), QmConstants.SLOT_PARAMETER_DEFAULTVALUE, paraValue);
         }
     }
    
@@ -202,9 +213,7 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
     private ParameterEditor(UIConfiguration config, IDecisionVariable variable, Composite parent) {
         super(config, variable, parent, SWT.NULL);
         setLayout(new FillLayout());
-        // TODO increase size to 3 lines
-        tableViewer = setTableViewer(new TableViewer(this, SWT.SINGLE
-                | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER));
+        tableViewer = setTableViewer(new TableViewer(this, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER));
         Table table = tableViewer.getTable();
         TableLayout layout = new TableLayout();
         table.setLayout(layout);
@@ -255,7 +264,7 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
             IDatatype contained = type.getGenericType(0);
             Project prj = getProject();
             try {
-                IDatatype pType = ModelQuery.findType(prj, "Parameter", null);
+                IDatatype pType = ModelQuery.findType(prj, QmConstants.TYPE_PARAMETER, null);
                 if (pType.isAssignableFrom(contained)) {
                     result = (Compound) contained;
                 }
@@ -284,7 +293,7 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
     private IDatatype getDefaultParameterType() {
         IDatatype result;
         try {
-            result = ModelQuery.findType(getProject(), "IntegerParameter", null);
+            result = ModelQuery.findType(getProject(), QmConstants.TYPE_INTEGERPARAMETER, null);
         } catch (ModelQueryException e) {
             LOGGER.exception(e);
             result = StringType.TYPE; // just as a fallback
@@ -323,20 +332,16 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
 
         @Override
         public String getColumnText(Object element, int columnIndex) {
-
             String result = "";
-
             ParameterObject elem = (ParameterObject) element;
-
             switch (columnIndex) {
-
-            case 0:
+            case DATAINDEX_NAME:
                 result = elem.getName();
                 break;
-            case 1:
+            case DATAINDEX_TYPE:
                 result = elem.getType();
                 break;
-            case 2:
+            case DATAINDEX_VALUE:
                 result = elem.getParaValue();
                 break;
             default:
@@ -412,7 +417,7 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
                         displayTypeName = "?";
                     }
                     ParameterObject obj = new ParameterObject(getCompoundSlot(val, NAME), displayTypeName,
-                        getCompoundSlot(val, "defaultValue"), accessor);
+                        getCompoundSlot(val, QmConstants.SLOT_INTEGERPARAMETER_DEFAULTVALUE), accessor);
                     accessor.associate(obj, container.getElementSize() - 1);
                     valueList.add(obj);
                     tableViewer.refresh();
@@ -505,7 +510,7 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
                     name = decl.getName();
                 }
 
-                if (name.equals("name")) {
+                if (name.equals(QmConstants.SLOT_PARAMETER_NAME)) {
                     tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
                     layout.addColumnData(new ColumnWeightData(3, 100, true));
 
@@ -519,14 +524,14 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
 
         tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
         layout.addColumnData(new ColumnWeightData(3, 100, true));
-        tableViewerColumn.getColumn().setText("Type");
+        tableViewerColumn.getColumn().setText("type");
         tableViewerColumn.getColumn().setResizable(true);
         tableViewerColumn.setEditingSupport(new ParameterTypeEditingSupport(tableViewer));
 
         // add the colum "value"
         TableViewerColumn tableViewerValueColumn = new TableViewerColumn(tableViewer, SWT.NONE);
         layout.addColumnData(new ColumnWeightData(3, 100, true));
-        tableViewerValueColumn.getColumn().setText("value");
+        tableViewerValueColumn.getColumn().setText("default value");
         tableViewerValueColumn.getColumn().setResizable(true);
         tableViewerValueColumn.setEditingSupport(new ParameterValueEditingSupport(tableViewer));
     }
@@ -544,39 +549,36 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
      */
     private void createRows(ContainerValue cVal, Table table, Compound compound) {
         int rows = cVal.getElementSize();
-        int cols = table.getColumnCount();
+        //int cols = table.getColumnCount();
         for (int r = 0; r < rows; r++) {
             Value eVal = cVal.getElement(r);
-            String[] row = new String[cols];
+            String[] row = new String[DATAINDEX_COUNT];
+            Arrays.fill(row, "");
             String typeName = "";
             String value = null;
-            int i = 0;
             if (eVal instanceof CompoundValue) {
                 CompoundValue v = (CompoundValue) eVal;
                 typeName = v.getType().getName();
                 for (int e = 0; e < compound.getInheritedElementCount(); e++) {
                     DecisionVariableDeclaration decl = compound.getInheritedElement(e);
                     if (display(decl)) {
-                        row[i++] = getCompoundSlot(v, decl.getName());
-                        if (i >= cols) { // just to be sure
-                            break;
+                        String fieldName = decl.getName();
+                        if (QmConstants.SLOT_PARAMETER_NAME.equals(fieldName)) {
+                            row[DATAINDEX_NAME] = getCompoundSlot(v, decl.getName());
                         }
                     }
                 }
-                // get the parameter value for the VALUE colum
-                value = getCompoundSlot(v, "defaultValue");
+                // get the parameter value for the VALUE column
+                value = getCompoundSlot(v, QmConstants.SLOT_PARAMETER_DEFAULTVALUE);
             }
             
             String displayTypeName = IVML_TO_DISPLAY.get(typeName);
             if (null == displayTypeName) {
                 displayTypeName = "?";
             }
-            row[i++] = displayTypeName;
-            row[i++] = value;
+            row[DATAINDEX_TYPE] = displayTypeName;
+            row[DATAINDEX_VALUE] = value;
             
-            while (i < cols - 1) {
-                row[i++] = "";
-            }
             // Add parameter to list.
             ParameterObject param = new ParameterObject(row[0], row[1], row[2], accessor);
             accessor.associate(param, r);
@@ -670,9 +672,8 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
         // here we do not have a type field... just create one
         Project prj = getProject();
         try {
-            IDatatype targetType = ModelQuery.findType(prj, "FieldType", null);
-            DecisionVariableDeclaration tmpDecl = new DecisionVariableDeclaration(
-                    "type", targetType, tmpModel);
+            IDatatype targetType = ModelQuery.findType(prj, QmConstants.TYPE_FIELDTYPE, null);
+            DecisionVariableDeclaration tmpDecl = new DecisionVariableDeclaration(SLOT_TYPE, targetType, tmpModel);
             tmpModel.add(tmpDecl);
         } catch (ModelQueryException e) {
             LOGGER.exception(e);
@@ -732,7 +733,6 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
      * Editing Support for type.
      * 
      * @author Niko
-     * 
      */
     protected class ParameterTypeEditingSupport extends EditingSupport {
 
@@ -783,6 +783,26 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
             }
         }
 
+    }
+    
+    /**
+     * Returns the display name for a given parameter type.
+     * 
+     * @param ivmlType the IVML type
+     * @return the display name (may be <b>null</b> if not known)
+     */
+    public static final String getDisplayNameForParameterType(String ivmlType) {
+        return IVML_TO_DISPLAY.get(ivmlType);
+    }
+
+    /**
+     * Returns the parameter type name for a given display name.
+     * 
+     * @param displayName the display name
+     * @return the parameter type name (may be <b>null</b> if not known)
+     */
+    public static final String getParameterTypeForDisplayName(String displayName) {
+        return DISPLAY_TO_IVML.get(displayName);
     }
 
     /**

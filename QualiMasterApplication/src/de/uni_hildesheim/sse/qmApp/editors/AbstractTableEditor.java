@@ -47,6 +47,7 @@ import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
 import de.uni_hildesheim.sse.utils.modelManagement.IModelListener;
+import eu.qualimaster.easy.extension.QmConstants;
 
 /**
  * Provides the basis for QualiMaster specific table editors.
@@ -56,6 +57,8 @@ import de.uni_hildesheim.sse.utils.modelManagement.IModelListener;
 public abstract class AbstractTableEditor extends Composite implements IQMEditor, IDirtyableEditor, 
     IModelListener<Project> {
 
+    protected static final String SLOT_TYPE = QmConstants.SLOT_FIELD_TYPE;
+    
     private TableViewer tableViewer;
     private int prefWidth = -1;
     private int prefHeight = 80;
@@ -406,7 +409,7 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
          */
         public void setType(String type) {
             this.type = type;
-            setValue(getCompoundValue(), "type", type);
+            setValue(getCompoundValue(), SLOT_TYPE, type);
         }
         
         /**
@@ -511,7 +514,7 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
         public EnumTypeEditingSupport(TableViewer viewer) {
             super(viewer);
             this.viewer = viewer;
-            var = getTemporaryDecisionVariable("type");
+            var = getTemporaryDecisionVariable(SLOT_TYPE);
             if (null != var) {
                 IDatatype varType = var.getDeclaration().getType();
                 if (varType instanceof de.uni_hildesheim.sse.model.varModel.datatypes.Enum) {
@@ -586,7 +589,7 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
         public ReferenceTypeEditingSupport(TableViewer viewer) {
             super(viewer);
             this.viewer = viewer;
-            var = getTemporaryDecisionVariable("type");
+            var = getTemporaryDecisionVariable(SLOT_TYPE);
         }
 
         @Override

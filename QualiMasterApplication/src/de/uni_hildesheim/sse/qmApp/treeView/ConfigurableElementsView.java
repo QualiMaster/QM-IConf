@@ -1,6 +1,7 @@
 package de.uni_hildesheim.sse.qmApp.treeView;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -18,6 +19,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -36,7 +38,9 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
+import de.uni_hildesheim.sse.model.confModel.ContainerVariable;
 import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
+import de.uni_hildesheim.sse.model.varModel.AbstractVariable;
 import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.qmApp.commands.AbstractConfigurableHandler;
 import de.uni_hildesheim.sse.qmApp.commands.InstantiateLocal;
@@ -44,15 +48,18 @@ import de.uni_hildesheim.sse.qmApp.dialogs.CloneNumberInputDialog;
 import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator.CloneMode;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
+import de.uni_hildesheim.sse.qmApp.images.ImageRegistry;
 import de.uni_hildesheim.sse.qmApp.model.ConnectorUtils;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.PipelineDiagramUtils;
+import de.uni_hildesheim.sse.qmApp.model.QualiMasterDisplayNameProvider;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.EventKind;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.IChangeListener;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
+import eu.qualimaster.easy.extension.QmConstants;
 import pipeline.diagram.part.PipelineDiagramEditor;
 
 /**
@@ -672,21 +679,33 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
    
     @Override
     public void variableChanged(EventKind kind, IDecisionVariable variable, int globalIndex) {
-        if (enableChangeEventProcessing) {
+        if (enableChangeEventProcessing 
+            && variable.getParent() instanceof de.uni_hildesheim.sse.model.confModel.Configuration) {
             ConfigurableElement element = elements.findElement(variable);
+            boolean done;
             if (null != element) {
                 switch (kind) {
                 case ADDED:
-                    viewer.add(element.getParent(), element);
+                    done = VariabilityModel.DISPLAY_ALGORITHMS_NESTED && updateHardwareMachine(variable, element);
+                    if (!done) {
+                        viewer.add(element.getParent(), element);
+                    }
                     break;
                 case CHANGED:
-                    element.setDisplayName(ModelAccess.getDisplayName(variable));
-                    viewer.refresh(element, true);
+                    done = VariabilityModel.DISPLAY_ALGORITHMS_NESTED && (updateAlgorithmMembers(variable, element) 
+                        || updateHardwareMachine(variable, element));
+                    if (!done) {
+                        element.setDisplayName(ModelAccess.getDisplayName(variable));
+                        viewer.refresh(element, true);
+                    }
                     break;
                 case DELETING:
                     break; // do nothing
                 case DELETED:
-                    viewer.remove(element);
+                    deleteNested(variable, element, QmConstants.TYPE_MACHINE, Configuration.HARDWARE);
+                    deleteNested(variable, element, QmConstants.TYPE_FAMILY, Configuration.ALGORITHMS);
+                    deleteNested(variable, element, QmConstants.TYPE_ALGORITHM, Configuration.ALGORITHMS);
+                    viewer.remove(element); // configurable element removes itself
                     break;
                 default:
                     break; // cannot handle, shall not occur
@@ -694,10 +713,195 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
             }
         }
     }
+    
+    /**
+     * Adds a hardware machine into within its grouping.
+     * 
+     * @param variable the variable representing the machine
+     * @param element the configurable element representing the machine
+     * @return <code>true</code> if done, <code>false</code> else
+     */
+    private boolean updateHardwareMachine(IDecisionVariable variable, ConfigurableElement element) {
+        boolean done = false;
+        AbstractVariable decl = variable.getDeclaration();
+        if (QmConstants.TYPE_MACHINE.equals(decl.getType().getName())) {
+            String name = ModelAccess.getDisplayName(variable);
+            String group = VariabilityModel.getHardwareGroup(name);
+            if (null != group) {
+                updateHardware(element, group, name);
+            }
+        }
+        return done;
+    }
+    
+    /**
+     * Deletes a nested element.
+     * 
+     * @param variable the variable representing the element
+     * @param element the configurable element to be deleted (representing <code>variable</code>)
+     * @param type the name of the type of variable to be deleted (filter)
+     * @param part the model part to work on
+     * @return <code>true</code> if at least one configurable element was deleted, <code>false</code> else
+     */
+    private boolean deleteNested(IDecisionVariable variable, ConfigurableElement element, String type, 
+        IModelPart part) {
+        boolean done = false;
+        AbstractVariable decl = variable.getDeclaration();
+        if (type.equals(decl.getType().getName())) {
+            String displayPart = QualiMasterDisplayNameProvider.INSTANCE.getModelPartDisplayName(part);
+            ConfigurableElement parent = getByName(displayPart);
+            if (null != parent) {
+                for (int c = 0; c < parent.getChildCount(); c++) {
+                    ConfigurableElement child = parent.getChild(c);
+                    if (child.deleteFromChildren(element)) {
+                        viewer.remove(new TreePath(new Object[] {parent, child, element}));
+                        done = true;
+                    }
+                }
+            }
+        }
+        return done;
+    }
+        
+    /**
+     * Adds a hardware machine into within its grouping.
+     * 
+     * @param element the configurable element representing the machine
+     * @param group the group name (must not be <b>null</b>)
+     * @param name the machine name 
+     * @return <code>true</code> if done, <code>false</code> else
+     */
+    private boolean updateHardware(ConfigurableElement element, String group, String name) {
+        boolean done = false;
+        String hwDisplayPart = QualiMasterDisplayNameProvider.INSTANCE.getModelPartDisplayName(
+            Configuration.HARDWARE);
+        ConfigurableElement hwParent = getByName(hwDisplayPart);
+        if (null != hwParent) {
+            ConfigurableElement groupElement = null;
+            for (int c = 0; c < hwParent.getChildCount(); c++) {
+                ConfigurableElement grp = hwParent.getChild(c);
+                String grpName = grp.getDisplayName();
+                ConfigurableElement tmp = getByName(grp, name);
+                if (name.equals(grpName)) {
+                    // if grouped and still in general ungrouped list (children if hwParent) - remove from ungrouped
+                    hwParent.deleteFromChildren(element);
+                    viewer.refresh(hwParent, true);
+                } else if (group.equals(grpName)) {
+                    // if group found and not already in group, add
+                    groupElement = grp;
+                    if (null == tmp) {
+                        grp.addChild(element);
+                        viewer.add(grp, element);
+                        done = true;
+                    }
+                } else {
+                    // if it's not the right group but stored within, remove as name changed
+                    if (null != tmp) {
+                        grp.deleteFromChildren(tmp);
+                        viewer.refresh(grp, true);
+                        done = true;
+                    }
+                }
+            }
+            if (null == groupElement) {
+                // if there is no group, create one and add it
+                groupElement = new ConfigurableElement(group, null, null, Configuration.HARDWARE);
+                groupElement.setImage(ImageRegistry.INSTANCE.getImage(Configuration.HARDWARE));
+                hwParent.addChild(groupElement);
+                groupElement.addChild(element);
+                viewer.add(groupElement, element);
+                viewer.add(hwParent, groupElement);
+            }
+        }
+        return done;
+    }
+
+    /**
+     * Returns a configurable child by its name.
+     * 
+     * @param element the element for return the child for
+     * @param name the name of the element
+     * @return the element or <b>null</b> if not found
+     */
+    private static ConfigurableElement getByName(ConfigurableElement element, String name) {
+        ConfigurableElement result = null;
+        for (int c = 0; null == result && c < element.getChildCount(); c++) {
+            ConfigurableElement tmp = element.getChild(c);
+            if (name.equals(tmp.getDisplayName())) {
+                result = tmp;
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Returns a top-level configurable element by its name.
+     * 
+     * @param name the name of the element
+     * @return the element or <b>null</b> if not found
+     */
+    private static ConfigurableElement getByName(String name) {
+        ConfigurableElement result = null;
+        if (null != name) {
+            for (int e = 0; null == result && e < elements.getElementsCount(); e++) {
+                ConfigurableElement tmp = elements.getElement(e);
+                if (name.equals(tmp.getDisplayName())) {
+                    result = tmp;
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Updates the nested algorithm members of a family.
+     * 
+     * @param family the variable (supposed to be a changed family, ignored if not)
+     * @param parent the parent
+     * @return <code>true</code> if done, <code>false</code> else
+     */
+    private boolean updateAlgorithmMembers(IDecisionVariable family, ConfigurableElement parent) {
+        boolean done = false;
+        AbstractVariable decl = family.getDeclaration();
+        if (QmConstants.TYPE_FAMILY.equals(decl.getType().getName())) {
+            String algDisplayPart = QualiMasterDisplayNameProvider.INSTANCE.getModelPartDisplayName(
+                Configuration.ALGORITHMS);
+            ConfigurableElement algParent = getByName(algDisplayPart);
+            if (null != algParent) {
+                algParent = algParent.findElement(family);
+            }
+            IDecisionVariable algs = family.getNestedElement(QmConstants.SLOT_ALGORITHM_MEMBERS);
+            if (null != algParent && algs instanceof ContainerVariable) {
+                Set<ConfigurableElement> known = new HashSet<ConfigurableElement>();
+                for (int c = 0; c < algParent.getChildCount(); c++) {
+                    known.add(algParent.getChild(c));
+                }
+                for (int n = 0; n < algs.getNestedElementsCount(); n++) {
+                    IDecisionVariable nested = VariabilityModel.dereference(algs.getNestedElement(n));
+                    ConfigurableElement elt = algParent.findElement(nested);
+                    if (null == elt) {
+                        ConfigurableElements.variableToConfigurableElements(Configuration.ALGORITHMS, 
+                            nested.getDeclaration().getName(), nested, algParent, 
+                            Configuration.ALGORITHMS.getElementFactory(), null);
+                    } else if (!known.contains(elt)) {
+                        algParent.addChild(elt);
+                    } else {
+                        known.remove(elt);
+                    }
+                }
+                for (ConfigurableElement elt : known) {
+                    algParent.deleteFromChildren(elt);
+                }
+                viewer.refresh(algParent, true);
+                done = true;
+            }
+        } 
+        return done;
+    }
 
     /**
      * Show errors in TreeViewer.
-     * @param configurableElementsViewMapping info about falwed elements.
+     * @param configurableElementsViewMapping info about flawed elements.
      */
     public static void saveReasosiningInfoInTreeElements(Set<String> configurableElementsViewMapping) {
 

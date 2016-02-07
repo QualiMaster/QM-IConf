@@ -44,6 +44,7 @@ import de.uni_hildesheim.sse.qmApp.runtime.UIUtils;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import de.uni_hildesheim.sse.utils.modelManagement.ModelInfo;
 import eu.qualimaster.adaptation.external.PipelineMessage;
+import eu.qualimaster.easy.extension.QmConstants;
 
 /**
  * Implements the configuration element factory for pipelines.
@@ -437,8 +438,8 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
         String name = variable.getDeclaration().getName();
         CompoundVariable comVariable = (CompoundVariable) variable;
         String displayName;
-        if (comVariable.getNestedVariable("name").hasValue()) {
-            displayName = comVariable.getNestedVariable("name").getValue().toString();
+        if (comVariable.getNestedVariable(QmConstants.SLOT_NAME).hasValue()) {
+            displayName = comVariable.getNestedVariable(QmConstants.SLOT_NAME).getValue().toString();
             displayName = displayName.substring(0, displayName.lastIndexOf(":") - 1);
             // links pipeline variable name and display name, only for the first loading time
             QMPipelineEditor.getPipelineNameAndDisplayname().put(name, displayName);

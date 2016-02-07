@@ -334,7 +334,7 @@ public class ModelAccess {
                 model = new Project(modelName);
                 VarModel.INSTANCE.events().addModelListener(model, CONFIG_LISTENER);
             }
-            result = new Configuration(model);
+            result = new Configuration(model, AssignmentState.ASSIGNED);
             CONFIG_CACHE.put(modelName, result);
         }
         return result;
