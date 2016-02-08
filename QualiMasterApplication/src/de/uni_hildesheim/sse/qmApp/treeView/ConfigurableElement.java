@@ -48,7 +48,7 @@ public class ConfigurableElement { // unsure whether this shall be a resource
      * @param input The editor input creator.
      * @param modelPart the underlying model part
      */
-    private ConfigurableElement(ConfigurableElement parent, String displayName,
+    public ConfigurableElement(ConfigurableElement parent, String displayName,
         String editorId, IEditorInputCreator input, IModelPart modelPart) {
         this.parent = parent;
         this.displayName = displayName;
@@ -335,6 +335,9 @@ public class ConfigurableElement { // unsure whether this shall be a resource
         List<ConfigurableElement> result = null;
         if (!isTopLevel() && isCloneable().countAllowed(count)) {
             ConfigurableElement parent = getParent();
+            if (parent.isVirtualSubGroup()) {
+                parent = parent.getParent();
+            }
             List<IDecisionVariable> clones = input.clone(count);
             if (null != clones && !clones.isEmpty()) {
                 result = new ArrayList<ConfigurableElement>();
@@ -347,6 +350,15 @@ public class ConfigurableElement { // unsure whether this shall be a resource
             }
         }
         return result;
+    }
+
+    /**
+     * Returns whether this element is a virtual sub-group.
+     * 
+     * @return <code>true</code> for a sub-group, <code>false</code> else
+     */
+    public boolean isVirtualSubGroup() {
+        return null == parent.getEditorInputCreator() && null != parent.getParent();
     }
     
     /**

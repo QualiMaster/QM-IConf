@@ -51,7 +51,7 @@ import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElements.IElementReferre
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.ApplicationRole;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.Role;
-import eu.qualimaster.easy.extension.QmConstants;
+import static eu.qualimaster.easy.extension.QmConstants.*;
 
 /**
  * Defines and initializes model-specific data and functionality. 
@@ -100,51 +100,51 @@ public class VariabilityModel {
      * @author Holger Eichelberger
      */
     public enum Definition implements IModelPart {
-        BASICS("Basics",
-            new String[] {"types"},
-            new String[] {"FieldType"},
+        BASICS(PROJECT_BASICS,
+            new String[] {VAR_BASICS_TYPES},
+            new String[] {TYPE_FIELDTYPE},
             SourceMode.VARIABLES),
-        HARDWARE("Hardware", 
-            new String[] {"machines"}, 
-            new String[] {"Machine"}, 
+        HARDWARE(PROJECT_HARDWARE,
+            new String[] {VAR_HARDWARE_MACHINES}, 
+            new String[] {TYPE_MACHINE}, 
             SourceMode.VARIABLES), 
-        RECONFIG_HARDWARE("ReconfigurableHardware", 
-            new String[] {"clusters"}, 
-            new String[] {"HwNode"},
+        RECONFIG_HARDWARE(PROJECT_RECONFHW, 
+            new String[] {VAR_RECONFHW_CLUSTERS}, 
+            new String[] {TYPE_HWNODE},
             SourceMode.VARIABLES), 
-        DATA_MANAGEMENT("DataManagement", 
-            new String[] {"dataSources", "dataSinks", "persistentDataElements"},
-            new String[] {"DataSource", "DataSink", "PersistentDataElement"}, 
+        DATA_MANAGEMENT(PROJECT_DATAMGT,
+            new String[] {VAR_DATAMGT_DATASOURCES, VAR_DATAMGT_DATASINKS, VAR_DATAMGT_PERSISTENTDATAELTS},
+            new String[] {TYPE_DATASOURCE, TYPE_DATASINK, TYPE_PERSISTENTDATAELT}, 
             SourceMode.VARIABLES, 
             new DecisionVariableElementFactory(SourceSinkEditor.ID)), 
-        ALGORITHMS("Algorithms", 
-            new String[] {"algorithms"}, 
-            new String[] {"Algorithm"}, 
+        ALGORITHMS(PROJECT_ALGORITHMS,
+            new String[] {VAR_ALGORITHMS_ALGORITHMS}, 
+            new String[] {TYPE_ALGORITHM}, 
             SourceMode.VARIABLES,
             new DecisionVariableElementFactory(AlgorithmEditor.ID)), 
-        FAMILIES("Families", 
-            new String[] {"families"}, 
-            new String[] {"Family"}, 
+        FAMILIES(PROJECT_FAMILIES, 
+            new String[] {VAR_FAMILIES_FAMILIES}, 
+            new String[] {TYPE_FAMILY}, 
             SourceMode.VARIABLES, 
             new DecisionVariableElementFactory(FamilyEditor.ID)), 
-        OBSERVABLES("Observables", 
-            new String[] {"configuredParameters"}, 
-            new String[] {"ConfiguredQualityParameter"}, 
+        OBSERVABLES(PROJECT_OBSERVABLES, 
+            new String[] {VAR_OBSERVABLES_CONFIGUREDPARAMS}, 
+            new String[] {TYPE_OBSERVABLES_CONFIGUREDQPARAM}, 
             SourceMode.VARIABLES), // add provided types
-        ADAPTIVITY("Adaptivity", 
-            new String[] {"pipelineImportance", "crossPipelineTradeoffs"}, 
-            new String[] {"QualityParameterWeighting", "QualityParameterWeighting"}, 
+        ADAPTIVITY(PROJECT_ADAPTIVITY, 
+            new String[] {VAR_ADAPTIVITY_PIPELINEIMPORTANCE, VAR_ADAPTIVITY_CROSSPIPELINETRADEOFFS}, 
+            new String[] {TYPE_ADAPTIVITY_QPARAMWEIGHTING, TYPE_ADAPTIVITY_QPARAMWEIGHTING}, 
             SourceMode.VARIABLES), // add provided types
-        PIPELINES("Pipelines", 
-            new String[] {"pipelines"}, 
-            new String[] {"Pipeline"}, 
+        PIPELINES(PROJECT_PIPELINES, 
+            new String[] {VAR_PIPELINES_PIPELINES}, 
+            new String[] {TYPE_PIPELINE}, 
             SourceMode.VARIABLES,
             PipelineElementFactory.INSTANCE), 
-        INFRASTRUCTURE("Infrastructure", 
+        INFRASTRUCTURE(PROJECT_INFRASTRUCTURE, 
             new String[] {"pipelines"}, 
             null,
             SourceMode.VARIABLES), // no top-level type so far
-        TOP_LEVEL("QM", 
+        TOP_LEVEL(PROJECT_TOP_LEVEL, 
             null, 
             null, 
             SourceMode.VARIABLES);
@@ -287,7 +287,7 @@ public class VariabilityModel {
 
         @Override
         public String getModelName() {
-            return definition.getModelName() + QmConstants.CFG_POSTFIX;
+            return definition.getModelName() + CFG_POSTFIX;
         }
 
         @Override
@@ -438,7 +438,7 @@ public class VariabilityModel {
             if (null != pName) {
                 result = parents.get(pName);
                 if (null == result) {
-                    result = new ConfigurableElement(pName, null, null, PART);
+                    result = new ConfigurableElement(result, pName, null, null, PART);
                     result.setImage(ImageRegistry.INSTANCE.getImage(PART));
                     parent.addChild(result);
                     parents.put(pName, result);
@@ -539,12 +539,12 @@ public class VariabilityModel {
             QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.OBSERVABLES, 
                 "Observables");
             elements.variableToConfigurableElements(Configuration.OBSERVABLES, 
-                            "de.uni_hildesheim.sse.qmApp.ObservablesEditor");
+                "de.uni_hildesheim.sse.qmApp.ObservablesEditor");
     
-            QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.OBSERVABLES, 
+            QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.ADAPTIVITY, 
                 "Adaptation");
-            ConfigurableElement elt = elements.variableToConfigurableElements(Configuration.OBSERVABLES, 
-                            "de.uni_hildesheim.sse.qmApp.AdaptationEditor");
+            ConfigurableElement elt = elements.variableToConfigurableElements(Configuration.ADAPTIVITY, 
+                "de.uni_hildesheim.sse.qmApp.AdaptationEditor");
             elt.setImage(IconManager.retrieveImage(IconManager.ADAPTATION));
             IEditorInputCreator editorInput = new RtVilEditorInputCreator();
             if (editorInput.isEnabled()) {
@@ -603,7 +603,7 @@ public class VariabilityModel {
      * @return <code>true</code> if it is a name slot, <code>false</code> else
      */
     public static boolean isNameSlot(AbstractVariable decl) {
-        return QmConstants.SLOT_NAME.equals(decl.getName()) && StringType.TYPE.isAssignableFrom(decl.getType());
+        return SLOT_NAME.equals(decl.getName()) && StringType.TYPE.isAssignableFrom(decl.getType());
     }
 
     /**
@@ -822,15 +822,15 @@ public class VariabilityModel {
         for (int a = 0; visible && a < variable.getAttributesCount(); a++) {
             IDecisionVariable attribute = variable.getAttribute(a);
             String name = attribute.getDeclaration().getName();
-            if (QmConstants.ANNOTATION_BINDING_TIME.equals(name)) {
+            if (ANNOTATION_BINDING_TIME.equals(name)) {
                 Value value = attribute.getValue();
                 if (null != value && value instanceof EnumValue) {
                     EnumLiteral lit = ((EnumValue) value).getValue();
-                    if (null != lit && !lit.getName().equals(QmConstants.CONST_BINDING_TIME_COMPILE)) {
+                    if (null != lit && !lit.getName().equals(CONST_BINDING_TIME_COMPILE)) {
                         visible = false;
                     }
                 }
-            } else if (QmConstants.ANNOTATION_USER_VISIBLE.equals(name)) { // restrict only if given an false
+            } else if (ANNOTATION_USER_VISIBLE.equals(name)) { // restrict only if given an false
                 Value value = attribute.getValue();
                 if (null != value && value instanceof BooleanValue) {
                     Boolean val = ((BooleanValue) value).getValue();

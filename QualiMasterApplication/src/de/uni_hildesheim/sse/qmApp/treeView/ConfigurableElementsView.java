@@ -187,8 +187,12 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                         List<ConfigurableElement> elements = selectedElement.clone(ConfigurableElementsView.this,
                                 cloneCount);
                         if (null != elements) {
+                            ConfigurableElement parent = selectedElement.getParent();
+                            if (parent.isVirtualSubGroup()) {
+                                parent = parent.getParent();
+                            }
                             for (int e = 0; e < elements.size(); e++) {
-                                viewer.add(selectedElement.getParent(), elements.get(e));
+                                viewer.add(parent, elements.get(e));
                             }
                         }
                     }
@@ -420,7 +424,7 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
      * @param elt the element to open the editor for (ignored if <b>null</b>)
      */
     private void openEditor(ConfigurableElement elt) {
-        if (null != elt) {
+        if (null != elt && null != elt.getEditorInputCreator()) { // no editor input creator -> virtual grouping
             IEditorInput input = elt.getEditorInputCreator().create();
             String editorId = elt.getEditorId();
             if (null != input && null != editorId) {
