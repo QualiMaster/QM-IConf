@@ -358,7 +358,7 @@ public class ConfigurableElement { // unsure whether this shall be a resource
      * @return <code>true</code> for a sub-group, <code>false</code> else
      */
     public boolean isVirtualSubGroup() {
-        return null == parent.getEditorInputCreator() && null != parent.getParent();
+        return null == getEditorInputCreator() && null != getParent();
     }
     
     /**
@@ -377,7 +377,8 @@ public class ConfigurableElement { // unsure whether this shall be a resource
      * @return <code>true</code> if this element is deletable, <code>false</code> else
      */
     public boolean isDeletable() {
-        return null != getParent() && input.isDeletable(); // top-level elements are not deletable
+        // top-level elements are not deletable
+        return null != getParent() && input.isDeletable() && !isVirtualSubGroup(); 
     }
     
     /**
@@ -387,7 +388,7 @@ public class ConfigurableElement { // unsure whether this shall be a resource
      */
     public boolean isWritable() {
         return (null == getParent() && VariabilityModel.isWritable(modelPart)) 
-            || input.isWritable();
+            || (null != input && input.isWritable());
     }
 
     /**
@@ -396,7 +397,8 @@ public class ConfigurableElement { // unsure whether this shall be a resource
      * @return <code>true</code> if this element is readable, <code>false</code> else
      */
     public boolean isReadable() {
-        return (null == getParent() && VariabilityModel.isReadable(modelPart)) || input.isReadable();
+        return (null == getParent() && VariabilityModel.isReadable(modelPart)) || isVirtualSubGroup() 
+            || input.isReadable();
     }
     
     /**

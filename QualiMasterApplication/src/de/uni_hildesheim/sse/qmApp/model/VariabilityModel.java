@@ -438,7 +438,7 @@ public class VariabilityModel {
             if (null != pName) {
                 result = parents.get(pName);
                 if (null == result) {
-                    result = new ConfigurableElement(result, pName, null, null, PART);
+                    result = new ConfigurableElement(parent, pName, null, null, PART);
                     result.setImage(ImageRegistry.INSTANCE.getImage(PART));
                     parent.addChild(result);
                     parents.put(pName, result);
