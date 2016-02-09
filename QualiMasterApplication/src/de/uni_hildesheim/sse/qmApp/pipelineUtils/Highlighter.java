@@ -16,6 +16,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
+import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.qmApp.model.PipelineDiagramUtils;
 import de.uni_hildesheim.sse.qmApp.treeView.ElementStatusIndicator;
 import pipeline.diagram.part.PipelineDiagramEditor;
@@ -342,30 +343,32 @@ public class Highlighter implements IHighlighter {
         IFigure figure = getTargetFigure(editPartForSemanticElement);
 
         SVGFigure svgFigure = (SVGFigure) figure;
-
+        String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
+        
         if (eobject instanceof SourceImpl) {
 
             switch(dataflow) {
             case VERYHIGH:  
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/source.svg");
+                uri += IconManager.SVG_SOURCE;
                 break;
             case HIGH:    
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/source2.svg");
+                uri += IconManager.SVG_SOURCE2;
                 break;
             case MEDIUM:            
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/source3.svg");
+                uri += IconManager.SVG_SOURCE3;
                 break;
             case LOW:                 
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/source4.svg");
+                uri += IconManager.SVG_SOURCE4;
                 break;
             case VERYLOW:                 
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/source5.svg");
+                uri += IconManager.SVG_SOURCE5;
                 break;
             default:                
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/source.svg");
+                uri += IconManager.SVG_SOURCE;
                 break;
 
             }
+            svgFigure.setURI(uri);
         }
     }
 
@@ -383,31 +386,32 @@ public class Highlighter implements IHighlighter {
         IFigure figure = getTargetFigure(editPartForSemanticElement);
 
         SVGFigure svgFigure = (SVGFigure) figure;
-
+        String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
+        
         if (eobject instanceof SinkImpl) {
 
             switch(dataflow) {
-            case VERYHIGH: 
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/sink.svg");
+            case VERYHIGH:  
+                uri += IconManager.SVG_SINK;
                 break;
-            case HIGH:              
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/sink2.svg");
+            case HIGH:    
+                uri += IconManager.SVG_SINK2;
                 break;
-            case MEDIUM:              
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/sink3.svg");
+            case MEDIUM:            
+                uri += IconManager.SVG_SINK3;
                 break;
-            case LOW:               
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/sink4.svg");
+            case LOW:                 
+                uri += IconManager.SVG_SINK4;
                 break;
-            case VERYLOW:               
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/sink5.svg");
+            case VERYLOW:                 
+                uri += IconManager.SVG_SINK5;
                 break;
-            default:           
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/sink.svg");
+            default:                
+                uri += IconManager.SVG_SINK5;
                 break;
-            }
-            svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/sink.svg");
 
+            }
+            svgFigure.setURI(uri);
         }
     }
 
@@ -425,30 +429,33 @@ public class Highlighter implements IHighlighter {
         IFigure figure = getTargetFigure(editPartForSemanticElement);
 
         SVGFigure svgFigure = (SVGFigure) figure;
-
+        
+        String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
+        
         if (eobject instanceof FamilyElementImpl) {
 
             switch(dataflow) {
-            case VERYHIGH:             
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/familyelement.svg");
+            case VERYHIGH:  
+                uri += IconManager.SVG_FAMILYELEMENT;
                 break;
-            case HIGH:                 
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/familyelement2.svg");
+            case HIGH:    
+                uri += IconManager.SVG_FAMILYELEMENT2;
                 break;
-            case MEDIUM:           
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/familyelement3.svg");
+            case MEDIUM:            
+                uri += IconManager.SVG_FAMILYELEMENT3;
                 break;
-            case LOW: 
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/familyelement4.svg");
+            case LOW:                 
+                uri += IconManager.SVG_FAMILYELEMENT4;
                 break;
-            case VERYLOW: 
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/familyelement5.svg");
+            case VERYLOW:                 
+                uri += IconManager.SVG_FAMILYELEMENT5;
                 break;
-            default: 
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/familyelement.svg");
+            default:                
+                uri += IconManager.SVG_FAMILYELEMENT5;
                 break;
+
             }
-            svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/familyelement.svg");
+            svgFigure.setURI(uri);
         }
     }
 
@@ -466,30 +473,32 @@ public class Highlighter implements IHighlighter {
         IFigure figure = getTargetFigure(editPartForSemanticElement);
 
         SVGFigure svgFigure = (SVGFigure) figure;
-
+        String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
+        
         if (eobject instanceof DataManagementElementImpl) {
 
             switch(dataflow) {
-            case VERYHIGH: 
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/datamanagement.svg");
+            case VERYHIGH:  
+                uri += "datamanagement.svg";
                 break;
-            case HIGH: 
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/datamanagement2.svg");
+            case HIGH:    
+                uri += "datamanagement2.svg";
                 break;
-            case MEDIUM:
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/datamanagement3.svg");
+            case MEDIUM:            
+                uri += "datamanagement3.svg";
                 break;
-            case LOW: 
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/datamanagement4.svg");
+            case LOW:                 
+                uri += "datamanagement4.svg";
                 break;
-            case VERYLOW: 
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/datamanagement5.svg");
+            case VERYLOW:                 
+                uri += "datamanagement5.svg";
                 break;
-            default: 
-                svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/datamanagement.svg");
+            default:                
+                uri += "datamanagement.svg";
                 break;
+
             }
-            svgFigure.setURI("platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/datamanagement.svg");
+            svgFigure.setURI(uri);
         }
     }
 }

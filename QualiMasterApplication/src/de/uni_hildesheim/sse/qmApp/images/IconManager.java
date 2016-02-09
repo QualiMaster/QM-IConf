@@ -74,49 +74,29 @@ public class IconManager {
     public static final String RECTANGLE_GREEN1 = PRE + "green1.png";
     public static final String RECTANGLE_GREEN2 = PRE + "green2.png";
     
-    public static final String SVG_DATAMANAGEMENT =
-            "platform:/plugin/QualiMasterApplication/icons/svg/datamanagement.svg";
-    public static final String SVG_DATAMANAGEMENT2 =
-            "platform:/plugin/QualiMasterApplication/icons/svg/datamanagement2.svg";
-    public static final String SVG_DATAMANAGEMENT3 =
-            "platform:/plugin/QualiMasterApplication/icons/svg/datamanagement3.svg";
-    public static final String SVG_DATAMANAGEMENT4 =
-            "platform:/plugin/QualiMasterApplication/icons/svg/datamanagement4.svg";
-    public static final String SVG_DATAMANAGEMENT5 =
-            "platform:/plugin/QualiMasterApplication/icons/svg/datamanagement5.svg";
+    public static final String SVG_DATAMANAGEMENT = "datamanagement.svg";
+    public static final String SVG_DATAMANAGEMENT2 = "datamanagement2.svg";
+    public static final String SVG_DATAMANAGEMENT3 = "datamanagement3.svg";
+    public static final String SVG_DATAMANAGEMENT4 = "datamanagement4.svg";
+    public static final String SVG_DATAMANAGEMENT5 = "datamanagement5.svg";
     
-    public static final String SVG_FAMILYELEMENT =
-            "platform:/plugin/QualiMasterApplication/icons/svg/familyelement.svg";
-    public static final String SVG_FAMILYELEMENT2 =
-            "platform:/plugin/QualiMasterApplication/icons/svg/familyelement2.svg";
-    public static final String SVG_FAMILYELEMENT3 =
-            "platform:/plugin/QualiMasterApplication/icons/svg/familyelement3.svg";
-    public static final String SVG_FAMILYELEMENT4 =
-            "platform:/plugin/QualiMasterApplication/icons/svg/familyelement4.svg";
-    public static final String SVG_FAMILYELEMENT5 =
-            "platform:/plugin/QualiMasterApplication/icons/svg/familyelement5.svg";
+    public static final String SVG_FAMILYELEMENT = "familyelement.svg";
+    public static final String SVG_FAMILYELEMENT2 = "familyelement2.svg";
+    public static final String SVG_FAMILYELEMENT3 = "familyelement3.svg";
+    public static final String SVG_FAMILYELEMENT4 = "familyelement4.svg";
+    public static final String SVG_FAMILYELEMENT5 = "familyelement5.svg";
     
-    public static final String SVG_SINK =
-            "platform:/plugin/QualiMasterApplication/icons/svg/sink.svg";
-    public static final String SVG_SINK2 =
-            "platform:/plugin/QualiMasterApplication/icons/svg/sink2.svg";
-    public static final String SVG_SINK3 =
-            "platform:/plugin/QualiMasterApplication/icons/svg/sink3.svg";
-    public static final String SVG_SINK4 =
-            "platform:/plugin/QualiMasterApplication/icons/svg/sink4.svg";
-    public static final String SVG_SINK5 =
-            "platform:/plugin/QualiMasterApplication/icons/svg/sink5.svg";
+    public static final String SVG_SINK = "sink.svg";
+    public static final String SVG_SINK2 = "sink2.svg";
+    public static final String SVG_SINK3 = "sink3.svg";
+    public static final String SVG_SINK4 = "sink4.svg";
+    public static final String SVG_SINK5 = "sink5.svg";
     
-    public static final String SVG_SOURCE =
-            "platform:/plugin/QualiMasterApplication/icons/svg/sink.svg";
-    public static final String SVG_SOURCE2 =
-            "platform:/plugin/QualiMasterApplication/icons/svg/sink.svg";
-    public static final String SVG_SOURCE3 =
-            "platform:/plugin/QualiMasterApplication/icons/svg/sink.svg";
-    public static final String SVG_SOURCE4 =
-            "platform:/plugin/QualiMasterApplication/icons/svg/sink.svg";
-    public static final String SVG_SOURCE5 =
-            "platform:/plugin/QualiMasterApplication/icons/svg/sink.svg";
+    public static final String SVG_SOURCE = "source.svg";
+    public static final String SVG_SOURCE2 = "source2.svg";
+    public static final String SVG_SOURCE3 = "source3.svg";
+    public static final String SVG_SOURCE4 = "source4.svg";
+    public static final String SVG_SOURCE5 = "source5.svg";
     
     public static final org.eclipse.swt.graphics.Color DARK_GREEN =
             new org.eclipse.swt.graphics.Color(Display.getCurrent(), 102, 255, 102);

@@ -630,8 +630,6 @@ public class PipelineDiagramUtils {
         DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
         
-        EObject element = diagram.getDiagram().getElement();
-        EList<EObject> eContents = element.eContents();
         Highlighter highlighter = new Highlighter(diagram);
         
         //determine or use dataflow-information of specific EObject!!!
@@ -673,10 +671,10 @@ public class PipelineDiagramUtils {
         Highlighter adapter = new Highlighter(diagram);
         List<PipelineDataflowInformationWrapper> wrapperList = adapter.getPipelineFlowInfo();
 
-//        PipelineDataflowInformationWrapper test = 
-//                new PipelineDataflowInformationWrapper("priorityPip", "FinancialDataSource",
-//                        ElementStatusIndicator.HIGH);
-//        wrapperList.add(test);
+        PipelineDataflowInformationWrapper test = 
+                new PipelineDataflowInformationWrapper("priorityPip", "FinancialDataSource",
+                        ElementStatusIndicator.HIGH);
+        wrapperList.add(test);
         
         EObject element = diagram.getDiagram().getElement();
         EList<EObject> eContents = element.eContents();
