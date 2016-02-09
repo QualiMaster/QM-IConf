@@ -191,7 +191,7 @@ public class ManifestConnection {
     public ManifestConnection() {
         
         if (null == ivyOut) {
-            setRetrievalFolder(new File("out"));
+            setRetrievalFolder(new File("C:/Test/out"));
         }
         this.out = ivyOut;
         
@@ -369,8 +369,8 @@ public class ManifestConnection {
             sysOut.setMax(100);
             sysOut.setTask(mainTask);
             
-            //System.setOut(sysOut);
-            //System.setErr(sysOut);
+            System.setOut(sysOut);
+            System.setErr(sysOut);
             report = ivy.resolve(md, ro);
             m = report.getModuleDescriptor();
             if (report.hasError()) {
