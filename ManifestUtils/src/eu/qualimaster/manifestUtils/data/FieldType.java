@@ -1,6 +1,5 @@
 package eu.qualimaster.manifestUtils.data;
 
-
 /**
  * Represents the type of a Field used by an Item.
  * @author pastuschek
@@ -8,7 +7,7 @@ package eu.qualimaster.manifestUtils.data;
  */
 public enum FieldType {
     
-    INTEGER, STRING, BOOLEAN, REAL, DOUBLE, LONG, OBJECT, RISK, UNKNOWN;
+    INTEGER, STRING, STRINGLIST, BOOLEAN, REAL, DOUBLE, LONG, OBJECT, RISK, UNKNOWN;
 
     /**
      * Returns a FieldType that fits the given FieldType class.
@@ -35,6 +34,14 @@ public enum FieldType {
         }
         
         return result;
+    }
+    
+    /**
+     * Returns the normalized name of the FieldType.
+     * @return The normalized name (capitalized first letter).
+     */
+    public String getNormalizedName() {
+        return this.name().substring(0, 1).toUpperCase() + this.name().substring(1).toLowerCase();
     }
     
 }
