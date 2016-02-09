@@ -330,7 +330,6 @@ public abstract class AbstractUploadEditor extends VariableEditor {
             list2.add(0, (IDecisionVariable) list2.get(0).getParent());
             list3.add(0, (IDecisionVariable) list3.get(0).getParent());
 
-            //param.add(new Parameter("Test", ParameterType.STRING, "Testvalue!"));
             clearInput(list);
             clearInput(list2);
             clearInput(list3);
@@ -432,6 +431,15 @@ public abstract class AbstractUploadEditor extends VariableEditor {
                 }
             };
             pmd.run(true, true, new ProgressDialogOperation());
+            for (int i = 0; i < this.getEditorCount(); i++) {
+                if (this.getEditor(i) instanceof ParameterEditor) {
+                    ((ParameterEditor) this.getEditor(i)).refresh();
+                    System.out.println("Found it!!!");
+                }
+            }
+            parent.redraw();
+            parent.update();
+            
         } catch (final InvocationTargetException e) {
             MessageDialog.openError(parent.getShell(), "Error", "Error: ");
             e.printStackTrace();
