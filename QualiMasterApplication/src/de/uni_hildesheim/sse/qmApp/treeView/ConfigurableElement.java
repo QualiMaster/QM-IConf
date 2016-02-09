@@ -30,6 +30,7 @@ import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
  */
 public class ConfigurableElement { // unsure whether this shall be a resource
 
+    private ElementStatusIndicator status = ElementStatusIndicator.MEDIUM;
     private String displayName;
     private String editorId;
     private IEditorInputCreator input;
@@ -55,6 +56,7 @@ public class ConfigurableElement { // unsure whether this shall be a resource
         this.modelPart = modelPart;
         this.editorId = editorId;
         this.input = input;
+        this.status = ElementStatusIndicator.LOW;
     }
     
     /**
@@ -480,4 +482,20 @@ public class ConfigurableElement { // unsure whether this shall be a resource
         }
     }
     
+    /**
+     * Get the current dataflow information for this configurable element.
+     * @return dataflow The current dataflow information for this element.
+     */
+    public ElementStatusIndicator getStatus() {
+        return status;
+    }
+    
+    /**
+     * Set the dataflow information for this configurable element.
+     * @param indicator New assigned dataflow information for this element.
+     */
+    public void setStatus(ElementStatusIndicator indicator) {
+        
+        this.status = indicator;
+    }
 }

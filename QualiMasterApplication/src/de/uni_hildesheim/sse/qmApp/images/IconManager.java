@@ -21,6 +21,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
 import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
+import de.uni_hildesheim.sse.qmApp.treeView.ElementStatusIndicator;
 
 /**
  * Class for managing icons.
@@ -66,6 +67,67 @@ public class IconManager {
     public static final String MAVEN_DIALOG_ICON = PRE + "mavenEditor.png";
     public static final String OVERLAY_ERROR_SMALL = PRE + "error_small.png";
     public static final String CLASS = PRE + "class_obj.png";
+    
+    public static final String RECTANGLE_RED1 = PRE + "red1.png";
+    public static final String RECTANGLE_RED2 = PRE + "red2.png";
+    public static final String RECTANGLE_ORANGE = PRE + "orange.png";
+    public static final String RECTANGLE_GREEN1 = PRE + "green1.png";
+    public static final String RECTANGLE_GREEN2 = PRE + "green2.png";
+    
+    public static final String SVG_DATAMANAGEMENT =
+            "platform:/plugin/QualiMasterApplication/icons/svg/datamanagement.svg";
+    public static final String SVG_DATAMANAGEMENT2 =
+            "platform:/plugin/QualiMasterApplication/icons/svg/datamanagement2.svg";
+    public static final String SVG_DATAMANAGEMENT3 =
+            "platform:/plugin/QualiMasterApplication/icons/svg/datamanagement3.svg";
+    public static final String SVG_DATAMANAGEMENT4 =
+            "platform:/plugin/QualiMasterApplication/icons/svg/datamanagement4.svg";
+    public static final String SVG_DATAMANAGEMENT5 =
+            "platform:/plugin/QualiMasterApplication/icons/svg/datamanagement5.svg";
+    
+    public static final String SVG_FAMILYELEMENT =
+            "platform:/plugin/QualiMasterApplication/icons/svg/familyelement.svg";
+    public static final String SVG_FAMILYELEMENT2 =
+            "platform:/plugin/QualiMasterApplication/icons/svg/familyelement2.svg";
+    public static final String SVG_FAMILYELEMENT3 =
+            "platform:/plugin/QualiMasterApplication/icons/svg/familyelement3.svg";
+    public static final String SVG_FAMILYELEMENT4 =
+            "platform:/plugin/QualiMasterApplication/icons/svg/familyelement4.svg";
+    public static final String SVG_FAMILYELEMENT5 =
+            "platform:/plugin/QualiMasterApplication/icons/svg/familyelement5.svg";
+    
+    public static final String SVG_SINK =
+            "platform:/plugin/QualiMasterApplication/icons/svg/sink.svg";
+    public static final String SVG_SINK2 =
+            "platform:/plugin/QualiMasterApplication/icons/svg/sink2.svg";
+    public static final String SVG_SINK3 =
+            "platform:/plugin/QualiMasterApplication/icons/svg/sink3.svg";
+    public static final String SVG_SINK4 =
+            "platform:/plugin/QualiMasterApplication/icons/svg/sink4.svg";
+    public static final String SVG_SINK5 =
+            "platform:/plugin/QualiMasterApplication/icons/svg/sink5.svg";
+    
+    public static final String SVG_SOURCE =
+            "platform:/plugin/QualiMasterApplication/icons/svg/sink.svg";
+    public static final String SVG_SOURCE2 =
+            "platform:/plugin/QualiMasterApplication/icons/svg/sink.svg";
+    public static final String SVG_SOURCE3 =
+            "platform:/plugin/QualiMasterApplication/icons/svg/sink.svg";
+    public static final String SVG_SOURCE4 =
+            "platform:/plugin/QualiMasterApplication/icons/svg/sink.svg";
+    public static final String SVG_SOURCE5 =
+            "platform:/plugin/QualiMasterApplication/icons/svg/sink.svg";
+    
+    public static final org.eclipse.swt.graphics.Color DARK_GREEN =
+            new org.eclipse.swt.graphics.Color(Display.getCurrent(), 102, 255, 102);
+    public static final org.eclipse.swt.graphics.Color LIGHT_GREEN =
+            new org.eclipse.swt.graphics.Color(Display.getCurrent(), 51, 255, 102);
+    public static final org.eclipse.swt.graphics.Color YELLOW =
+            new org.eclipse.swt.graphics.Color(Display.getCurrent(), 255, 255, 0);
+    public static final org.eclipse.swt.graphics.Color LIGHT_RED =
+            new org.eclipse.swt.graphics.Color(Display.getCurrent(), 255, 102, 102);
+    public static final org.eclipse.swt.graphics.Color DARK_RED =
+            new org.eclipse.swt.graphics.Color(Display.getCurrent(), 204, 0, 0);
     
     private static final Map<String, String> TYPE_MAP = new HashMap<String, String>();
     
@@ -310,6 +372,87 @@ public class IconManager {
 
         BufferedImage base = toBufferedImage(image);
         BufferedImage overlay = IconManager.toBufferedImage(retrieveImage(IconManager.OVERLAY_ERROR_SMALL));
+        
+        int w = Math.max(base.getWidth(), overlay.getWidth());
+        int h = Math.max(base.getHeight(), overlay.getHeight());
+        BufferedImage combined  = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        
+        Graphics g = combined.getGraphics();
+        g.drawImage(base, 0, 0, null);
+        g.drawImage(overlay, 8, 8, null);
+        
+        Image result = new Image(Display.getCurrent(), convertToSWT(combined));
+        return result;
+    }
+
+    /**
+     * Adds a little error-image to the given 16x16-image.
+     * @param image Given 16x16-image.
+     * @param indicator indicated status of the element.
+     * @return result - new Image with error.icon in the bottom-right corner.
+     */
+    public static Image addErrorToImage(Image image, ElementStatusIndicator indicator) {
+        
+        BufferedImage overlay =
+                IconManager.toBufferedImage(retrieveImage(IconManager.OVERLAY_ERROR_SMALL));
+        
+        switch (indicator) {
+        case VERYHIGH:
+            overlay = IconManager.toBufferedImage(retrieveImage(IconManager.RECTANGLE_RED2));
+            break;
+        case HIGH: 
+            overlay = IconManager.toBufferedImage(retrieveImage(IconManager.RECTANGLE_RED1));
+            break;
+        case MEDIUM:  
+            overlay = IconManager.toBufferedImage(retrieveImage(IconManager.RECTANGLE_ORANGE));
+            break;
+        case LOW:    
+            overlay = IconManager.toBufferedImage(retrieveImage(IconManager.RECTANGLE_GREEN1));
+            break;
+        case VERYLOW:  
+            overlay = IconManager.toBufferedImage(retrieveImage(IconManager.RECTANGLE_GREEN2));
+            break;
+        default:
+            break;
+        }
+        
+        image = IconManager.addIndicatorToImage(image, overlay);
+
+        return image;
+    }
+
+    /**
+     * Adds a little error-image to the given 16x16-image.
+     * @param image Given 16x16-image.
+     * @param overlay Overlay image.
+     * @return result - new Image with error icon in the bottom-right corner.
+     */
+    private static Image addIndicatorToImage(Image image, BufferedImage overlay) {
+        BufferedImage base = toBufferedImage(image);
+        
+        
+        int w = Math.max(base.getWidth(), overlay.getWidth());
+        int h = Math.max(base.getHeight(), overlay.getHeight());
+        BufferedImage combined  = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        
+        Graphics g = combined.getGraphics();
+        g.drawImage(base, 0, 0, null);
+        g.drawImage(overlay, 0, 8, null);
+        
+        Image result = new Image(Display.getCurrent(), convertToSWT(combined));
+        return result;
+    }
+    
+    /**
+     * Adds a little error-image to the given 16x16-image.
+     * @param image Given 16x16-image.
+     * @param overlay Overlay image.
+     * @return result - new Image with error icon in the bottom-right corner.
+     */
+    @SuppressWarnings("unused")
+    private static Image addErrorToImage(Image image, BufferedImage overlay) {
+        BufferedImage base = toBufferedImage(image);
+        
         
         int w = Math.max(base.getWidth(), overlay.getWidth());
         int h = Math.max(base.getHeight(), overlay.getHeight());

@@ -1,13 +1,20 @@
 package de.uni_hildesheim.sse.qmApp.pipelineUtils;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.transaction.ResourceSetChangeEvent;
-import org.eclipse.gmf.runtime.emf.core.util.EMFCoreUtil;
-import org.eclipse.gmf.runtime.notation.Connector;
+import org.eclipse.gmf.runtime.diagram.ui.parts.DiagramEditor;
 import org.eclipse.gmf.runtime.notation.impl.ConnectorImpl;
+import org.eclipse.ui.PlatformUI;
+
+import de.uni_hildesheim.sse.qmApp.model.PipelineDiagramUtils;
+import de.uni_hildesheim.sse.qmApp.model.PipelineDiagramUtils.ConnectorWrapper;
+import pipeline.PipelineElement;
+import pipeline.impl.FlowImpl;
 
 /**
  * Gets a ResourceSetChangeEvent and calls the suited method of {@link IPipelineEditorListener} according to the event.
@@ -48,40 +55,45 @@ public class PipelineEditorListener {
                     }
                     if (notification.getFeature().toString().contains(FLOW_IDENTIFIER)) {
                         if (Integer.compare(notification.getEventType(), Notification.ADD) == 0) {
-                            //add nodes which are connected to the newly added flow to the listener
-                            //listener.flowAdded(node1, node2);
-                            System.out.println("flow added " + feature.getName()); // TODO from flow to nodes??
+
+                            FlowImpl newFlow = (FlowImpl) notification.getNewValue();
                             
-                            ConnectorImpl connector = (ConnectorImpl) eObject;
-                            Object object = connector.getSource();
+                            PipelineElement node1 = newFlow.getSource();
+                            PipelineElement node2 = newFlow.getDestination();
                             
-//                            FlowImpl flow = (FlowImpl) eObject;
-//                            System.out.println(flow);
+                            String node1Name = node1.getName();
+                            String node2Name = node2.getName();
                             
+                            listener.flowAdded(node1Name, node2Name);
                         }
                     }
                     if (eObject instanceof ConnectorImpl && Integer.compare(notification.getEventType(),
                          Notification.UNSET) == 0) {
                     
-                        Connector connector = (Connector) eObject;
-                        System.out.println(connector);
-                    
-                        Object object = connector.getSource();
-                        System.out.println(object);
-                    
-                        ConnectorImpl connector2 = (ConnectorImpl) eObject;
-                        Object object2 = connector2.getSource();
-//                        ConnectorImpl connector = (ConnectorImpl) eObject;
-//                      View source = connector.getSource();
-//                      View target = connector.getTarget();
-                    
-                        //listener.flowRemoved(node1, node2);
-                        System.out.println("flow removed " + feature.getName()); // TODO from flow to nodes??
+                        //Find the flow which is missing now in list connections
+                        List<ConnectorWrapper> connections = PipelineDiagramUtils.getConnectionInfoList();
+                        
+                        DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench()
+                                .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+                        
+                        EObject element = diagram.getDiagram().getElement();
+                        EList<EObject> eContents = element.eContents();
+                        
+                        for (int i = 0; i < connections.size(); i++) {
+                            ConnectorWrapper wrapper = connections.get(i);
+                            FlowImpl flow = wrapper.getFlow();
+   
+                            if (!eContents.contains(flow)) {
+                                //The right flow is found
+                                    
+                                String source = wrapper.getSource();
+                                String target = wrapper.getTarget();
+                                    
+                                listener.flowRemoved(source, target);
+                                break;
+                            }
+                        }
                     }
-                    // get the name of the changed feature and the qualified name of
-                    //    the object, substituting <type> for any element that has no name
-                    System.out.println("The " + feature.getName() + " of the object \""
-                            + EMFCoreUtil.getQualifiedName(eObject, true) + "\" has changed.");
                 }
             }
         }

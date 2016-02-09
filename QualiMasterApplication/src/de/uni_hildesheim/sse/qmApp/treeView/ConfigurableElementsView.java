@@ -13,6 +13,7 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -25,6 +26,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -56,6 +58,7 @@ import de.uni_hildesheim.sse.qmApp.model.PipelineDiagramUtils;
 import de.uni_hildesheim.sse.qmApp.model.QualiMasterDisplayNameProvider;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
+import de.uni_hildesheim.sse.qmApp.pipelineUtils.PipelineEditorListener;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.EventKind;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.IChangeListener;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
@@ -334,6 +337,8 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                         
                         if (diagram instanceof PipelineDiagramEditor) {
                             PipelineDiagramUtils.highlightDiagram();
+                            
+                            PipelineDiagramUtils.addPipelineColor();
                         }
                         
                        
@@ -350,74 +355,17 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
      */
     private void listenOnDiagrm(DiagramEditor diagram) {
    
-//        listener = new IPipelineEditorListener() {
-//            @Override
-//            public void nodeRemoved(String name) {
-//                // TODO Auto-generated method stub
-//            }
-//            @Override
-//            public void nodeAdded(String name) {
-//                // TODO Auto-generated method stub
-//            }
-//            @Override
-//            public void flowRemoved(String node1, String node2) {
-//                // TODO Auto-generated method stub
-//            }
-//            @Override
-//            public void flowAdded(String node1, String node2) {
-//                // TODO Auto-generated method stub
-//            }
-//        };  
         diagram.getEditingDomain().addResourceSetListener(new ResourceSetListenerImpl() {
             
             public void resourceSetChanged(ResourceSetChangeEvent event) {
             
-                //@SuppressWarnings("unused")
-                //PipelineEditorListener listener = new PipelineEditorListener(event);
-//            
-//                for (Iterator<?> iter = event.getNotifications().iterator(); iter.hasNext();) {
-//                    Notification notification = (Notification) iter.next();
-//                    Object notifier = notification.getNotifier();
-//                    
-//                    if (notifier instanceof EObject) {
-//                        EObject eObject = (EObject) notifier;
-//                
-//                        EStructuralFeature feature = (EStructuralFeature) notification.getFeature();
-//                        
-//                        // only respond to changes to structural features of the object
-//                        if (feature instanceof EStructuralFeature) {
-//                            if (notification.getFeature().toString().contains(NODE_IDENTIFIER)) {       
-//                                if (Integer.compare(notification.getEventType(), Notification.REMOVE) == 0) {
-//                                    //listener.nodeRemoved(feature.getName());
-//                                    System.out.println("node removed");
-//                                }
-//                                if (Integer.compare(notification.getEventType(), Notification.ADD) == 0) {
-//                                    //listener.nodeAdded(feature.getName());
-//                                    System.out.println("node added");
-//                                }
-//                            }
-//                            if (notification.getFeature().toString().contains(FLOW_IDENTIFIER)) {
-//                                if (Integer.compare(notification.getEventType(), Notification.ADD) == 0) {
-//                                    //add nodes which are connected to the newly added flow to the listener
-//                                    //listener.flowAdded();
-//                                    System.out.println("flow added");
-//                                }
-//                            }
-//                            if (eObject instanceof ConnectorImpl && Integer.compare(notification.getEventType(),
-//                                     Notification.UNSET) == 0) {
-//                                    //listener.flowRemoved();
-//                                    System.out.println("Flow removed");
-//                            }
-//                            // get the name of the changed feature and the qualified name of
-//                            //    the object, substituting <type> for any element that has no name
-//                            System.out.println("The " + feature.getName() + " of the object \""
-//                                    + EMFCoreUtil.getQualifiedName(eObject, true) + "\" has changed.");
-//                        }
-//                    }
-//                }
+                PipelineDiagramUtils.saveConnections();
+                @SuppressWarnings("unused")
+                PipelineEditorListener listener = new PipelineEditorListener(event);
             }
         });
     }
+    
     /**
      * Opens an editor for <code>elt</code>.
      * 
@@ -541,7 +489,7 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
      * 
      * @author Niko Nowatzki
      */
-    class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
+    class ViewLabelProvider extends LabelProvider implements ITableLabelProvider, IColorProvider {
 
         /**
          * Get the text for the given object.
@@ -592,20 +540,72 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                 image = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
             }
            
-            if (elem.getFlawedIndicator()) {
-                //Check whether item is flawed. If true, annotate the corresponding icon with an error-marker.
-
-                Image newImage = IconManager.addErrorToImage(image);
-                originalIconReminder.put(newImage, image);
-                image = newImage;
-            } 
-            if (!elem.getFlawedIndicator()) {
-
-                if (originalIconReminder.containsKey(image)) {
-                    image = originalIconReminder.get(image);
-                }
+//            if (elem.getFlawedIndicator()) {
+//                //Check whether item is flawed. If true, annotate the corresponding icon with an error-marker.
+//
+//                Image newImage = IconManager.addErrorToImage(image);
+//                originalIconReminder.put(newImage, image);
+//                image = newImage;
+//            } 
+            
+            
+            //In order to set the icon for elements indicator.
+            if (!elem.getDisplayName().equals("Runtime")) {
+                ElementStatusIndicator indicator = elem.getStatus();
+                image = IconManager.addErrorToImage(image, indicator);
             }
+            
+//            if (!elem.getFlawedIndicator()) {
+//
+//                if (originalIconReminder.containsKey(image)) {
+//                    image = originalIconReminder.get(image);
+//                }
+//            }
             return image;
+        }
+
+        @Override
+        public Color getForeground(Object element) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Color getBackground(Object element) {
+
+            //Or use this to set the Background of a item
+            
+//            ConfigurableElement elem = (ConfigurableElement) element;
+//            Color color;
+//            
+//            ElementsStatusIndicator indicator = elem.getDataflowInfo();
+//
+//            switch (indicator) {
+//            case VERYHIGH:
+//                //Image littleErrorImage = IconManager...
+//                //image = IconManager.addErrorToImage(image);
+//                color = IconManager.DARK_RED;
+//                break;
+//            case HIGH:
+//                //image = IconManager.addErrorToImage(image);
+//                color = IconManager.LIGHT_RED;
+//                break;
+//            case MEDIUM: 
+//                //image = IconManager.addErrorToImage(image);
+//                color = IconManager.YELLOW;
+//                break;
+//            case LOW:    
+//                //image = IconManager.addErrorToImage(image);
+//                color = IconManager.DARK_GREEN;
+//                break;
+//            case VERYLOW:   
+//                color = IconManager.LIGHT_GREEN;
+//                //image =  IconManager.addErrorToImage(image);
+//                break;
+//            default:
+//                break;
+//            }
+            return null;
         }
     }
     
