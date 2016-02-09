@@ -22,6 +22,9 @@ import de.uni_hildesheim.sse.model.varModel.ProjectImport;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Compound;
 import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Reference;
+import de.uni_hildesheim.sse.model.varModel.filter.FilterType;
+import de.uni_hildesheim.sse.model.varModel.filter.mandatoryVars.MandatoryDeclarationClassifier;
+import de.uni_hildesheim.sse.model.varModel.filter.mandatoryVars.VariableContainer;
 import de.uni_hildesheim.sse.qmApp.editors.EditorUtils;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
@@ -44,6 +47,8 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
     private Class<?> reactsOn;
     private IModelPart modelPart = VariabilityModel.Configuration.PIPELINES;
     private LabelProviderCreator labelCreator;
+    private Configuration cfg;
+    private VariableContainer importance;
 
     /**
      * Creates a new pipeline diagram node property editor creator.
@@ -52,6 +57,10 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
      */
     public PipelineDiagramElementPropertyEditorCreator(Class<?> reactsOn) {
         this.reactsOn = reactsOn;
+        cfg = modelPart.getConfiguration();
+        MandatoryDeclarationClassifier classifier = new MandatoryDeclarationClassifier(cfg, FilterType.ALL);
+        cfg.getProject().accept(classifier);
+        importance = classifier.getImportances();
         labelCreator = new LabelProviderCreator(modelPart);
     }
     
@@ -198,7 +207,10 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
         String result = null;
         DecisionVariableDeclaration decl = getVariableDeclaration(propertyIdentifier);
         if (null != decl) {
-            result = ModelAccess.getLabelName(decl);
+            result = ModelAccess.getLabelName(decl);                
+            if (null != importance && importance.isMandatory(decl)) {
+                result = result + "*";
+            }
         }
         return result;
     }

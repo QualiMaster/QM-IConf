@@ -682,7 +682,8 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
             int[] tupleIndex = getTupleIndex();
             if (null != tupleIndex && tupleIndex[TUPLEINDEX_FIELD_POS] >= 0) {
                 ContainerValue container = getContainer();
-                Value value = container.getElement(tupleIndex[TUPLEINDEX_CONTAINER_POS]);
+                int tIndex = tupleIndex[TUPLEINDEX_CONTAINER_POS];
+                Value value = container.getElement(tIndex);
                 int fieldIndex = tupleIndex[TUPLEINDEX_FIELD_POS];
                 Project prj = getProject();
                 try {
@@ -693,6 +694,9 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
                         if (fieldsType.isAssignableFrom(fields.getType())) {
                             ContainerValue fContainer = (ContainerValue) fields;
                             fContainer.removeElement(fieldIndex);
+                            if (0 == fContainer.getElementSize()) {
+                                container.removeElement(tIndex);
+                            }
                             updateUi();
                         }
                     }
