@@ -72,6 +72,7 @@ Development:
   
 Release:
 - Check EASyLoggerFactory.DEBUG must be false!
+- Produce actual versions of the documentation PDFs (user guide, constraints) and place them into help/pdf.
 - Test the development version.
 - Check that all QMapp bundles as well as relevant EASy bundles have a new (minor) version number.
 - Change Product version number according to the main application bundle (Qualimaster application plugin).

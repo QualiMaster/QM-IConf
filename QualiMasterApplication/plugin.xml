@@ -9,6 +9,10 @@
       </application>
    </extension>
 
+   <extension point="org.eclipse.help.toc">
+      <toc file="toc.xml" primary="true">
+      </toc>
+   </extension>
    
    <extension point="org.eclipse.ui.elementFactories">
      <factory id="de.uni_hildesheim.sse.qmApp.editors.DecisionVariableEditorInputFactory" 
@@ -139,6 +143,11 @@
             </separator>            
          </menu>
          <menu label="Help" id="helpMenu">
+            <command commandId="de.uni_hildesheim.sse.qmApp.commands.HelpCommand"
+                  icon = "icons/help.png"
+                  mnemonic="E"
+                  id="de.uni_hildesheim.sse.qmApp.helpCommand">
+            </command>
          <!--
          	<command commandId="org.eclipse.equinox.p2.ui.sdk.update"
 				label="Check for updates">
@@ -154,15 +163,9 @@
              <separator name="additions" visible="false"></separator>
              <separator name="about" visible="false"> </separator>
          </menu>
-         
-         
-         
-         
-         
       </menuContribution>
    </extension>
-   <extension
-         point="org.eclipse.ui.commands">
+   <extension point="org.eclipse.ui.commands">
       <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.SaveAllHandler"
             id="de.uni_hildesheim.sse.qmApp.saveAll"
             name="SaveAll">
@@ -214,8 +217,24 @@
        <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.DisconnectHandler"
           id="de.uni_hildesheim.sse.qmApp.commands.DisconnectHandler"
           name="Disconnect">
-      </command>      
+      </command>
+      <category
+            name="QM-IConf Documentation"
+            id="de.uni_hildesheim.sse.qmApp.help.category">
+      </category>
+      <command
+            categoryId="de.uni_hildesheim.sse.qmApp.help.category"
+            id="de.uni_hildesheim.sse.qmApp.commands.HelpCommand"
+            name="QM-IConf Documentation">
+      </command>
    </extension>   
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="de.uni_hildesheim.sse.qmApp.commands.HelpCommand"
+            class="de.uni_hildesheim.sse.qmApp.commands.HelpCommand">
+      </handler>
+   </extension>
    
    <extension
        point="org.eclipse.ui.commandImages">
@@ -258,7 +277,7 @@
            </image>
            <image 
                commandId="de.uni_hildesheim.sse.qmApp.commands.AboutHandler"
-               icon="icons/help.png">
+               icon="icons/QMicon.png">
            </image>
            <image 
                commandId="de.uni_hildesheim.sse.qmApp.commands.P2UpdateHandler"
