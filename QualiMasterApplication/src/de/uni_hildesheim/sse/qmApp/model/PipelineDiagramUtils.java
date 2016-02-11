@@ -35,12 +35,18 @@ import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
 import de.uni_hildesheim.sse.model.management.VarModel;
 import de.uni_hildesheim.sse.model.varModel.Project;
 import de.uni_hildesheim.sse.qmApp.pipelineUtils.Highlighter;
+import de.uni_hildesheim.sse.qmApp.pipelineUtils.Highlighter.PipelineDataflowInformationWrapper;
 import de.uni_hildesheim.sse.qmApp.pipelineUtils.HighlighterParam;
+import de.uni_hildesheim.sse.qmApp.treeView.ElementStatusIndicator;
 import de.uni_hildesheim.sse.utils.modelManagement.ModelInfo;
 import pipeline.Pipeline;
 import pipeline.PipelinePackage;
 import pipeline.diagram.part.PipelineDiagramEditorUtil;
+import pipeline.impl.DataManagementElementImpl;
+import pipeline.impl.FamilyElementImpl;
 import pipeline.impl.FlowImpl;
+import pipeline.impl.SinkImpl;
+import pipeline.impl.SourceImpl;
 import pipeline.presentation.PipelineModelWizard;
 import qualimasterapplication.Activator;
 
@@ -58,6 +64,50 @@ public class PipelineDiagramUtils {
     public static final String CONSTRAINT_SEPARATOR = ";";
     public static final IProgressMonitor NULL_MONITOR = new NullProgressMonitor();
 
+    private static List<ConnectorWrapper> connectionsList = new ArrayList<ConnectorWrapper>();
+    /**
+     * Wraps up gmf connectors with their corresponding nodes.
+     * @author nowatzki
+     */
+    public static class ConnectorWrapper {
+        private String sourceNode;
+        private String targetNode;
+        private FlowImpl flow;
+        
+        /**
+         * Constructs a wrapper instance for connections.
+         * @param sourceNode connectios source node.
+         * @param targetNode connections target node.
+         * @param flow the connection itself.
+         */
+        public ConnectorWrapper(String sourceNode, String targetNode, FlowImpl flow) {
+            this.sourceNode = sourceNode;
+            this.targetNode = targetNode;
+            this.flow = flow;
+        }
+        /**
+         * Get the flow.
+         * @return flow in this wrapper-object.
+         */
+        public FlowImpl getFlow() {
+            return flow;
+        }
+        /**
+         * Get source in this wrapper-object.
+         * @return sourceNode source in this wrapper.
+         */
+        public String getSource() {
+            return sourceNode;
+        }
+        /**
+         * Get target in this wrapper-object.
+         * @return targetNode target in this wrapper.
+         */
+        public String getTarget() {
+            return targetNode;
+        }
+    }
+    
     /**
      * Returns the diagram URI for a given decision variable.
      * 
@@ -565,5 +615,136 @@ public class PipelineDiagramUtils {
                 adapter.resetNode(eContents.get(j), param);
             }
         }
+    }
+    
+
+    /**
+     * Highlight a given Pipeline-Editor concerning its dataflow characteristics.
+     * The nodes will be coloured in different green tones.
+     * 
+     * @param eobject object to highlight.
+     * @param indicator Indicator which indicates the elements status.
+     */
+    public static void highlightDataFlow(EObject eobject, ElementStatusIndicator indicator) {
+        // TODO Auto-generated method stub
+        DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+        
+        Highlighter highlighter = new Highlighter(diagram);
+        
+        //determine or use dataflow-information of specific EObject!!!
+        //An integer which indicated the dataflow for each eobject.
+        //Absolute or relative scalar...
+
+        //for (int j = 0; j < eContents.size(); j++) {
+
+        if (eobject instanceof SourceImpl) {
+            SourceImpl source = (SourceImpl) eobject;
+            highlighter.highlightDataFlowForSource(source, indicator);
+        }
+        if (eobject instanceof FamilyElementImpl) {
+            FamilyElementImpl source = (FamilyElementImpl) eobject;
+            highlighter.highlightDataFlowForFamily(source, indicator);
+        }
+        if (eobject instanceof SinkImpl) {
+            SinkImpl source = (SinkImpl) eobject;
+            highlighter.highlightDataFlowForSink(source, indicator);
+        }
+        if (eobject instanceof DataManagementElementImpl) {
+            DataManagementElementImpl source = (DataManagementElementImpl) eobject;
+            highlighter.highlightDataFlowForDatamangement(source, indicator);
+        }
+        //}
+    }
+
+    /**
+     * Add color to pipeline.
+     */
+    public static void addPipelineColor() {
+        
+        // Get diagram.
+        DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+        
+        String pipelineName = diagram.getTitle();
+        // highlightAdapter for highlighting diagram-elements.
+        Highlighter adapter = new Highlighter(diagram);
+        List<PipelineDataflowInformationWrapper> wrapperList = adapter.getPipelineFlowInfo();
+
+        PipelineDataflowInformationWrapper test = 
+                new PipelineDataflowInformationWrapper("priorityPip", "FinancialDataSource",
+                        ElementStatusIndicator.HIGH);
+        wrapperList.add(test);
+        
+        EObject element = diagram.getDiagram().getElement();
+        EList<EObject> eContents = element.eContents();
+        
+        for (int i = 0; i < wrapperList.size(); i++) {
+            
+            PipelineDataflowInformationWrapper wrapper = wrapperList.get(i);
+
+            if (wrapper.getPipelineName().toLowerCase().equals(pipelineName.toLowerCase())) {
+                for (int j = 0; j < eContents.size(); j++) {
+                        
+                    //Hiervon der Name
+                    String name = eContents.get(j).toString();
+                    name = name.substring(name.indexOf(":"), name.indexOf(","));
+                    name = name.replaceAll("[^a-zA-Z0-9]", "");
+                    name.replace(":", "");
+                    name = name.trim();
+                    
+                    if (wrapper.getVariableName().equals(name)) {
+                        highlightDataFlow(eContents.get(j), wrapper.getIndicator());
+                    }   
+                    
+                    
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Save the information about the currently open PipelineEditor, aka which nodes 
+     * belong to which flow.
+     */
+    public static void saveConnections() {
+        
+        DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+        
+        EObject element = diagram.getDiagram().getElement();
+        EList<EObject> eContents = element.eContents();
+        
+        for (int j = 0; j < eContents.size(); j++) {
+            
+            if (eContents.get(j) instanceof FlowImpl) {
+                
+                FlowImpl flow = (FlowImpl) eContents.get(j);
+                        
+                
+                String source = flow.getSource().getName();
+                String target = flow.getDestination().getName();
+                
+                ConnectorWrapper wrapper = new ConnectorWrapper(source, target, flow);
+                connectionsList.add(wrapper);
+            }
+        }
+    }
+
+    /**
+     * Clear the information about the connections and their respective nodes in the former
+     * Pipelineeditor.
+     */
+    public static void deleteConnectionsInfo() {
+        connectionsList.clear();
+    }
+    
+    /**
+     * Get the info about current connections and thei nodes.
+     * @return connectionsList List containing info about nodes and connectios.
+     */
+    public static List<ConnectorWrapper> getConnectionInfoList() {
+        return connectionsList;
     }
 }

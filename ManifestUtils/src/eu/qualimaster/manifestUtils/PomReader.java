@@ -21,22 +21,65 @@ import org.xml.sax.SAXException;
 public class PomReader {
 
     /**
+     * Simple wrapper class for extracted information.
+     * @author Patu
+     *
+     */
+    public static class PomInfo {
+        
+        private String fullPath = null;
+        private String groupId = null;
+        private String artifactId = null;
+        private String version = null;
+        
+        /**
+         * Returns the fullPath.
+         * @return String fullPath.
+         */
+        public String getFullPath() {
+            return this.fullPath;
+        }
+        
+        /**
+         * Returns the GroupId.
+         * @return String GroupId.
+         */
+        public String getGroupId() {
+            return this.groupId;
+        }
+        
+        /**
+         * Returns the ArtifactId.
+         * @return String ArtifactId.
+         */
+        public String getArtifactId() {
+            return this.artifactId;
+        }
+        
+        /**
+         * Returns the Version.
+         * @return String Version.
+         */
+        public String getVersion() {
+            return this.version;
+        }
+        
+    }
+    
+    /**
      * Returns the full classpath from a pom file.
      * @param file The pom file to read from.
      * @return The full classpath or NULL if no classpath was available.
      */
-    public static String getFullClasspath(File file) {
+    public static PomInfo getInfo(File file) {
+        
+        PomInfo result = new PomInfo();
         
         DocumentBuilderFactory factory = null;
         DocumentBuilder builder = null;
         //TransformerFactory transformerFactory = null;
         //Transformer transformer = null;
         Document doc = null;
-        
-        String groupId = null;
-        String artifactId = null;
-        
-        String result = null;
         
         if (file != null && file.length() > 0) {
             
@@ -69,10 +112,13 @@ public class PomReader {
                 Node node = list.item(i);
                 //System.out.println(node.getNodeName() + " = " + node.getTextContent());
                 if (node.getNodeName().equalsIgnoreCase("groupId")) {
-                    groupId = node.getTextContent();
+                    result.groupId = node.getTextContent();
                 }
                 if (node.getNodeName().equalsIgnoreCase("artifactId")) {
-                    artifactId = node.getTextContent();
+                    result.artifactId = node.getTextContent();
+                }
+                if (node.getNodeName().equalsIgnoreCase("version")) {
+                    result.version = node.getTextContent();
                 }
             }
             
@@ -80,8 +126,8 @@ public class PomReader {
             System.out.println("FAILED!");   
         }
         
-        if (null != groupId && null != artifactId) {
-            result = groupId + "." + artifactId;
+        if (null != result.groupId && null != result.artifactId) {
+            result.fullPath = result.groupId + "." + result.artifactId;
         } else {
             result = null;
         }
@@ -97,9 +143,15 @@ public class PomReader {
     public static void main(String[] args) {
         
         String test = "";
-        File file = new File("C:/Users/Patu/Desktop/test.pom");
-        test = getFullClasspath(file);
+        File file = new File("C:/Test/pom.xml");
+        if (file.exists()) {
+            System.out.println("DA");
+        }
+        test = getInfo(file).getFullPath();
         System.out.println(test);
+        System.out.println(getInfo(file).getArtifactId());
+        System.out.println(getInfo(file).getGroupId());
+        System.out.println(getInfo(file).getVersion());
         
     }
     

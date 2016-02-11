@@ -255,6 +255,16 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
         // Set input
         tableViewer.setInput(valueList);
     }
+    
+    /**
+     * Refreshes the TableViewer and rebuilds the rows.
+     */
+    public void refresh() {
+        if (null != tableViewer) {
+            createRows(getContainer(), tableViewer.getTable(), getCompound());
+            tableViewer.refresh();
+        }
+    }
 
     @Override
     protected Compound getCompound() {

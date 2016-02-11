@@ -432,7 +432,7 @@ public class ManifestParser {
         }
         
         ManifestConnection con = new ManifestConnection();
-        con.load(groupId, artifactId, version);
+        con.load(null, groupId, artifactId, version);
         List<Item> input = con.getInput(name, artifactId);
         List<Item> output = con.getOutput(name, artifactId);
         List<Parameter> parameters = con.getParameters(name, artifactId);

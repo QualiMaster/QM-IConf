@@ -10,6 +10,7 @@ public class Parameter {
 
     private String name;
     private ParameterType type;
+    private String value;
     
     /**
      * Represents the type of the Parameter.
@@ -17,7 +18,7 @@ public class Parameter {
      */
     public enum ParameterType {
         
-        STRING, BOOLEAN, REAL, INTEGER, UNKNOWN;
+        STRING, BOOLEAN, REAL, INTEGER, LONG, UNKNOWN;
         
         /**
          * Returns a FieldType that fits the given FieldType class.
@@ -31,6 +32,10 @@ public class Parameter {
             try {
                 
                 String name = type.getName().toUpperCase();
+                
+                if (name.equals("DOUBLE")) {
+                    name = "REAL";
+                }
                 
                 if (name.equals("INT")) {
                     name = "INTEGER";
@@ -61,11 +66,47 @@ public class Parameter {
     }
     
     /**
+     * Advanced constructor, which needs a name and a ParameterType and also a (default) value.
+     * @param name The name of the Parameter as String.
+     * @param type The type of the Parameter as ParameterType.
+     * @param value The (default) value of the Paramater.
+     */
+    public Parameter(String name, ParameterType type, String value) {
+        this.name = name;
+        this.type = type;
+        this.value = value;
+    }
+    
+    /**
+     * Sets the (default) value for this parameter.
+     * @param value The default value.
+     */
+    public void setValue(String value) {
+        this.value = value;
+    }
+    
+    /**
+     * Returns the (default) value of the parameter.
+     * @return The (default) value as String.
+     */
+    public String getValue() {
+        return this.value;
+    }
+    
+    /**
      * Returns the name of the Parameter.
      * @return The name as String.
      */
     public String getName() {
         return this.name;
+    }
+    
+    /**
+     * Returns the name of the Parameter in normalized form (first letter capitalized, rest lowercase).
+     * @return The name in normalized form.
+     */
+    public String getNormalizedTypeName() {
+        return this.type.name().substring(0, 1).toUpperCase() + this.type.name().substring(1).toLowerCase();
     }
 
     /**
