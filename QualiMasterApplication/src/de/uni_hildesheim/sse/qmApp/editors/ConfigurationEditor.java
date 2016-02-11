@@ -240,7 +240,7 @@ public class ConfigurationEditor extends EditorPart {
                         tmp.append(ModelAccess.getDisplayName(decl));
                         if (null != ConfigurationEditor.this.importances
                             && ConfigurationEditor.this.importances.isMandatory(decl)) {
-                            tmp.append(" (Mandatory)");
+                            tmp.append(" (mandatory)");
                         }
                         tmp.append("</b>: ");
                         tmp.append(ModelAccess.getHelpText(decl));
