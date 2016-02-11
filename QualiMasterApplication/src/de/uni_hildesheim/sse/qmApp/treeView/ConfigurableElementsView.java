@@ -540,13 +540,13 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                 image = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
             }
            
-//            if (elem.getFlawedIndicator()) {
-//                //Check whether item is flawed. If true, annotate the corresponding icon with an error-marker.
-//
-//                Image newImage = IconManager.addErrorToImage(image);
-//                originalIconReminder.put(newImage, image);
-//                image = newImage;
-//            } 
+            if (elem.getFlawedIndicator()) {
+                //Check whether item is flawed. If true, annotate the corresponding icon with an error-marker.
+
+                Image newImage = IconManager.addErrorToImage(image);
+                originalIconReminder.put(newImage, image);
+                image = newImage;
+            } 
             
             
             //In order to set the icon for elements indicator.
@@ -555,12 +555,12 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                 image = IconManager.addErrorToImage(image, indicator);
             }
             
-//            if (!elem.getFlawedIndicator()) {
-//
-//                if (originalIconReminder.containsKey(image)) {
-//                    image = originalIconReminder.get(image);
-//                }
-//            }
+            if (!elem.getFlawedIndicator()) {
+
+                if (originalIconReminder.containsKey(image)) {
+                    image = originalIconReminder.get(image);
+                }
+            }
             return image;
         }
 

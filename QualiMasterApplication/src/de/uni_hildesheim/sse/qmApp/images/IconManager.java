@@ -373,31 +373,41 @@ public class IconManager {
      */
     public static Image addErrorToImage(Image image, ElementStatusIndicator indicator) {
         
-        BufferedImage overlay =
-                IconManager.toBufferedImage(retrieveImage(IconManager.OVERLAY_ERROR_SMALL));
+        BufferedImage overlay = null;
         
-        switch (indicator) {
-        case VERYHIGH:
-            overlay = IconManager.toBufferedImage(retrieveImage(IconManager.RECTANGLE_RED2));
-            break;
-        case HIGH: 
-            overlay = IconManager.toBufferedImage(retrieveImage(IconManager.RECTANGLE_RED1));
-            break;
-        case MEDIUM:  
-            overlay = IconManager.toBufferedImage(retrieveImage(IconManager.RECTANGLE_ORANGE));
-            break;
-        case LOW:    
-            overlay = IconManager.toBufferedImage(retrieveImage(IconManager.RECTANGLE_GREEN1));
-            break;
-        case VERYLOW:  
-            overlay = IconManager.toBufferedImage(retrieveImage(IconManager.RECTANGLE_GREEN2));
-            break;
-        default:
-            break;
+        if (null == indicator) {
+            overlay = IconManager.toBufferedImage(retrieveImage(IconManager.OVERLAY_ERROR_SMALL));
         }
         
-        image = IconManager.addIndicatorToImage(image, overlay);
-
+        if (null != indicator) {
+            switch (indicator) {
+            case VERYHIGH:
+                overlay = IconManager.toBufferedImage(retrieveImage(IconManager.RECTANGLE_RED2));
+                break;
+            case HIGH: 
+                overlay = IconManager.toBufferedImage(retrieveImage(IconManager.RECTANGLE_RED1));
+                break;
+            case MEDIUM:  
+                overlay = IconManager.toBufferedImage(retrieveImage(IconManager.RECTANGLE_ORANGE));
+                break;
+            case LOW:    
+                overlay = IconManager.toBufferedImage(retrieveImage(IconManager.RECTANGLE_GREEN1));
+                break;
+            case VERYLOW:  
+                overlay = IconManager.toBufferedImage(retrieveImage(IconManager.RECTANGLE_GREEN2));
+                break;
+            case NONE:
+                overlay = null;
+                break;
+            default:
+                overlay = null;
+                break;
+            }
+        }
+        
+        if (null != overlay) {
+            image = IconManager.addIndicatorToImage(image, overlay);
+        }
         return image;
     }
 

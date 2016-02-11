@@ -30,7 +30,7 @@ import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
  */
 public class ConfigurableElement { // unsure whether this shall be a resource
 
-    private ElementStatusIndicator status = ElementStatusIndicator.MEDIUM;
+    private ElementStatusIndicator status;
     private String displayName;
     private String editorId;
     private IEditorInputCreator input;
@@ -56,7 +56,7 @@ public class ConfigurableElement { // unsure whether this shall be a resource
         this.modelPart = modelPart;
         this.editorId = editorId;
         this.input = input;
-        this.status = ElementStatusIndicator.LOW;
+        this.status = ElementStatusIndicator.NONE;
     }
     
     /**

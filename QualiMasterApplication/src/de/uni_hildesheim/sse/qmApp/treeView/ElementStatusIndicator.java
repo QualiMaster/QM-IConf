@@ -7,5 +7,5 @@ package de.uni_hildesheim.sse.qmApp.treeView;
  */
 public enum ElementStatusIndicator {
 
-    VERYHIGH, HIGH, MEDIUM, LOW, VERYLOW
+    VERYHIGH, HIGH, MEDIUM, LOW, VERYLOW, NONE;
 }
