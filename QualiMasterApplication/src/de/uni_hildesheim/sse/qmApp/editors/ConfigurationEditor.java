@@ -37,6 +37,10 @@ import de.uni_hildesheim.sse.model.varModel.datatypes.EnumLiteral;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Reference;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Sequence;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Set;
+import de.uni_hildesheim.sse.model.varModel.filter.FilterType;
+import de.uni_hildesheim.sse.model.varModel.filter.mandatoryVars.MandatoryClassifierSettings;
+import de.uni_hildesheim.sse.model.varModel.filter.mandatoryVars.MandatoryDeclarationClassifier;
+import de.uni_hildesheim.sse.model.varModel.filter.mandatoryVars.VariableContainer;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.Utils;
@@ -44,7 +48,8 @@ import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 
 /**
  * This class is responsible for providing Editors for given elements which are shown in the 
- * {@link ConfigurableElementsView}. Requires {@link VarModelEditorInput} as input.
+ * {@link de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElementsView}.
+ * Requires {@link VarModelEditorInput} as input.
  * 
  * @author Niko Nowatzki
  * @author Holger Eichelberger
@@ -56,6 +61,7 @@ public class ConfigurationEditor extends EditorPart {
     private DelegatingEasyEditorPage parent;
     private TreeViewer treeViewer;
     private VarModelEditorInput input;
+    private VariableContainer importances;
     
     @Override
     public void doSave(IProgressMonitor monitor) {
@@ -72,6 +78,11 @@ public class ConfigurationEditor extends EditorPart {
         if (input instanceof VarModelEditorInput) {
             this.input = (VarModelEditorInput) input;
             cfg = this.input.getConfiguration();
+            MandatoryClassifierSettings settings = new MandatoryClassifierSettings();
+            settings.setDefaultValueConsideration(false);
+            MandatoryDeclarationClassifier finder = new MandatoryDeclarationClassifier(cfg, FilterType.ALL, settings);
+            cfg.getProject().accept(finder);
+            importances = finder.getImportances();
         } else {
             throw new PartInitException("wrong editor input");
         }
@@ -135,7 +146,7 @@ public class ConfigurationEditor extends EditorPart {
      * 
      * @author Holger Eichelberger
      */
-    private static class HtmlVisitor extends AbstractVisitor {
+    private class HtmlVisitor extends AbstractVisitor {
 
         private StringBuilder actualCompound;
         private List<String> compounds = new ArrayList<String>();
@@ -227,6 +238,10 @@ public class ConfigurationEditor extends EditorPart {
                         }
                         tmp.append("<b>");
                         tmp.append(ModelAccess.getDisplayName(decl));
+                        if (null != ConfigurationEditor.this.importances
+                            && ConfigurationEditor.this.importances.isMandatory(decl)) {
+                            tmp.append(" (Mandatory)");
+                        }
                         tmp.append("</b>: ");
                         tmp.append(ModelAccess.getHelpText(decl));
                         tmp.append("\n");
