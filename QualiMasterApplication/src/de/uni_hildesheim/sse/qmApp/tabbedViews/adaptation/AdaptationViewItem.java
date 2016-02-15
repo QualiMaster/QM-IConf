@@ -24,20 +24,20 @@ class AdaptationViewItem {
     
     private long timestamp;
     private String pipelineName;
-    private String type;
+    private String element;
     private String description;
     
     /**
      * Single constructor of this class.
      * @param timestamp The timestamp when the event was created.
      * @param pipelineName The pipeline where the event was created.
-     * @param type The type of event
+     * @param element The element of the pipeline, which was affected.
      * @param description A detailed description of this event.
      */
-    AdaptationViewItem(long timestamp, String pipelineName, String type, String description) {
+    AdaptationViewItem(long timestamp, String pipelineName, String element, String description) {
         this.timestamp = timestamp;
         this.pipelineName = pipelineName;
-        this.type = type;
+        this.element = element;
         this.description = description;
     }
 
@@ -58,11 +58,11 @@ class AdaptationViewItem {
     }
 
     /**
-     * The kind of event.
-     * @return The kind of event, maybe <tt>null</tt>.
+     * The element of the pipeline, which was affected.
+     * @return The sub element of the pipeline, maybe <tt>null</tt>.
      */
-    public String getType() {
-        return type;
+    public String getElement() {
+        return element;
     }
 
     /**
