@@ -24,6 +24,8 @@ import org.eclipse.ui.part.ViewPart;
 
 /**
  * A moveable view to display events of the adaptation layer.
+ * See <a href="https://eclipse.org/articles/viewArticle/ViewArticle2.html">
+ * https://eclipse.org/articles/viewArticle/ViewArticle2.html</a> for how to add <b>Menus and Toolbars</b>.
  * @author El-Sharkawy
  *
  */
