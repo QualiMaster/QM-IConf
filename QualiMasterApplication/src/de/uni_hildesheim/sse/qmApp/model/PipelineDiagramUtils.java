@@ -35,8 +35,9 @@ import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
 import de.uni_hildesheim.sse.model.management.VarModel;
 import de.uni_hildesheim.sse.model.varModel.Project;
 import de.uni_hildesheim.sse.qmApp.pipelineUtils.Highlighter;
-import de.uni_hildesheim.sse.qmApp.pipelineUtils.Highlighter.PipelineDataflowInformationWrapper;
 import de.uni_hildesheim.sse.qmApp.pipelineUtils.HighlighterParam;
+import de.uni_hildesheim.sse.qmApp.pipelineUtils.PipelineStatusHighlighter;
+import de.uni_hildesheim.sse.qmApp.pipelineUtils.PipelineStatusHighlighter.PipelineDataflowInformationWrapper;
 import de.uni_hildesheim.sse.qmApp.treeView.ElementStatusIndicator;
 import de.uni_hildesheim.sse.utils.modelManagement.ModelInfo;
 import pipeline.Pipeline;
@@ -627,11 +628,9 @@ public class PipelineDiagramUtils {
      */
     public static void highlightDataFlow(EObject eobject, ElementStatusIndicator indicator) {
         // TODO Auto-generated method stub
-        DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-        
-        Highlighter highlighter = new Highlighter(diagram);
-        
+
+        //Highlighter highlighter = new Highlighter(diagram);
+
         //determine or use dataflow-information of specific EObject!!!
         //An integer which indicated the dataflow for each eobject.
         //Absolute or relative scalar...
@@ -640,21 +639,20 @@ public class PipelineDiagramUtils {
 
         if (eobject instanceof SourceImpl) {
             SourceImpl source = (SourceImpl) eobject;
-            highlighter.highlightDataFlowForSource(source, indicator);
+            PipelineStatusHighlighter.INSTANCE.highlightDataFlowForSource(source, indicator);
         }
         if (eobject instanceof FamilyElementImpl) {
             FamilyElementImpl source = (FamilyElementImpl) eobject;
-            highlighter.highlightDataFlowForFamily(source, indicator);
+            PipelineStatusHighlighter.INSTANCE.highlightDataFlowForFamily(source, indicator);
         }
         if (eobject instanceof SinkImpl) {
             SinkImpl source = (SinkImpl) eobject;
-            highlighter.highlightDataFlowForSink(source, indicator);
+            PipelineStatusHighlighter.INSTANCE.highlightDataFlowForSink(source, indicator);
         }
         if (eobject instanceof DataManagementElementImpl) {
             DataManagementElementImpl source = (DataManagementElementImpl) eobject;
-            highlighter.highlightDataFlowForDatamangement(source, indicator);
+            PipelineStatusHighlighter.INSTANCE.highlightDataFlowForDatamangement(source, indicator);
         }
-        //}
     }
 
     /**
@@ -667,14 +665,14 @@ public class PipelineDiagramUtils {
                 .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
         
         String pipelineName = diagram.getTitle();
-        // highlightAdapter for highlighting diagram-elements.
-        Highlighter adapter = new Highlighter(diagram);
-        List<PipelineDataflowInformationWrapper> wrapperList = adapter.getPipelineFlowInfo();
+        
+        List<de.uni_hildesheim.sse.qmApp.pipelineUtils.PipelineStatusHighlighter.PipelineDataflowInformationWrapper>
+            wrapperList = PipelineStatusHighlighter.INSTANCE.getPipelineFlowInfo();
 
-        PipelineDataflowInformationWrapper test = 
-                new PipelineDataflowInformationWrapper("priorityPip", "FinancialDataSource",
-                        ElementStatusIndicator.HIGH);
-        wrapperList.add(test);
+//        PipelineDataflowInformationWrapper test = 
+//                new PipelineDataflowInformationWrapper("priorityPip", "FinancialDataSource",
+//                        ElementStatusIndicator.HIGH);
+//        wrapperList.add(test);
         
         EObject element = diagram.getDiagram().getElement();
         EList<EObject> eContents = element.eContents();
