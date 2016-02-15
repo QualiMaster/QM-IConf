@@ -46,9 +46,8 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
 
     public static final String ID = "de.uni_hildesheim.sse.qmApp.VariableEditor";
     
-    
     private static final String COMPOSITE_STRING = "class org.eclipse.swt.widgets.Composite";
-    private static final int PREFERRED_WIDTH = 400;
+    private static final int PREFERRED_WIDTH = 700;
     
     private HashMap<Control, ControlDecoration> flawedControls = new HashMap<Control, ControlDecoration>();
     private ScrolledComposite scroll;
@@ -114,7 +113,8 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
         GridLayout layout = new GridLayout(2, false);
         
         //Set the margin thus the textfields wont fill completely
-        layout.marginRight = 80;
+        //layout.marginRight = 80;
+        
         inner.setLayout(layout);
         
         if (null != var) { // may not be there, e.g., in case of the wrong model
@@ -172,6 +172,9 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
      */
     private void collectTextFields(Control ctrl) {
 
+//        GridData data = new GridData();
+//        data.minimumWidth = 1500;
+
         if (!(ctrl instanceof Composite)) {
             final ControlDecoration decorator = new ControlDecoration(ctrl, SWT.RIGHT);
             Image img = IconManager.retrieveImage(IconManager.ERROR);
@@ -198,6 +201,9 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
                     comboDecorator.hide();
                     flawedControls.put(control, comboDecorator);
                 }
+//                if (control instanceof Text) {
+//                    control.setLayoutData(data);
+//                }
                 if (!control.getClass().toString().equals(COMPOSITE_STRING)) {
                     collectTextFields(control);
                 }
