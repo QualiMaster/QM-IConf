@@ -15,11 +15,22 @@
  */
 package de.uni_hildesheim.sse.qmApp.tabbedViews.adaptation;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -53,8 +64,10 @@ public class AdaptationEventsLogView extends ViewPart {
 
         table.setLinesVisible(true);
         table.setHeaderVisible(true);
-        String[] titles = {"Time", "Pipeline", "Event Type", "Description"};
+        String[] titles = {"Time", "Pipeline", "Element", "Description"};
         int[] defColumnSizes = {180, 75, 75, 280};
+        Assert.isTrue(titles.length == defColumnSizes.length, "Same amount of titles and column "
+            + "sizes must be specified.");
         for (int i = 0; i < titles.length; i++) {
             TableViewerColumn column = new TableViewerColumn(viewer, SWT.NONE);
             column.getColumn().setText(titles[i]);
@@ -66,5 +79,43 @@ public class AdaptationEventsLogView extends ViewPart {
         viewer.setContentProvider(AdaptationEventsViewModel.INSTANCE);
         AdaptationEventsViewModel.INSTANCE.setViewer(viewer);
         viewer.setInput(AdaptationEventsViewModel.INSTANCE);
+        
+        createActions();
     }
+    
+    /**
+     * Registers the actions (methods of this class) as listeners to the Eclipse framework.
+     */
+    private void createActions() {
+        Action saveAction = new Action("Save...") {
+            public void run() { 
+                saveAll();
+            }
+        };
+        saveAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+            .getImageDescriptor(ISharedImages.IMG_ETOOL_SAVE_EDIT));
+        
+        IMenuManager mgr = getViewSite().getActionBars().getMenuManager();
+        mgr.add(saveAction);
+    }
+
+    /**
+     * Saves the current model to file system.
+     */
+    private void saveAll() {
+        File target = new File(System.getProperty("user.home") + "/" + "adaptation_events_log.csv");
+        try {
+            AdaptationEventsViewModel.INSTANCE.save(target);
+        } catch (IOException e) {
+            IWorkbench workbench = PlatformUI.getWorkbench();
+            Shell parent = workbench.getActiveWorkbenchWindow().getShell();
+            Shell shell = new Shell(parent);
+            MessageBox messageBox = new MessageBox(shell, SWT.OK | SWT.ICON_ERROR);
+            messageBox.setText("QualiMaster - Error");
+            messageBox.setMessage(e.getMessage());
+            messageBox.open();
+        }
+    }
+    
+    
 }

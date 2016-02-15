@@ -27,7 +27,7 @@ import org.eclipse.jface.viewers.ColumnLabelProvider;
  */
 class AdaptationColumnProvider extends ColumnLabelProvider {
     
-    private static final SimpleDateFormat FORMATER = new SimpleDateFormat("EEE, MMM d, ''yy 'at' HH:mm:ss z");
+    static final SimpleDateFormat FORMATER = new SimpleDateFormat("EEE, MMM d, ''yy 'at' HH:mm:ss z");
     
     private int column;
     
@@ -52,7 +52,7 @@ class AdaptationColumnProvider extends ColumnLabelProvider {
                 text = item.getPipelineName();
                 break;
             case 2:
-                text = item.getType();
+                text = item.getElement();
                 break;
             case 3:
                 text = item.getDescription();
