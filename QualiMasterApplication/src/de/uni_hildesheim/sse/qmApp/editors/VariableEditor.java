@@ -47,7 +47,7 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     public static final String ID = "de.uni_hildesheim.sse.qmApp.VariableEditor";
     
     private static final String COMPOSITE_STRING = "class org.eclipse.swt.widgets.Composite";
-    private static final int PREFERRED_WIDTH = 700;
+    private static final int PREFERRED_WIDTH = 590;
     
     private HashMap<Control, ControlDecoration> flawedControls = new HashMap<Control, ControlDecoration>();
     private ScrolledComposite scroll;
