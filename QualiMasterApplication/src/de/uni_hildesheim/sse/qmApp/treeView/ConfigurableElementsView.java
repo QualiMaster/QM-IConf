@@ -539,19 +539,18 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
             if (null == image) {
                 image = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
             }
-           
             
             if (elem.getFlawedIndicator()) {
-                //Check whether item is flawed. If true, annotate the corresponding icon with an error-marker.
 
-                image = originalIndicatorIconReminder.get(image);
+                if (originalIndicatorIconReminder.containsKey(image)) {
+                    image = originalIndicatorIconReminder.get(image);
+                }
                 
                 Image newImage = IconManager.addErrorToImage(image);
                 originalErrorIconReminder.put(newImage, image);
                 image = newImage;
-            }   
-            
-            if (!elem.getFlawedIndicator()) {
+                
+            } else if (!elem.getFlawedIndicator()) {
 
                 if (originalErrorIconReminder.containsKey(image)) {
                     image = originalErrorIconReminder.get(image);
@@ -559,6 +558,7 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                 
                 //In order to set the icon for elements indicator.
                 if (!elem.getDisplayName().equals("Runtime")) {
+                    
                     ElementStatusIndicator indicator = elem.getStatus();
                     Image newImage = IconManager.addErrorToImage(image, indicator);
                     originalIndicatorIconReminder.put(newImage, image);
@@ -670,9 +670,9 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
     }
 
     /**
-     * Force the viewer to referesh its input.
+     * Force the viewer to refresh its input.
      */
-    public void forceTreeRefresh() {
+    public static void forceTreeRefresh() {
         viewer.refresh();
     }
 
@@ -917,24 +917,38 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
 
             ConfigurableElement treeElement = elements.elements()[i];
 
-            for (int k = 0; k < treeElement.getChildCount(); k++) {
-                
-                ConfigurableElement innerTreeElement = treeElement.getChild(k);
-
-                String innerTreeElementName = innerTreeElement.getDisplayName();
-                innerTreeElementName = innerTreeElementName.replaceAll("[^a-zA-Z0-9]", "");
-                if (configurableElementsViewMapping.contains(innerTreeElementName)) {
-                    innerTreeElement.setFlawedIndicator(true);
-                    viewer.refresh(innerTreeElement);
-                } else {
-
-                    innerTreeElement.setFlawedIndicator(false);
-                    viewer.refresh(innerTreeElement);
-                }
-            }
+            
+            traverseTree(treeElement, configurableElementsViewMapping);
+            
+            
         }
     }
 
+    /**
+     * Visit all treeitems.
+     * @param element one top-level parent
+     * @param configurableElementsViewMapping list of items to search for.
+     */
+    private static void traverseTree(ConfigurableElement element, Set<String> configurableElementsViewMapping) {
+        
+        for (int k = 0; k < element.getChildCount(); k++) {
+            
+            ConfigurableElement innerTreeElement = element.getChild(k);
+
+            String innerTreeElementName = innerTreeElement.toString();
+            innerTreeElementName = innerTreeElementName.replaceAll("[^a-zA-Z0-9]", "");
+            if (configurableElementsViewMapping.contains(innerTreeElementName)) {
+                innerTreeElement.setFlawedIndicator(true);
+                viewer.refresh(innerTreeElement);
+            } else {
+
+                innerTreeElement.setFlawedIndicator(false);
+                viewer.refresh(innerTreeElement);
+            }
+            
+            traverseTree(innerTreeElement, configurableElementsViewMapping);
+        }
+    }
     /**
      * Change all icons to standard with no red markers.
      */

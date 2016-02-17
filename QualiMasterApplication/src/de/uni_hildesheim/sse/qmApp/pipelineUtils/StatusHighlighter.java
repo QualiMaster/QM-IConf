@@ -14,6 +14,8 @@ import org.eclipse.ui.PlatformUI;
 
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.qmApp.model.PipelineDiagramUtils;
+import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElement;
+import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElementsView;
 import de.uni_hildesheim.sse.qmApp.treeView.ElementStatusIndicator;
 import pipeline.diagram.part.PipelineDiagramEditor;
 import pipeline.impl.DataManagementElementImpl;
@@ -25,16 +27,16 @@ import pipeline.impl.SourceImpl;
  * Singleton-Class for highlighting Pipeline-Editors.
  * @author nowatzki
  */
-public class PipelineStatusHighlighter {
+public class StatusHighlighter {
 
-    public static final PipelineStatusHighlighter INSTANCE = new PipelineStatusHighlighter();
+    public static final StatusHighlighter INSTANCE = new StatusHighlighter();
     private List<PipelineDataflowInformationWrapper> pipelineDataflowList = 
             new ArrayList<PipelineDataflowInformationWrapper>();
     
     /**
      * // Exists only to avoid instantiation.
      */
-    private PipelineStatusHighlighter() {
+    private StatusHighlighter() {
     }
     
 //    /**
@@ -106,6 +108,12 @@ public class PipelineStatusHighlighter {
                 pipelineName, variableName, indicator);
         boolean alreadySaved = false;
         
+        //If no variablename is given, then mark the corresponding pipeline in the treeview
+        if (variableName == null || variableName.length() < 1) {    
+            
+            markPipelineStatus(pipelineName, indicator);
+        }
+        
         for (int i = 0; i < pipelineDataflowList.size(); i++) {
             
             PipelineDataflowInformationWrapper existingWrapper = pipelineDataflowList.get(i);
@@ -141,6 +149,92 @@ public class PipelineStatusHighlighter {
         }
     }
 
+    /**
+     * Mark an pipeline-element.
+     * @param pipelineName name of the pipeline.
+     * @param indicator indicator which indicates the pipelines status.
+     */
+    public void markPipelineStatus(String pipelineName, ElementStatusIndicator indicator) {
+        
+        ConfigurableElement[] elements = ConfigurableElementsView.getElements();
+        for (int i = 0; i < elements.length; i++) {
+            ConfigurableElement topLevel = elements[i];
+            
+            if (topLevel.getDisplayName().equals("Pipelines")) {
+                markPipelineElement(topLevel, pipelineName, indicator);
+            }
+
+        }
+        
+    }
+    
+    /**
+     * Go through pipelineElements and mark the right one.
+     * @param topLevel toplevel Treelement for pipelines.
+     * @param pipelineName name of the pipeline.
+     * @param indicator indicator which indicates the status of the pipeline.
+     */
+    private void markPipelineElement(ConfigurableElement topLevel, String pipelineName,
+            ElementStatusIndicator indicator) {
+        
+        for (int i = 0; i < topLevel.getChildCount(); i++) {
+            
+            ConfigurableElement element = topLevel.getChild(i);
+            
+            if (element.getDisplayName().toLowerCase().equals(pipelineName.toLowerCase())) {
+                
+                element.setStatus(indicator);
+                ConfigurableElementsView.forceTreeRefresh();
+            }
+        } 
+    }
+    
+    /**
+     * Set the status of a given ConfigurableElement.
+     * @param elementName name of the element.
+     * @param status status of the element.
+     */
+    public void markConfigurableElementsStatus(String elementName, ElementStatusIndicator status) {
+        ConfigurableElement[] elements = ConfigurableElementsView.getElements();
+        
+        for (int i = 0; i < elements.length; i++) {
+            ConfigurableElement element = elements[i];
+            
+            if (element.getDisplayName().toLowerCase().equals(elementName.toLowerCase())) {
+                element.setStatus(status);
+                ConfigurableElementsView.forceTreeRefresh();
+            }
+            
+            for (int j = 0; j < element.getChildCount(); j++) {
+                ConfigurableElement child = element.getChild(j);
+                markConfigurableElement(child, elementName, status);
+            }
+            
+        }
+    }
+    
+    /**
+     * Set the status of a given ConfigurableElement.
+     * @param element current element in tree.
+     * @param elementName name of the searched element.
+     * @param status status to set.
+     */
+    public void markConfigurableElement(ConfigurableElement element, String elementName,
+            ElementStatusIndicator status) {
+        
+        if (element.getDisplayName().toLowerCase().equals(elementName.toLowerCase())) {
+            
+            element.setStatus(status);
+            ConfigurableElementsView.forceTreeRefresh();
+        } else {
+            if (element.hasChildren()) {
+                for (int j = 0; j < element.getChildCount(); j++) {
+                    markConfigurableElement(element.getChild(j), elementName, status);
+                }
+            }
+        }
+    }
+    
     /**
      * Mark the flawed pipeline-elements in the currently opened Pipeline-Diagram.
      */
