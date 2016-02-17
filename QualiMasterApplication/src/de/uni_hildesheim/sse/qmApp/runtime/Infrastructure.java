@@ -33,6 +33,8 @@ import eu.qualimaster.adaptation.external.DisconnectRequest;
 import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
 import eu.qualimaster.adaptation.external.HardwareAliveMessage;
 import eu.qualimaster.adaptation.external.IDispatcher;
+import eu.qualimaster.adaptation.external.IInformationDispatcher;
+import eu.qualimaster.adaptation.external.InformationMessage;
 import eu.qualimaster.adaptation.external.LoggingFilterRequest;
 import eu.qualimaster.adaptation.external.LoggingMessage;
 import eu.qualimaster.adaptation.external.Message;
@@ -52,8 +54,8 @@ public class Infrastructure {
 
     private static ClientEndpoint endpoint;
     private static String user;
-    private static List<IDispatcher> dispatchers 
-        = Collections.synchronizedList(new ArrayList<IDispatcher>());
+    private static List<IClientDispatcher> dispatchers 
+        = Collections.synchronizedList(new ArrayList<IClientDispatcher>());
     private static List<IInfrastructureListener> listeners 
         = Collections.synchronizedList(new ArrayList<IInfrastructureListener>());
 
@@ -62,6 +64,14 @@ public class Infrastructure {
      */
     private Infrastructure() {
     }
+
+    /**
+     * Defines a combining interface.
+     * 
+     * @author Holger Eichelberger
+     */
+    public interface IClientDispatcher extends IDispatcher, IInformationDispatcher {
+    }
     
     /**
      * Implements a delegating dispatcher, i.e., a dispatcher that delegates to the registered
@@ -69,7 +79,7 @@ public class Infrastructure {
      * 
      * @author Holger Eichelberger
      */
-    private static class DelegatingDispatcher implements IDispatcher {
+    private static class DelegatingDispatcher implements IDispatcher, IInformationDispatcher {
 
         @Override
         public void handleAlgorithmChangedMessage(AlgorithmChangedMessage message) {
@@ -142,6 +152,13 @@ public class Infrastructure {
         public void handleLoggingMessage(LoggingMessage message) {
             for (int d = 0; d < dispatchers.size(); d++) {
                 dispatchers.get(d).handleLoggingMessage(message);
+            }
+        }
+
+        @Override
+        public void handleInformationMessage(InformationMessage message) {
+            for (int d = 0; d < dispatchers.size(); d++) {
+                dispatchers.get(d).handleInformationMessage(message);
             }
         }
         
@@ -252,7 +269,7 @@ public class Infrastructure {
      * 
      * @param dispatcher the dispatcher to be registered (may be <b>null</b>, ignored then)
      */
-    public static void registerDispatcher(IDispatcher dispatcher) {
+    public static void registerDispatcher(IClientDispatcher dispatcher) {
         if (null != dispatcher && !dispatchers.contains(dispatcher)) {
             dispatchers.add(dispatcher);
         }
@@ -263,7 +280,7 @@ public class Infrastructure {
      * 
      * @param dispatcher the dispatcher to be unregistered (may be <b>null</b>, ignored then)
      */
-    public static void unregisterDispatcher(IDispatcher dispatcher) {
+    public static void unregisterDispatcher(IClientDispatcher dispatcher) {
         if (null != dispatcher) {
             dispatchers.remove(dispatcher);
         }
@@ -342,12 +359,14 @@ public class Infrastructure {
      */
     public static void registerDefaultListeners() {
         registerListener(ExecutionMessageHandler.INSTANCE);
+        registerDispatcher(ViewModelClientDispatcher.INSTANCE);
     }
 
     /**
      * Unregisters default listeners.
      */
     public static void unregisterDefaultListeners() {
+        unregisterDispatcher(ViewModelClientDispatcher.INSTANCE);
         unregisterListener(ExecutionMessageHandler.INSTANCE);
     }
 

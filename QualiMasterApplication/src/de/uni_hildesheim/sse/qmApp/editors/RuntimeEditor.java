@@ -43,12 +43,13 @@ import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
 import de.uni_hildesheim.sse.qmApp.runtime.IInfrastructureListener;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
+import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure.IClientDispatcher;
 import eu.qualimaster.adaptation.external.AlgorithmChangedMessage;
 import eu.qualimaster.adaptation.external.ChangeParameterRequest;
 import eu.qualimaster.adaptation.external.DisconnectRequest;
 import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
 import eu.qualimaster.adaptation.external.HardwareAliveMessage;
-import eu.qualimaster.adaptation.external.IDispatcher;
+import eu.qualimaster.adaptation.external.InformationMessage;
 import eu.qualimaster.adaptation.external.LoggingFilterRequest;
 import eu.qualimaster.adaptation.external.LoggingMessage;
 import eu.qualimaster.adaptation.external.MonitoringDataMessage;
@@ -61,7 +62,7 @@ import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
  * 
  * @author Holger Eichelberger
  */
-public class RuntimeEditor extends EditorPart implements IDispatcher, IInfrastructureListener {
+public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInfrastructureListener {
 
     private static int counter = 0;
     
@@ -519,6 +520,11 @@ public class RuntimeEditor extends EditorPart implements IDispatcher, IInfrastru
     @Override
     public void handleLoggingMessage(LoggingMessage arg0) {
         // server side - nothing to do
+    }
+
+    @Override
+    public void handleInformationMessage(InformationMessage arg0) {
+        // show along with executed commands
     }
 
 }
