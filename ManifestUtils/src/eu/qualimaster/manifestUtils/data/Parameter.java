@@ -31,7 +31,7 @@ public class Parameter {
             
             try {
                 
-                String name = type.getName().toUpperCase();
+                String name = type.getSimpleName().toUpperCase();
                 
                 if (name.equals("DOUBLE")) {
                     name = "REAL";
