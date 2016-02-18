@@ -585,12 +585,14 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
     /**
      * Updates the UI after changing the tuples.
      */
-    private void updateUi() {
+    public void updateUi() {
         Compound compound = getCompound();
         ContainerValue container = getContainer();
 
         valueList.clear();
-        createRows(container, tableViewer.getTable(), compound);
+        if (null != container && null != tableViewer) {
+            createRows(container, tableViewer.getTable(), compound);
+        }
         tableViewer.refresh();
         notifyDirty();
     }

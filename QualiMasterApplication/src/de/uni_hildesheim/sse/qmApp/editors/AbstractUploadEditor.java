@@ -311,6 +311,7 @@ public abstract class AbstractUploadEditor extends VariableEditor {
             
         }   
         con.load(observer, groupId, artifactId, version);
+        
         List<Item> input = con.getInput(className, artifactId);
         List<Item> output = con.getOutput(className, artifactId);
         List<Parameter> param = con.getParameters(className, artifactId);
@@ -434,7 +435,8 @@ public abstract class AbstractUploadEditor extends VariableEditor {
             for (int i = 0; i < this.getEditorCount(); i++) {
                 if (this.getEditor(i) instanceof ParameterEditor) {
                     ((ParameterEditor) this.getEditor(i)).refresh();
-                    System.out.println("Found it!!!");
+                } else if (this.getEditor(i) instanceof TuplesEditor) {
+                    ((TuplesEditor) this.getEditor(i)).updateUi();
                 }
             }
             parent.redraw();
