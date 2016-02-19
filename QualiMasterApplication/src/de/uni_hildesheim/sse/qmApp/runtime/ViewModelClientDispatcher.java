@@ -15,6 +15,8 @@
  */
 package de.uni_hildesheim.sse.qmApp.runtime;
 
+import org.eclipse.swt.widgets.Display;
+
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure.IClientDispatcher;
 import de.uni_hildesheim.sse.qmApp.tabbedViews.adaptation.AdaptationEventsViewModel;
 import eu.qualimaster.adaptation.external.AlgorithmChangedMessage;
@@ -54,9 +56,16 @@ public class ViewModelClientDispatcher implements IClientDispatcher {
     }
     
     @Override
-    public void handleAlgorithmChangedMessage(AlgorithmChangedMessage message) {
-        AdaptationEventsViewModel.INSTANCE.addEvent(getNow(), message.getPipeline(), message.getPipelineElement(), 
-            "algorithm changed to '" + message.getAlgorithm() + "'");
+    public void handleAlgorithmChangedMessage(final AlgorithmChangedMessage message) {
+        Display.getDefault().asyncExec(new Runnable() {
+            
+            @Override
+            public void run() {
+                AdaptationEventsViewModel.INSTANCE.addEvent(getNow(), message.getPipeline(), 
+                    message.getPipelineElement(), "algorithm changed to '" + message.getAlgorithm() + "'");
+            }
+            
+        });
     }
 
     @Override
@@ -115,10 +124,17 @@ public class ViewModelClientDispatcher implements IClientDispatcher {
     }
 
     @Override
-    public void handleInformationMessage(InformationMessage message) {
-        String pip = toDisplay(message.getPipeline());
-        String pipElt = toDisplay(message.getPipelineElement());
-        AdaptationEventsViewModel.INSTANCE.addEvent(getNow(), pip, pipElt, message.getDescription());
+    public void handleInformationMessage(final InformationMessage message) {
+        Display.getDefault().asyncExec(new Runnable() {
+            
+            @Override
+            public void run() {
+                String pip = toDisplay(message.getPipeline());
+                String pipElt = toDisplay(message.getPipelineElement());
+                AdaptationEventsViewModel.INSTANCE.addEvent(getNow(), pip, pipElt, message.getDescription());
+            }
+            
+        });
     }
 
 }

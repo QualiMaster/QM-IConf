@@ -51,7 +51,7 @@ public class AdaptationEventsViewModel implements IStructuredContentProvider  {
         viewer = null;
         autoRefresh = true;
         items = new ArrayList<AdaptationViewItem>();
-        addEvent(System.currentTimeMillis(), "PriorityPip", "elem", "An element from Priority Pip was exchanged.");
+        //addEvent(System.currentTimeMillis(), "PriorityPip", "elem", "An element from Priority Pip was exchanged.");
     }
     
     /**
