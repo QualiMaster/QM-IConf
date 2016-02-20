@@ -57,15 +57,7 @@ public class ViewModelClientDispatcher implements IClientDispatcher {
     
     @Override
     public void handleAlgorithmChangedMessage(final AlgorithmChangedMessage message) {
-        Display.getDefault().asyncExec(new Runnable() {
-            
-            @Override
-            public void run() {
-                AdaptationEventsViewModel.INSTANCE.addEvent(getNow(), message.getPipeline(), 
-                    message.getPipelineElement(), "algorithm changed to '" + message.getAlgorithm() + "'");
-            }
-            
-        });
+        // legacy, repeated via information message
     }
 
     @Override
