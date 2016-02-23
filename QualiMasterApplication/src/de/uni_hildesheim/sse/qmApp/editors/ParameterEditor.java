@@ -262,6 +262,7 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
     public void refresh() {
         ContainerValue container = getContainer();
         if (null != tableViewer && null != container) {
+            valueList.clear();
             createRows(container, tableViewer.getTable(), getCompound());
             tableViewer.refresh();
         }

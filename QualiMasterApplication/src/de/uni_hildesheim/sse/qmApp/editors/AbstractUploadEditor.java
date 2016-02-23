@@ -436,7 +436,7 @@ public abstract class AbstractUploadEditor extends VariableEditor {
                 if (this.getEditor(i) instanceof ParameterEditor) {
                     ((ParameterEditor) this.getEditor(i)).refresh();
                 } else if (this.getEditor(i) instanceof TuplesEditor) {
-                    ((TuplesEditor) this.getEditor(i)).updateUi();
+                    ((TuplesEditor) this.getEditor(i)).refresh();
                 }
             }
             parent.redraw();

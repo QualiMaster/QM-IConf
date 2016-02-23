@@ -556,7 +556,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
             if (null != containerPos) {
                 ContainerValue container = getContainer();
                 container.removeElement(containerPos[TUPLEINDEX_CONTAINER_POS]);
-                updateUi();
+                refresh();
             }
         }
     }
@@ -578,14 +578,14 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
         public void run() {
             ContainerValue container = getContainer();
             container.clear();
-            updateUi();
+            refresh();
         }
     }
 
     /**
      * Updates the UI after changing the tuples.
      */
-    public void updateUi() {
+    public void refresh() {
         Compound compound = getCompound();
         ContainerValue container = getContainer();
 
@@ -654,7 +654,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
                     if (null != nested) {
                         try {
                             getVariable().setValue(nested.getValue().clone(), AssignmentState.ASSIGNED);
-                            updateUi();
+                            refresh();
                         } catch (ConfigurationException e) {
                             LOGGER.exception(e);
                         }
@@ -699,7 +699,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
                             if (0 == fContainer.getElementSize()) {
                                 container.removeElement(tIndex);
                             }
-                            updateUi();
+                            refresh();
                         }
                     }
                 } catch (ModelQueryException e) {
@@ -756,7 +756,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
                                 ContainerValue fContainer = (ContainerValue) fields;
                                 fContainer.addElement(fieldIndex,
                                     ValueFactory.createValue(fieldType, (Object[]) null));
-                                updateUi();
+                                refresh();
                             }
                         }
                     } catch (ModelQueryException
@@ -812,7 +812,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
                     container = (ContainerValue) value;
                 }
                 container.addElement(tupleValue);
-                updateUi();
+                refresh();
             } catch (ValueDoesNotMatchTypeException | ModelQueryException
                     | ConfigurationException e) {
                 LOGGER.exception(e);

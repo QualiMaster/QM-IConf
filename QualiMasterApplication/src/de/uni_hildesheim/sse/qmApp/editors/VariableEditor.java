@@ -167,6 +167,18 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     }
     
     /**
+     * Refreshes all nested editors.
+     */
+    public void refreshNestedEditors() {
+        for (int j = 0; j < getEditorCount(); j++) {
+            Control editor = getEditor(j);
+            if (editor instanceof AbstractTableEditor) {
+                ((AbstractTableEditor) editor).refresh();
+            }
+        }
+    }
+    
+    /**
      * Go through the {@link Text}´s and pair them with a control-Decoration which can be hidden or not.
      * @param ctrl parent control.
      */

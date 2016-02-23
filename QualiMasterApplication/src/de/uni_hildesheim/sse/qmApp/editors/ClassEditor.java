@@ -39,8 +39,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
 import org.eclipse.ui.dialogs.SearchPattern;
 
@@ -118,9 +123,6 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             }
             
         }
-        
-        classes.add("java.util.String");
-        classes.add("java.util.Object");
         ClassSelectorDialog dlg = new ClassSelectorDialog(DialogsUtil.getActiveShell(), "Select class", classes);
         dlg.setInitialPattern("?");
         int res = dlg.open();
@@ -128,7 +130,47 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
         if (Window.OK == res && null != cls) {
             updater.updateText(cls);
             updateArtifactInfo(cls, ManifestConnection.getArtifactId(artifact), context);
+            updateEditors(getTitle(context));
         }
+    }
+    
+    /**
+     * Updates the editor tables. Used when new data is inserted into the model.
+     * TODO: move this and informEditor(VariableEditor) into a utility class!
+     * @param title The title of this editor, to ensure that only THIS editor is updated!
+     */
+    private static void updateEditors(String title) {
+        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        IEditorReference[] allOpenEditors = page.getEditorReferences();
+        for (int i = 0; i < allOpenEditors.length; i++) {
+            IEditorPart editor = allOpenEditors[i].getEditor(false);
+            if (editor instanceof VariableEditor && editor.getTitle().equals(title)) {
+                VariableEditor varEditor = (VariableEditor) editor;
+//                for (int j = 0; j < varEditor.getEditorCount(); j++) {
+//                    if (varEditor.getEditor(j) instanceof ParameterEditor) {
+//                        ((ParameterEditor) varEditor.getEditor(j)).refresh();
+//                    } else if (varEditor.getEditor(j) instanceof TuplesEditor) {
+//                        ((TuplesEditor) varEditor.getEditor(j)).refresh();
+//                    }
+//                }
+                varEditor.refreshNestedEditors();
+                informEditor(varEditor);
+            }
+        }
+    }
+    
+    /**
+     * Updates a single editor.
+     * @param editor The editor to update.
+     */
+    private static void informEditor(final VariableEditor editor) {
+        Display.getDefault().syncExec(new Runnable() {
+        
+            @Override
+            public void run() {
+                editor.refreshEditor();
+            }
+        });
     }
     
     /**
@@ -459,6 +501,30 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             if (par instanceof CompoundVariable) {
                 CompoundVariable artifactHolder = (CompoundVariable) par;
                 IDecisionVariable artifactVar = artifactHolder.getNestedVariable("artifact");
+                if (null != artifactVar) {
+                    Value val = artifactVar.getValue();
+                    if (val instanceof StringValue) {
+                        result = ((StringValue) val).getValue();
+                    }
+                }
+            }
+        }
+        return result;
+    } 
+    
+    /**
+     * Returns the artifact specification from the (parent) decision variable.
+     * 
+     * @param context the context for this editor
+     * @return the artifact specification (if available, may be <b>null</b> if there is none)
+     */
+    private String getTitle(IDecisionVariable context) {
+        String result = null;
+        if (null != context) {
+            IConfigurationElement par = context.getParent();
+            if (par instanceof CompoundVariable) {
+                CompoundVariable artifactHolder = (CompoundVariable) par;
+                IDecisionVariable artifactVar = artifactHolder.getNestedVariable("name");
                 if (null != artifactVar) {
                     Value val = artifactVar.getValue();
                     if (val instanceof StringValue) {

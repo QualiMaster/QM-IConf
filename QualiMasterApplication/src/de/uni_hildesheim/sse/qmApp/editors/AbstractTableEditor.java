@@ -692,5 +692,10 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
                 .error("No variable found in new configuratio, i.e., discontinued mapping!");
         }
     }
+    
+    /**
+     * Forces this editor (part) to update the gui.
+     */
+    public abstract void refresh();
 
 }
