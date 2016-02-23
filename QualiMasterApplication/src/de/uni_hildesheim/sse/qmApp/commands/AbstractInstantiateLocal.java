@@ -23,6 +23,7 @@ import de.uni_hildesheim.sse.qmApp.dialogs.UiTracerFactory;
 import de.uni_hildesheim.sse.qmApp.model.Location;
 import de.uni_hildesheim.sse.qmApp.model.ProjectDescriptor;
 import de.uni_hildesheim.sse.qmApp.model.Reasoning;
+import de.uni_hildesheim.sse.qmApp.model.SessionModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.utils.modelManagement.ModelManagementException;
 
@@ -54,6 +55,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
         EclipseConsole.INSTANCE.clearConsole();
         EclipseConsole.INSTANCE.displayConsole();
         final String targetLocation = selectTargetFolder(getMessage());
+        SessionModel.INSTANCE.setInstantiationFolder(targetLocation);
         final Shell shell = Dialogs.getDefaultShell(); 
         if (null != targetLocation) {
             Job job = new Job("QualiMaster Infrastructure Instantiation Process") {
