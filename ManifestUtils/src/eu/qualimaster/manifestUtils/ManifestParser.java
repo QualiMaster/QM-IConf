@@ -865,9 +865,9 @@ public class ManifestParser {
     public static void main(String[] args) {
         
         ManifestParser mp = new ManifestParser();
-        String name = "eu.qualimaster.algorithms.recommendations.family.impl.RecommendationsAlgorithm";
+        String name = "eu.qualimaster.algorithms.imp.correlation.hardwaresubtopology.TopoHardwareCorrelationFinancial";
         
-        List<URL> urls = mp.loadJars("C:/Test/out");
+        List<URL> urls = mp.loadJars("C:/.m2/repository/ivy");
         URL[] u = new URL[1];
         
         Class<?> cs = null;
