@@ -136,7 +136,7 @@
             <arg value="file:${basedir}/gen/final" />
             <arg value="-artifactRepository" />
             <arg value="file:${basedir}/gen/final" />
-            <arg value="-productFile">
+            <arg value="-productFile" />
             <arg value="${basedir}/gen/intermediate/QualiMasterApplication.product" />
             <arg value="-executables" />
         	<arg value="${eclipse.delta.executables}"/>
