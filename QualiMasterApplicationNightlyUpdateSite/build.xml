@@ -137,16 +137,19 @@
             <!--arg value="-productFile" /-->
             <arg value="-installIU" />
             <arg value="${basedir}/gen/intermediate/QualiMasterApplication.product" />
-            <arg value="-append"/>
+            <!--arg value="-append"/-->
         	<arg value="-flavor" />
         	<arg value="tooling" />
-        	<arg value="-executables" />
-        	<arg value="${eclipse.delta.executables}"/>
-            <arg value="-compress" />
-        	<arg value="-configs" />
-        	<arg value="-p2.os ${test.eclipse.os}" />
-        	<arg value="-p2.ws ${test.eclipse.ws}" />
-        	<arg value="-p2.arch ${test.eclipse.arch}" />
+        	<!--arg value="-executables" />
+        	<arg value="${eclipse.delta.executables}"/-->
+            <!--arg value="-compress" /-->
+        	<!--arg value="-configs" /-->
+        	<arg value="-p2.os" />
+        	<arg value="${test.eclipse.os}" />
+        	<arg value="-p2.ws" />
+        	<arg value="${test.eclipse.ws}" />
+        	<arg value="-p2.arch" />
+        	<arg value="${test.eclipse.arch}" />
         	<!--arg value="gtk.linux.x86_64" /-->
         </java>
     </target>
