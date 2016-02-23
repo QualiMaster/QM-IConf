@@ -116,12 +116,13 @@ public class ManifestConnection {
          */
         private void process(String string) {
             if (null != string) {
-                if (string.contains("found")) {
+                if (string.contains("found") || string.contains("downloading")) {
                     if (prog < max) {
                         monitor.notifyProgress(mainTask, prog);
+                        ProgressObserver.ISubtask subtask = monitor.registerSubtask(string);
+                        monitor.notifyStart(mainTask, subtask, 1);
                         this.prog = this.prog + 1;
                     } else {
-                        //VERY DIRTY!!!
                         monitor.notifyProgress(mainTask, prog, max + 1);
                     }
                 }
@@ -196,8 +197,25 @@ public class ManifestConnection {
      */
     public ManifestConnection() {
         
+        try {
+            sysOut = new Interceptor(output, new PrintStream(new FileOutputStream(FileDescriptor.out)));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        
+        IvySettings ivySettings = new IvySettings();
+        
+        //Set the maven repository as default.
+        String mavenPath = System.getenv("M2_HOME");
+        if (null == mavenPath || mavenPath.isEmpty()) {
+            mavenPath = "C:/.m2/repository";
+            System.out.println("No Systemvariable for Maven Repository found! Assuming location in: " + mavenPath);
+        }
+        
         if (null == ivyOut) {
-            setRetrievalFolder(new File("C:/Test/out"));
+            //setRetrievalFolder(new File("C:/Test/out"));
+            setRetrievalFolder(new File(mavenPath + "/ivy"));
+
         }
         this.out = ivyOut;
         
@@ -218,20 +236,6 @@ public class ManifestConnection {
             }
         }
         
-        try {
-            sysOut = new Interceptor(output, new PrintStream(new FileOutputStream(FileDescriptor.out)));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        
-        IvySettings ivySettings = new IvySettings();
-        
-        //Set the maven repository as default.
-        String mavenPath = System.getenv("M2_HOME");
-        if (null == mavenPath || mavenPath.isEmpty()) {
-            mavenPath = "C:/.m2/repository";
-            System.out.println("No Systemvariable for Maven Repository found! Assuming location in: " + mavenPath);
-        }
         ivySettings.setDefaultCache(new File(mavenPath));
         ivySettings.setDefaultCacheArtifactPattern("[organisation]/[module]/[revision]/[module]-[revision].[ext]");
         ivySettings.setDefaultCacheIvyPattern("[organisation]/[module]/[revision]/[module]-[revision].[ext]");
@@ -575,7 +579,6 @@ public class ManifestConnection {
 
                 Class<?>[] param = m.getParameterTypes();
                 for (int i = 0; i < param.length; i++) {
-                    System.out.println("PARAM: " + param[i].getName());
                     inOut.add(param[i].getName());
                     io = loader.loadClass(param[i].getName());
                     itemName = decrypt(param[i]);

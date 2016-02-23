@@ -479,7 +479,10 @@ public class MavenArtifactSelectionDialog extends Dialog {
                 if (putIn.endsWith("/") || putIn.endsWith(".")) {
                     putIn = putIn.substring(0, groupIDText.getText().length() - 1);
                 }
-                artifactEditorUpdater.updateText(putIn + ":" + artifactIDText.getText() + ":" + versionText.getText());
+                artifactEditorUpdater.updateTextAndModel(
+                        putIn + ":" + artifactIDText.getText() + ":" + versionText.getText());
+                
+                //TODO: notify the ClassEditor!
                 
                 closeEditor();
             }

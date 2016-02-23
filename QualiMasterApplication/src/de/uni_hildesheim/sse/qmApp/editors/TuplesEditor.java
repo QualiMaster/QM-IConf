@@ -579,6 +579,21 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
             ContainerValue container = getContainer();
             container.clear();
             refresh();
+            //TOOD: just TESING!!!
+            createTemporaryModel(getCompound());
+            tableViewer.refresh();
+            try {
+                createColumns(getTupleType(), getCompound(), tableViewer.getTable(), 
+                        new TableLayout());
+            } catch (ModelQueryException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            createRows(container, tableViewer.getTable(), getCompound());
+            tableViewer.setLabelProvider(new TupleEditorLabelProvider());
+            tableViewer.setContentProvider(new TupleEditorContentProvider());
+            tableViewer.setColumnProperties(PROPS);
+            tableViewer.setInput(valueList);
         }
     }
 

@@ -173,6 +173,11 @@ public class MultipleLineText {
             updateFromValueText();
         }
 
+        @Override
+        public void updateTextAndModel(String message) {
+            updateText(message);
+        }
+
     }
     
     /**

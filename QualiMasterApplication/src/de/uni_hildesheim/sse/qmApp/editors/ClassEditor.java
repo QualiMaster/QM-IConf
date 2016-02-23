@@ -77,6 +77,7 @@ import de.uni_hildesheim.sse.model.varModel.values.StringValue;
 import de.uni_hildesheim.sse.model.varModel.values.Value;
 import de.uni_hildesheim.sse.model.varModel.values.ValueDoesNotMatchTypeException;
 import de.uni_hildesheim.sse.model.varModel.values.ValueFactory;
+import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.dialogs.DialogsUtil;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.utils.progress.ProgressObserver;
@@ -111,7 +112,7 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
     protected void browseButtonSelected(String text, IDecisionVariable context, ITextUpdater updater) {
         List<String> classes = new ArrayList<String>();
         artifact = getArtifact(context);
-        if (null != artifact) {
+        if (null != artifact && !artifact.isEmpty()) {
             
             System.out.println("RETRIEVE CLASSES FROM " + artifact);
             
@@ -122,16 +123,22 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
                 classes.add(s);
             }
             
+            ClassSelectorDialog dlg = new ClassSelectorDialog(DialogsUtil.getActiveShell(), "Select class", classes);
+            dlg.setInitialPattern("?");
+            int res = dlg.open();
+            String cls = dlg.getFirstResult();
+            if (Window.OK == res && null != cls) {
+                updater.updateText(cls);
+                updateArtifactInfo(cls, ManifestConnection.getArtifactId(artifact), context);
+                updateEditors(getTitle(context));
+            }
+            
+        } else {
+            
+            Dialogs.showInfoDialog("No artifact selected", "Please select an artifact first!");
+            
         }
-        ClassSelectorDialog dlg = new ClassSelectorDialog(DialogsUtil.getActiveShell(), "Select class", classes);
-        dlg.setInitialPattern("?");
-        int res = dlg.open();
-        String cls = dlg.getFirstResult();
-        if (Window.OK == res && null != cls) {
-            updater.updateText(cls);
-            updateArtifactInfo(cls, ManifestConnection.getArtifactId(artifact), context);
-            updateEditors(getTitle(context));
-        }
+        
     }
     
     /**
@@ -182,7 +189,7 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
     private void updateArtifactInfo(String className, String artifactId, IDecisionVariable context) {
         List<Item> input = con.getInput(className, artifactId);
         List<Item> output = con.getOutput(className, artifactId);
-        List<Parameter> param = con.getParameters(className, artifactId);
+        List<Parameter> param = con.getParameters(className, artifactId);   
         
         try {
             IDecisionVariable var = (IDecisionVariable) context.getParent();
@@ -485,7 +492,7 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
     
     @Override
     protected boolean isBrowseButtonActive(boolean cell, IDecisionVariable context) {
-        return ENABLE_BROWSE && null != getArtifact(context); // TODO use Manifest utils
+        return ENABLE_BROWSE; // && null != getArtifact(context);
     }
     
     /**
@@ -556,7 +563,11 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             pmd.run(true, true, new ProgressDialogOperation());
             
         } catch (final InvocationTargetException e) {
-            MessageDialog.openError(parent.getShell(), "Error", "Error: ");
+            Throwable exc = e;
+            if (null != e.getCause()) {
+                exc = e.getCause();
+            }
+            MessageDialog.openError(parent.getShell(), "Error", "Error: " + exc.getMessage());
             e.printStackTrace();
         } catch (final InterruptedException e) {
             MessageDialog.openInformation(parent.getShell(), "Cancelled",
@@ -567,7 +578,7 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
     }
     
     /**
-     * This Operation will is used to monitor the ManifestConnection and its progress.
+     * This Operation is used to monitor the ManifestConnection and its progress.
      */
     class ProgressDialogOperation implements IRunnableWithProgress {
         
