@@ -2,6 +2,7 @@ package eu.qualimaster.manifestUtils;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -564,8 +565,8 @@ public class ManifestParser {
     public Manifest createFromClass(Class<?> cs) {
         
         Manifest manifest = new Manifest(cs.getSimpleName());
+        manifest.setType(ManifestType.UNKNOWN);
         manifest.setProvider(cs.getName());
-        manifest.setType(ManifestType.SINGLE_JAVA);
         Algorithm alg = new Algorithm(cs.getSimpleName(), cs.getName(), null, null);
         manifest.addMember(alg);
         
@@ -573,47 +574,13 @@ public class ManifestParser {
             
             if (m.getName().equals("calculate")) {
                 
-                Class<?>[] param = m.getParameterTypes();
+                manifest.setType(ManifestType.SINGLE_JAVA);
                 
-                for (Class<?> p : param) {
-                    
-                    try {
-                        
-                        Class<?> ioClass = cs.getClassLoader().loadClass(p.getName());
-                        Method[] methods = ioClass.getMethods();
-                        
-                        if (p.getName().endsWith("Input")) {                   
-                            for (Method met : methods) {      
-                                if (met.getName().startsWith("set")) {
-                                    Item item = new Item();
-                                    Field field = new Field(met.getName().substring(3), 
-                                            FieldType.valueOf(met.getParameterTypes()[0]));
-                                    item.addField(field);
-                                    alg.addInput(item);
-                                }                
-                            }                
-                        } else {               
-                            for (Method met : methods) {              
-                                if (met.getName().startsWith("set")) {
-                                    Item item = new Item();
-                                    Field field = new Field(met.getName().substring(3), 
-                                            FieldType.valueOf(met.getParameterTypes()[0]));
-                                    item.addField(field);
-                                    alg.addOutput(item);
-                                }                 
-                            }                        
-                        }
-                        
-                    } catch (ClassNotFoundException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    
-                }
+                getInOut(m, alg, cs);
                 
             } else if (m.getName().startsWith("setParameter")) {
                 
-                String pName = m.getName().substring(12);
+                String pName = ManifestConnection.lowerFirstLetter(m.getName().substring(12));
                 Class<?>[] param = m.getParameterTypes();
                 
                 for (Class<?> p : param) {
@@ -621,12 +588,81 @@ public class ManifestParser {
                     alg.addParameter(parameter);
                 }
                 
+            } else if (m.getName().startsWith("post")) {
+                
+                manifest.setType(ManifestType.PIPELINE_SINK);
+                getInOut(m, alg, cs);
+                
             }
             
         }  
+        
+        if (manifest.getType().equals(ManifestType.UNKNOWN)) {
+            manifest.setType(ManifestType.PIPELINE_SOURCE);
+            
+            for (Method m : cs.getDeclaredMethods()) {
+                if (m.getName().startsWith("get")) {
+                    
+                    getInOut(m, alg, cs);
+                    
+                }
+            }
+        }
                 
         return manifest;
         
+    }
+    
+    /**
+     * Gather in and output.
+     * @param method The Method.
+     * @param alg The Algorithm.
+     * @param cs The class for the classloader.
+     */
+    private void getInOut(Method method, Algorithm alg, Class<?> cs) {
+        Class<?>[] param = method.getParameterTypes();
+        
+        for (Class<?> p : param) {
+            
+            try {
+                
+                Class<?> ioClass = cs.getClassLoader().loadClass(p.getName());
+                Method[] methods = ioClass.getMethods();
+                
+                if (p.getName().endsWith("Input")) { 
+                    Item item = new Item();
+                    for (Method met : methods) {      
+                        if (met.getName().startsWith("set")) {
+                            
+                            item.setName(ManifestConnection.decrypt(p));
+                            Field field = new Field(ManifestConnection.lowerFirstLetter(met.getName().substring(3)), 
+                                    FieldType.valueOf(met.getParameterTypes()[0]));
+                            item.addField(field);
+                            
+                        }                
+                    }
+                    alg.addInput(item);
+                } else {               
+                    Item item = new Item();
+                    for (Method met : methods) {              
+                        if (met.getName().startsWith("set")) {
+                            
+                            item.setName(ManifestConnection.decrypt(p));
+                            Field field = new Field(ManifestConnection.lowerFirstLetter(met.getName().substring(3)), 
+                                    FieldType.valueOf(met.getParameterTypes()[0]));
+                            item.addField(field);
+                            
+                        }                 
+                    }   
+                    alg.addOutput(item);
+                }
+                
+            } catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
+        }
     }
     
     /**
@@ -720,6 +756,7 @@ public class ManifestParser {
             for (Item item : algorithm.getInput()) {
                 
                 Element tuple = doc.createElement("tuple");
+                tuple.setAttribute("name", item.getName());
                 input.appendChild(tuple);
                 
                 for (Field f : item.getFields()) {
@@ -753,6 +790,7 @@ public class ManifestParser {
             for (Item item : algorithm.getOutput()) {
                 
                 Element tuple = doc.createElement("tuple");
+                tuple.setAttribute("name", item.getName());
                 output.appendChild(tuple);
                 
                 for (Field f : item.getFields()) {
@@ -794,70 +832,60 @@ public class ManifestParser {
     }
     
     /**
+     * Load all jars from a given folder.
+     * @param folder The folder to load from.
+     * @return A list with jar names.
+     */
+    public List<URL> loadJars(String folder) {
+        
+        List<URL> list = new ArrayList<URL>();
+        
+        File dir = new File(folder);
+        
+        for (File file : dir.listFiles()) {
+            
+            if (!file.isDirectory()) {
+                try {
+                    list.add(new URL("file:///" + dir.getAbsolutePath() + "\\" + file.getName()));
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }
+            
+        }
+        
+        return list;
+        
+    }
+    
+    /**
      * Just for testing purposes!
      * @param args main args.
      */
     public static void main(String[] args) {
         
         ManifestParser mp = new ManifestParser();
+        String name = "eu.qualimaster.algorithms.recommendations.family.impl.RecommendationsAlgorithm";
         
-//        File file = new File("C:/Users/pastuschek/Workspace/SwitchProcessor1/"
-//                + "target/classes/eu/qualimaster/algorithms/SwitchProcessor1.class");
+        List<URL> urls = mp.loadJars("C:/Test/out");
+        URL[] u = new URL[1];
         
-        File file = new File("C:/users/pastuschek/Workspace/SwitchProcessor1/"
-                + "target/classes/");
-        File file2 = new File("C:/users/pastuschek/Workspace/SwitchProcessor2/"
-                + "target/classes/");
-        
-        URL[] urls = new URL[5];
+        Class<?> cs = null;
+        URLClassLoader loader = new URLClassLoader(urls.toArray(u));
+
         try {
-            urls[1] = file.toURI().toURL(); //new URL("file:///" + path);
-            urls[4] = file2.toURI().toURL();
-            urls[0] = new File("H:/.m2/repository/eu/qualimaster/PriorityPipelineInterfaces/"
-                    + "0.0.5-SNAPSHOT/PriorityPipelineInterfaces-0.0.5-SNAPSHOT.jar").toURI().toURL();
-            urls[2] = new File("H:/.m2/repository/eu/qualimaster/StormCommons/"
-                    + "0.0.5-SNAPSHOT/StormCommons-0.0.5-SNAPSHOT.jar").toURI().toURL();
-            urls[3] = new File("H:/.m2/repository/eu/qualimaster/QualiMaster.Events/"
-                    + "0.0.5-SNAPSHOT/QualiMaster.Events-0.0.5-SNAPSHOT.jar").toURI().toURL();
-            System.out.println(urls[0]);
-            System.out.println(urls[1]);
-            URLClassLoader loader = new URLClassLoader(urls);
-            
-            Class<?> cl = loader.loadClass("eu.qualimaster.algorithms.SwitchProcessor1");
-            Class<?> cl2 = loader.loadClass("eu.qualimaster.algorithms.SwitchProcessor2");
-            
-            System.out.println("Class successfully loaded...");
-            
-            Manifest result = mp.createFromClass(cl);
-            Manifest test = mp.parseFile(new File("H:/Desktop/manifest.xml"));
-            Manifest test2 = mp.parseFile(new File("H:/Desktop/manifest2.xml"));
-            
-            test = mp.validateWithClass(test, cl);
-            test2 = mp.validateWithClass(test2, cl2);
-            
-            mp.writeToFile(new File("H:/Desktop/manifest_IMPROVED.xml"), test);
-            mp.writeToFile(new File("H:/Desktop/manifest2_IMPROVED.xml"), test2);
-            
-            System.out.println("\nRESULT:  \n");
-            System.out.println(result.toString());
-            
-            mp.writeToFile(new File("H:/Desktop/test.xml"), result);
-         
-            Manifest result2 = mp.parseFile(new File("H:/Desktop/test.xml"));
-            mp.writeToFile(new File("H:/Desktop/test2.xml"), result2);
-            
-            loader.close();
-        } catch (ClassNotFoundException | IOException e) {
-            // TODO Auto-generated catch block
+            cs = loader.loadClass(name);
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         
-        //mp.parseFile(new File("H:/Desktop/manifest_test/mha.xml"));
-        //mp.parseFile(new File("C:/Users/Patu/Downloads/ManifestParser/manifest_test/new/mha.xml"));
-        //mp.parseFile(new File("C:/Users/Patu/Downloads/ManifestParser/manifest_test/new/pspa.xml"));
-        //mp.parseFile(new File("C:/Users/Patu/Downloads/ManifestParser/manifest_test/new/sda.xml"));
-        //mp.parseFile(new File("C:/Users/Patu/Downloads/ManifestParser/manifest_test/new/sha.xml"));
-        //mp.parseFile(new File("C:/Users/Patu/Downloads/ManifestParser/manifest_test/new/ssa.xml"));
+        Manifest manifest = mp.createFromClass(cs);
+        mp.writeToFile(new File("C:/Test/manifest.xml"), manifest);
+        try {
+            loader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         
     }
     
