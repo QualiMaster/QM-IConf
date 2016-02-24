@@ -1,5 +1,6 @@
 package de.uni_hildesheim.sse.qmApp.editors;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -38,8 +39,11 @@ import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
 import de.uni_hildesheim.sse.model.varModel.values.CompoundValue;
 import de.uni_hildesheim.sse.model.varModel.values.ContainerValue;
 import de.uni_hildesheim.sse.model.varModel.values.EnumValue;
+import de.uni_hildesheim.sse.model.varModel.values.IntValue;
+import de.uni_hildesheim.sse.model.varModel.values.StringValue;
 import de.uni_hildesheim.sse.model.varModel.values.Value;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
+import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
 import de.uni_hildesheim.sse.qmApp.runtime.IInfrastructureListener;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
@@ -55,6 +59,8 @@ import eu.qualimaster.adaptation.external.LoggingMessage;
 import eu.qualimaster.adaptation.external.MonitoringDataMessage;
 import eu.qualimaster.adaptation.external.PipelineMessage;
 import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
+import static eu.qualimaster.easy.extension.QmConstants.*;
+import static eu.qualimaster.easy.extension.QmObservables.*;
 
 /**
  * The preliminary editor for runtime settings. Will be replaced by an appropriate
@@ -78,6 +84,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     private Label sentState;
     
     private MeterFigure usedClusterMachines;
+    private MeterFigure usedHardwareMachines;
     private CircularBufferDataProvider pipelineLatencyDataProvider;
     private CircularBufferDataProvider pipelineThroughputDataProvider;
     //private int observationTime = 0;
@@ -177,57 +184,35 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
      */
     private Control createMeter(final Composite parent) {
         Composite panel = new Composite(parent, SWT.NONE);
-        panel.setLayout(new GridLayout(1, true));
+        panel.setLayout(new GridLayout(2, true));
         
-        Canvas meterCanvas = new Canvas(panel, SWT.BORDER);
+        Canvas clusterCanvas = new Canvas(panel, SWT.BORDER);
         GridData data = new GridData(GridData.FILL_VERTICAL);
         data.heightHint = 200;
-        data.widthHint = 350;
-        meterCanvas.setLayoutData(data);
+        data.widthHint = 300;
+        clusterCanvas.setLayoutData(data);
+
+        Canvas hardwareCanvas = new Canvas(panel, SWT.BORDER);
+        data = new GridData(GridData.FILL_VERTICAL);
+        data.heightHint = 200;
+        data.widthHint = 300;
+        hardwareCanvas.setLayoutData(data);
         
         Label label = new Label(panel, SWT.CENTER);
-        label.setText("used machines");
+        label.setText("used nodes");
         data = new GridData();
-        data.widthHint = 400;
+        data.widthHint = 300;
         label.setLayoutData(data);
 
-        //Create Figure
-        usedClusterMachines = new MeterFigure();
-        usedClusterMachines.setBackgroundColor(XYGraphMediaFactory.getInstance().getColor(255, 255, 255));
-        usedClusterMachines.setBorder(new SchemeBorder(SchemeBorder.SCHEMES.ETCHED));
-        IDecisionVariable machines = ModelAccess.findTopContainer(Configuration.HARDWARE, 
-            Configuration.HARDWARE.getProvidedTypes()[0]); // uhh
-        Value value = machines.getValue();
-        int workerCount = 0;
-        if (value instanceof ContainerValue) {
-            ContainerValue cnt = (ContainerValue) value;
-            for (int i = 0; i < cnt.getElementSize(); i++) {
-                Value val = cnt.getElement(i);
-                if (val instanceof CompoundValue) {
-                    CompoundValue cmp = (CompoundValue) val;
-                    Value roleValue = cmp.getNestedValue("role");
-                    if (roleValue instanceof EnumValue) {
-                        EnumValue eValue = (EnumValue) roleValue;
-                        if ("Worker".equals(eValue.getValue().getName())) {
-                            workerCount++;
-                        }
-                    }
-                }
-            }
-        }
-        
-        usedClusterMachines.setRange(0, workerCount);
-        usedClusterMachines.setValue(0);
-        
-        //meterFigure.setLoLevel(20);
-        //meterFigure.setLoloLevel(40);
-        //meterFigure.setHiLevel(60);
-        //meterFigure.setHihiLevel(80);
-        //meterFigure.setMajorTickMarkStepHint(50);
-     
-        LightweightSystem lws = new LightweightSystem(meterCanvas);
-        lws.setContents(usedClusterMachines);
+        label = new Label(panel, SWT.CENTER);
+        label.setText("used DFEs");
+        data = new GridData();
+        data.widthHint = 300;
+        label.setLayoutData(data);
 
+        createClusterMachinesMeter(clusterCanvas);
+        createHardwareNodesMeter(hardwareCanvas);
+        
         invalidateGauges();
         return panel;
     }
@@ -239,6 +224,10 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         if (null != usedClusterMachines) {
             usedClusterMachines.setValue(0);
             usedClusterMachines.setValid(false);
+        }
+        if (null != usedHardwareMachines) {
+            usedHardwareMachines.setValue(0);
+            usedHardwareMachines.setValid(false);
         }
     }
     
@@ -305,7 +294,112 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             }
         }, 100, 100, TimeUnit.MILLISECONDS);
     }
-    
+
+    /**
+     * Creates the meter figure for cluster machines. Modifies {@link #usedClusterMachines}.
+     * 
+     * @param meterCanvas the canvas for the meter
+     * @return the system holding the meter
+     */
+    private LightweightSystem createClusterMachinesMeter(Canvas meterCanvas) {
+        //Create Figure
+        usedClusterMachines = new MeterFigure();
+        usedClusterMachines.setBackgroundColor(XYGraphMediaFactory.getInstance().getColor(255, 255, 255));
+        usedClusterMachines.setBorder(new SchemeBorder(SchemeBorder.SCHEMES.ETCHED));
+        IDecisionVariable machines = ModelAccess.findTopContainer(Configuration.HARDWARE, 
+            Configuration.HARDWARE.getProvidedTypes()[0]); // uhh
+        Value value = machines.getValue();
+        Map<String, Integer> groupCounts = new HashMap<String, Integer>();
+        if (value instanceof ContainerValue) {
+            ContainerValue cnt = (ContainerValue) value;
+            for (int i = 0; i < cnt.getElementSize(); i++) {
+                Value val = VariabilityModel.dereference(Configuration.HARDWARE.getConfiguration(), cnt.getElement(i));
+                if (val instanceof CompoundValue) {
+                    CompoundValue cmp = (CompoundValue) val;
+                    String group = null;
+                    int inc = 0;
+                    Value name = cmp.getNestedValue(SLOT_NAME);
+                    if (name instanceof StringValue) {
+                        group = VariabilityModel.getHardwareGroup(((StringValue) name).getValue());
+                    }
+                    Value roleValue = cmp.getNestedValue("role");
+                    if (null != group && roleValue instanceof EnumValue) {
+                        EnumValue eValue = (EnumValue) roleValue;
+                        if ("Worker".equals(eValue.getValue().getName())) {
+                            inc = 1;
+                        }
+                    }
+                    Integer actual = groupCounts.get(group);
+                    if (null == actual) {
+                        actual = inc;
+                    } else {
+                        actual = actual + inc; 
+                    }
+                    groupCounts.put(group, actual);
+                }
+            }
+        }
+
+        int workerCount = 0;
+        for (Integer entry : groupCounts.values()) {
+            workerCount = Math.max(workerCount, entry);
+        }
+        
+        usedClusterMachines.setRange(0, workerCount);
+        usedClusterMachines.setValue(0);
+        //meterFigure.setLoLevel(20);
+        //meterFigure.setLoloLevel(40);
+        //meterFigure.setHiLevel(60);
+        //meterFigure.setHihiLevel(80);
+        //meterFigure.setMajorTickMarkStepHint(50);
+
+        LightweightSystem lws = new LightweightSystem(meterCanvas);
+        lws.setContents(usedClusterMachines);
+        return lws;
+    }
+
+    /**
+     * Creates the meter figure for reconfigurable hardware machines. Modifies {@link #usedHardwareMachines}.
+     * 
+     * @param meterCanvas the canvas for the meter
+     * @return the system holding the meter
+     */
+    private LightweightSystem createHardwareNodesMeter(Canvas meterCanvas) {
+        //Create Figure
+        usedHardwareMachines = new MeterFigure();
+        usedHardwareMachines.setBackgroundColor(XYGraphMediaFactory.getInstance().getColor(255, 255, 255));
+        usedHardwareMachines.setBorder(new SchemeBorder(SchemeBorder.SCHEMES.ETCHED));
+        IDecisionVariable machines = ModelAccess.findTopContainer(Configuration.RECONFIG_HARDWARE, 
+            Configuration.RECONFIG_HARDWARE.getProvidedTypes()[0]); // uhh
+        Value value = machines.getValue();
+        int dfeCount = 0;
+        if (value instanceof ContainerValue) {
+            ContainerValue cnt = (ContainerValue) value;
+            for (int i = 0; i < cnt.getElementSize(); i++) {
+                Value val = cnt.getElement(i);
+                if (val instanceof CompoundValue) {
+                    CompoundValue cmp = (CompoundValue) val;
+                    Value dfeValue = cmp.getNestedValue("numDFEs");
+                    if (dfeValue instanceof IntValue) {
+                        dfeCount += ((IntValue) dfeValue).getValue();
+                    }
+                }
+            }
+        }
+        
+        usedHardwareMachines.setRange(0, dfeCount);
+        usedHardwareMachines.setValue(0);
+        //meterFigure.setLoLevel(20);
+        //meterFigure.setLoloLevel(40);
+        //meterFigure.setHiLevel(60);
+        //meterFigure.setHihiLevel(80);
+        //meterFigure.setMajorTickMarkStepHint(50);
+
+        LightweightSystem lws = new LightweightSystem(meterCanvas);
+        lws.setContents(usedHardwareMachines);
+        return lws;
+    }
+
     /**
      * Create meter-widget for monitoring panel.
      * @param parent parent composite on which the widgets are placed.
@@ -383,10 +477,10 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
         Control control = createMeter(panel);
         GridData data = new GridData(GridData.CENTER);
-        data.widthHint = 400;
+        data.widthHint = 600;
         data.heightHint = 200;
         //data.verticalAlignment = GridData.FILL;
-        data.horizontalAlignment = GridData.CENTER;
+        data.horizontalAlignment = GridData.FILL;
         control.setLayoutData(data);
         
         //createGauche(panel);
@@ -415,15 +509,20 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         // not nice, but we do not put the QM.events dependency in here by now; Names taken from resource descriptors / 
         // monitoring layer system state
         Map<String, Double> observations = message.getObservations();
-        if ("Infrastructure".equals(part)) {
-            final Double usedMachines = observations.get("USED_MACHINES"); 
-            if (null != usedMachines) {
+        if (PART_INFRASTRUCTURE.equals(part)) {
+            final Double usedMachines = observations.get(RESOURCEUSAGE_USED_MACHINES); 
+            final Double usedDfes = observations.get(RESOURCEUSAGE_USED_DFES); 
+            if (null != usedMachines || null != usedDfes) {
                 Display.getDefault().asyncExec(new Runnable() {
 
                     @Override
                     public void run() {
-                        int machineCount  = usedMachines.intValue();
-                        usedClusterMachines.setValue(machineCount);
+                        if (null != usedMachines) {
+                            usedClusterMachines.setValue(usedMachines);
+                        }
+                        if (null != usedDfes) {
+                            usedHardwareMachines.setValue(usedDfes);
+                        }
                     }
                 });
             }
