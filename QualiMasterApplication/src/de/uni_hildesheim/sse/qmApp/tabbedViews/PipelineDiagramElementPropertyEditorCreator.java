@@ -322,7 +322,7 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
         @Override
         public void variableChanged(EventKind kind, IDecisionVariable variable, int globalIndex) {
             if (EventKind.DELETING != kind && Reference.TYPE.isAssignableFrom(variable.getDeclaration().getType())) {
-                provider.refreshContents();
+                provider.refresh();
             }
         }
 

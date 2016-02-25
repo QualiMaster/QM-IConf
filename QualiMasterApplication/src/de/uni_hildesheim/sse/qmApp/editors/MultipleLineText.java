@@ -169,7 +169,7 @@ public class MultipleLineText {
         }
 
         @Override
-        public void refreshContents() {
+        public void refresh() {
             updateFromValueText();
         }
 
