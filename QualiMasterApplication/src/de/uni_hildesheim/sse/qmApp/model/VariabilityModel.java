@@ -142,9 +142,9 @@ public class VariabilityModel {
             SourceMode.VARIABLES,
             PipelineElementFactory.INSTANCE), 
         INFRASTRUCTURE(PROJECT_INFRASTRUCTURE, 
-            new String[] {"pipelines"}, 
-            null,
-            SourceMode.VARIABLES), // no top-level type so far
+            new String[] {VAR_INFRASTRUCTURE_ACTIVEPIPELINES}, 
+            new String[] {TYPE_PIPELINE}, 
+            SourceMode.VARIABLES),
         TOP_LEVEL(PROJECT_TOP_LEVEL, 
             null, 
             null, 

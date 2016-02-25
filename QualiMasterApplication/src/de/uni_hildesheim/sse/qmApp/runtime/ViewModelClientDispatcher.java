@@ -17,26 +17,15 @@ package de.uni_hildesheim.sse.qmApp.runtime;
 
 import org.eclipse.swt.widgets.Display;
 
-import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure.IClientDispatcher;
 import de.uni_hildesheim.sse.qmApp.tabbedViews.adaptation.AdaptationEventsViewModel;
-import eu.qualimaster.adaptation.external.AlgorithmChangedMessage;
-import eu.qualimaster.adaptation.external.ChangeParameterRequest;
-import eu.qualimaster.adaptation.external.DisconnectRequest;
-import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
-import eu.qualimaster.adaptation.external.HardwareAliveMessage;
 import eu.qualimaster.adaptation.external.InformationMessage;
-import eu.qualimaster.adaptation.external.LoggingFilterRequest;
-import eu.qualimaster.adaptation.external.LoggingMessage;
-import eu.qualimaster.adaptation.external.MonitoringDataMessage;
-import eu.qualimaster.adaptation.external.PipelineMessage;
-import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
 
 /**
  * A dispatcher for the view model, linking the view model with the runtime instance.
  * 
  * @author Holger Eichelberger
  */
-public class ViewModelClientDispatcher implements IClientDispatcher {
+public class ViewModelClientDispatcher extends DispatcherAdapter {
 
     public static final ViewModelClientDispatcher INSTANCE = new ViewModelClientDispatcher();
     
@@ -55,56 +44,9 @@ public class ViewModelClientDispatcher implements IClientDispatcher {
         return System.currentTimeMillis();
     }
     
-    @Override
-    public void handleAlgorithmChangedMessage(final AlgorithmChangedMessage message) {
-        // legacy, repeated via information message
-    }
+    // handleAlgorithmChangedMessage
+    // legacy, repeated via information message
 
-    @Override
-    public void handleChangeParameterRequest(ChangeParameterRequest<?> arg0) {
-        // not here
-    }
-
-    @Override
-    public void handleDisconnectRequest(DisconnectRequest arg0) {
-        // not here
-    }
-
-    @Override
-    public void handleExecutionResponseMessage(ExecutionResponseMessage arg0) {
-        // not here
-    }
-
-    @Override
-    public void handleHardwareAliveMessage(HardwareAliveMessage arg0) {
-        // not here
-    }
-
-    @Override
-    public void handleLoggingFilterRequest(LoggingFilterRequest arg0) {
-        // not here
-    }
-
-    @Override
-    public void handleLoggingMessage(LoggingMessage arg0) {
-        // not here
-    }
-
-    @Override
-    public void handleMonitoringDataMessage(MonitoringDataMessage arg0) {
-        // not here
-    }
-
-    @Override
-    public void handlePipelineMessage(PipelineMessage arg0) {
-        // server side
-    }
-
-    @Override
-    public void handleSwitchAlgorithmRequest(SwitchAlgorithmRequest arg0) {
-        // server side
-    }
-    
     /**
      * Turns a string into a displayable string.
      * 
