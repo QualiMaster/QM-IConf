@@ -145,9 +145,8 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
     @Override
     public void infrastructureConnectionStateChanged(boolean hasConnection) {
         if (!hasConnection) {
-            for (int e = 0; e < elements.getElementsCount(); e++) {
-                clearStatus(elements.getElement(e), true);
-            }
+            clearStatus(findTopLevelElement(Configuration.HARDWARE), true);
+            clearStatus(findTopLevelElement(Configuration.RECONFIG_HARDWARE), true);
         }
     }
     
@@ -158,9 +157,13 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
      * @param recursive whether clearing shall happen recursively
      */
     private void clearStatus(ConfigurableElement element, boolean recursive) {
-        setStatus(element, ElementStatusIndicator.NONE);
-        for (int c = 0; c < element.getChildCount(); c++) {
-            setStatus(element.getChild(c), ElementStatusIndicator.NONE);
+        if (null != element) {
+            setStatus(element, ElementStatusIndicator.NONE);
+            if (recursive) {
+                for (int c = 0; c < element.getChildCount(); c++) {
+                    clearStatus(element.getChild(c), true);
+                }
+            }
         }
     }
     
@@ -177,7 +180,7 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
 
                 @Override
                 public void run() {
-                    elementsViewer.refresh(element, false);
+                    elementsViewer.refresh(element, true);
                 }
                 
             });
