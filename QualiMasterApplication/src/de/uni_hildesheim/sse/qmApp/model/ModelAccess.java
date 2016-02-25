@@ -831,7 +831,7 @@ public class ModelAccess {
                         Value refValue = ValueFactory.createValue(result.getDeclaration().getType(), newVarDecl);
                         result.setValue(refValue, AssignmentState.ASSIGNED);
                         result = newVar;
-                        result.freeze(AllFreezeSelector.INSTANCE);
+                        freezeAgain(result);
                     }
                     prj.add(newVarDecl);
                 } catch (ConfigurationException e) {
@@ -1040,12 +1040,19 @@ public class ModelAccess {
                 }
             } 
             if (conFrozen) {
-                con.freeze(AllFreezeSelector.INSTANCE);
+                freezeAgain(con);
             }
         }
-
     }
 
+    /**
+     * Freezes <code>var</code> again.
+     * 
+     * @param var the variable to freeze
+     */
+    public static void freezeAgain(IDecisionVariable var) {
+        var.freeze(AllFreezeSelector.INSTANCE); // just ignore binding times for now although not correct
+    }
 
     /**
      * Sets the value of the name slot if it exists.
@@ -1187,7 +1194,7 @@ public class ModelAccess {
             }
             cont.removeNestedElement(toRemove);
             if (isFrozen) {
-                cont.freeze(AllFreezeSelector.INSTANCE);
+                freezeAgain(cont);
             }
         }
     }
@@ -1247,7 +1254,7 @@ public class ModelAccess {
                     Dialogs.showErrorDialog("Cloning element", e.getMessage());
                 }
                 if (frozen) {
-                    newElement.freeze(AllFreezeSelector.INSTANCE);
+                    freezeAgain(newElement);
                 }*/
                 result.add(newElement);
             }

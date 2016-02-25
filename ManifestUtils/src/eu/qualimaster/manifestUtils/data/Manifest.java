@@ -30,8 +30,57 @@ public class Manifest extends Algorithm {
      */
     public enum ManifestType {
         
-        UNKNOWN, SINGLE_JAVA, SINGLE_HARDWARE, STORMBASED, MULTI_HARDWARE, PIPELINE_SOURCE, PIPELINE_SINK;
+        UNKNOWN(false, false, false), 
+        SINGLE_JAVA(false, true, false), 
+        SINGLE_HARDWARE(false, true, false), 
+        STORMBASED(false, true, false), 
+        MULTI_HARDWARE(false, true, false), 
+        PIPELINE_SOURCE(true, false, false), 
+        PIPELINE_SINK(false, false, true);
         
+        private boolean isSource;
+        private boolean isAlgorithm;
+        private boolean isSink;
+        
+        /**
+         * Creates a manifest type.
+         * 
+         * @param isSource whether this type can represent a source 
+         * @param isAlgorithm whether this type can represent an algorithm
+         * @param isSink whether this type can represent a sink
+         */
+        private ManifestType(boolean isSource, boolean isAlgorithm, boolean isSink) {
+            this.isSource = isSource;
+            this.isSink = isSink;
+            this.isAlgorithm = isAlgorithm;
+        }
+
+        /**
+         * Returns whether this type can represent a source.
+         * 
+         * @return <code>true</code> for source, <code>false</code> else
+         */
+        public boolean isSource() {
+            return isSource;
+        }
+
+        /**
+         * Returns whether this type can represent an algorithm.
+         * 
+         * @return <code>true</code> for algorithm, <code>false</code> else
+         */
+        public boolean isAlgorithm() {
+            return isAlgorithm;
+        }
+
+        /**
+         * Returns whether this type can represent a sink.
+         * 
+         * @return <code>true</code> for sink, <code>false</code> else
+         */
+        public boolean isSink() {
+            return isSink;
+        }
     }
     
     /**

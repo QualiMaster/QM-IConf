@@ -51,6 +51,7 @@ import eu.qualimaster.manifestUtils.data.FieldType;
 import eu.qualimaster.manifestUtils.data.Item;
 import eu.qualimaster.manifestUtils.data.JarInfo;
 import eu.qualimaster.manifestUtils.data.Manifest;
+import eu.qualimaster.manifestUtils.data.Manifest.ManifestType;
 import eu.qualimaster.manifestUtils.data.Parameter;
 import eu.qualimaster.manifestUtils.data.Parameter.ParameterType;
 
@@ -206,9 +207,10 @@ public class ManifestConnection {
         IvySettings ivySettings = new IvySettings();
         
         //Set the maven repository as default.
-        String mavenPath = System.getenv("M2_HOME");
+        String mavenPath = System.getenv("M2_REPO");
         if (null == mavenPath || mavenPath.isEmpty()) {
-            mavenPath = "C:/.m2/repository";
+            
+            mavenPath = System.getProperty("user.home") + "/.m2/repository";
             System.out.println("No Systemvariable for Maven Repository found! Assuming location in: " + mavenPath);
         }
         
@@ -542,6 +544,41 @@ public class ManifestConnection {
     }
     
     /**
+     * Returns the type of the manifest.
+     * 
+     * @param name The name of the class. Can be null?
+     * @param artifactId the id of the artifact.
+     * @return the type or {@link ManifestType#UNKNOWN}
+     */
+    public ManifestType getType(String name, String artifactId) {
+        ManifestType result = ManifestType.UNKNOWN;
+
+        // TODO REFACTOR - load Manifest only once!
+        URLClassLoader loader = null;
+        try {
+            URL[] urls = new URL[1];
+            loader = new URLClassLoader(loadJars(out.getAbsolutePath()).toArray(urls));
+
+            if (extractManifest(artifactId)) {
+                ManifestParser mp = new ManifestParser();
+                Manifest manifest = mp.parseFile(new File(out + "/manifest.xml"));
+                result = manifest.getType();
+            }
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } finally {
+            if (null != loader) {
+                try {
+                    loader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return result;      
+    }
+    
+    /**
      * Retrieves the in/output for Sinks and Sources.
      * @param loader The used ClassLoader.
      * @param methods The list of methods to retrieve from.
@@ -804,11 +841,13 @@ public class ManifestConnection {
         
         IBiblioResolver testRes = new IBiblioResolver();
         testRes.setName("publisher");
+        // TODO fixed URL?? -> shall be configured from outside
         testRes.setRoot("https://nexus.sse.uni-hildesheim.de/content/repositories/qmproject/");
         this.ivy.getSettings().addResolver(testRes);
         System.out.println("CACHE: " + this.ivy.getSettings().getDefaultCache());
         
         try {
+            // TODO UNCLEAR C:/ no .m2 -> mavenPath?
             ivy.deliver(ri, revision, 
                     "C:/m2/repository/[organisation]/[module]/[revision]/[module]-[revision].[ext]");
             ivy.publish(ri, srcArtifactPattern, resolverName, options);
@@ -955,7 +994,14 @@ public class ManifestConnection {
         try {
             
             url = new URL("jar:file:/" + out.getAbsolutePath() + "/" + artifactId + ".jar!/manifest.xml");
-            InputStream is = url.openStream();
+            InputStream is;
+            try {
+                is = url.openStream();
+            } catch (IOException e) {
+                // fallback
+                url = new URL("jar:file:/" + out.getAbsolutePath() + "/" + artifactId + ".jar!/META-INF/manifest.xml");
+                is = url.openStream();
+            }
             byte[] buffer = new byte[is.available()];
             is.read(buffer);
          

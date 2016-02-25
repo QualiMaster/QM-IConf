@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -51,7 +52,6 @@ import org.eclipse.ui.dialogs.SearchPattern;
 
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.IEditorCreator;
 import de.uni_hildesheim.sse.easy_producer.observer.EclipseProgressObserver;
-import de.uni_hildesheim.sse.model.confModel.AllFreezeSelector;
 import de.uni_hildesheim.sse.model.confModel.AssignmentState;
 import de.uni_hildesheim.sse.model.confModel.CompoundVariable;
 import de.uni_hildesheim.sse.model.confModel.Configuration;
@@ -73,6 +73,7 @@ import de.uni_hildesheim.sse.model.varModel.filter.DatatypeFinder;
 import de.uni_hildesheim.sse.model.varModel.filter.DeclarationFinder;
 import de.uni_hildesheim.sse.model.varModel.filter.DeclarationFinder.VisibilityType;
 import de.uni_hildesheim.sse.model.varModel.filter.FilterType;
+import de.uni_hildesheim.sse.model.varModel.values.NullValue;
 import de.uni_hildesheim.sse.model.varModel.values.StringValue;
 import de.uni_hildesheim.sse.model.varModel.values.Value;
 import de.uni_hildesheim.sse.model.varModel.values.ValueDoesNotMatchTypeException;
@@ -80,10 +81,13 @@ import de.uni_hildesheim.sse.model.varModel.values.ValueFactory;
 import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.dialogs.DialogsUtil;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
+import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.utils.progress.ProgressObserver;
+import static eu.qualimaster.easy.extension.QmConstants.*;
 import eu.qualimaster.manifestUtils.ManifestConnection;
 import eu.qualimaster.manifestUtils.data.Field;
 import eu.qualimaster.manifestUtils.data.Item;
+import eu.qualimaster.manifestUtils.data.Manifest.ManifestType;
 import eu.qualimaster.manifestUtils.data.Parameter;
 
 /**
@@ -95,8 +99,9 @@ import eu.qualimaster.manifestUtils.data.Parameter;
  */
 public class ClassEditor extends AbstractTextSelectionEditorCreator {
 
-    public static final boolean ENABLE_BROWSE = true; // TODO connect Manifest utils
+    public static final boolean ENABLE_BROWSE = true;
     public static final IEditorCreator CREATOR = new ClassEditor();
+    private static final String ERROR_PREFIX = "Manifest analysis";
     
     private String artifact = null;
     private ManifestConnection con = null;
@@ -189,38 +194,117 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
     private void updateArtifactInfo(String className, String artifactId, IDecisionVariable context) {
         List<Item> input = con.getInput(className, artifactId);
         List<Item> output = con.getOutput(className, artifactId);
-        List<Parameter> param = con.getParameters(className, artifactId);   
+        List<Parameter> param = con.getParameters(className, artifactId);
+        ManifestType type = con.getType(className, artifactId);
         
-        try {
-            IDecisionVariable var = (IDecisionVariable) context.getParent();
-            
+        IDecisionVariable var = (IDecisionVariable) context.getParent();
+        
+        if (takeOverValues(var, type)) {
             createMap(var);
             
-            ModelQuery.findType(var.getConfiguration().getProject(), "Algorithm", null);
             var.unfreeze(AssignmentState.ASSIGNED);
            
-            List<IDecisionVariable> list = getIDecisionVariable(var, "input");
-            List<IDecisionVariable> list2 = getIDecisionVariable(var, "output");
-            List<IDecisionVariable> list3 = getIDecisionVariable(var, "parameters");
+            // just use the
+            List<IDecisionVariable> inputVars = getIDecisionVariable(var, SLOT_INPUT);
+            List<IDecisionVariable> outputVars = getIDecisionVariable(var, SLOT_OUTPUT);
+            List<IDecisionVariable> parameterVars = getIDecisionVariable(var, SLOT_PARAMETERS);
             
-            list2.add(0, (IDecisionVariable) list2.get(0).getParent());
-            list3.add(0, (IDecisionVariable) list3.get(0).getParent());
-
-            clearInput(list);
-            clearInput(list2);
-            clearInput(list3);
+            outputVars.add(0, (IDecisionVariable) outputVars.get(0).getParent());
+            parameterVars.add(0, (IDecisionVariable) parameterVars.get(0).getParent());
+    
+            clearInput(inputVars);
+            clearInput(outputVars);
+            clearInput(parameterVars);
             
-            list2.remove(0);
+            outputVars.remove(0);
             
-            addInOut(input, list, true);
-            addInOut(output, list2, false);
-            addParameter(param, list3);
+            addInOut(input, inputVars, true);
+            addInOut(output, outputVars, false);
+            addParameter(param, parameterVars);
+            setTopoClass(var, type, className);
             System.out.println("Updated INPUT...");
-            var.freeze(AllFreezeSelector.INSTANCE);
+            ModelAccess.freezeAgain(var);
+        }
+        // TODO information message if there is no manifest?
+    }
+    
+    /**
+     * Checks manifest type versus variable type and asks the user on how to go on.
+     * 
+     * @param var the variable
+     * @param manifestType the obtained manifest type
+     * @return <code>true</code> for take over values, <code>false</code> for skip
+     */
+    private boolean takeOverValues(IDecisionVariable var, ManifestType manifestType) {
+        Boolean result = null;
+        IDatatype varType = var.getDeclaration().getType();
+        Project prj = var.getConfiguration().getProject();
+        try {
+            final IDatatype algType = ModelQuery.findType(prj, TYPE_ALGORITHM, null);
+            if (algType.isAssignableFrom(varType)) {
+                result = manifestType.isAlgorithm();
+            } 
+            if (null == result) {
+                final IDatatype srcType = ModelQuery.findType(prj, TYPE_SOURCE, null);
+                if (srcType.isAssignableFrom(varType)) {
+                    result = manifestType.isSource();
+                } 
+            }
+            if (null == result) {
+                final IDatatype snkType = ModelQuery.findType(prj, TYPE_SINK, null);
+                if (snkType.isAssignableFrom(varType)) {
+                    result = manifestType.isSink();
+                }
+            }
         } catch (ModelQueryException e) {
-            System.out.println("FAILED!");
-            e.printStackTrace();
-        }     
+            Dialogs.showErrorDialog(ERROR_PREFIX + " - Model problem", e.getMessage());
+        }
+        if (null == result) {
+            Dialogs.showErrorDialog(ERROR_PREFIX, "Cannot apply the manifest to this editor. Ignoring.");
+            result = false;
+        } else {
+            if (!result) {
+                int msgCode = Dialogs.showInfoConfirmDialog(ERROR_PREFIX, "Type in manifest does not match type of "
+                    + "configurable element. Take manifest information over (where applicable) anyway?");
+                if (Dialog.OK == msgCode) {
+                    result = true;
+                }
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Sets the topology class information if possible.
+     * 
+     * @param var the decision variable to modify
+     * @param type the manifest type.
+     * @param className The name of the class.
+     */
+    private void setTopoClass(IDecisionVariable var, ManifestType type, String className) {
+        try {
+            IDecisionVariable topo = var.getNestedElement(SLOT_ALGORITHM_TOPOLOGYCLASS);
+            if (null != topo && StringType.TYPE.isAssignableFrom(topo.getDeclaration().getType())) {
+                String topoCls = null;
+                if (ManifestType.STORMBASED == type) {
+                    int pos = className.lastIndexOf('.');
+                    if (pos > 0 && pos < className.length() - 1) {
+                        topoCls = className.substring(pos + 1);
+                    } else if (pos < 0) {
+                        topoCls = className;
+                    } // else invalid
+                }
+                Value value;
+                if (null == topoCls) {
+                    value = NullValue.INSTANCE;
+                } else {
+                    value = ValueFactory.createValue(StringType.TYPE, topoCls);
+                }
+                topo.setValue(value, AssignmentState.ASSIGNED);
+            }
+        } catch (ConfigurationException | ValueDoesNotMatchTypeException e) {
+            Dialogs.showErrorDialog(ERROR_PREFIX, "Cannot set topology name" + e.getMessage());
+        }
     }
     
     /**
