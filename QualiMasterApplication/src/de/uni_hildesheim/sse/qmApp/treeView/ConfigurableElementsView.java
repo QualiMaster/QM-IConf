@@ -83,7 +83,7 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
     private static TreeViewer viewer;
     private boolean enableChangeEventProcessing = true;
     private MenuManager menuManager;
-    private ConfigurableElementsDispatcher elementsDispatcher = new ConfigurableElementsDispatcher(elements);
+    private ConfigurableElementsDispatcher elementsDispatcher;
 
     /**
      * Mapping for icons in the {@link ConfigurableElementsView}. The original-image is not annotated.
@@ -655,6 +655,7 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
         Menu contextMenu = menuManager.createContextMenu(tree);
         tree.setMenu(contextMenu);
         
+        elementsDispatcher = new ConfigurableElementsDispatcher(elements, viewer);
         elementsDispatcher.register();
     }
 

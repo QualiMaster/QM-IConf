@@ -17,6 +17,9 @@ package de.uni_hildesheim.sse.qmApp.treeView;
 
 import java.util.Map;
 
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.widgets.Display;
+
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
@@ -34,14 +37,17 @@ import static eu.qualimaster.easy.extension.QmObservables.*;
 class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfrastructureListener {
 
     private ConfigurableElements elements;
+    private TreeViewer elementsViewer;
     
     /**
      * Creates a configurable elements dispatcher.
      * 
      * @param elements the elements
+     * @param elementsViewer the viewer to update
      */
-    ConfigurableElementsDispatcher(ConfigurableElements elements) {
+    ConfigurableElementsDispatcher(ConfigurableElements elements, TreeViewer elementsViewer) {
         this.elements = elements;
+        this.elementsViewer = elementsViewer;
     }
 
     /**
@@ -90,7 +96,7 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
                         } else {
                             indicator = ElementStatusIndicator.NONE;
                         }
-                        node.setStatus(indicator);
+                        setStatus(node, indicator);
                     }
                 }
             }
@@ -152,9 +158,29 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
      * @param recursive whether clearing shall happen recursively
      */
     private void clearStatus(ConfigurableElement element, boolean recursive) {
-        element.setStatus(ElementStatusIndicator.NONE);
+        setStatus(element, ElementStatusIndicator.NONE);
         for (int c = 0; c < element.getChildCount(); c++) {
-            element.getChild(c).setStatus(ElementStatusIndicator.NONE);
+            setStatus(element.getChild(c), ElementStatusIndicator.NONE);
+        }
+    }
+    
+    /**
+     * Changes the status of a configurable elements and performs an UI update in case of a status change.
+     * 
+     * @param element the element
+     * @param status the new status
+     */
+    private void setStatus(final ConfigurableElement element, ElementStatusIndicator status) {
+        if (element.getStatus() != status) {
+            element.setStatus(status);
+            Display.getDefault().asyncExec(new Runnable() {
+
+                @Override
+                public void run() {
+                    elementsViewer.refresh(element, false);
+                }
+                
+            });
         }
     }
     
