@@ -505,6 +505,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
                 String artifactID = artifactIDText.getText();
                 String versionID = versionText.getText();
                 if (!groupID.isEmpty() && !artifactID.isEmpty() && !versionID.isEmpty()) {
+                
                     if (groupID.endsWith("/") || groupID.endsWith(".")) {
                         groupID = groupID.substring(0, groupID.length() - 1);
                     }
