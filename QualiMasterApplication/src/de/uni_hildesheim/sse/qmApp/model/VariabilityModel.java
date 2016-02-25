@@ -14,6 +14,7 @@ import pipeline.impl.PipelineImpl;
 import pipeline.impl.SinkImpl;
 import pipeline.impl.SourceImpl;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory;
+import de.uni_hildesheim.sse.model.confModel.IConfiguration;
 import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
 import de.uni_hildesheim.sse.model.varModel.AbstractVariable;
 import de.uni_hildesheim.sse.model.varModel.datatypes.ConstraintType;
@@ -851,6 +852,17 @@ public class VariabilityModel {
      */
     public static IDecisionVariable dereference(IDecisionVariable var) {
         return de.uni_hildesheim.sse.model.confModel.Configuration.dereference(var);
+    }
+    
+    /**
+     * Dereferences a value.
+     * 
+     * @param config the configuration access
+     * @param value the value to be dereferenced
+     * @return the dereferenced value
+     */
+    public static Value dereference(IConfiguration config, Value value) {
+        return de.uni_hildesheim.sse.model.confModel.Configuration.dereference(config, value);
     }
     
     /**

@@ -76,14 +76,14 @@ import pipeline.diagram.part.PipelineDiagramEditor;
 public class ConfigurableElementsView extends ViewPart implements IChangeListener {
     public static final String ID = "QualiMasterApplication.view";
     private static final boolean DIAGRAM_STATUS_LISTENER = true;
-    //private static final String NODE_IDENTIFIER = "name: nodes";
-    //private static final String FLOW_IDENTIFIER = "name: nodes";
-    private static HashMap<Image, Image> originalIconReminder = new HashMap<Image, Image>();
+    private static HashMap<Image, Image> originalErrorIconReminder = new HashMap<Image, Image>();
+    private static HashMap<Image, Image> originalIndicatorIconReminder = new HashMap<Image, Image>();
+    
     private static ConfigurableElements elements = new ConfigurableElements();
     private static TreeViewer viewer;
     private boolean enableChangeEventProcessing = true;
     private MenuManager menuManager;
-    //private IPipelineEditorListener listener;
+
     /**
      * Mapping for icons in the {@link ConfigurableElementsView}. The original-image is not annotated.
      * The errorImage is marked with a little image indicating an error.
@@ -539,28 +539,33 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
             if (null == image) {
                 image = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
             }
-           
+            
             if (elem.getFlawedIndicator()) {
-                //Check whether item is flawed. If true, annotate the corresponding icon with an error-marker.
 
+                if (originalIndicatorIconReminder.containsKey(image)) {
+                    image = originalIndicatorIconReminder.get(image);
+                }
+                
                 Image newImage = IconManager.addErrorToImage(image);
-                originalIconReminder.put(newImage, image);
+                originalErrorIconReminder.put(newImage, image);
                 image = newImage;
-            } 
-            
-            
-            //In order to set the icon for elements indicator.
-            if (!elem.getDisplayName().equals("Runtime")) {
-                ElementStatusIndicator indicator = elem.getStatus();
-                image = IconManager.addErrorToImage(image, indicator);
-            }
-            
-            if (!elem.getFlawedIndicator()) {
+                
+            } else if (!elem.getFlawedIndicator()) {
 
-                if (originalIconReminder.containsKey(image)) {
-                    image = originalIconReminder.get(image);
+                if (originalErrorIconReminder.containsKey(image)) {
+                    image = originalErrorIconReminder.get(image);
+                }
+                
+                //In order to set the icon for elements indicator.
+                if (!elem.getDisplayName().equals("Runtime")) {
+                    
+                    ElementStatusIndicator indicator = elem.getStatus();
+                    Image newImage = IconManager.addErrorToImage(image, indicator);
+                    originalIndicatorIconReminder.put(newImage, image);
+                    image = newImage;
                 }
             }
+            
             return image;
         }
 
@@ -574,7 +579,6 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
         public Color getBackground(Object element) {
 
             //Or use this to set the Background of a item
-            
 //            ConfigurableElement elem = (ConfigurableElement) element;
 //            Color color;
 //            
@@ -666,9 +670,9 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
     }
 
     /**
-     * Force the viewer to referesh its input.
+     * Force the viewer to refresh its input.
      */
-    public void forceTreeRefresh() {
+    public static void forceTreeRefresh() {
         viewer.refresh();
     }
 
@@ -874,7 +878,7 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
             if (null != algParent) {
                 algParent = algParent.findElement(family);
             }
-            IDecisionVariable algs = family.getNestedElement(QmConstants.SLOT_ALGORITHM_MEMBERS);
+            IDecisionVariable algs = family.getNestedElement(QmConstants.SLOT_FAMILY_MEMBERS);
             if (null != algParent && algs instanceof ContainerVariable) {
                 Set<ConfigurableElement> known = new HashSet<ConfigurableElement>();
                 for (int c = 0; c < algParent.getChildCount(); c++) {
@@ -913,24 +917,38 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
 
             ConfigurableElement treeElement = elements.elements()[i];
 
-            for (int k = 0; k < treeElement.getChildCount(); k++) {
-                
-                ConfigurableElement innerTreeElement = treeElement.getChild(k);
-
-                String innerTreeElementName = innerTreeElement.getDisplayName();
-                innerTreeElementName = innerTreeElementName.replaceAll("[^a-zA-Z0-9]", "");
-                if (configurableElementsViewMapping.contains(innerTreeElementName)) {
-                    innerTreeElement.setFlawedIndicator(true);
-                    viewer.refresh(innerTreeElement);
-                } else {
-
-                    innerTreeElement.setFlawedIndicator(false);
-                    viewer.refresh(innerTreeElement);
-                }
-            }
+            
+            traverseTree(treeElement, configurableElementsViewMapping);
+            
+            
         }
     }
 
+    /**
+     * Visit all treeitems.
+     * @param element one top-level parent
+     * @param configurableElementsViewMapping list of items to search for.
+     */
+    private static void traverseTree(ConfigurableElement element, Set<String> configurableElementsViewMapping) {
+        
+        for (int k = 0; k < element.getChildCount(); k++) {
+            
+            ConfigurableElement innerTreeElement = element.getChild(k);
+
+            String innerTreeElementName = innerTreeElement.toString();
+            innerTreeElementName = innerTreeElementName.replaceAll("[^a-zA-Z0-9]", "");
+            if (configurableElementsViewMapping.contains(innerTreeElementName)) {
+                innerTreeElement.setFlawedIndicator(true);
+                viewer.refresh(innerTreeElement);
+            } else {
+
+                innerTreeElement.setFlawedIndicator(false);
+                viewer.refresh(innerTreeElement);
+            }
+            
+            traverseTree(innerTreeElement, configurableElementsViewMapping);
+        }
+    }
     /**
      * Change all icons to standard with no red markers.
      */

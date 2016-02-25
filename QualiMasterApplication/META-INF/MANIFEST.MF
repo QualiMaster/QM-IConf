@@ -57,7 +57,12 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.equinox.p2.touchpoint.natives;bundle-version="1.1.100",
  org.eclipse.ecf.provider.filetransfer;bundle-version="3.2.0",
  org.eclipse.equinox.preferences,
- org.eclipse.gmf.runtime.diagram.ui
+ org.eclipse.gmf.runtime.diagram.ui,
+ org.eclipse.help;bundle-version="3.6.0",
+ org.eclipse.help.base;bundle-version="4.0.300",
+ org.eclipse.help.ui;bundle-version="4.0.100",
+ org.eclipse.help.webapp;bundle-version="3.7.0",
+ org.eclipse.equinox.http.jetty;bundle-version="3.1.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: org.apache.commons.lang,

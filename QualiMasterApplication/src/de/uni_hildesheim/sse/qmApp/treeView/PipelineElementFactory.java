@@ -45,6 +45,7 @@ import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import de.uni_hildesheim.sse.utils.modelManagement.ModelInfo;
 import eu.qualimaster.adaptation.external.PipelineMessage;
 import eu.qualimaster.easy.extension.QmConstants;
+import eu.qualimaster.manifestUtils.ManifestConnection;
 
 /**
  * Implements the configuration element factory for pipelines.
@@ -363,6 +364,9 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
                             Dialogs.showInfoDialog("In implementation...", "Will deploy '" 
                                 + ModelAccess.getDisplayName(var) + "' to " + deploymentUrl);
                             // TODO deploy
+                            //find target folder... artifact there?... then...
+                            ManifestConnection con = new ManifestConnection();
+                            
                         }
                     };
                     action.setEnabled(isInfrastructureAdmin && (null != deploymentUrl && deploymentUrl.length() > 0));

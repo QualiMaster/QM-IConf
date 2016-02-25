@@ -6,13 +6,8 @@ package de.uni_hildesheim.sse.qmApp.editors;
  * 
  * @author Holger Eichelberger
  */
-public class AlgorithmEditor extends AbstractUploadEditor {
+public class AlgorithmEditor extends VariableEditor {
 
     public static final String ID = "de.uni_hildesheim.sse.qmApp.AlgorithmEditor";
-
-    @Override
-    protected boolean disableKeyPart() {
-        return true;
-    }
     
 }

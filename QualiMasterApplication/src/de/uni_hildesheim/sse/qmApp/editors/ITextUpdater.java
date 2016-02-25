@@ -12,4 +12,11 @@ public interface ITextUpdater {
      * @param message Message to set in the Textfield.
      */
     public void updateText(String message);
+    
+    /**
+     * Updates the Text's message and pushes the changes into the model.
+     * @param message Message to set in the Textfield.
+     */
+    public void updateTextAndModel(String message);
+    
 }

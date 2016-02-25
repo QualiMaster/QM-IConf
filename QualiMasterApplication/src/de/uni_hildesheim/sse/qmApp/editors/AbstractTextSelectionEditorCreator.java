@@ -14,6 +14,8 @@ import org.eclipse.swt.widgets.Text;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.IEditorCreator;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.IOverridingEditor;
+import de.uni_hildesheim.sse.model.confModel.AssignmentState;
+import de.uni_hildesheim.sse.model.confModel.ConfigurationException;
 import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
 import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.model.varModel.datatypes.StringType;
@@ -243,6 +245,23 @@ public abstract class AbstractTextSelectionEditorCreator implements IEditorCreat
         @Override
         public void refreshContents() {
             updateFromValueText();
+        }
+
+        @Override
+        public void updateTextAndModel(String message) {
+            updateText(message);
+            Value value;
+            try {
+                value = ValueFactory.createValue(StringType.TYPE, message);
+                variable.setValue(value, AssignmentState.ASSIGNED);
+            } catch (ValueDoesNotMatchTypeException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (ConfigurationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
         }
 
     }

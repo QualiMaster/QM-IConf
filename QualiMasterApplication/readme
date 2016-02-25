@@ -88,6 +88,7 @@ Release:
   This needs two steps, an export from the qualiMasterApplication.product and a subsequent installation of the QualiMaster
   bundle into the RCP platform, as otherwise updates will not work.
   - Adjust the createInstallable.bat (from QualiMasterApplicationNightlyUpdateSite) to the target platforms to be exported
+  - See https://wiki.eclipse.org/Building#Preferred_way_of_doing_multi-platform_builds for how to build multi platform build.
   - Execute the export of the QualiMaster Application. Open the 'qualiMasterApplication.product' file
     in Eclipse and click on the 'Overview' tab. On the right bottom corner there is a link called 'Eclipse Product Export Wizard'.
     Click on the link and follow the instructions on the screen. Multiple platforms here is only relevant to test the 

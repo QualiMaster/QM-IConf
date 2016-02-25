@@ -352,4 +352,8 @@ public class ConstraintsEditor extends AbstractTableEditor {
         return tmp.toArray(new String[tmp.size()]);
     }
 
+    @Override
+    public void refresh() {
+        tableViewer.refresh();
+    }
 }

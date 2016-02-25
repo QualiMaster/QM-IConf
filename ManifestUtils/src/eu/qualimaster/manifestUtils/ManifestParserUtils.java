@@ -32,6 +32,7 @@ public class ManifestParserUtils {
             resolver.setCheckmodified(true);
             resolver.setValidate(true);
             result.add(resolver);
+            System.out.println("REP#" + i + " = " + repositories.get(i));
             
         }
         

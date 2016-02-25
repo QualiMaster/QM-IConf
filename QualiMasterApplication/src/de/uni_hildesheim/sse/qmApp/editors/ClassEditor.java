@@ -15,46 +15,92 @@
  */
 package de.uni_hildesheim.sse.qmApp.editors;
 
+import java.lang.reflect.InvocationTargetException;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.window.Window;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
 import org.eclipse.ui.dialogs.SearchPattern;
 
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.IEditorCreator;
+import de.uni_hildesheim.sse.easy_producer.observer.EclipseProgressObserver;
+import de.uni_hildesheim.sse.model.confModel.AllFreezeSelector;
+import de.uni_hildesheim.sse.model.confModel.AssignmentState;
 import de.uni_hildesheim.sse.model.confModel.CompoundVariable;
+import de.uni_hildesheim.sse.model.confModel.Configuration;
+import de.uni_hildesheim.sse.model.confModel.ConfigurationException;
+import de.uni_hildesheim.sse.model.confModel.ContainerVariable;
 import de.uni_hildesheim.sse.model.confModel.IConfigurationElement;
 import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
+import de.uni_hildesheim.sse.model.varModel.AbstractVariable;
+import de.uni_hildesheim.sse.model.varModel.ModelQuery;
+import de.uni_hildesheim.sse.model.varModel.ModelQueryException;
+import de.uni_hildesheim.sse.model.varModel.Project;
+import de.uni_hildesheim.sse.model.varModel.datatypes.Container;
+import de.uni_hildesheim.sse.model.varModel.datatypes.CustomDatatype;
+import de.uni_hildesheim.sse.model.varModel.datatypes.DerivedDatatype;
+import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
+import de.uni_hildesheim.sse.model.varModel.datatypes.Reference;
+import de.uni_hildesheim.sse.model.varModel.datatypes.StringType;
+import de.uni_hildesheim.sse.model.varModel.filter.DatatypeFinder;
+import de.uni_hildesheim.sse.model.varModel.filter.DeclarationFinder;
+import de.uni_hildesheim.sse.model.varModel.filter.DeclarationFinder.VisibilityType;
+import de.uni_hildesheim.sse.model.varModel.filter.FilterType;
 import de.uni_hildesheim.sse.model.varModel.values.StringValue;
 import de.uni_hildesheim.sse.model.varModel.values.Value;
+import de.uni_hildesheim.sse.model.varModel.values.ValueDoesNotMatchTypeException;
+import de.uni_hildesheim.sse.model.varModel.values.ValueFactory;
+import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.dialogs.DialogsUtil;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
+import de.uni_hildesheim.sse.utils.progress.ProgressObserver;
+import eu.qualimaster.manifestUtils.ManifestConnection;
+import eu.qualimaster.manifestUtils.data.Field;
+import eu.qualimaster.manifestUtils.data.Item;
+import eu.qualimaster.manifestUtils.data.Parameter;
 
 /**
  * The {@link ArtifactEditor} specializes {@link AbstractTextSelectionEditorCreator} to select from a 
  * class list.
  * 
  * @author Holger Eichelberger
+ * @author Patrik Pastuschek
  */
 public class ClassEditor extends AbstractTextSelectionEditorCreator {
 
-    public static final boolean ENABLE_BROWSE = false; // TODO connect Manifest utils
+    public static final boolean ENABLE_BROWSE = true; // TODO connect Manifest utils
     public static final IEditorCreator CREATOR = new ClassEditor();
+    
+    private String artifact = null;
+    private ManifestConnection con = null;
+    private Map<String, AbstractVariable> instances;
     
     /**
      * Prevents external creation.
@@ -65,20 +111,378 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
     @Override
     protected void browseButtonSelected(String text, IDecisionVariable context, ITextUpdater updater) {
         List<String> classes = new ArrayList<String>();
-        String artifact = getArtifact(context);
-        if (null != artifact) {
-            // TODO ask Manifest utils
+        artifact = getArtifact(context);
+        if (null != artifact && !artifact.isEmpty()) {
+            
             System.out.println("RETRIEVE CLASSES FROM " + artifact);
+            
+            createProgressDialog(DialogsUtil.getActiveShell());
+            
+            List<String> list = con.getAllValidClasses();
+            for (String s : list) {
+                classes.add(s);
+            }
+            
+            ClassSelectorDialog dlg = new ClassSelectorDialog(DialogsUtil.getActiveShell(), "Select class", classes);
+            dlg.setInitialPattern("?");
+            int res = dlg.open();
+            String cls = dlg.getFirstResult();
+            if (Window.OK == res && null != cls) {
+                updater.updateText(cls);
+                updateArtifactInfo(cls, ManifestConnection.getArtifactId(artifact), context);
+                updateEditors(getTitle(context));
+            }
+            
+        } else {
+            
+            Dialogs.showInfoDialog("No artifact selected", "Please select an artifact first!");
+            
         }
-        classes.add("java.util.String");
-        classes.add("java.util.Object");
-        ClassSelectorDialog dlg = new ClassSelectorDialog(DialogsUtil.getActiveShell(), "Select class", classes);
-        dlg.setInitialPattern("?");
-        int res = dlg.open();
-        String cls = dlg.getFirstResult();
-        if (Window.OK == res && null != cls) {
-            updater.updateText(cls);
+        
+    }
+    
+    /**
+     * Updates the editor tables. Used when new data is inserted into the model.
+     * TODO: move this and informEditor(VariableEditor) into a utility class!
+     * @param title The title of this editor, to ensure that only THIS editor is updated!
+     */
+    private static void updateEditors(String title) {
+        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        IEditorReference[] allOpenEditors = page.getEditorReferences();
+        for (int i = 0; i < allOpenEditors.length; i++) {
+            IEditorPart editor = allOpenEditors[i].getEditor(false);
+            if (editor instanceof VariableEditor && editor.getTitle().equals(title)) {
+                VariableEditor varEditor = (VariableEditor) editor;
+//                for (int j = 0; j < varEditor.getEditorCount(); j++) {
+//                    if (varEditor.getEditor(j) instanceof ParameterEditor) {
+//                        ((ParameterEditor) varEditor.getEditor(j)).refresh();
+//                    } else if (varEditor.getEditor(j) instanceof TuplesEditor) {
+//                        ((TuplesEditor) varEditor.getEditor(j)).refresh();
+//                    }
+//                }
+                varEditor.refreshNestedEditors();
+                informEditor(varEditor);
+            }
         }
+    }
+    
+    /**
+     * Updates a single editor.
+     * @param editor The editor to update.
+     */
+    private static void informEditor(final VariableEditor editor) {
+        Display.getDefault().syncExec(new Runnable() {
+        
+            @Override
+            public void run() {
+                editor.refreshEditor();
+            }
+        });
+    }
+    
+    /**
+     * Updates the In- and Output and the Parameters of the artifact.
+     * @param className The name of the class.
+     * @param artifactId The name of the artifact.
+     * @param context The current context.
+     */
+    private void updateArtifactInfo(String className, String artifactId, IDecisionVariable context) {
+        List<Item> input = con.getInput(className, artifactId);
+        List<Item> output = con.getOutput(className, artifactId);
+        List<Parameter> param = con.getParameters(className, artifactId);   
+        
+        try {
+            IDecisionVariable var = (IDecisionVariable) context.getParent();
+            
+            createMap(var);
+            
+            ModelQuery.findType(var.getConfiguration().getProject(), "Algorithm", null);
+            var.unfreeze(AssignmentState.ASSIGNED);
+           
+            List<IDecisionVariable> list = getIDecisionVariable(var, "input");
+            List<IDecisionVariable> list2 = getIDecisionVariable(var, "output");
+            List<IDecisionVariable> list3 = getIDecisionVariable(var, "parameters");
+            
+            list2.add(0, (IDecisionVariable) list2.get(0).getParent());
+            list3.add(0, (IDecisionVariable) list3.get(0).getParent());
+
+            clearInput(list);
+            clearInput(list2);
+            clearInput(list3);
+            
+            list2.remove(0);
+            
+            addInOut(input, list, true);
+            addInOut(output, list2, false);
+            addParameter(param, list3);
+            System.out.println("Updated INPUT...");
+            var.freeze(AllFreezeSelector.INSTANCE);
+        } catch (ModelQueryException e) {
+            System.out.println("FAILED!");
+            e.printStackTrace();
+        }     
+    }
+    
+    /**
+     * Adds parameters into the editor.
+     * @param param A list of parameters to add.
+     * @param list The actual list-object of the editor.
+     */
+    public void addParameter(List<Parameter> param, List<IDecisionVariable> list) {
+        
+        if (!list.isEmpty()) {
+         
+            IDecisionVariable base = list.get(0);
+            Configuration config = base.getConfiguration();
+            Project project = config.getProject(); 
+            ContainerVariable container = null;   
+            List<IDecisionVariable> found = null;         
+            found = getIDecisionVariable(base, "parameters");
+            IDecisionVariable var = found.get(0); 
+            container = (ContainerVariable) var;
+            
+            for (Parameter p : param) {
+                
+                try {
+                    
+                    //if (container.getNestedElementsCount() == 0) {
+                    container.addNestedElement(); 
+                    //}
+                    
+                    IDatatype containerType = container.getDeclaration().getType();
+                    // The container could be a deriveddatatype -> resolve to basis to be sure that we have a container
+                    containerType = DerivedDatatype.resolveToBasis(containerType);
+                    IDatatype containedType = null;
+                    if (containerType instanceof Container) {
+                        containedType = ((Container) containerType).getContainedType();
+                    }
+                    
+                    AbstractVariable parameterType = instances.get(p.getNormalizedTypeName());
+                    parameterType = getVarInstance(p.getNormalizedTypeName());     
+                    DatatypeFinder finder = new DatatypeFinder(project, FilterType.ALL, containedType);
+                    List<CustomDatatype> foundTypes = finder.getFoundDatatypes();
+                    
+                    if (null != parameterType) {
+                        
+                        Value refValue = ValueFactory.createValue(
+                                new Reference("", parameterType.getType(), var.getConfiguration().getProject()), 
+                                parameterType); //instances.get(p.getNormalizedTypeName())
+                        IDatatype refinedType = null;
+                        
+                        for (CustomDatatype cDtype : foundTypes) {
+                            if (cDtype.getName().contains(p.getNormalizedTypeName())) {
+                                refinedType = cDtype;  
+                            }       
+                        }
+                        if (null != refinedType) {
+                            
+                            //"name", "class" and "defaultValue" must not be changed, they are the names of the columns!
+                            Value val = ValueFactory.createValue(refinedType, 
+                                    new Object[] {"name", new String(p.getName()), 
+                                        "class", refValue, "defaultValue", p.getValue()});
+                        
+                            container.getNestedElement(container.getNestedElementsCount() - 1)
+                                .setValue(val, AssignmentState.ASSIGNED);        
+                        }        
+                    } else {
+                        System.err.println("Unable to find ParameterType for: " + p.getNormalizedTypeName());
+                    }  
+                } catch (ConfigurationException e) {
+                    e.printStackTrace();
+                } catch (ValueDoesNotMatchTypeException e) {
+                    e.printStackTrace();
+                }     
+            }     
+        }    
+    }
+    
+    /**
+     * Adds input information for the artifact.
+     * @param input A list of input items.
+     * @param list The base for model operations.
+     * @param isInput true if this is input, false for output.
+     */
+    private void addInOut(List<Item> input, List<IDecisionVariable> list, boolean isInput) {
+        
+        if (!list.isEmpty()) {
+            
+            IDecisionVariable base = list.get(0);
+            Configuration config = base.getConfiguration();
+            Project project = config.getProject();
+            ContainerVariable container = null;
+            
+            List<IDecisionVariable> found = null;
+            found = getIDecisionVariable(base, "fields");
+
+            if (found.isEmpty()) {
+                found.add(base); 
+            }
+            
+            container = (ContainerVariable) base;
+            
+            for (Item item : input) {
+
+                if (container.getNestedElementsCount() == 0) {
+                    container.addNestedElement();
+                }
+                ((ContainerVariable) container.getNestedElement(
+                        container.getNestedElementsCount() - 1).getParent()).addNestedElement();
+                
+                try {
+                    
+                    container.getNestedElement(container.getNestedElementsCount() - 1)
+                        .getNestedElement(0).setValue(ValueFactory.createValue(
+                            StringType.TYPE, new String(item.getName())), AssignmentState.ASSIGNED);
+                    
+                    int count = 0;
+                    
+                    for (Field f : item.getFields()) {                  
+
+                        ((ContainerVariable) container.getNestedElement(container.getNestedElementsCount() - 1)
+                                .getNestedElement(1)).addNestedElement();
+                        
+                        IDecisionVariable second = container.getNestedElement(
+                                container.getNestedElementsCount() - 1).getNestedElement(1)
+                                .getNestedElement(count);
+                        
+                        container.getNestedElement(container.getNestedElementsCount() - 1)
+                            .getNestedElement(1).getNestedElement(count).getNestedElement(0)
+                            .setValue(ValueFactory.createValue(StringType.TYPE, f.getName()), 
+                                    AssignmentState.ASSIGNED);
+                        
+                        AbstractVariable neededType = getVarInstance(f.getFieldType().getNormalizedName()); 
+                        
+                        if (null != neededType) {
+                            
+                            Value refValue = ValueFactory.createValue(
+                                    new Reference("", neededType.getType(), project), neededType
+                                    );
+                            
+                            second.getNestedElement(1).setValue(refValue, AssignmentState.ASSIGNED);
+                            
+                        }   
+                        count++;
+                    }
+
+                } catch (ConfigurationException e) {
+                    e.printStackTrace();
+                } catch (ValueDoesNotMatchTypeException e) {
+                    e.printStackTrace();
+                }  
+            }
+        }     
+    }
+    
+    /**
+     * Attempts to resolve the name and get a matching AbstractVariable.
+     * @param name The name of the type.
+     * @return A matching AbstractVariable or null if none was found.
+     */
+    private AbstractVariable getVarInstance(String name) {
+        
+        if (name.equalsIgnoreCase("double")) {
+            name = "real";
+        }
+        
+        AbstractVariable result = null;
+        Set<String> keys = instances.keySet();
+        for (String key : keys) {
+            String temp = instances.get(key).getName().toLowerCase();
+            if (temp.substring(0, temp.length() - 4).equals(name.toLowerCase())) {
+                    //|| temp.equals(name.toLowerCase())) { //|| temp.contains(name.toLowerCase())
+                result = instances.get(key);
+                break;
+            }
+        }
+        
+        return result;
+        
+    }
+    
+    /**
+     * Creates a map of type-references.
+     * @param var A IDecisionVariable with access to the configuration.
+     */
+    private void createMap(IDecisionVariable var) {
+        
+        Project project = var.getConfiguration().getProject();
+        IDatatype type;
+        try {
+            type = ModelQuery.findType(project, "FieldType", null);
+            DeclarationFinder finder = new DeclarationFinder(project, FilterType.ALL, type);
+            List<AbstractVariable> declarations = finder.getVariableDeclarations(VisibilityType.ALL);
+            instances = new HashMap<String, AbstractVariable>();
+            for (int i = 0; i < declarations.size(); i++) {
+                IDecisionVariable variable = var.getConfiguration().getDecision(declarations.get(i));
+                instances.put(variable.getNestedElement(1).getValue().getValue().toString(), variable.getDeclaration());
+            }
+        } catch (ModelQueryException e) {
+            e.printStackTrace();
+        }   
+        
+    }
+    
+    /**
+     * Removes all input information for the artifact.
+     * @param list The base for model operations.
+     */
+    private void clearInput(List<IDecisionVariable> list) {
+        
+        if (!list.isEmpty()) {
+            
+            for (IDecisionVariable var : list) {
+                IDecisionVariable base = var;
+                for (int i = 0; i < base.getNestedElementsCount(); i++) {
+                    clearInput(base.getNestedElement(i), false);
+                }
+            }
+        
+        }
+
+    }
+    
+    /**
+     * Removes all input information for the artifact.
+     * @param base The base for model operations.
+     * @param deleteBase True if the base itself should be deleted aswell.
+     */
+    private void clearInput(IDecisionVariable base, boolean deleteBase) {
+        
+        for (int i = 0; i < base.getNestedElementsCount(); i++) {
+            clearInput(base.getNestedElement(i), true);
+        }
+        
+        if (base.getParent() instanceof ContainerVariable && deleteBase) {
+            ContainerVariable container = (ContainerVariable) base.getParent();
+            for (int i = 0; i < container.getNestedElementsCount(); i++) {
+                container.removeNestedElement(container.getNestedElement(i));
+            }
+        }
+        
+    }
+    
+    /**
+     * Returns a list of nested elements with the given name, can be empty.
+     * @param parent The base element.
+     * @param name The name of the desired nested element.
+     * @return A list of matching elements, can be empty.
+     */
+    private List<IDecisionVariable> getIDecisionVariable(IDecisionVariable parent, String name) {
+        
+        List<IDecisionVariable> result = new ArrayList<IDecisionVariable>();
+        
+        if (parent.getDeclaration().getName().equals(name)) {
+            result.add(parent);
+        }
+        
+        if (parent.getNestedElementsCount() > 0) {
+            for (int i = 0; i < parent.getNestedElementsCount(); i++) {
+                result.addAll(getIDecisionVariable(parent.getNestedElement(i), name));
+            }
+        }
+        
+        return result;
+        
     }
     
     @Override
@@ -88,9 +492,9 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
     
     @Override
     protected boolean isBrowseButtonActive(boolean cell, IDecisionVariable context) {
-        return ENABLE_BROWSE && null != getArtifact(context); // TODO use Manifest utils
+        return ENABLE_BROWSE; // && null != getArtifact(context);
     }
-
+    
     /**
      * Returns the artifact specification from the (parent) decision variable.
      * 
@@ -113,6 +517,111 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             }
         }
         return result;
+    } 
+    
+    /**
+     * Returns the artifact specification from the (parent) decision variable.
+     * 
+     * @param context the context for this editor
+     * @return the artifact specification (if available, may be <b>null</b> if there is none)
+     */
+    private String getTitle(IDecisionVariable context) {
+        String result = null;
+        if (null != context) {
+            IConfigurationElement par = context.getParent();
+            if (par instanceof CompoundVariable) {
+                CompoundVariable artifactHolder = (CompoundVariable) par;
+                IDecisionVariable artifactVar = artifactHolder.getNestedVariable("name");
+                if (null != artifactVar) {
+                    Value val = artifactVar.getValue();
+                    if (val instanceof StringValue) {
+                        result = ((StringValue) val).getValue();
+                    }
+                }
+            }
+        }
+        return result;
+    } 
+    
+    /**
+     * Create progress Dialog.
+     * 
+     * @param parent
+     *            parent composite.
+     */
+    protected void createProgressDialog(Composite parent) {
+        try {
+            ProgressMonitorDialog pmd = new ProgressMonitorDialog(parent.getShell()) {
+
+                @Override
+                protected void setShellStyle(int newShellStyle) {
+                    super.setShellStyle(SWT.CLOSE | SWT.INDETERMINATE
+                            | SWT.BORDER | SWT.TITLE);
+                    setBlockOnOpen(false);
+                }
+            };
+            pmd.run(true, true, new ProgressDialogOperation());
+            
+        } catch (final InvocationTargetException e) {
+            Throwable exc = e;
+            if (null != e.getCause()) {
+                exc = e.getCause();
+            }
+            MessageDialog.openError(parent.getShell(), "Error", "Error: " + exc.getMessage());
+            e.printStackTrace();
+        } catch (final InterruptedException e) {
+            MessageDialog.openInformation(parent.getShell(), "Cancelled",
+                    "Error: ");
+            e.printStackTrace();
+        }
+        
+    }
+    
+    /**
+     * This Operation is used to monitor the ManifestConnection and its progress.
+     */
+    class ProgressDialogOperation implements IRunnableWithProgress {
+        
+        @Override
+        public void run(final IProgressMonitor monitor)
+            throws InvocationTargetException, InterruptedException {
+            
+            startManifestConnection(monitor);
+            
+            monitor.done();
+        }
+        
+    }
+    
+    /**
+     * Starts the ManifestConnection process and monitors it.
+     * @param monitor The used monitor.
+     */
+    private void startManifestConnection(IProgressMonitor monitor) {
+        EclipseProgressObserver obs = new EclipseProgressObserver();
+        obs.register(monitor);
+        resolveManifest(obs);
+        obs.unregister(monitor);
+    }
+    
+    /**
+     * Will actually use the ManifestConnection in order to retrieve and resolve the manifest information.
+     * @param observer The used observer.
+     */
+    private void resolveManifest(ProgressObserver observer) {
+        
+        con = new ManifestConnection();
+        String artifactId = ManifestConnection.getArtifactId(artifact);
+        String groupId = ManifestConnection.getGroupId(artifact);
+        String version = ManifestConnection.getVersion(artifact);  
+        
+        System.out.println(artifact);
+        System.out.println(artifactId);
+        System.out.println(groupId);
+        System.out.println(version);
+        
+        con.load(observer, groupId, artifactId, version);
+        
     }
     
     /**

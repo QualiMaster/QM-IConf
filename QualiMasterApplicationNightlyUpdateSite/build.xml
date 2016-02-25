@@ -82,7 +82,7 @@
     	
         <!-- the update site for the eclipse to create the nightly versions -->
     	<mkdir dir="${basedir}/gen/final/internal"/>
-        <java jar="${eclipse.launcher}" fork="true" failonerror="true" maxmemory="128m">
+        <java jar="${eclipse.product.launcher}" fork="true" failonerror="true" maxmemory="128m">
             <arg value="-application" />
             <arg value="org.eclipse.equinox.p2.publisher.UpdateSitePublisher" />
             <arg value="-metadataRepository" />
@@ -111,7 +111,7 @@
             <fileset dir="${user.home}/Eclipse/delta-4.3.2/eclipse/plugins"/>
         </copy>
     	
-    	<java jar="${eclipse.launcher}" fork="true" failonerror="true" maxmemory="128m">
+    	<java jar="${eclipse.product.launcher}" fork="true" failonerror="true" maxmemory="128m">
             <arg value="-application" />
             <arg value="org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher" />
             <arg value="-metadataRepository" />
@@ -127,24 +127,45 @@
     	<mkdir dir="${basedir}/gen/final/binary"/>
     	<binary SourceFolder="/var/lib/jenkins/Eclipse/qmRepository/binary" DestinationFolder="${basedir}/gen/final/binary" Version="${version}" Prefix="de.uni-hildesheim.sse.qualiMasterApplication"/>
 
-        <java jar="${eclipse.launcher}" fork="true" failonerror="false" maxmemory="128m">
+        <!-- import the RCP product into the repository
+             See: http://www.eclipse.org/forums/index.php/t/746045/ -->
+        <java jar="${eclipse.product.launcher}" fork="true" failonerror="false" maxmemory="128m">
             <arg value="-application" />
-            <arg value="org.eclipse.equinox.p2.director" />
+            <arg value="org.eclipse.equinox.p2.publisher.ProductPublisher" />
             <arg value="-metadataRepository" />
             <arg value="file:${basedir}/gen/final" />
             <arg value="-artifactRepository" />
             <arg value="file:${basedir}/gen/final" />
             <arg value="-productFile" />
             <arg value="${basedir}/gen/intermediate/QualiMasterApplication.product" />
-            <arg value="-append"/>
+            <arg value="-executables" />
+        	<arg value="${eclipse.delta.executables}"/>
         	<arg value="-flavor" />
         	<arg value="tooling" />
-        	<arg value="-executables" />
-        	<arg value="${eclipse.delta.executables}"/>
-            <arg value="-compress" />
         	<arg value="-configs" />
-        	<arg value="win32.win32.x86" />
+        	<arg value="ANY" />
+            <arg value="-append"/>
         </java>
+        
+        <!-- Creation of a prepacked Eclipse/QM app -->
+        <!--java jar="${eclipse.product.launcher}" fork="true" failonerror="false" maxmemory="128m">
+            <arg value="-application" />
+            <arg value="org.eclipse.equinox.p2.director" />
+            <arg value="-metadataRepository" />
+            <arg value="file:${basedir}/gen/final" />
+            <arg value="-artifactRepository" />
+            <arg value="file:${basedir}/gen/final" />
+            <arg value="-installIU" />
+            <arg value="QualiMasterApplication.application" />
+            <arg value="-profileProperties" />
+            <arg value="org.eclipse.update.install.features=true" />
+        	<arg value="-p2.os" />
+        	<arg value="${test.eclipse.os}" />
+        	<arg value="-p2.ws" />
+        	<arg value="${test.eclipse.ws}" />
+        	<arg value="-p2.arch" />
+        	<arg value="${test.eclipse.arch}" />
+        </java-->
     </target>
     
     <target name="zip.Site">
