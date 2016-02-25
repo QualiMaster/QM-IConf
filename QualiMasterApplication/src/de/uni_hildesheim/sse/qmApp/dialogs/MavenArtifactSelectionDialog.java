@@ -1,5 +1,6 @@
 package de.uni_hildesheim.sse.qmApp.dialogs;
 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -33,13 +35,8 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -174,60 +171,36 @@ public class MavenArtifactSelectionDialog extends Dialog {
      *            parent composite.
      * @return composite The parent composite.
      */
-    protected Control createContents(Composite parent) {
+    protected Control createDialogArea(Composite parent) {
         final Composite composite = (Composite) super.createDialogArea(parent);
         Image icon = IconManager.retrieveImage(IconManager.MAVEN_DIALOG_ICON);
         composite.getShell().setImage(icon);
-        FillLayout fillLayout = new FillLayout();
-        fillLayout.marginHeight = 5;
-        fillLayout.marginWidth = 5;
-        composite.setLayout(fillLayout);
-        // outer composite
-        Composite outer = new Composite(composite, SWT.BORDER);
-        FormLayout formLayout = new FormLayout();
-        formLayout.marginHeight = 5;
-        formLayout.marginWidth = 5;
-        formLayout.marginBottom = 5;
-        formLayout.spacing = 5;
-        outer.setLayout(formLayout);
-
-        // Composite for the treeviewer
-        treeContainer = new Composite(outer, SWT.BORDER);
+        composite.setLayout(new GridLayout(1, true));
+        
+        treeContainer = new Composite(composite, SWT.BORDER);
+        GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+//        gridData.widthHint = 500;
+        gridData.heightHint = 450;
+        treeContainer.setLayoutData(gridData);
         treeContainer.setLayout(new GridLayout(1, true));
-        FormData fData = new FormData();
-        fData.top = new FormAttachment(0);
-        fData.left = new FormAttachment(0);
-        fData.right = new FormAttachment(100);
-        fData.bottom = new FormAttachment(65); // Locks on 65% of the view
-        fData.width = 450;
-        fData.height = 500;
-        treeContainer.setLayoutData(fData);
-
-        Composite labelsContainer = new Composite(outer, SWT.BORDER);
-        GridLayout innerRightLayout = new GridLayout();
-        innerRightLayout.numColumns = 1;
-        labelsContainer.setLayout(innerRightLayout);
-        fData = new FormData();
-        fData.top = new FormAttachment(treeContainer);
-        fData.left = new FormAttachment(0);
-        fData.right = new FormAttachment(100);
-        fData.bottom = new FormAttachment(93); // Locks on 93% of the view
-        labelsContainer.setLayoutData(fData);
-
-        Composite buttonsContainer = new Composite(outer, SWT.BORDER);
-        RowLayout rowLayout = new RowLayout();
-        rowLayout.marginLeft = 270; // Positioning of the Buttons
-        buttonsContainer.setLayout(rowLayout);
-        fData = new FormData();
-        fData.top = new FormAttachment(labelsContainer);
-        fData.left = new FormAttachment(0);
-        fData.right = new FormAttachment(100);
-        fData.bottom = new FormAttachment(100);
-        buttonsContainer.setLayoutData(fData);
-        createUserInterface(labelsContainer);
-        createButtons(buttonsContainer);
-        createTreeViewer(parent);
-        setViewerInput(parent);
+        createTreeViewer(treeContainer);
+        setViewerInput(treeContainer);
+        
+        Composite labels = new Composite(composite, SWT.BORDER);
+        labels.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+        labels.setLayout(new GridLayout(1, true));
+        
+        Composite cacheUpdate = new Composite(composite, SWT.BORDER);
+        cacheUpdate.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+        cacheUpdate.setLayout(new GridLayout(1, true));
+        Label lastUpdate = new Label(cacheUpdate, SWT.NONE);
+        lastUpdate.setText(getLastUpdateToolTipText());
+        
+        createUserInterface(labels);
+        
+//        oldstuff();
+        
+//        createButtons(buttonsContainer);
 
         composite.addListener(SWT.Traverse, new Listener() {
 
@@ -239,7 +212,66 @@ public class MavenArtifactSelectionDialog extends Dialog {
         });
         return composite;
     };
-
+    
+//    private void oldstuff() {
+//        FillLayout fillLayout = new FillLayout();
+//      fillLayout.marginHeight = 5;
+//      fillLayout.marginWidth = 5;
+//      composite.setLayout(fillLayout);
+      // outer composite
+//      Composite outer = new Composite(composite, SWT.BORDER);
+//      FormLayout formLayout = new FormLayout();
+//      formLayout.marginHeight = 5;
+//      formLayout.marginWidth = 5;
+//      formLayout.marginBottom = 5;
+//      formLayout.spacing = 5;
+//      outer.setLayout(formLayout);
+//
+//      // Composite for the treeviewer
+//      treeContainer = new Composite(outer, SWT.BORDER);
+//      treeContainer.setLayout(new GridLayout(1, true));
+//      FormData fData = new FormData();
+//      fData.top = new FormAttachment(0);
+//      fData.left = new FormAttachment(0);
+//      fData.right = new FormAttachment(100);
+//      fData.bottom = new FormAttachment(65); // Locks on 65% of the view
+//      fData.width = 450;
+//      fData.height = 500;
+//      treeContainer.setLayoutData(fData);
+//
+//      Composite labelsContainer = new Composite(outer, SWT.BORDER);
+//      labelsContainer.setLayout(new GridLayout(1, false));
+//      fData = new FormData();
+//      fData.top = new FormAttachment(treeContainer);
+//      fData.left = new FormAttachment(0);
+//      fData.right = new FormAttachment(100);
+//      fData.bottom = new FormAttachment(100); // Locks on 93% of the view
+//      fData.width = 450;
+//      fData.height = 100;
+//      labelsContainer.setLayoutData(fData);
+//
+//      createUserInterface(labelsContainer);
+//      createTreeViewer(parent);
+//      setViewerInput(parent);
+//
+//      Composite buttonsContainer = new Composite(outer, SWT.BORDER);
+////      RowLayout rowLayout = new RowLayout();
+////      rowLayout.marginLeft = 270; // Positioning of the Buttons
+//      buttonsContainer.setLayout(new GridLayout(1, false));
+//      fData = new FormData();
+//      fData.top = new FormAttachment(labelsContainer);
+//      fData.left = new FormAttachment(0);
+//      fData.right = new FormAttachment(100);
+//      fData.bottom = new FormAttachment(100);
+//      fData.width = 450;
+//      fData.height = 100;
+//      buttonsContainer.setLayoutData(fData);
+//      buttonsContainer.setBackground(new Color(Display.getCurrent(), new RGB(255, 0, 0)));
+//      
+//      Label lastUpdate = new Label(buttonsContainer, SWT.NONE);
+//      lastUpdate.setText("ABC");
+//    }
+    
     /**
      * Set the input for the viewer.
      * 
@@ -338,8 +370,8 @@ public class MavenArtifactSelectionDialog extends Dialog {
 
         viewer = new TreeViewer(treeContainer, SWT.NONE);
 
-        viewer.getTree().setLayoutData(
-                new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+        viewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+//        viewer.getTree().setBackground(new Color(Display.getCurrent(), new RGB(255, 0, 0)));
 
         viewer.setContentProvider(new MyTreeContentProvider());
 
@@ -459,32 +491,31 @@ public class MavenArtifactSelectionDialog extends Dialog {
      * @param buttonsContainer
      *            Container for the buttons.
      */
-    public void createButtons(final Composite buttonsContainer) {
-        final Button refresh = new Button(buttonsContainer, SWT.PUSH);
-        refresh.setToolTipText(getLastUpdateToolTipText());
-        refresh.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-        refresh.setSize(SWT.DEFAULT, SWT.DEFAULT);
-        refresh.setText("Refresh");
-        Button ok = new Button(buttonsContainer, SWT.PUSH);
-        ok.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-        ok.setSize(SWT.DEFAULT, SWT.DEFAULT);
-        ok.setText("OK");
+    @Override
+    protected void createButtonsForButtonBar(final Composite buttonsContainer) {
+//        buttonsContainer.setBackground(new Color(Display.getCurrent(), new RGB(255, 0, 0)));
+        Button ok = createButton(buttonsContainer, IDialogConstants.BACK_ID, IDialogConstants.OK_LABEL, true);
+        final Button refresh = createButton(buttonsContainer, IDialogConstants.NO_ID, "Refresh", false);
+        createButton(buttonsContainer, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
         ok.addSelectionListener(new SelectionListener() {
 
             @Override
             public void widgetSelected(SelectionEvent exc) {
-                String putIn = "";
-                putIn = groupIDText.getText().replaceAll("/", ".");
-
-                if (putIn.endsWith("/") || putIn.endsWith(".")) {
-                    putIn = putIn.substring(0, groupIDText.getText().length() - 1);
+                String groupID = groupIDText.getText().replaceAll("/", ".");
+                String artifactID = artifactIDText.getText();
+                String versionID = versionText.getText();
+                if (!groupID.isEmpty() && !artifactID.isEmpty() && !versionID.isEmpty()) {
+                
+                    if (groupID.endsWith("/") || groupID.endsWith(".")) {
+                        groupID = groupID.substring(0, groupID.length() - 1);
+                    }
+                    artifactEditorUpdater.updateTextAndModel(groupID + ":" + artifactID + ":" + versionID);
+                    
+                    //TODO: notify the ClassEditor! 
+                    closeEditor();
+                } else {
+                    Dialogs.showErrorDialog("No artifact selected", "No artifact selected. Please select a file.");
                 }
-                artifactEditorUpdater.updateTextAndModel(
-                        putIn + ":" + artifactIDText.getText() + ":" + versionText.getText());
-                
-                //TODO: notify the ClassEditor!
-                
-                closeEditor();
             }
 
             @Override
@@ -492,21 +523,21 @@ public class MavenArtifactSelectionDialog extends Dialog {
             }
         });
 
-        Button cancel = new Button(buttonsContainer, SWT.PUSH);
-        cancel.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-        cancel.setSize(SWT.DEFAULT, SWT.DEFAULT);
-        cancel.setText("Cancel");
+//        Button cancel = new Button(buttonsContainer, SWT.PUSH);
+//        cancel.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+//        cancel.setSize(SWT.DEFAULT, SWT.DEFAULT);
+//        cancel.setText("Cancel");
 
-        cancel.addSelectionListener(new SelectionListener() {
-            @Override
-            public void widgetSelected(SelectionEvent exc) {
-                getShell().dispose();
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent exc) {
-            }
-        });
+//        cancel.addSelectionListener(new SelectionListener() {
+//            @Override
+//            public void widgetSelected(SelectionEvent exc) {
+//                getShell().dispose();
+//            }
+//
+//            @Override
+//            public void widgetDefaultSelected(SelectionEvent exc) {
+//            }
+//        });
         refresh.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent exc) {
@@ -516,7 +547,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
                     createProgressDialog(buttonsContainer);
                     viewer.setInput(mavenList);
                     saveTreeLocally();
-                    refresh.setToolTipText(getLastUpdateToolTipText());
+//                    refresh.setToolTipText(getLastUpdateToolTipText());
                 } else {
                     loadTreeLocally();
                 }
@@ -564,15 +595,17 @@ public class MavenArtifactSelectionDialog extends Dialog {
         }
         Label artifactIDLabel = new Label(textArea, SWT.NONE);
         artifactIDLabel.setText("Artifact ID:");
+        data.widthHint = 350;
         artifactIDText = new Text(textArea, SWT.BORDER);
-        artifactIDText.setLayoutData(data);
+        artifactIDText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         if (null != initialArtifactId) {
             artifactIDText.setText(initialArtifactId);
         }
         Label versionLabel = new Label(textArea, SWT.NONE);
         versionLabel.setText("Version:");
+        data.widthHint = 350;
         versionText = new Text(textArea, SWT.BORDER);
-        versionText.setLayoutData(data);
+        versionText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         if (null != initialVersion) {
             versionText.setText(initialVersion);
         }
@@ -753,8 +786,8 @@ public class MavenArtifactSelectionDialog extends Dialog {
     @Override
     protected void configureShell(Shell newShell) {
 
-        newShell.pack();
-        newShell.setSize(500, 650);
+//        newShell.pack();
+//        newShell.setSize(500, 650);
 
         super.configureShell(newShell);
         newShell.setText("Maven Selector");
