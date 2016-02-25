@@ -497,29 +497,24 @@ public class MavenArtifactSelectionDialog extends Dialog {
         Button ok = createButton(buttonsContainer, IDialogConstants.BACK_ID, IDialogConstants.OK_LABEL, true);
         final Button refresh = createButton(buttonsContainer, IDialogConstants.NO_ID, "Refresh", false);
         createButton(buttonsContainer, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
-//        
-//        final Button refresh = new Button(buttonsContainer, SWT.PUSH);
-//        refresh.setToolTipText(getLastUpdateToolTipText());
-//        refresh.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-//        refresh.setSize(SWT.DEFAULT, SWT.DEFAULT);
-//        refresh.setText("Refresh");
-//        Button ok = new Button(buttonsContainer, SWT.PUSH);
-//        ok.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-//        ok.setSize(SWT.DEFAULT, SWT.DEFAULT);
-//        ok.setText("OK");
         ok.addSelectionListener(new SelectionListener() {
 
             @Override
             public void widgetSelected(SelectionEvent exc) {
-                String putIn = "";
-                putIn = groupIDText.getText().replaceAll("/", ".");
-
-                if (putIn.endsWith("/") || putIn.endsWith(".")) {
-                    putIn = putIn.substring(0, groupIDText.getText().length() - 1);
+                String groupID = groupIDText.getText().replaceAll("/", ".");
+                String artifactID = artifactIDText.getText();
+                String versionID = versionText.getText();
+                if (!groupID.isEmpty() && !artifactID.isEmpty() && !versionID.isEmpty()) {
+                    if (groupID.endsWith("/") || groupID.endsWith(".")) {
+                        groupID = groupID.substring(0, groupID.length() - 1);
+                    }
+                    artifactEditorUpdater.updateTextAndModel(groupID + ":" + artifactID + ":" + versionID);
+                    
+                    //TODO: notify the ClassEditor! 
+                    closeEditor();
+                } else {
+                    Dialogs.showErrorDialog("No artifact selected", "No artifact selected. Please select a file.");
                 }
-                artifactEditorUpdater.updateText(putIn + ":" + artifactIDText.getText() + ":" + versionText.getText());
-                
-                closeEditor();
             }
 
             @Override
