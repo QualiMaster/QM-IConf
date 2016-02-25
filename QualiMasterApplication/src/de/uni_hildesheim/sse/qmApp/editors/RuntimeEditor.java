@@ -11,11 +11,11 @@ import org.csstudio.swt.widgets.figures.GaugeFigure;
 import org.csstudio.swt.widgets.figures.MeterFigure;
 import org.csstudio.swt.widgets.figures.TankFigure;
 import org.csstudio.swt.xygraph.dataprovider.CircularBufferDataProvider;
+import org.csstudio.swt.xygraph.dataprovider.Sample;
 import org.csstudio.swt.xygraph.figures.Axis;
 import org.csstudio.swt.xygraph.figures.Trace;
 import org.csstudio.swt.xygraph.figures.Trace.PointStyle;
 import org.csstudio.swt.xygraph.figures.XYGraph;
-import org.csstudio.swt.xygraph.linearscale.AbstractScale.LabelSide;
 import org.csstudio.swt.xygraph.util.XYGraphMediaFactory;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.draw2d.LightweightSystem;
@@ -23,7 +23,6 @@ import org.eclipse.draw2d.SchemeBorder;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -59,6 +58,8 @@ import eu.qualimaster.adaptation.external.LoggingMessage;
 import eu.qualimaster.adaptation.external.MonitoringDataMessage;
 import eu.qualimaster.adaptation.external.PipelineMessage;
 import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
+import eu.qualimaster.easy.extension.QmObservables;
+
 import static eu.qualimaster.easy.extension.QmConstants.*;
 import static eu.qualimaster.easy.extension.QmObservables.*;
 
@@ -75,19 +76,93 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     private static final int PIPELINE_DISPLAY_BUFFER_SIZE = 50;
     private static final int PIPELINE_DISPLAY_DELAY = 100;
     
-    private Button enact;
-    private Button startPipeline;
-    private Button stopPipeline;
-    private String correlation;
-    private String sentiment;
-    private Label corrState;
-    private Label sentState;
-    
     private MeterFigure usedClusterMachines;
     private MeterFigure usedHardwareMachines;
-    private CircularBufferDataProvider pipelineLatencyDataProvider;
-    private CircularBufferDataProvider pipelineThroughputDataProvider;
-    //private int observationTime = 0;
+    //private CircularBufferDataProvider pipelineLatencyDataProvider;
+    //private CircularBufferDataProvider pipelineThroughputDataProvider;
+    private Map<String, PipelineTrace> pipelineTraces = new HashMap<String, PipelineTrace>();
+
+    /**
+     * Returns a point style of <code>count</code> modulo the actual point styles.
+     * 
+     * @param count the count to determine the style
+     * @return the point style
+     */
+    private static PointStyle getPointStyleMod(int count) {
+        PointStyle[] styles = PointStyle.values();
+        return styles[count % styles.length];
+    }
+    
+    /**
+     * Represents a pipeline trace, i.e., an observation buffer and an XY-graph trace.
+     * 
+     * @author Holger Eichelberger
+     */
+    private static class PipelineTrace {
+        private CircularBufferDataProvider dataProvider;
+        private Trace trace;
+        private String observable;
+        private int observationTime = 0;
+
+        /**
+         * Creates the trace.
+         * 
+         * @param label the label
+         * @param xAxis the x-axis to display on
+         * @param yAxis the y-axis to display on
+         * @param style the display style
+         * @param observable the observable to draw
+         */
+        private PipelineTrace(String label, Axis xAxis, Axis yAxis, PointStyle style, String observable) {
+            this.observable = observable;
+            
+            //create a trace data provider, which will provide the data to the trace.
+            dataProvider = new CircularBufferDataProvider(true);
+            dataProvider.setBufferSize(PIPELINE_DISPLAY_BUFFER_SIZE);
+            dataProvider.setUpdateDelay(PIPELINE_DISPLAY_DELAY);
+            
+            //create the latency trace
+            trace = new Trace(label, xAxis, xAxis, dataProvider);
+            trace.setDataProvider(dataProvider);
+            trace.setPointStyle(style);
+        }
+        
+        /**
+         * Returns the trace.
+         * 
+         * @return the trace
+         */
+        private Trace getTrace() {
+            return trace;
+        }
+        
+        /**
+         * Clears the trace.
+         */
+        private void clearTrace() {
+            dataProvider.clearTrace();
+        }
+        
+        /**
+         * Updates the trace.
+         * 
+         * @param observations the observations to take the value from 
+         */
+        private void update(Map<String, Double> observations) {
+            final Double observation = observations.get(observable);
+            if (null != observation) {
+                Display.getDefault().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        dataProvider.addSample(new Sample(observationTime, observation.doubleValue()));
+                        observationTime++;
+                    }
+                });
+                
+            }
+        }
+        
+    }
     
     @Override
     public void doSave(IProgressMonitor monitor) {
@@ -139,16 +214,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
      * Enables or disables the buttons on this editor.
      */
     private void enableButtons() {
-        boolean connected = Infrastructure.isConnected();
-        if (null != startPipeline) {
-            startPipeline.setEnabled(connected);
-        }
-        if (null != stopPipeline) {
-            stopPipeline.setEnabled(connected);
-        }
-        if (null != enact) {
-            enact.setEnabled(connected && (null != correlation || null != sentiment));
-        }
+        //boolean connected = Infrastructure.isConnected();
     }
 
     /**
@@ -376,7 +442,8 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         if (value instanceof ContainerValue) {
             ContainerValue cnt = (ContainerValue) value;
             for (int i = 0; i < cnt.getElementSize(); i++) {
-                Value val = cnt.getElement(i);
+                Value val = VariabilityModel.dereference(Configuration.RECONFIG_HARDWARE.getConfiguration(), 
+                    cnt.getElement(i));
                 if (val instanceof CompoundValue) {
                     CompoundValue cmp = (CompoundValue) val;
                     Value dfeValue = cmp.getNestedValue("numDFEs");
@@ -419,45 +486,40 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         //xyGraph.primaryXAxis.setDateEnabled(true);
         
         xyGraph.primaryYAxis.setShowMajorGrid(true);
-        xyGraph.primaryYAxis.setTitle("latency (ms)");
+        xyGraph.primaryYAxis.setTitle("throughput (items/s)");
         xyGraph.primaryYAxis.setAutoScale(true);
         xyGraph.primaryYAxis.setForegroundColor(
             XYGraphMediaFactory.getInstance().getColor(XYGraphMediaFactory.COLOR_BLUE));
 
-        Axis throughputAxis = new Axis("throughput (items)", true);
+        /*Axis throughputAxis = new Axis("throughput (items)", true);
         throughputAxis.setForegroundColor(XYGraphMediaFactory.getInstance().getColor(XYGraphMediaFactory.COLOR_RED));
         throughputAxis.setTickLableSide(LabelSide.Secondary);
         throughputAxis.setAutoScale(true);
-        xyGraph.addAxis(throughputAxis);
+        xyGraph.addAxis(throughputAxis);*/
         
+        IDecisionVariable actPipelines = ModelAccess.findTopContainer(Configuration.INFRASTRUCTURE, 
+            Configuration.INFRASTRUCTURE.getProvidedTypes()[0]); // uhh
+        Value value = actPipelines.getValue();
+        if (value instanceof ContainerValue) {
+            ContainerValue cnt = (ContainerValue) value;
+            for (int i = 0; i < cnt.getElementSize(); i++) {
+                Value pip = VariabilityModel.dereference(Configuration.INFRASTRUCTURE.getConfiguration(), 
+                    cnt.getElement(i));
+                if (pip instanceof CompoundValue) {
+                    CompoundValue cmp = (CompoundValue) pip;
+                    Value nameValue = cmp.getNestedValue(SLOT_PIPELINE_NAME);
+                    if (nameValue instanceof StringValue) {
+                        String name = ((StringValue) nameValue).getValue();
+                        PipelineTrace pTrace = new PipelineTrace(name, xyGraph.primaryXAxis, xyGraph.primaryYAxis, 
+                            getPointStyleMod(pipelineTraces.size()), QmObservables.SCALABILITY_ITEMS);
+                        pipelineTraces.put(name, pTrace);
+                        xyGraph.addTrace(pTrace.getTrace());
+                    }
+                }                
+            }
+        }
         
-        // AXIS
-        
-        //create a trace data provider, which will provide the data to the trace.
-        pipelineLatencyDataProvider = new CircularBufferDataProvider(true);
-        pipelineLatencyDataProvider.setBufferSize(PIPELINE_DISPLAY_BUFFER_SIZE);
-        pipelineLatencyDataProvider.setUpdateDelay(PIPELINE_DISPLAY_DELAY);
-        
-        pipelineThroughputDataProvider = new CircularBufferDataProvider(true);
-        pipelineThroughputDataProvider.setBufferSize(PIPELINE_DISPLAY_BUFFER_SIZE);
-        pipelineThroughputDataProvider.setUpdateDelay(PIPELINE_DISPLAY_DELAY);
-        
-        //create the latency trace
-        Trace trace = new Trace("latency (ms)", xyGraph.primaryXAxis, xyGraph.primaryYAxis, 
-            pipelineLatencyDataProvider);
-        trace.setDataProvider(pipelineLatencyDataProvider);
-        trace.setPointStyle(PointStyle.XCROSS);
-        xyGraph.addTrace(trace);
-        
-        //create the throughput trace
-        trace = new Trace("throughput (items)", xyGraph.primaryXAxis, throughputAxis, 
-            pipelineThroughputDataProvider);
-        trace.setDataProvider(pipelineThroughputDataProvider);
-        trace.setPointStyle(PointStyle.DIAMOND);
-        xyGraph.addTrace(trace);
-
         lws.setContents(xyGraph);
-        
         return xyGraphCanvas;
     }
     
@@ -469,7 +531,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
      * @return the created panel
      */
     private Composite createMonitoringPanel(Composite parent) {
-        Composite panel = new Composite(parent, SWT.BORDER);
+        Composite panel = new Composite(parent, SWT.BORDER | SWT.CENTER);
         GridLayout layout = new GridLayout(1, false);
         //layout.marginBottom = 50;
         //layout.marginWidth = 50;
@@ -526,24 +588,12 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                     }
                 });
             }
-        } /*else if (PIPELINE_NAME.equals(part)) {
-            final Double latency = observations.get("LATENCY");
-            final Double items = observations.get("THROUGHPUT_ITEMS");
-            if (null != latency || null != items) {
-                Display.getDefault().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (null != latency) {
-                            pipelineLatencyDataProvider.addSample(new Sample(observationTime, latency.doubleValue()));
-                        }
-                        if (null != items) {
-                            pipelineThroughputDataProvider.addSample(new Sample(observationTime, items.doubleValue()));
-                        }
-                        observationTime++;
-                    }
-                });
+        } else {
+            PipelineTrace trace = pipelineTraces.get(part);
+            if (null != trace) {
+                trace.update(observations);
             }
-        }*/
+        }
     }
 
     @Override
@@ -556,47 +606,21 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         // server side - nothing to do
     }
 
-    /**
-     * Updates a label from another thread.
-     * 
-     * @param label the label to be updated
-     * @param text the new text of <code>label</code>
-     */
-    private static void updateLabel(final Label label, final String text) {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                label.setText(text);
-            }     
-        });
-    }
-    
     @Override
     public void handleAlgorithmChangedMessage(AlgorithmChangedMessage msg) {
-        String algorithm = msg.getAlgorithm(); // passed through, not translated
-        if ("TopoSoftwareCorrelationFinancial".equals(algorithm)) {
-            updateLabel(corrState, "SW");
-        } else if ("TopoHardwareCorrelationFinancial".equals(algorithm)) {
-            updateLabel(corrState, "HW");
-        } else if ("SentimentAnaylsisSentiWordNetTopology".equals(algorithm)) {
-            updateLabel(sentState, "SWord");
-        } else if ("SentimentAnaylsisSVMTopology".equals(algorithm)) {
-            updateLabel(sentState, "SVM");
-        }
-        System.out.println("AlgChg: " + msg.getPipeline() + " " + msg.getPipelineElement() + " " + msg.getAlgorithm());
     }
 
     @Override
     public void handleHardwareAliveMessage(HardwareAliveMessage msg) {
-        System.out.println("HwAlive: " + msg.getIdentifier());
-        updateLabel(corrState, "HW-run");
     }
 
     @Override
     public void infrastructureConnectionStateChanged(boolean hasConnection) {
         usedClusterMachines.setValid(hasConnection);
         if (hasConnection) {
-            pipelineLatencyDataProvider.clearTrace();
+            for (PipelineTrace trace : pipelineTraces.values()) {
+                trace.clearTrace();
+            }
         }
         enableButtons();
     }
