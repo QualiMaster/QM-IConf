@@ -32,9 +32,12 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -175,16 +178,15 @@ public class MavenArtifactSelectionDialog extends Dialog {
         final Composite composite = (Composite) super.createDialogArea(parent);
         Image icon = IconManager.retrieveImage(IconManager.MAVEN_DIALOG_ICON);
         composite.getShell().setImage(icon);
+        composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         composite.setLayout(new GridLayout(1, true));
         
         treeContainer = new Composite(composite, SWT.BORDER);
         GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-//        gridData.widthHint = 500;
+        gridData.widthHint = 500;
         gridData.heightHint = 450;
         treeContainer.setLayoutData(gridData);
         treeContainer.setLayout(new GridLayout(1, true));
-        createTreeViewer(treeContainer);
-        setViewerInput(treeContainer);
         
         Composite labels = new Composite(composite, SWT.BORDER);
         labels.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
@@ -210,6 +212,8 @@ public class MavenArtifactSelectionDialog extends Dialog {
                 }
             }
         });
+        createTreeViewer(treeContainer);
+        setViewerInput(treeContainer);
         return composite;
     };
     
@@ -278,14 +282,14 @@ public class MavenArtifactSelectionDialog extends Dialog {
      * @param parent
      *            The viewers parent.
      */
-    private void setViewerInput(Composite parent) {
+    private void setViewerInput(final Composite parent) {
         // if online
         boolean openLocal = true;
         if (MavenFetcher.checkRepositoryConnectivity()) {
             File file = getTreeFile();
             if (!file.exists() || System.currentTimeMillis() - file.lastModified() > ACTUAL_TREE_TIME_DIFF) {
                 createProgressDialog(parent);
-                createTreeViewer(treeContainer); // mavenlist is filled and input is set
+//                createTreeViewer(treeContainer); // mavenlist is filled and input is set
                 Display.getCurrent().asyncExec(new Runnable() {
                     public void run() {
                         viewer.setInput(mavenList);
@@ -302,7 +306,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
         } 
         if (openLocal) {
             // open error dialog
-            createTreeViewer(treeContainer);
+//            createTreeViewer(treeContainer);
             loadTreeLocally();
             if (null != initialTreePath) {
                 highlightTreePath(initialTreePath);
