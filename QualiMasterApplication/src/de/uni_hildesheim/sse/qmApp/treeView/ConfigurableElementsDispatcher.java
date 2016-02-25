@@ -95,10 +95,6 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
                 }
             }
         }
-        // consider disconnect
-        
-        
-        // not here
     }
     
     /**
