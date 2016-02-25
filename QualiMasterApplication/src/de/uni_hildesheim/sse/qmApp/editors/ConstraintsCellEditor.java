@@ -1,32 +1,32 @@
 package de.uni_hildesheim.sse.qmApp.editors;
 
+import org.eclipse.jface.viewers.DialogCellEditor;
 import org.eclipse.jface.window.Window;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
+import de.uni_hildesheim.sse.easy.ui.productline_editor.IUpdateListener;
+import de.uni_hildesheim.sse.easy.ui.productline_editor.IUpdateProvider;
 import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
+import de.uni_hildesheim.sse.model.varModel.values.ContainerValue;
+import de.uni_hildesheim.sse.model.varModel.values.Value;
 
 /**
  * Implements a cell editor for constraints.
  * 
  * @author Holger Eichelberger
+ * @author El-Sharkawy
+ * @see <a href="http://stackoverflow.com/questions/14464611/jface-dialogcelleditor-how-to-make-buttons-always-appear">
+ * http://stackoverflow.com/questions/14464611/jface-dialogcelleditor-how-to-make-buttons-always-appear</a>
  */
-class ConstraintsCellEditor extends UpdatingCellEditor {
+class ConstraintsCellEditor extends DialogCellEditor implements IUpdateProvider {
 
-    private Label text;
-    private Shell shell;
     private IDecisionVariable context;
-
+    private IUpdateListener listener;
+    private Button button;
+    
     /**
      * Creates a constraint cell editor.
      * 
@@ -36,72 +36,77 @@ class ConstraintsCellEditor extends UpdatingCellEditor {
      */
     ConstraintsCellEditor(UIConfiguration config, IDecisionVariable variable, Composite parent) {
         super(parent);
-        this.shell = parent.getShell();
         this.context = variable;
     }
+   
     
     @Override
-    protected Control createControl(Composite parent) {
-        Composite panel = new Composite(parent, SWT.EMBEDDED);
-        panel.setBounds(new Rectangle(0, 0, 0, 0));
-        
-        panel.setLayout(new GridLayout(2, false));
-        text = new Label(panel, 0);
-        GridData gridData = new GridData();
-        gridData.horizontalAlignment = SWT.FILL;
-        gridData.grabExcessHorizontalSpace = true;
-        text.setLayoutData(gridData);
-        
-        Button button = new Button(panel, SWT.NONE);
+    protected Button createButton(Composite parent) {
+        button = super.createButton(parent);
         button.setText("...");
-        gridData = new GridData();
-        gridData.heightHint = 14;
-        button.setLayoutData(gridData);
-        button.addSelectionListener(new SelectionListener() {
-            
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                openEditorDialog();
-            }
-            
-            @Override
-            public void widgetDefaultSelected(SelectionEvent event) {
-            }
-        });
-        return panel;
+        return button;
     }
 
-    /**
-     * Opens the constraint editor dialog.
-     */
-    private void openEditorDialog() {
-        ConstraintsEditorDialog dlg = new ConstraintsEditorDialog(shell, context, text.getText());
+    @Override
+    protected Object openDialogBox(Control cellEditorWindow) {
+        ConstraintsEditorDialog dlg = new ConstraintsEditorDialog(cellEditorWindow.getShell(), context, valueToStr());
         if (Window.OK == dlg.open()) {
             setValue(dlg.getConstraintsText());
         }
+        return null;
     }
-
-    @Override
-    protected Object doGetValue() {
-        return text.getText();
-    }
-
-    @Override
-    protected void doSetFocus() {
-        text.setFocus();
+    
+    /**
+     * Converts a (ContainerValue full of Constraints) value into a string representation as needed by the
+     * {@link ConstraintsEditorDialog}.
+     * @return A String representation of the current value, maybe an empty string, but not <tt>null</tt>.
+     */
+    private String valueToStr() {
+        StringBuffer sb = new StringBuffer();
+        Value value = context.getValue();
+        if (null != value && value instanceof ContainerValue) {
+            ContainerValue conValue = (ContainerValue) value;
+            int nConstraints = conValue.getElementSize();
+            if (nConstraints > 0) {
+                sb.append(conValue.getElement(0).getValue().toString());
+            }
+            for (int i = 1; i < nConstraints; i++) {
+                sb.append(ConstraintsEditorDialog.SEPARATOR);
+                sb.append(conValue.getElement(1).getValue().toString());
+            }
+        }
+        return sb.toString();
     }
 
     @Override
     protected void doSetValue(Object value) {
-        if (null != text && null != value) {
-            text.setText(value.toString());
-            super.doSetValue(value);
-        }
+        super.doSetValue(value);
+        notifyValueChanged();
     }
 
     @Override
     public IDecisionVariable getVariable() {
         return context;
+    }
+
+    @Override
+    public void setUpdateListener(IUpdateListener listener) {
+        this.listener = listener;
+    }
+    
+    /**
+     * Called to notify about a value change.
+     */
+    protected void notifyValueChanged() {
+        if (null != listener) {
+            listener.valueChanged(this);
+        }
+    }
+
+    @Override
+    public void refresh() {
+        // TODO Auto-generated method stub
+        
     }
 
 }

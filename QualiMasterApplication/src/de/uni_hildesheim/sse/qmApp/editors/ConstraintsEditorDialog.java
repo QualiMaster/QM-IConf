@@ -58,7 +58,7 @@ class ConstraintsEditorDialog extends Dialog {
      * @return the individual constraints as array
      */
     static String[] splitConstraints(String constraints) {
-        return constraints.split(SEPARATOR);
+        return constraints.isEmpty() ? new String[] {} : constraints.split(SEPARATOR);
     }
     
     /**
