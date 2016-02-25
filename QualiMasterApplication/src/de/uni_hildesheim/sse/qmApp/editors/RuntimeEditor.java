@@ -617,10 +617,14 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     @Override
     public void infrastructureConnectionStateChanged(boolean hasConnection) {
         usedClusterMachines.setValid(hasConnection);
+        usedHardwareMachines.setValid(hasConnection);
         if (hasConnection) {
             for (PipelineTrace trace : pipelineTraces.values()) {
                 trace.clearTrace();
             }
+        } else {
+            usedClusterMachines.setValue(0);
+            usedHardwareMachines.setValue(0);            
         }
         enableButtons();
     }
