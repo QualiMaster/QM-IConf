@@ -878,7 +878,7 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
             if (null != algParent) {
                 algParent = algParent.findElement(family);
             }
-            IDecisionVariable algs = family.getNestedElement(QmConstants.SLOT_ALGORITHM_MEMBERS);
+            IDecisionVariable algs = family.getNestedElement(QmConstants.SLOT_FAMILY_MEMBERS);
             if (null != algParent && algs instanceof ContainerVariable) {
                 Set<ConfigurableElement> known = new HashSet<ConfigurableElement>();
                 for (int c = 0; c < algParent.getChildCount(); c++) {
