@@ -24,6 +24,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
+import de.uni_hildesheim.sse.easy.ui.productline_editor.IRefreshableEditor;
 import de.uni_hildesheim.sse.easy_producer.instantiator.Bundle;
 import de.uni_hildesheim.sse.model.confModel.Configuration;
 import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
@@ -172,8 +173,8 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     public void refreshNestedEditors() {
         for (int j = 0; j < getEditorCount(); j++) {
             Control editor = getEditor(j);
-            if (editor instanceof AbstractTableEditor) {
-                ((AbstractTableEditor) editor).refresh();
+            if (editor instanceof IRefreshableEditor) {
+                ((IRefreshableEditor) editor).refresh();
             }
         }
     }

@@ -243,7 +243,7 @@ public abstract class AbstractTextSelectionEditorCreator implements IEditorCreat
         }
 
         @Override
-        public void refreshContents() {
+        public void refresh() {
             updateFromValueText();
         }
 

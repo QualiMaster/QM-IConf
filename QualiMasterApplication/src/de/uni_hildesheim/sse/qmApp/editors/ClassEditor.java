@@ -209,14 +209,22 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             List<IDecisionVariable> outputVars = getIDecisionVariable(var, SLOT_OUTPUT);
             List<IDecisionVariable> parameterVars = getIDecisionVariable(var, SLOT_PARAMETERS);
             
-            outputVars.add(0, (IDecisionVariable) outputVars.get(0).getParent());
-            parameterVars.add(0, (IDecisionVariable) parameterVars.get(0).getParent());
+            if (type.isSource() || type.isSink()) { // follow the conventions of the model
+                List<IDecisionVariable> tmp = inputVars;
+                inputVars = outputVars;
+                outputVars = tmp;
+            }
+            
+            ensureParent(outputVars);
+            ensureParent(parameterVars);
     
             clearInput(inputVars);
             clearInput(outputVars);
             clearInput(parameterVars);
             
-            outputVars.remove(0);
+            if (outputVars.size() > 0) {
+                outputVars.remove(0);
+            }
             
             addInOut(input, inputVars, true);
             addInOut(output, outputVars, false);
@@ -226,6 +234,18 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             ModelAccess.freezeAgain(var);
         }
         // TODO information message if there is no manifest?
+    }
+
+    /**
+     * Adds the parent to <code>vars</code> - whyever.
+     * 
+     * @param vars the vars to be modified
+     */
+    private void ensureParent(List<IDecisionVariable> vars) {
+        if (vars.size() > 0) {
+            // may easily fail on top-level variables
+            vars.add(0, (IDecisionVariable) vars.get(0).getParent());
+        }
     }
     
     /**
@@ -241,18 +261,18 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
         Project prj = var.getConfiguration().getProject();
         try {
             final IDatatype algType = ModelQuery.findType(prj, TYPE_ALGORITHM, null);
-            if (algType.isAssignableFrom(varType)) {
+            if (null != algType && algType.isAssignableFrom(varType)) { // null -> depends on config view
                 result = manifestType.isAlgorithm();
             } 
             if (null == result) {
-                final IDatatype srcType = ModelQuery.findType(prj, TYPE_SOURCE, null);
-                if (srcType.isAssignableFrom(varType)) {
+                final IDatatype srcType = ModelQuery.findType(prj, TYPE_DATASOURCE, null);
+                if (null != srcType && srcType.isAssignableFrom(varType)) { // null -> depends on config view
                     result = manifestType.isSource();
                 } 
             }
             if (null == result) {
-                final IDatatype snkType = ModelQuery.findType(prj, TYPE_SINK, null);
-                if (snkType.isAssignableFrom(varType)) {
+                final IDatatype snkType = ModelQuery.findType(prj, TYPE_DATASINK, null);
+                if (null != snkType && snkType.isAssignableFrom(varType)) { // null -> depends on config view
                     result = manifestType.isSink();
                 }
             }
