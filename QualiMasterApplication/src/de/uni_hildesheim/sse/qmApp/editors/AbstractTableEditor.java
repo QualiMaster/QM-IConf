@@ -15,11 +15,11 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 
-import qualimasterapplication.Activator;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIParameter;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.DelegatingEasyEditorPage;
+import de.uni_hildesheim.sse.easy.ui.productline_editor.IRefreshableEditor;
 import de.uni_hildesheim.sse.easy_producer.instantiator.Bundle;
 import de.uni_hildesheim.sse.model.confModel.Configuration;
 import de.uni_hildesheim.sse.model.confModel.DisplayNameProvider;
@@ -48,6 +48,7 @@ import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
 import de.uni_hildesheim.sse.utils.modelManagement.IModelListener;
 import eu.qualimaster.easy.extension.QmConstants;
+import qualimasterapplication.Activator;
 
 /**
  * Provides the basis for QualiMaster specific table editors.
@@ -55,7 +56,7 @@ import eu.qualimaster.easy.extension.QmConstants;
  * @author Holger Eichelberger
  */
 public abstract class AbstractTableEditor extends Composite implements IQMEditor, IDirtyableEditor, 
-    IModelListener<Project> {
+    IModelListener<Project>, IRefreshableEditor {
 
     protected static final String SLOT_TYPE = QmConstants.SLOT_FIELD_TYPE;
     
@@ -692,10 +693,4 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
                 .error("No variable found in new configuratio, i.e., discontinued mapping!");
         }
     }
-    
-    /**
-     * Forces this editor (part) to update the gui.
-     */
-    public abstract void refresh();
-
 }

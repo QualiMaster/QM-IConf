@@ -130,6 +130,7 @@ public class Reasoning {
      */
     public static boolean reasonOn(IModelPart modelPart, boolean showSuccessDialog) {
         boolean success;
+        resetReasoningMarkers(); // Clear all markers and set only relevant markers afterwards
         deleteAllReasoningMarkers();
         clearConfigurableElementsMarkings();  
         errors.clear();
@@ -189,7 +190,6 @@ public class Reasoning {
             }
             success = false;
         } else {
-            resetReasoningMarkers();
             if (showSuccessDialog) {
                 Dialogs.showInfoDialog("Validation successful", "Model is valid.");
             }
