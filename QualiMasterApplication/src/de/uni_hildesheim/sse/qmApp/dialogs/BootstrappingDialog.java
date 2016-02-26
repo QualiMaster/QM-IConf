@@ -6,14 +6,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -29,15 +28,11 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.osgi.service.prefs.BackingStoreException;
 
-import de.uni_hildesheim.sse.easy_producer.instantiator.Bundle;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.qmApp.model.Location;
 import de.uni_hildesheim.sse.qmApp.model.Utils;
 import de.uni_hildesheim.sse.qmApp.model.Utils.ConfigurationProperties;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
 
 /**
  * Dialog for bootstrapping the application.
@@ -48,8 +43,6 @@ import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
 public class BootstrappingDialog {
 
     public static final BootstrappingDialog INSTANCE = new BootstrappingDialog();
-
-    private static EASyLogger logger = EASyLoggerFactory.INSTANCE.getLogger(BootstrappingDialog.class, Bundle.ID);
 
     private static final String APPLICATION_NAME = "QualiMaster Infrastructure Configuration (QM-IConf)";
 
@@ -120,10 +113,7 @@ public class BootstrappingDialog {
 
     private boolean sourceLocationConfigured = false;
     private boolean modelLocationConfigured = false;
-    private String applicationConfiguredPreferenceKey = "app-configured";
-    private String manualConfiguredPreferenceKey = "app-configured-manually";
-    private IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(Bundle.ID);
-
+    
     /**
      * A private Constructor prevents any other class from instantiating.
      */
@@ -137,8 +127,10 @@ public class BootstrappingDialog {
      *            Display
      */
     public void init(final Display display) {
-        boolean configured = Boolean.valueOf(prefs.get(applicationConfiguredPreferenceKey, null));
-        boolean manually = Boolean.valueOf(prefs.get(manualConfiguredPreferenceKey, null));
+        boolean configured = Boolean.valueOf(EclipsePrefUtils.INSTANCE.getPreference(
+            EclipsePrefUtils.APP_CONFIGURED_PREF_KEY));
+        boolean manually = Boolean.valueOf(EclipsePrefUtils.INSTANCE.getPreference(
+            EclipsePrefUtils.MANUAL_CONFIGURED_PREF_KEY));
         if (configured) {
             if (manually) {
                 ConfigurationProperties.DISABLE_LOGIN.store(String.valueOf(true));
@@ -310,16 +302,15 @@ public class BootstrappingDialog {
     private void validateSettings(final Shell shell, final Composite root, final Composite parent,
             final StackLayout layout, final Composite[] compositeArray, final int[] indexNextButton) {
         if (validateConfiguration()) {
-            prefs.put(applicationConfiguredPreferenceKey, "true");
+            EclipsePrefUtils.INSTANCE.addPreference(EclipsePrefUtils.APP_CONFIGURED_PREF_KEY, "true");
             if (defaultRepo.getSelection() || ownRepo.getSelection()) {
-                prefs.put(manualConfiguredPreferenceKey, "false");
+                EclipsePrefUtils.INSTANCE.addPreference(EclipsePrefUtils.MANUAL_CONFIGURED_PREF_KEY, "false");
                 if (ownRepo.getSelection() && null != urlField.getText() && !urlField.getText().isEmpty()) {
                     ConfigurationProperties.REPOSITORY_URL.store(urlField.getText());
                 }
             } else {
-                prefs.put(manualConfiguredPreferenceKey, "true");
+                EclipsePrefUtils.INSTANCE.addPreference(EclipsePrefUtils.MANUAL_CONFIGURED_PREF_KEY, "true");
             }
-            savePreferences();
             shell.dispose();
         } else {
             next.setEnabled(false);
@@ -399,18 +390,6 @@ public class BootstrappingDialog {
             label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
         }
         return root;
-    }
-
-    /**
-     * Saves the preferences.
-     */
-    private void savePreferences() {
-        try {
-            // prefs are automatically flushed during a plugin's "super.stop()".
-            prefs.flush();
-        } catch (BackingStoreException e) {
-            logger.exception(e);
-        }
     }
 
     /**

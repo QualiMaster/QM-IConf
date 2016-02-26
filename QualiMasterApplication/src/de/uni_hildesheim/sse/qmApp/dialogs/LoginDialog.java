@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -28,7 +27,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.osgi.service.prefs.BackingStoreException;
 
 //this shall be the Activator.PLUGIN_ID but then the roles are away
 import de.uni_hildesheim.sse.easy_producer.instantiator.Bundle;
@@ -52,7 +50,7 @@ import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
  * @author Sass
  */
 public class LoginDialog {
-
+    
     private static EASyLogger logger = EASyLoggerFactory.INSTANCE.getLogger(LoginDialog.class, Bundle.ID);
     private static IRepositoryConnector repositoryConnector = new SVNConnector();
     private static final boolean OFFLINE_DEBUG = false; // requires conf.properties
@@ -61,10 +59,6 @@ public class LoginDialog {
     private Text username;
     private Display display;
     private ProgressIndicator progress;
-    private String localDataPreferenceKey = "local-data";
-    private String repositoryUrlPreferenceKey = "repository-url";
-    
-    private IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(Bundle.ID);
     
     private String localDataToolTip = "If this checkbox is selected you will be working with local data only."
             + "\n You will not be able to commit changes to the pipeline repository.";
@@ -126,14 +120,9 @@ public class LoginDialog {
         progress = createProgressIndicator(cmpLogin);
         final Button loginButton = createLoginButton(cmpLogin);
         addSelectButtonListener(loginButton, selectButton);
-//         Adding login action to this button.
+        // Adding login action to this button.
         addButtonListener(loginButton, shell, selectButton);
         shell.setDefaultButton(loginButton);
-        // Drawing a region which will form the base of the login
-//        Region region = new Region();
-//        Rectangle pixel = new Rectangle(1, 1, 388, 180);
-//        region.add(pixel);
-//        shell.setRegion(region);
         // Adding ability to move shell around
         Listener listener = createMoveListener(shell);
         // Adding the listeners to all visible components
@@ -152,7 +141,6 @@ public class LoginDialog {
                 display.sleep();
             }
         }
-//        region.dispose();
     }
 
     /**
@@ -291,16 +279,11 @@ public class LoginDialog {
                             if (response == SWT.OK) {
                                 Location.setModelLocation(Utils.getDestinationFileForModel().getAbsolutePath());
                                 repositoryConnector.updateModel(Utils.getDestinationFileForModel());
-//                                Location.setModelLocation(repositoryConnector.loadModel(
-//                                        Utils.getDestinationFileForModel()).getAbsolutePath());
                                 repositoryConnector.resolveConflicts(Utils.getDestinationFileForModel(), false);
                             } else if (response == SWT.CANCEL) {
                                 //TODO:  Update or better do nothing?
                                 Location.setModelLocation(Utils.getDestinationFileForModel().getAbsolutePath());
                                 completed();
-//                                Location.setModelLocation(repositoryConnector.loadModel(
-//                                        Utils.getDestinationFileForModel()).getAbsolutePath());
-//                                repositoryConnector.resolveConflicts(Utils.getDestinationFileForModel(), true);
                             }
                         }
                     });
@@ -311,8 +294,7 @@ public class LoginDialog {
                 }
                 // Save user roles
                 saveRoles();
-                prefs.put(localDataPreferenceKey, "false");
-                savePreferences();
+                EclipsePrefUtils.INSTANCE.addPreference(EclipsePrefUtils.LOCAL_DATA_PREF_KEY, "false");
             }
         }
 
@@ -389,7 +371,8 @@ public class LoginDialog {
      * @param shell The shell
      */
     private void checkIfLocalDataWasUsed(Shell shell) {
-        boolean localData = Boolean.valueOf(prefs.get(localDataPreferenceKey, null));
+        boolean localData = Boolean.valueOf(EclipsePrefUtils.INSTANCE.getPreference(
+            EclipsePrefUtils.LOCAL_DATA_PREF_KEY));
         if (localData) {
             MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.YES | SWT.NO);
             dialog.setText("Warning");
@@ -413,40 +396,27 @@ public class LoginDialog {
     private void loadRoles() {
         Set<Role> roles = new HashSet<Role>();
         // you might want to call prefs.sync() if you're worried about others changing your settings
-        if (prefs.get(ApplicationRole.ADMIN.getId(), null) != null) {
+        if (EclipsePrefUtils.INSTANCE.getPreference(ApplicationRole.ADMIN.getId()) != null) {
             roles.add(ApplicationRole.ADMIN);
         }
-        if (prefs.get(ApplicationRole.ADAPTATION_MANAGER.getId(), null) != null) {
+        if (EclipsePrefUtils.INSTANCE.getPreference(ApplicationRole.ADAPTATION_MANAGER.getId()) != null) {
             roles.add(ApplicationRole.ADAPTATION_MANAGER);
         }
-        if (prefs.get(ApplicationRole.INFRASTRUCTURE_ADMIN.getId(), null) != null) {
+        if (EclipsePrefUtils.INSTANCE.getPreference(ApplicationRole.INFRASTRUCTURE_ADMIN.getId()) != null) {
             roles.add(ApplicationRole.INFRASTRUCTURE_ADMIN);
         }
-        if (prefs.get(ApplicationRole.PIPELINE_DESIGNER.getId(), null) != null) {
+        if (EclipsePrefUtils.INSTANCE.getPreference(ApplicationRole.PIPELINE_DESIGNER.getId()) != null) {
             roles.add(ApplicationRole.PIPELINE_DESIGNER);
         }
         UserContext.INSTANCE.setRoles(roles);
-        String repoURL = prefs.get(repositoryUrlPreferenceKey, null);
+        String repoURL = EclipsePrefUtils.INSTANCE.getPreference(EclipsePrefUtils.REPOSITORY_URL_PREF_KEY);
         if (null != repoURL) {
             Location.setModelLocation(Utils.getDestinationFileForModel(repoURL).getAbsolutePath());
         }
         // add preference entry that local data was used
-        prefs.put(localDataPreferenceKey, "true");
-        savePreferences();
+        EclipsePrefUtils.INSTANCE.addPreference(EclipsePrefUtils.LOCAL_DATA_PREF_KEY, "true");
     }
     
-    /**
-     * Saves the preferences.
-     */
-    private void savePreferences() {
-        try {
-            // prefs are automatically flushed during a plugin's "super.stop()".
-            prefs.flush();
-        } catch (BackingStoreException e) {
-            logger.exception(e);
-        }
-    }
-
     /**
      * Saves the roles to {@link IEclipsePreferences}.
      */
@@ -454,10 +424,10 @@ public class LoginDialog {
         // saves plugin preferences at the workspace level
         Set<Role> roles = UserContext.INSTANCE.getRoles();
         for (Role role : roles) {
-            prefs.put(role.getId(), role.getId());
+            EclipsePrefUtils.INSTANCE.addPreference(role.getId(), role.getId());
         }
-        prefs.put(repositoryUrlPreferenceKey, repositoryConnector.getUserContext().getRepositoryURL());
-        savePreferences();
+        EclipsePrefUtils.INSTANCE.addPreference(EclipsePrefUtils.REPOSITORY_URL_PREF_KEY, 
+            repositoryConnector.getUserContext().getRepositoryURL());
     }
 
     /**
@@ -468,7 +438,7 @@ public class LoginDialog {
     private boolean localDataExists() {
         boolean exists = Utils.getDestinationFileForModel().isDirectory();
         if (!exists) {
-            String url = prefs.get(repositoryUrlPreferenceKey, null);
+            String url = EclipsePrefUtils.INSTANCE.getPreference(EclipsePrefUtils.REPOSITORY_URL_PREF_KEY);
             if (url != null) {
                 exists = Utils.getDestinationFileForModel(url).isDirectory();
             }
@@ -485,12 +455,6 @@ public class LoginDialog {
      */
     private Button createLoginButton(Composite composite) {
         Button button = new Button(composite, SWT.FLAT);
-//        final FormData formData = new FormData();
-//        formData.bottom = new FormAttachment(0, 28);
-//        formData.top = new FormAttachment(0, 5);
-//        formData.right = new FormAttachment(100, -3);
-//        formData.left = new FormAttachment(100, -40);
-//        button.setLayoutData(formData);
         button.setText("Login");
         return button;
     }
@@ -504,12 +468,6 @@ public class LoginDialog {
      */
     private ProgressIndicator createProgressIndicator(Composite composite) {
         ProgressIndicator progress = new ProgressIndicator(composite, SWT.HORIZONTAL);
-//        final FormData formData = new FormData();
-//        formData.bottom = new FormAttachment(0, 32);
-//        formData.top = new FormAttachment(0, 19);
-//        formData.right = new FormAttachment(100, -45);
-//        formData.left = new FormAttachment(0, 0);
-//        progress.setLayoutData(formData);
         progress.beginTask(10); // show it up, no progress
         return progress;
     }
@@ -605,6 +563,7 @@ public class LoginDialog {
         } else {
             result = repositoryConnector.authenticate(username, password);
             Infrastructure.setUserName(username);
+            EclipsePrefUtils.INSTANCE.addPreference(EclipsePrefUtils.USERNAME_PREF_KEY, username);
         }
         return result;
     }
