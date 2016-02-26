@@ -710,21 +710,22 @@ public class PipelineDiagramUtils {
         DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
         
-        EObject element = diagram.getDiagram().getElement();
-        EList<EObject> eContents = element.eContents();
-        
-        for (int j = 0; j < eContents.size(); j++) {
+        if (null != diagram && null != diagram.getDiagram()) { // in shutdown
+            EObject element = diagram.getDiagram().getElement();
+            EList<EObject> eContents = element.eContents();
             
-            if (eContents.get(j) instanceof FlowImpl) {
+            for (int j = 0; j < eContents.size(); j++) {
                 
-                FlowImpl flow = (FlowImpl) eContents.get(j);
-                        
-                
-                String source = flow.getSource().getName();
-                String target = flow.getDestination().getName();
-                
-                ConnectorWrapper wrapper = new ConnectorWrapper(source, target, flow);
-                connectionsList.add(wrapper);
+                if (eContents.get(j) instanceof FlowImpl) {
+                    
+                    FlowImpl flow = (FlowImpl) eContents.get(j);
+                            
+                    String source = flow.getSource().getName();
+                    String target = flow.getDestination().getName();
+                    
+                    ConnectorWrapper wrapper = new ConnectorWrapper(source, target, flow);
+                    connectionsList.add(wrapper);
+                }
             }
         }
     }
