@@ -448,7 +448,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
                     artifactEditorUpdater.updateTextAndModel(groupID + ":" + artifactID + ":" + versionID);
                     
                     //TODO: notify the ClassEditor! 
-                    closeEditor();
+                    MavenArtifactSelectionDialog.this.close();
                 } else {
                     Dialogs.showErrorDialog("No artifact selected", "No artifact selected. Please select a file.");
                 }
@@ -479,13 +479,6 @@ public class MavenArtifactSelectionDialog extends Dialog {
         });
     }
 
-    /**
-     * Close the editor.
-     */
-    private void closeEditor() {
-        Display.getCurrent().getActiveShell().close();    
-    }
-    
     /**
      * Create the user-interface.
      * 
