@@ -562,7 +562,6 @@ public class LoginDialog {
             result = true;
         } else {
             result = repositoryConnector.authenticate(username, password);
-            Infrastructure.setUserName(username);
             EclipsePrefUtils.INSTANCE.addPreference(EclipsePrefUtils.USERNAME_PREF_KEY, username);
         }
         return result;

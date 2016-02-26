@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import de.uni_hildesheim.sse.qmApp.dialogs.EclipsePrefUtils;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
@@ -53,7 +54,6 @@ import qualimasterapplication.Activator;
 public class Infrastructure {
 
     private static ClientEndpoint endpoint;
-    private static String user;
     private static List<IClientDispatcher> dispatchers 
         = Collections.synchronizedList(new ArrayList<IClientDispatcher>());
     private static List<IInfrastructureListener> listeners 
@@ -176,10 +176,7 @@ public class Infrastructure {
         if (null == endpoint) {
             endpoint = new ClientEndpoint(new DelegatingDispatcher(), address, port);
             boolean isInfrastructureAdmin = UserContext.INSTANCE.isInfrastructureAdmin();
-            if (null == user) { // TODO for now
-                user = "me";
-                isInfrastructureAdmin = true;
-            }
+            String user = getUserName();
             boolean simpleConnect = true;
             if (isInfrastructureAdmin) {
                 if (null != user) {
@@ -324,22 +321,12 @@ public class Infrastructure {
     }
     
     /**
-     * Sets the user name. This may cause reading a connection key/certificate for implicit authentication 
-     * with the server / infrastructure.
-     * 
-     * @param userName the user name
-     */
-    public static void setUserName(String userName) {
-        user = userName;
-    }
-    
-    /**
-     * Returns the actual user name set by {@link #setUserName(String)}.
+     * Returns the actual user name from the user context / workspace / preferences.
      * 
      * @return the user name (may be <b>null</b>)
      */
     public static String getUserName() {
-        return user;
+        return EclipsePrefUtils.INSTANCE.getPreference(EclipsePrefUtils.USERNAME_PREF_KEY);
     }
     
     /**
@@ -351,6 +338,7 @@ public class Infrastructure {
     private static byte[] obtainPassphrase(String userName) {
         // this follows the actual hilarious authentication of the infrastructure ;)
         int hash = 0;
+        String user = getUserName();
         if (null != user) {
             hash = user.hashCode();
         }
