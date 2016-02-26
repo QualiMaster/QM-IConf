@@ -258,7 +258,7 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
                 Control failedControl = getUIConfiguration().getEditorFor(variable);
                          
                 if (failedControl != null) {
-                	final String errorMessage = errors.get(variable);
+                    final String errorMessage = errors.get(variable);
                     ControlDecoration declaration = flawedControls.get(failedControl);
                     if (null != declaration) {
                         declaration.show();
