@@ -89,7 +89,7 @@ public class SVNConnector implements IRepositoryConnector {
     }
 
     @Override
-    public boolean authenticate(String username, String password) {
+    public boolean authenticate(String username, String password) throws ConnectorException {
         DAVRepositoryFactory.setup();
         repository = null;
         boolean auth = false;
@@ -108,21 +108,21 @@ public class SVNConnector implements IRepositoryConnector {
             logger.debug("Authentication successfull");
             UserContext.INSTANCE.init(username, password, repository);
             UserContext.INSTANCE.setRoles(RoleFetcher.getUserRoles());
-        } catch (SVNException svne) {
-            logger.exception(svne);
+            countEntries("");
+        } catch (SVNException e) {
+            throw new ConnectorException(e);
         }
-        countEntries("");
         return auth;
     }
 
     @Override
-    public File loadModel(File destinationFile) {
+    public File loadModel(File destinationFile) throws ConnectorException {
         checkout(destinationFile);
         return destinationFile;
     }
 
     @Override
-    public boolean storeModel(File destinationFile) {
+    public boolean storeModel(File destinationFile) throws ConnectorException {
         return commit(destinationFile, false);
     }
 
@@ -132,12 +132,12 @@ public class SVNConnector implements IRepositoryConnector {
     // }
 
     @Override
-    public List<File> updateModel(File destinationFile) {
+    public List<File> updateModel(File destinationFile) throws ConnectorException {
         return update(destinationFile);
     }
 
     @Override
-    public void resolveConflicts(File path, boolean keepMine) {
+    public void resolveConflicts(File path, boolean keepMine) throws ConnectorException {
         SVNConflictChoice conflictChoice = SVNConflictChoice.THEIRS_FULL;
         if (keepMine) {
             conflictChoice = SVNConflictChoice.MINE_FULL;
@@ -151,8 +151,10 @@ public class SVNConnector implements IRepositoryConnector {
      * @param destination
      *            The destination directory where the model should be stored on
      *            the local system
+     * @throws ConnectorException
+     *             exception
      */
-    private void checkout(File destination) {
+    private void checkout(File destination) throws ConnectorException {
         svnClientManager.setAuthenticationManager(repository.getAuthenticationManager());
         updateClient.setIgnoreExternals(false);
         try {
@@ -160,7 +162,7 @@ public class SVNConnector implements IRepositoryConnector {
                     SVNRevision.create(repository.getLatestRevision()),
                     SVNRevision.create(repository.getLatestRevision()), SVNDepth.INFINITY, false);
         } catch (SVNException e) {
-            logger.exception(e);
+            throw new ConnectorException(e);
         }
     }
 
@@ -170,15 +172,17 @@ public class SVNConnector implements IRepositoryConnector {
      * @param wcPath
      *            working copy paths
      * @return List with conflicting files
+     * @throws ConnectorException
+     *             Exception
      */
-    private List<File> update(File wcPath) {
+    private List<File> update(File wcPath) throws ConnectorException {
         svnClientManager.setAuthenticationManager(repository.getAuthenticationManager());
         updateClient.setIgnoreExternals(false);
-        doStatus(wcPath, true);
         try {
+            doStatus(wcPath, true);
             updateClient.doUpdate(wcPath, SVNRevision.HEAD, SVNDepth.INFINITY, true, false);
         } catch (SVNException e) {
-            logger.exception(e);
+            throw new ConnectorException(e);
         }
         return getConflictingFilesInWorkspace(wcPath);
     }
@@ -188,13 +192,11 @@ public class SVNConnector implements IRepositoryConnector {
      * 
      * @param workingCopyPath
      *            Path of the workspace
+     * @throws SVNException
+     *             exception
      */
-    private void addEntry(File workingCopyPath) {
-        try {
-            workingCopyClient.doAdd(workingCopyPath, true, false, false, SVNDepth.INFINITY, false, false);
-        } catch (SVNException e) {
-            logger.exception(e);
-        }
+    private void addEntry(File workingCopyPath) throws SVNException {
+        workingCopyClient.doAdd(workingCopyPath, true, false, false, SVNDepth.INFINITY, false, false);
     }
 
     /**
@@ -204,13 +206,11 @@ public class SVNConnector implements IRepositoryConnector {
      *            Path to the workspace
      * @param force
      *            true or false
+     * @throws SVNException
+     *             exception
      */
-    private void deleteEntry(File workingCopyPath, boolean force) {
-        try {
-            workingCopyClient.doDelete(workingCopyPath, force, false);
-        } catch (SVNException e) {
-            logger.exception(e);
-        }
+    private void deleteEntry(File workingCopyPath, boolean force) throws SVNException {
+        workingCopyClient.doDelete(workingCopyPath, force, false);
     }
 
     /**
@@ -221,8 +221,10 @@ public class SVNConnector implements IRepositoryConnector {
      * @param override
      *            Should the remote file be overwritten in case of conflicts
      * @return conflict true or false whether there are conflicts
+     * @throws ConnectorException
+     *             exception
      */
-    private boolean commit(File path, boolean override) {
+    private boolean commit(File path, boolean override) throws ConnectorException {
         boolean conflict = false;
         // SVNConflictChoice conflictChoice = SVNConflictChoice.THEIRS_FULL;
         // if (override) {
@@ -265,13 +267,15 @@ public class SVNConnector implements IRepositoryConnector {
      * @param conflictChoice
      *            Choice on how to handle conflict
      *            (SVNConflictChoice.THEIRS_FULL or SVNConflictChoice.MINE_FULL)
+     * @throws ConnectorException
+     *             exception
      */
-    private void resolve(File path, SVNConflictChoice conflictChoice) {
+    private void resolve(File path, SVNConflictChoice conflictChoice) throws ConnectorException {
         SVNWCClient svnWCClient = svnClientManager.getWCClient();
         try {
             svnWCClient.doResolve(path, SVNDepth.INFINITY, conflictChoice);
-        } catch (SVNException ex) {
-            logger.exception(ex);
+        } catch (SVNException e) {
+            throw new ConnectorException(e);
         }
     }
 
@@ -281,9 +285,11 @@ public class SVNConnector implements IRepositoryConnector {
      * @param wcPath
      *            Path to working copy
      * @return List with all conflicting files
+     * @throws ConnectorException
+     *             exception
      */
     @Override
-    public List<File> getConflictingFilesInWorkspace(File wcPath) {
+    public List<File> getConflictingFilesInWorkspace(File wcPath) throws ConnectorException {
         // Ignore certain files
         // SVNPropertyValue value = SVNPropertyValue.create(".settings");
         // try {
@@ -293,12 +299,12 @@ public class SVNConnector implements IRepositoryConnector {
         // logger.exception(e);
         // }
         final List<File> changeLists = new ArrayList<File>();
+        SVNStatusClient statusclient = svnClientManager.getStatusClient();
+        boolean remote = true;
+        boolean reportAll = false;
+        boolean includeIgnored = false;
+        boolean collectParentExternals = false;
         try {
-            SVNStatusClient statusclient = svnClientManager.getStatusClient();
-            boolean remote = true;
-            boolean reportAll = false;
-            boolean includeIgnored = false;
-            boolean collectParentExternals = false;
             statusclient.doStatus(wcPath, SVNRevision.HEAD, SVNDepth.INFINITY, remote, reportAll, includeIgnored,
                     collectParentExternals, new ISVNStatusHandler() {
                         @Override
@@ -316,7 +322,7 @@ public class SVNConnector implements IRepositoryConnector {
                         }
                     }, null);
         } catch (SVNException e) {
-            logger.exception(e);
+            throw new ConnectorException(e);
         }
         doDiff(changeLists);
         return changeLists;
@@ -327,24 +333,26 @@ public class SVNConnector implements IRepositoryConnector {
      * 
      * @param changeList
      *            List with all changes in working copy
+     * @throws ConnectorException
+     *             exception
      */
-    private void doDiff(List<File> changeList) {
-        try {
-            for (File file : changeList) {
-                final SvnOperationFactory svnOperationFactory = new SvnOperationFactory();
+    private void doDiff(List<File> changeList) throws ConnectorException {
+        for (File file : changeList) {
+            final SvnOperationFactory svnOperationFactory = new SvnOperationFactory();
+            try {
+                final ByteArrayOutputStream byteArrayOutputStream1 = new ByteArrayOutputStream();
+                final SvnDiff diff = svnOperationFactory.createDiff();
+                diff.setSources(SvnTarget.fromFile(file, SVNRevision.HEAD),
+                        SvnTarget.fromFile(file, SVNRevision.WORKING));
+                diff.setOutput(byteArrayOutputStream1);
                 try {
-                    final ByteArrayOutputStream byteArrayOutputStream1 = new ByteArrayOutputStream();
-                    final SvnDiff diff = svnOperationFactory.createDiff();
-                    diff.setSources(SvnTarget.fromFile(file, SVNRevision.HEAD),
-                            SvnTarget.fromFile(file, SVNRevision.WORKING));
-                    diff.setOutput(byteArrayOutputStream1);
                     diff.run();
-                } finally {
-                    svnOperationFactory.dispose();
+                } catch (SVNException e) {
+                    throw new ConnectorException(e);
                 }
+            } finally {
+                svnOperationFactory.dispose();
             }
-        } catch (SVNException e1) {
-            logger.exception(e1);
         }
     }
 
@@ -362,8 +370,10 @@ public class SVNConnector implements IRepositoryConnector {
      *            false
      * 
      * @return number of changed items
+     * @throws ConnectorException
+     *             exception
      */
-    private List<File> doStatus(File wcPath, final boolean isRemote) {
+    private List<File> doStatus(File wcPath, final boolean isRemote) throws ConnectorException {
         // reportAll - true to collect status information on all items including
         // those ones that are in a 'normal'
         // state (unchanged), otherwise false
@@ -371,9 +381,9 @@ public class SVNConnector implements IRepositoryConnector {
         boolean isIncludeIgnored = false;
         boolean isCollectParentExternals = true;
         final List<File> changeLists = new ArrayList<File>();
+        svnClientManager.setAuthenticationManager(repository.getAuthenticationManager());
+        SVNStatusClient statusclient = svnClientManager.getStatusClient();
         try {
-            svnClientManager.setAuthenticationManager(repository.getAuthenticationManager());
-            SVNStatusClient statusclient = svnClientManager.getStatusClient();
             statusclient.doStatus(wcPath, SVNRevision.HEAD, SVNDepth.INFINITY, isRemote, isReportAll, isIncludeIgnored,
                     isCollectParentExternals, new ISVNStatusHandler() {
                         @Override
@@ -381,7 +391,7 @@ public class SVNConnector implements IRepositoryConnector {
                             if (isRemote) {
                                 SVNStatusType statusType = status.getRemoteContentsStatus();
                                 if (statusType != SVNStatusType.STATUS_NORMAL
-                                        && statusType != SVNStatusType.STATUS_IGNORED 
+                                        && statusType != SVNStatusType.STATUS_IGNORED
                                         && statusType != SVNStatusType.STATUS_NONE) {
                                     changeLists.add(status.getFile());
                                 }
@@ -401,7 +411,7 @@ public class SVNConnector implements IRepositoryConnector {
                         }
                     }, null);
         } catch (SVNException e) {
-            logger.exception(e);
+            throw new ConnectorException(e);
         }
         return changeLists;
     }
@@ -411,9 +421,11 @@ public class SVNConnector implements IRepositoryConnector {
      * 
      * @param path
      *            path to the working copy
+     * @throws ConnectorException
+     *             exception
      */
     @Override
-    public void revert(File path) {
+    public void revert(File path) throws ConnectorException {
         List<File> list = doStatus(path, false);
         File[] changes = list.toArray(new File[list.size()]);
         try {
@@ -476,8 +488,10 @@ public class SVNConnector implements IRepositoryConnector {
      * @param isRemote
      *            check against repository
      * @return List with all files that contain changes
+     * @throws ConnectorException
+     *             exception
      */
-    public List<File> getStatus(File path, boolean isRemote) {
+    public List<File> getStatus(File path, boolean isRemote) throws ConnectorException {
         return doStatus(path, isRemote);
     }
 
@@ -534,7 +548,7 @@ public class SVNConnector implements IRepositoryConnector {
     }
 
     @Override
-    public int getChangesCount(File destinationFile, boolean isRemote) {
+    public int getChangesCount(File destinationFile, boolean isRemote) throws ConnectorException {
         return doStatus(destinationFile, isRemote).size();
     }
 
@@ -550,7 +564,9 @@ public class SVNConnector implements IRepositoryConnector {
 
     /**
      * Creates a local repository for testing purposes.
-     * @param path Path to local repository.
+     * 
+     * @param path
+     *            Path to local repository.
      */
     public void createLocalRepository(String path) {
         try {

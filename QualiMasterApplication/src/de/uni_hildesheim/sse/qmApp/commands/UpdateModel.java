@@ -12,12 +12,14 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
+import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.dialogs.DialogsUtil;
 import de.uni_hildesheim.sse.qmApp.model.Location;
 import de.uni_hildesheim.sse.qmApp.model.Utils;
 import de.uni_hildesheim.sse.qmApp.model.Utils.ConfigurationProperties;
 import de.uni_hildesheim.sse.repositoryConnector.IRepositoryConnector;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
+import de.uni_hildesheim.sse.repositoryConnector.svnConnector.ConnectorException;
 import de.uni_hildesheim.sse.repositoryConnector.svnConnector.RepositoryEventHandler;
 import de.uni_hildesheim.sse.repositoryConnector.svnConnector.SVNConnector;
 
@@ -27,6 +29,8 @@ import de.uni_hildesheim.sse.repositoryConnector.svnConnector.SVNConnector;
  * @author Holger Eichelberger, Aike Sass
  */
 public class UpdateModel extends AbstractHandler {
+
+    private static final String EXCEPTION_TITLE = "Connector Exception";
 
     private IRepositoryConnector repositoryConnector;
 
@@ -45,7 +49,12 @@ public class UpdateModel extends AbstractHandler {
             setBaseEnabled(false);
         } else {
             repositoryConnector.setRepositoryURL(ConfigurationProperties.REPOSITORY_URL.getValue());
-            repositoryConnector.authenticate(UserContext.INSTANCE.getUsername(), UserContext.INSTANCE.getPassword());
+            try {
+                repositoryConnector.authenticate(UserContext.INSTANCE.getUsername(),
+                        UserContext.INSTANCE.getPassword());
+            } catch (ConnectorException e) {
+                Dialogs.showErrorDialog(EXCEPTION_TITLE, e.getMessage());
+            }
             setBaseEnabled(true);
         }
     }
@@ -58,12 +67,13 @@ public class UpdateModel extends AbstractHandler {
     }
 
     /**
-     * Implements the model update running in parallel to the user interface so that user interface updates can happen.
+     * Implements the model update running in parallel to the user interface so
+     * that user interface updates can happen.
      * 
      * @author Sass
      */
     private class ModelUpdate implements Runnable, RepositoryEventHandler {
-        
+
         private boolean restart = false;
 
         /**
@@ -79,14 +89,18 @@ public class UpdateModel extends AbstractHandler {
             shell.setLocation(DialogsUtil.getXPosition(shell, display), DialogsUtil.getYPosition(shell, display));
             progress = new ProgressIndicator(shell, SWT.HORIZONTAL);
             progress.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
-            if (repositoryConnector.getChangesCount(Location.getModelLocationFile(), true) > 0) {
-                shell.open();
-                restart = true;
-            } else {
-                MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
-                dialog.setText("Info");
-                dialog.setMessage("No changes found.");
-                dialog.open();
+            try {
+                if (repositoryConnector.getChangesCount(Location.getModelLocationFile(), true) > 0) {
+                    shell.open();
+                    restart = true;
+                } else {
+                    MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
+                    dialog.setText("Info");
+                    dialog.setMessage("No changes found.");
+                    dialog.open();
+                }
+            } catch (ConnectorException e) {
+                Dialogs.showErrorDialog(EXCEPTION_TITLE, e.getMessage());
             }
         }
 
@@ -123,36 +137,45 @@ public class UpdateModel extends AbstractHandler {
 
                 @Override
                 public void run() {
-                    progress.beginTask(repositoryConnector.getChangesCount(Location.getModelLocationFile(), true));
+                    try {
+                        progress.beginTask(repositoryConnector.getChangesCount(Location.getModelLocationFile(), true));
+                    } catch (ConnectorException e) {
+                        Dialogs.showErrorDialog(EXCEPTION_TITLE, e.getMessage());
+                    }
                 }
             });
-            int conflicts = repositoryConnector.updateModel(Utils.getDestinationFileForModel()).size();
-            if (conflicts > 0) {
-                repositoryConnector.resolveConflicts(Utils.getDestinationFileForModel(), false);
-                Display.getDefault().syncExec(new Runnable() {
-                    public void run() {
-                        display = PlatformUI.getWorkbench().getDisplay();
-                        Shell shell = new Shell(display);
-                        shell.setLayout(new GridLayout());
-                        shell.setSize(300, 100);
-                        shell.setLocation(DialogsUtil.getXPosition(shell, display), 
-                                DialogsUtil.getYPosition(shell, display));
-                        shell.open();
-                        MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK );
-                        dialog.setText("Info");
-                        dialog.setMessage("There were some conflicts. Local changes were overwritten.");
-                        int messageBox = dialog.open();
-                        switch (messageBox) {
-                        case SWT.OK:
-                            shell.dispose();
-                            break;
-                        default:
-                            // TODO
-                            break;
+            int conflicts;
+            try {
+                conflicts = repositoryConnector.updateModel(Utils.getDestinationFileForModel()).size();
+                if (conflicts > 0) {
+                    repositoryConnector.resolveConflicts(Utils.getDestinationFileForModel(), false);
+                    Display.getDefault().syncExec(new Runnable() {
+                        public void run() {
+                            display = PlatformUI.getWorkbench().getDisplay();
+                            Shell shell = new Shell(display);
+                            shell.setLayout(new GridLayout());
+                            shell.setSize(300, 100);
+                            shell.setLocation(DialogsUtil.getXPosition(shell, display),
+                                    DialogsUtil.getYPosition(shell, display));
+                            shell.open();
+                            MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
+                            dialog.setText("Info");
+                            dialog.setMessage("There were some conflicts. Local changes were overwritten.");
+                            int messageBox = dialog.open();
+                            switch (messageBox) {
+                            case SWT.OK:
+                                shell.dispose();
+                                break;
+                            default:
+                                // TODO
+                                break;
+                            }
                         }
-                    }
-                });
-                        
+                    });
+
+                }
+            } catch (ConnectorException e) {
+                Dialogs.showErrorDialog(EXCEPTION_TITLE, e.getMessage());
             }
         }
 

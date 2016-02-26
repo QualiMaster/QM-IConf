@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
+import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.dialogs.DialogsUtil;
 import de.uni_hildesheim.sse.qmApp.model.Location;
 import de.uni_hildesheim.sse.qmApp.model.Reasoning;
@@ -21,6 +22,7 @@ import de.uni_hildesheim.sse.qmApp.model.Utils.ConfigurationProperties;
 import de.uni_hildesheim.sse.repositoryConnector.IRepositoryConnector;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import de.uni_hildesheim.sse.repositoryConnector.svnConnector.SVNConnector;
+import de.uni_hildesheim.sse.repositoryConnector.svnConnector.ConnectorException;
 import de.uni_hildesheim.sse.repositoryConnector.svnConnector.RepositoryEventHandler;
 
 /**
@@ -29,6 +31,8 @@ import de.uni_hildesheim.sse.repositoryConnector.svnConnector.RepositoryEventHan
  * @author Holger Eichelberger, Aike Sass
  */
 public class CommitModel extends AbstractHandler {
+
+    private static final String EXCEPTION_TITLE = "Connector Exception";
 
     private IRepositoryConnector repositoryConnector;
 
@@ -47,7 +51,12 @@ public class CommitModel extends AbstractHandler {
             setBaseEnabled(false);
         } else {
             repositoryConnector.setRepositoryURL(ConfigurationProperties.REPOSITORY_URL.getValue());
-            repositoryConnector.authenticate(UserContext.INSTANCE.getUsername(), UserContext.INSTANCE.getPassword());
+            try {
+                repositoryConnector.authenticate(UserContext.INSTANCE.getUsername(),
+                        UserContext.INSTANCE.getPassword());
+            } catch (ConnectorException e) {
+                Dialogs.showErrorDialog(EXCEPTION_TITLE, e.getMessage());
+            }
             setBaseEnabled(true);
         }
     }
@@ -62,7 +71,8 @@ public class CommitModel extends AbstractHandler {
     }
 
     /**
-     * Implements the model update running in parallel to the user interface so that user interface updates can happen.
+     * Implements the model update running in parallel to the user interface so
+     * that user interface updates can happen.
      * 
      * @author Sass
      */
@@ -81,13 +91,17 @@ public class CommitModel extends AbstractHandler {
             shell.setLocation(DialogsUtil.getXPosition(shell, display), DialogsUtil.getYPosition(shell, display));
             progress = new ProgressIndicator(shell, SWT.HORIZONTAL);
             progress.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
-            if (repositoryConnector.getChangesCount(Location.getModelLocationFile(), false) > 0) {
-                shell.open();
-            } else {
-                MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK | SWT.CANCEL);
-                dialog.setText("Info");
-                dialog.setMessage("There are no changes in your workspace.");
-                dialog.open();
+            try {
+                if (repositoryConnector.getChangesCount(Location.getModelLocationFile(), false) > 0) {
+                    shell.open();
+                } else {
+                    MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK | SWT.CANCEL);
+                    dialog.setText("Info");
+                    dialog.setMessage("There are no changes in your workspace.");
+                    dialog.open();
+                }
+            } catch (ConnectorException e) {
+                Dialogs.showErrorDialog(EXCEPTION_TITLE, e.getMessage());
             }
         }
 
@@ -120,29 +134,42 @@ public class CommitModel extends AbstractHandler {
 
                 @Override
                 public void run() {
-                    progress.beginTask(repositoryConnector.getChangesCount(Location.getModelLocationFile(), false));
+                    try {
+                        progress.beginTask(repositoryConnector.getChangesCount(Location.getModelLocationFile(), false));
+                    } catch (ConnectorException e) {
+                        Dialogs.showErrorDialog(EXCEPTION_TITLE, e.getMessage());
+                    }
                 }
             });
-            boolean conflicts = repositoryConnector.storeModel(Utils.getDestinationFileForModel());
-            if (conflicts) {
-                Display.getDefault().syncExec(new Runnable() {
-                    public void run() {
-                        repositoryConnector.updateModel(Utils.getDestinationFileForModel());
-                        repositoryConnector.resolveConflicts(Utils.getDestinationFileForModel(), false);
-                        MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK );
-                        dialog.setText("Info");
-                        dialog.setMessage("There were some conflicts. Local changes were overwritten.");
-                        int messageBox = dialog.open();
-                        switch (messageBox) {
-                        case SWT.OK:
-                            completed();
-                            break;
-                        default:
-                            // TODO
-                            break;
+            boolean conflicts;
+            try {
+                conflicts = repositoryConnector.storeModel(Utils.getDestinationFileForModel());
+                if (conflicts) {
+                    Display.getDefault().syncExec(new Runnable() {
+                        public void run() {
+                            try {
+                                repositoryConnector.updateModel(Utils.getDestinationFileForModel());
+                                repositoryConnector.resolveConflicts(Utils.getDestinationFileForModel(), false);
+                                MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
+                                dialog.setText("Info");
+                                dialog.setMessage("There were some conflicts. Local changes were overwritten.");
+                                int messageBox = dialog.open();
+                                switch (messageBox) {
+                                case SWT.OK:
+                                    completed();
+                                    break;
+                                default:
+                                    // TODO
+                                    break;
+                                }
+                            } catch (ConnectorException e) {
+                                Dialogs.showErrorDialog(EXCEPTION_TITLE, e.getMessage());
+                            }
                         }
-                    }
-                });
+                    });
+                }
+            } catch (ConnectorException e) {
+                Dialogs.showErrorDialog(EXCEPTION_TITLE, e.getMessage());
             }
         }
 

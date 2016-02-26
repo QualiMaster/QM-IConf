@@ -10,10 +10,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.PlatformUI;
 
+import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.model.Location;
 import de.uni_hildesheim.sse.qmApp.model.Utils.ConfigurationProperties;
 import de.uni_hildesheim.sse.repositoryConnector.IRepositoryConnector;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
+import de.uni_hildesheim.sse.repositoryConnector.svnConnector.ConnectorException;
 import de.uni_hildesheim.sse.repositoryConnector.svnConnector.SVNConnector;
 
 /**
@@ -24,8 +26,10 @@ import de.uni_hildesheim.sse.repositoryConnector.svnConnector.SVNConnector;
  */
 public class RevertModel extends AbstractHandler {
     
+    private static final String EXCEPTION_TITLE = "Connector Exception";
+
     private IRepositoryConnector repositoryConnector;
-    
+
     /**
      * Creates the instantiate command.
      */
@@ -46,31 +50,35 @@ public class RevertModel extends AbstractHandler {
         MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK | SWT.CANCEL);
         repositoryConnector = new SVNConnector();
         repositoryConnector.setRepositoryURL(ConfigurationProperties.REPOSITORY_URL.getValue());
-        repositoryConnector.authenticate(UserContext.INSTANCE.getUsername(), 
-                UserContext.INSTANCE.getPassword());
-        dialog.setText("Info");
-        if (repositoryConnector.getChangesCount(Location.getModelLocationFile(), false) == 0) {
-            dialog.setMessage("Your model is up to date and no local changes were found.");
-            dialog.open();
-        } else {
-            dialog.setMessage("In order to revert all changes the application will restart now.");
-            int buttonID = dialog.open();
-            switch(buttonID) {
-            case SWT.OK:
-                IEditorReference[] editors = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                .getActivePage().getEditorReferences();
-                for (IEditorReference iEditorReference : editors) {
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                    .getActivePage().closeEditor(iEditorReference.getEditor(false), true);
+        try {
+            repositoryConnector.authenticate(UserContext.INSTANCE.getUsername(), UserContext.INSTANCE.getPassword());
+
+            dialog.setText("Info");
+            if (repositoryConnector.getChangesCount(Location.getModelLocationFile(), false) == 0) {
+                dialog.setMessage("Your model is up to date and no local changes were found.");
+                dialog.open();
+            } else {
+                dialog.setMessage("In order to revert all changes the application will restart now.");
+                int buttonID = dialog.open();
+                switch (buttonID) {
+                case SWT.OK:
+                    IEditorReference[] editors = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+                            .getEditorReferences();
+                    for (IEditorReference iEditorReference : editors) {
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+                                .closeEditor(iEditorReference.getEditor(false), true);
+                    }
+                    repositoryConnector.revert(Location.getModelLocationFile());
+                    PlatformUI.getWorkbench().restart();
+                    break;
+                case SWT.CANCEL:
+                    break;
+                default:
+                    break;
                 }
-                repositoryConnector.revert(Location.getModelLocationFile());
-                PlatformUI.getWorkbench().restart();
-                break;
-            case SWT.CANCEL:
-                break;
-            default:
-                break;
             }
+        } catch (ConnectorException e) {
+            Dialogs.showErrorDialog(EXCEPTION_TITLE, e.getMessage());
         }
         return null;
     }
