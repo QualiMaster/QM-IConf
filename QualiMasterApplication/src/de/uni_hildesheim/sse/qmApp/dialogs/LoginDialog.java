@@ -113,6 +113,10 @@ public class LoginDialog {
         final CLabel usernameLabel = createLabel(cmpLogin, "Username");
         // Textfield for the username
         username = createTextField(cmpLogin, false);
+        String user = EclipsePrefUtils.INSTANCE.getPreference(EclipsePrefUtils.USERNAME_PREF_KEY);
+        if (null != user) {
+            username.setText(user);
+        }
         // Label for the password
         final CLabel passwordLabel = createLabel(cmpLogin, "Password");
         // Textfield for the password
