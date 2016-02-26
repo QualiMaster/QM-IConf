@@ -358,6 +358,20 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             }
         }, 100, 100, TimeUnit.MILLISECONDS);
     }
+    
+    /**
+     * Sets basic settings for meter figures.
+     * 
+     * @param figure the figure
+     */
+    private void configureMeterFigure(MeterFigure figure) {
+        figure.setBackgroundColor(XYGraphMediaFactory.getInstance().getColor(255, 255, 255));
+        figure.setBorder(new SchemeBorder(SchemeBorder.SCHEMES.ETCHED));
+        figure.setLoloColor(XYGraphMediaFactory.getInstance().getColor(XYGraphMediaFactory.COLOR_GREEN));
+        figure.setLoColor(XYGraphMediaFactory.getInstance().getColor(XYGraphMediaFactory.COLOR_GREEN));
+        figure.setHiColor(XYGraphMediaFactory.getInstance().getColor(XYGraphMediaFactory.COLOR_ORANGE));
+        figure.setHihiColor(XYGraphMediaFactory.getInstance().getColor(XYGraphMediaFactory.COLOR_RED));
+    }
 
     /**
      * Creates the meter figure for cluster machines. Modifies {@link #usedClusterMachines}.
@@ -368,8 +382,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     private LightweightSystem createClusterMachinesMeter(Canvas meterCanvas) {
         //Create Figure
         usedClusterMachines = new MeterFigure();
-        usedClusterMachines.setBackgroundColor(XYGraphMediaFactory.getInstance().getColor(255, 255, 255));
-        usedClusterMachines.setBorder(new SchemeBorder(SchemeBorder.SCHEMES.ETCHED));
+        configureMeterFigure(usedClusterMachines);
         IDecisionVariable machines = ModelAccess.findTopContainer(Configuration.HARDWARE, 
             Configuration.HARDWARE.getProvidedTypes()[0]); // uhh
         Value value = machines.getValue();
@@ -411,10 +424,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         
         usedClusterMachines.setRange(0, workerCount);
         usedClusterMachines.setValue(0);
-        //meterFigure.setLoLevel(20);
-        //meterFigure.setLoloLevel(40);
-        //meterFigure.setHiLevel(60);
-        //meterFigure.setHihiLevel(80);
+        usedClusterMachines.setHiLevel(workerCount * 0.9);
         //meterFigure.setMajorTickMarkStepHint(50);
 
         LightweightSystem lws = new LightweightSystem(meterCanvas);
@@ -431,8 +441,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     private LightweightSystem createHardwareNodesMeter(Canvas meterCanvas) {
         //Create Figure
         usedHardwareMachines = new MeterFigure();
-        usedHardwareMachines.setBackgroundColor(XYGraphMediaFactory.getInstance().getColor(255, 255, 255));
-        usedHardwareMachines.setBorder(new SchemeBorder(SchemeBorder.SCHEMES.ETCHED));
+        configureMeterFigure(usedHardwareMachines);
         IDecisionVariable machines = ModelAccess.findTopContainer(Configuration.RECONFIG_HARDWARE, 
             Configuration.RECONFIG_HARDWARE.getProvidedTypes()[0]); // uhh
         Value value = machines.getValue();
@@ -454,10 +463,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         
         usedHardwareMachines.setRange(0, dfeCount);
         usedHardwareMachines.setValue(0);
-        //meterFigure.setLoLevel(20);
-        //meterFigure.setLoloLevel(40);
-        //meterFigure.setHiLevel(60);
-        //meterFigure.setHihiLevel(80);
+        usedHardwareMachines.setHiLevel(dfeCount * 0.9);
         //meterFigure.setMajorTickMarkStepHint(50);
 
         LightweightSystem lws = new LightweightSystem(meterCanvas);
@@ -540,7 +546,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         data.widthHint = 600;
         data.heightHint = 200;
         //data.verticalAlignment = GridData.FILL;
-        data.horizontalAlignment = GridData.FILL;
+        data.horizontalAlignment = GridData.CENTER;
         control.setLayoutData(data);
         
         //createGauche(panel);
@@ -587,10 +593,11 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                 });
             }
         } else {
-System.out.println(message);            
-            PipelineTrace trace = pipelineTraces.get(part);
-            if (null != trace) {
-                trace.update(observations);
+            if (part.lastIndexOf(":") < 0) { // it's a pipeline
+                PipelineTrace trace = pipelineTraces.get(part);
+                if (null != trace) {
+                    trace.update(observations);
+                }
             }
         }
     }
