@@ -176,6 +176,10 @@ public class Infrastructure {
         if (null == endpoint) {
             endpoint = new ClientEndpoint(new DelegatingDispatcher(), address, port);
             boolean isInfrastructureAdmin = UserContext.INSTANCE.isInfrastructureAdmin();
+            if (null == user) { // TODO for now
+                user = "me";
+                isInfrastructureAdmin = true;
+            }
             boolean simpleConnect = true;
             if (isInfrastructureAdmin) {
                 if (null != user) {

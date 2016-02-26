@@ -20,13 +20,21 @@ import java.util.Map;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 
+import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
+import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
+import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Definition;
+import de.uni_hildesheim.sse.qmApp.pipelineUtils.StatusHighlighter;
 import de.uni_hildesheim.sse.qmApp.runtime.DispatcherAdapter;
 import de.uni_hildesheim.sse.qmApp.runtime.IInfrastructureListener;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
 import eu.qualimaster.adaptation.external.MonitoringDataMessage;
+import eu.qualimaster.easy.extension.QmObservables;
+import eu.qualimaster.easy.extension.internal.PipelineHelper;
+import eu.qualimaster.easy.extension.internal.VariableHelper;
+
 import static eu.qualimaster.easy.extension.QmObservables.*;
 
 /**
@@ -100,7 +108,76 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
                     }
                 }
             }
+        } else {
+            tryHighlightPipeline(msg.getPart(), msg.getObservations());
         }
+    }
+    
+    /**
+     * Tries to infer the actual pipeline from <code>part</code> and to highlight it. Actually,
+     * the monitoring message does not contain enough data for direct access :(
+     * 
+     * @param part the part
+     * @param observations the observations
+     */
+    private void tryHighlightPipeline(String part, Map<String, Double> observations) {
+        de.uni_hildesheim.sse.model.confModel.Configuration cfg = Definition.TOP_LEVEL.getConfiguration();
+        IDecisionVariable var = PipelineHelper.obtainPipelineByName(cfg, part);
+        // TODO ugly extend message accordingly
+        if (null == var) {
+            IDecisionVariable actPipelines = ModelAccess.findTopContainer(Configuration.INFRASTRUCTURE, 
+                Configuration.INFRASTRUCTURE.getProvidedTypes()[0]); // uhh
+            for (int n = 0; n < actPipelines.getNestedElementsCount(); n++) {
+                IDecisionVariable pip = actPipelines.getNestedElement(n);
+                IDecisionVariable elt = PipelineHelper.obtainPipelineElementByName(pip, null, part);
+                if (null != elt) {
+                    String pipelineName = VariableHelper.getName(pip);
+                    String variableName = VariableHelper.getName(elt);
+                    if (null != pipelineName && null != variableName) {
+                        StatusHighlighter.INSTANCE.markPipeline(pipelineName, variableName, 
+                            getPipelineStatusIndicator(pipelineName, observations));
+                    }
+                }
+            }
+        } else {
+            String pipelineName = VariableHelper.getName(var);
+            if (null != pipelineName) {
+                StatusHighlighter.INSTANCE.markPipelineStatus(pipelineName, 
+                    getPipelineStatusIndicator(pipelineName, observations));
+            }
+        }
+    }
+    
+    /**
+     * Returns a heuristic pipeline status indicator.
+     * 
+     * @param part the part name
+     * @param observations the actual observations to derive the indicator from
+     * @return the status indicator
+     */
+    private ElementStatusIndicator getPipelineStatusIndicator(String part, Map<String, Double> observations) {
+        ElementStatusIndicator result = ElementStatusIndicator.NONE;
+        Double throughput = observations.get(QmObservables.TIMEBEHAVIOR_THROUGHPUT_ITEMS);
+        Double items = observations.get(QmObservables.SCALABILITY_ITEMS);
+        if (null == throughput || null == items) {
+            result = ElementStatusIndicator.NONE;
+        } else {
+            if (null != items) {
+                if (items < 800) {
+                    result = ElementStatusIndicator.HIGH;
+                } else if (items < 1000) {
+                    result = ElementStatusIndicator.LOW;
+                } else if (items < 1200) {
+                    result = ElementStatusIndicator.MEDIUM;
+                } else {
+                    result = ElementStatusIndicator.HIGH;
+                }
+            } 
+            if (null != throughput && throughput < 10) {
+                result = ElementStatusIndicator.VERYLOW;
+            }
+        }
+        return result;
     }
     
     /**

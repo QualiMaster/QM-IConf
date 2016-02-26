@@ -160,7 +160,7 @@ public class StatusHighlighter {
         for (int i = 0; i < elements.length; i++) {
             ConfigurableElement topLevel = elements[i];
             
-            if (topLevel.getDisplayName().equals("Pipelines")) {
+            if (topLevel.getDisplayName().equals("Pipelines")) { // TODO more portable to search for the part type
                 markPipelineElement(topLevel, pipelineName, indicator);
             }
 
@@ -184,7 +184,7 @@ public class StatusHighlighter {
             if (element.getDisplayName().toLowerCase().equals(pipelineName.toLowerCase())) {
                 
                 element.setStatus(indicator);
-                ConfigurableElementsView.forceTreeRefresh();
+                ConfigurableElementsView.forceTreeRefresh(); // TODO inefficient, use viewer.refresh(element, true)
             }
         } 
     }
