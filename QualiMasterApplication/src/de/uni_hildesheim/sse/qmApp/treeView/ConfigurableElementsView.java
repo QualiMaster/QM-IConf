@@ -657,6 +657,8 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
         
         elementsDispatcher = new ConfigurableElementsDispatcher(elements, viewer);
         elementsDispatcher.register();
+        
+        setTitleImage(IconManager.retrieveImage(IconManager.QUALIMASTER_SMALL));
     }
 
     /**
