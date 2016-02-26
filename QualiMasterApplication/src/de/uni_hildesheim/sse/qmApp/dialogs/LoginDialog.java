@@ -37,6 +37,7 @@ import de.uni_hildesheim.sse.repositoryConnector.IRepositoryConnector;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.ApplicationRole;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.Role;
+import de.uni_hildesheim.sse.repositoryConnector.svnConnector.ConnectorException;
 import de.uni_hildesheim.sse.repositoryConnector.svnConnector.RepositoryEventHandler;
 import de.uni_hildesheim.sse.repositoryConnector.svnConnector.SVNConnector;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
@@ -48,16 +49,18 @@ import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
  * @author Sass
  */
 public class LoginDialog {
-    
+
     private static EASyLogger logger = EASyLoggerFactory.INSTANCE.getLogger(LoginDialog.class, Bundle.ID);
     private static IRepositoryConnector repositoryConnector = new SVNConnector();
-    private static final boolean OFFLINE_DEBUG = false; // requires conf.properties
+    private static final boolean OFFLINE_DEBUG = false; // requires
+                                                        // conf.properties
+    private static final String EXCEPTION_TITLE = "Connector Exception";
 
     private Text password;
     private Text username;
     private Display display;
     private ProgressIndicator progress;
-    
+
     private String localDataToolTip = "If this checkbox is selected you will be working with local data only."
             + "\n You will not be able to commit changes to the pipeline repository.";
     private String localDataUsedMessage = "Last time you used the application you worked with local data and you are "
@@ -95,7 +98,8 @@ public class LoginDialog {
         shell.setLayout(fillLayout);
         // Create a composite with grid layout.
         final Composite composite = createGridLayout(shell);
-        // Setting the background of the composite with the image background for login dialog
+        // Setting the background of the composite with the image background for
+        // login dialog
         final Label imageLabel = createBackground(composite);
         // Creating the composite which will contain the login related widgets
         final Composite cmpLogin = new Composite(composite, SWT.NONE);
@@ -130,7 +134,8 @@ public class LoginDialog {
         imageLabel.addListener(SWT.MouseDown, listener);
         imageLabel.addListener(SWT.MouseUp, listener);
         imageLabel.addListener(SWT.MouseMove, listener);
-        // Call pack before setting the location or else the location will be incorrect
+        // Call pack before setting the location or else the location will be
+        // incorrect
         shell.pack();
         shell.setLocation(DialogsUtil.getXPosition(shell, display), DialogsUtil.getYPosition(shell, display));
         shell.open();
@@ -142,7 +147,8 @@ public class LoginDialog {
     }
 
     /**
-     * Allows switching the login button text based on the selection of the checkbox.
+     * Allows switching the login button text based on the selection of the
+     * checkbox.
      * 
      * @param loginButton
      *            the login button
@@ -216,7 +222,8 @@ public class LoginDialog {
     }
 
     /**
-     * Implements the model update running in parallel to the user interface so that user interface updates can happen.
+     * Implements the model update running in parallel to the user interface so
+     * that user interface updates can happen.
      * 
      * @author Holger Eichelberger
      */
@@ -228,7 +235,8 @@ public class LoginDialog {
          * Creates a model updater.
          * 
          * @param shell
-         *            the shell of the calling window to be closed at the end of the update process
+         *            the shell of the calling window to be closed at the end of
+         *            the update process
          */
         private ModelUpdate(Shell shell) {
             this.shell = shell;
@@ -238,7 +246,6 @@ public class LoginDialog {
         @Override
         public void run() {
             Display.getDefault().syncExec(new Runnable() {
-
                 @Override
                 public void run() {
                     progress.beginTask(repositoryConnector.getRepositoryEntryCount());
@@ -255,44 +262,72 @@ public class LoginDialog {
                 Location.setModelLocation(ConfigurationProperties.MODEL_LOCATION.getValue());
             } else {
                 File wcPath = Utils.getDestinationFileForModel();
-                final List<File> conflicts = repositoryConnector.getConflictingFilesInWorkspace(wcPath);
-                if (conflicts.size() > 0) {
-                    // we got some conflicts: notify the user
+                try {
+                    final List<File> conflicts;
+                    if (wcPath.exists()) {
+                        conflicts = repositoryConnector.getConflictingFilesInWorkspace(wcPath);
+                    } else {
+                        conflicts = null;
+                    }
+                    if (null != conflicts && conflicts.size() > 0) {
+                        // we got some conflicts: notify the user
+                        Display.getDefault().asyncExec(new Runnable() {
+                            public void run() {
+                                String conflictsAsString = "";
+                                for (File file : conflicts) {
+                                    conflictsAsString = file + "\n";
+                                }
+                                showConflictMessage(conflictsAsString);
+                            }
+                        });
+                    } else {
+                        // update model
+                        try {
+                            Location.setModelLocation(repositoryConnector.loadModel(Utils.getDestinationFileForModel())
+                                    .getAbsolutePath());
+                        } catch (ConnectorException e) {
+                            Dialogs.showErrorDialog(new Shell(), EXCEPTION_TITLE, e.getMessage());
+                        }
+                    }
+                } catch (final ConnectorException e) {
                     Display.getDefault().asyncExec(new Runnable() {
+                        @Override
                         public void run() {
-                            String conflictsAsString = "";
-                            for (File file : conflicts) {
-                                conflictsAsString = file + "\n";
-                            }
-                            MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK | SWT.CANCEL);
-                            dialog.setText("Synchronize found conflicts");
-                            dialog.setMessage("Conflicts in working copy found. "
-                                    + "How do you want to handle these conflicts?"
-                                    + "\n"
-                                    + conflictsAsString
-                                    + "\n"
-                                    + "Press OK to update to override local changes. Press cancel "
-                                    + "to keep local changes");
-                            int response = dialog.open();
-                            if (response == SWT.OK) {
-                                Location.setModelLocation(Utils.getDestinationFileForModel().getAbsolutePath());
-                                repositoryConnector.updateModel(Utils.getDestinationFileForModel());
-                                repositoryConnector.resolveConflicts(Utils.getDestinationFileForModel(), false);
-                            } else if (response == SWT.CANCEL) {
-                                //TODO:  Update or better do nothing?
-                                Location.setModelLocation(Utils.getDestinationFileForModel().getAbsolutePath());
-                                completed();
-                            }
+                            Dialogs.showErrorDialog(new Shell(), EXCEPTION_TITLE, e.getMessage());
                         }
                     });
-                } else {
-                    // update model
-                    Location.setModelLocation(repositoryConnector.loadModel(Utils.getDestinationFileForModel())
-                            .getAbsolutePath());
                 }
                 // Save user roles
                 saveRoles();
                 EclipsePrefUtils.INSTANCE.addPreference(EclipsePrefUtils.LOCAL_DATA_PREF_KEY, "false");
+            }
+        }
+        
+        /**
+         * Shows a message box indicating that conflicts were found in the working copy.
+         * 
+         * @param conflictsAsString files containing conflicts.
+         */
+        private void showConflictMessage(String conflictsAsString) {
+            MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK | SWT.CANCEL);
+            dialog.setText("Synchronize found conflicts");
+            dialog.setMessage("Conflicts in working copy found. "
+                    + "How do you want to handle these conflicts?" + "\n" + conflictsAsString + "\n"
+                    + "Press OK to update to override local changes. Press cancel "
+                    + "to keep local changes");
+            int response = dialog.open();
+            if (response == SWT.OK) {
+                Location.setModelLocation(Utils.getDestinationFileForModel().getAbsolutePath());
+                try {
+                    repositoryConnector.updateModel(Utils.getDestinationFileForModel());
+                    repositoryConnector.resolveConflicts(Utils.getDestinationFileForModel(), false);
+                } catch (ConnectorException e) {
+                    Dialogs.showErrorDialog(new Shell(), EXCEPTION_TITLE, e.getMessage());
+                }
+            } else if (response == SWT.CANCEL) {
+                // TODO: Update or better do nothing?
+                Location.setModelLocation(Utils.getDestinationFileForModel().getAbsolutePath());
+                completed();
             }
         }
 
@@ -330,7 +365,8 @@ public class LoginDialog {
      * @param shell
      *            The shell
      * @param selectButton
-     *            The select button to check if user wants to work with local data
+     *            The select button to check if user wants to work with local
+     *            data
      * 
      */
     private void addButtonListener(final Button button, final Shell shell, final Button selectButton) {
@@ -347,40 +383,47 @@ public class LoginDialog {
                         checkIfLocalDataWasUsed(shell);
                         new Thread(new ModelUpdate(shell)).start();
                     } else {
-                        showLoginError(shell);
+                        // showLoginError(shell);
                         logger.warn("Login failed");
                         button.setEnabled(true);
                     }
                 }
             }
 
-            private void showLoginError(final Shell shell) {
-                MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK | SWT.CANCEL);
-                dialog.setText("Login failed");
-                dialog.setMessage("The login failed. Please make sure you have "
-                        + "a working internet connection and check your credentials.");
-                dialog.open();
-            }
+            // private void showLoginError(final Shell shell) {
+            // MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION |
+            // SWT.OK | SWT.CANCEL);
+            // dialog.setText("Login failed");
+            // dialog.setMessage("The login failed. Please make sure you have "
+            // + "a working internet connection and check your credentials.");
+            // dialog.open();
+            // }
         });
     }
-    
+
     /**
      * Check if local data was used before.
-     * @param shell The shell
+     * 
+     * @param shell
+     *            The shell
      */
     private void checkIfLocalDataWasUsed(Shell shell) {
-        boolean localData = Boolean.valueOf(EclipsePrefUtils.INSTANCE.getPreference(
-            EclipsePrefUtils.LOCAL_DATA_PREF_KEY));
+        boolean localData = Boolean
+                .valueOf(EclipsePrefUtils.INSTANCE.getPreference(EclipsePrefUtils.LOCAL_DATA_PREF_KEY));
         if (localData) {
             MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.YES | SWT.NO);
             dialog.setText("Warning");
             dialog.setMessage(localDataUsedMessage);
             int buttonID = dialog.open();
-            switch(buttonID) {
+            switch (buttonID) {
             case SWT.YES:
                 break;
             case SWT.NO:
-                repositoryConnector.revert(Utils.getDestinationFileForModel());
+                try {
+                    repositoryConnector.revert(Utils.getDestinationFileForModel());
+                } catch (ConnectorException e) {
+                    Dialogs.showErrorDialog(new Shell(), EXCEPTION_TITLE, e.getMessage());
+                }
                 break;
             default:
                 break;
@@ -393,7 +436,8 @@ public class LoginDialog {
      */
     private void loadRoles() {
         Set<Role> roles = new HashSet<Role>();
-        // you might want to call prefs.sync() if you're worried about others changing your settings
+        // you might want to call prefs.sync() if you're worried about others
+        // changing your settings
         if (EclipsePrefUtils.INSTANCE.getPreference(ApplicationRole.ADMIN.getId()) != null) {
             roles.add(ApplicationRole.ADMIN);
         }
@@ -414,7 +458,7 @@ public class LoginDialog {
         // add preference entry that local data was used
         EclipsePrefUtils.INSTANCE.addPreference(EclipsePrefUtils.LOCAL_DATA_PREF_KEY, "true");
     }
-    
+
     /**
      * Saves the roles to {@link IEclipsePreferences}.
      */
@@ -424,8 +468,8 @@ public class LoginDialog {
         for (Role role : roles) {
             EclipsePrefUtils.INSTANCE.addPreference(role.getId(), role.getId());
         }
-        EclipsePrefUtils.INSTANCE.addPreference(EclipsePrefUtils.REPOSITORY_URL_PREF_KEY, 
-            repositoryConnector.getUserContext().getRepositoryURL());
+        EclipsePrefUtils.INSTANCE.addPreference(EclipsePrefUtils.REPOSITORY_URL_PREF_KEY,
+                repositoryConnector.getUserContext().getRepositoryURL());
     }
 
     /**
@@ -476,7 +520,8 @@ public class LoginDialog {
      * @param composite
      *            The given Composite
      * @param password
-     *            Indicates if the given text is a password and should be masked.
+     *            Indicates if the given text is a password and should be
+     *            masked.
      * @return the new {@link Text}
      */
     private Text createTextField(final Composite composite, boolean password) {
@@ -554,12 +599,16 @@ public class LoginDialog {
      *            The password for the user
      */
     private boolean authenticate(String username, String password) {
-        boolean result;
+        boolean result = false;
         repositoryConnector.setRepositoryURL(ConfigurationProperties.REPOSITORY_URL.getValue());
         if (OFFLINE_DEBUG) {
             result = true;
         } else {
-            result = repositoryConnector.authenticate(username, password);
+            try {
+                result = repositoryConnector.authenticate(username, password);
+            } catch (ConnectorException e) {
+                Dialogs.showErrorDialog(new Shell(), EXCEPTION_TITLE, e.getMessage());
+            }
             EclipsePrefUtils.INSTANCE.addPreference(EclipsePrefUtils.USERNAME_PREF_KEY, username);
         }
         return result;

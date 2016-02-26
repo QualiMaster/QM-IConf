@@ -4,6 +4,9 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
+import org.tmatesoft.svn.core.SVNException;
+
+import de.uni_hildesheim.sse.repositoryConnector.svnConnector.ConnectorException;
 import de.uni_hildesheim.sse.repositoryConnector.svnConnector.RepositoryEventHandler;
 
 /**
@@ -23,8 +26,9 @@ public interface IRepositoryConnector {
      *            The password for the repository
      * 
      * @return true if successfully authenticated
+     * @throws ConnectorException 
      */
-    boolean authenticate(String username, String password);
+    boolean authenticate(String username, String password) throws ConnectorException;
 
     /**
      * Loads the model from the repository and stores it to a given destination directory.
@@ -33,8 +37,9 @@ public interface IRepositoryConnector {
      *            The destination directory where the model should be stored.
      * 
      * @return The file where the model is stored.
+     * @throws ConnectorException exception
      */
-    public File loadModel(File destinationFile);
+    public File loadModel(File destinationFile) throws ConnectorException;
 
 //    /**
 //     * Stores the model in the repository.
@@ -53,8 +58,9 @@ public interface IRepositoryConnector {
      * @param destinationFile
      *            The file where the model is located on the local system.
      * @return true or false whether there are conflicts
+     * @throws ConnectorException exception
      */
-    public boolean storeModel(File destinationFile);
+    public boolean storeModel(File destinationFile) throws ConnectorException;
 
     /**
      * Gets all roles.
@@ -111,8 +117,9 @@ public interface IRepositoryConnector {
      *            out-of-date (like '-u' option in the SVN client's 'svn status' command), otherwise false
      * 
      * @return number of changes
+     * @throws ConnectorException exception
      */
-    int getChangesCount(File destinationFile, boolean isRemote);
+    int getChangesCount(File destinationFile, boolean isRemote) throws ConnectorException;
 
     /**
      * Updates workspace to HEAD.
@@ -120,29 +127,33 @@ public interface IRepositoryConnector {
      * @param destinationFile
      *            Path to the workspace
      * @return List with conflicting files
+     * @throws ConnectorException exception
      */
-    List<File> updateModel(File destinationFile);
+    List<File> updateModel(File destinationFile) throws ConnectorException;
     
     /**
      * Resolves conflicts with given choice.
      * 
      * @param path Path to the workspace
      * @param keepMine if set to true the local changes will be kept 
+     * @throws ConnectorException exception
      */
-    void resolveConflicts(File path, boolean keepMine);
+    void resolveConflicts(File path, boolean keepMine) throws ConnectorException;
     
     /**
      * Gets all conflicting files in the working copy.
      * 
      * @param wcPath    Path to working copy
      * @return List with all conflicting files
+     * @throws ConnectorException exception
      */
-    public List<File> getConflictingFilesInWorkspace(File wcPath);
+    public List<File> getConflictingFilesInWorkspace(File wcPath) throws ConnectorException;
     
     /**
      * Reverts all changes in the workspace.
      * 
      * @param wcPath Path to the working copy
+     * @throws ConnectorException exception
      */
-    void revert(File wcPath);
+    void revert(File wcPath) throws ConnectorException;
 }

@@ -78,8 +78,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     
     private MeterFigure usedClusterMachines;
     private MeterFigure usedHardwareMachines;
-    //private CircularBufferDataProvider pipelineLatencyDataProvider;
-    //private CircularBufferDataProvider pipelineThroughputDataProvider;
     private Map<String, PipelineTrace> pipelineTraces = new HashMap<String, PipelineTrace>();
 
     /**
@@ -589,6 +587,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                 });
             }
         } else {
+System.out.println(message);            
             PipelineTrace trace = pipelineTraces.get(part);
             if (null != trace) {
                 trace.update(observations);
