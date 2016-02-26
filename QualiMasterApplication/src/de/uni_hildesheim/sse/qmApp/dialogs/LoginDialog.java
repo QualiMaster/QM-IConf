@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -34,7 +33,6 @@ import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.qmApp.model.Location;
 import de.uni_hildesheim.sse.qmApp.model.Utils;
 import de.uni_hildesheim.sse.qmApp.model.Utils.ConfigurationProperties;
-import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
 import de.uni_hildesheim.sse.repositoryConnector.IRepositoryConnector;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.ApplicationRole;
