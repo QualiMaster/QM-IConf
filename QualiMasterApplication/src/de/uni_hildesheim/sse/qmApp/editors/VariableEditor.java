@@ -2,6 +2,7 @@
 package de.uni_hildesheim.sse.qmApp.editors;
 
 import java.util.HashMap;
+import java.util.Set;
 
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -14,9 +15,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolTip;
@@ -180,7 +181,7 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     }
     
     /**
-     * Go through the {@link Text}´s and pair them with a control-Decoration which can be hidden or not.
+     * Go through the {@link Text}ï¿½s and pair them with a control-Decoration which can be hidden or not.
      * @param ctrl parent control.
      */
     private void collectTextFields(Control ctrl) {
@@ -246,25 +247,24 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
         
         //Get map which contains errors(variables and messages)
         HashMap<IDecisionVariable, String> errors = Reasoning.getErrors();
-        final Object[] keys = errors.keySet().toArray();
+        Set<IDecisionVariable> keys = errors.keySet();
  
-        if (keys != null && keys.length > 0) {
+        if (keys != null && !keys.isEmpty()) {
         
             //hideAllDecorators();
         
-            for (int i = 0; i < keys.length; i++) {
+            for (IDecisionVariable variable : keys) {
 
-                IDecisionVariable variable = (IDecisionVariable) keys[i];
                 Control failedControl = getUIConfiguration().getEditorFor(variable);
-                            
-                final String errorMessage = errors.get(keys[i]);
-                           
+                         
                 if (failedControl != null) {
+                	final String errorMessage = errors.get(variable);
                     ControlDecoration declaration = flawedControls.get(failedControl);
                     if (null != declaration) {
                         declaration.show();
     
-                        final ToolTip tip = new ToolTip(Display.getCurrent().getActiveShell(), SWT.BALLOON);
+                        Shell shell = this.getParent().getContentPane().getShell();
+                        final ToolTip tip = new ToolTip(shell, SWT.BALLOON);
                         tip.setMessage(errorMessage);
                         tip.setAutoHide(false);
                             
