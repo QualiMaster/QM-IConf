@@ -134,7 +134,7 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
                     String pipelineName = VariableHelper.getName(pip);
                     String variableName = VariableHelper.getName(elt);
                     if (null != pipelineName && null != variableName) {
-                        StatusHighlighter.INSTANCE.markPipeline(pipelineName, variableName, 
+                        markPipeline(pipelineName, variableName, 
                             getPipelineStatusIndicator(pipelineName, observations));
                     }
                 }
@@ -142,10 +142,42 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
         } else {
             String pipelineName = VariableHelper.getName(var);
             if (null != pipelineName) {
-                StatusHighlighter.INSTANCE.markPipelineStatus(pipelineName, 
-                    getPipelineStatusIndicator(pipelineName, observations));
+                markPipelineStatus(pipelineName, getPipelineStatusIndicator(pipelineName, observations));
             }
         }
+    }
+    
+    /**
+     * Mark an pipeline-element.
+     * @param pipelineName name of the pipeline.
+     * @param indicator indicator which indicates the pipelines status.
+     */
+    public void markPipelineStatus(final String pipelineName, final ElementStatusIndicator indicator) {
+        Display.getDefault().asyncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                StatusHighlighter.INSTANCE.markPipelineStatus(pipelineName, indicator);
+            }
+
+        });
+    }
+    
+    /**
+     * mark a specific variable within a pipeline given by the corresponding indicator.
+     * @param pipelineName name of the pipeline.
+     * @param variableName name of the variable.
+     * @param indicator indicator which indicates the situation of the element.
+     */
+    public void markPipeline(final String pipelineName, final String variableName, 
+        final ElementStatusIndicator indicator) {
+        Display.getDefault().asyncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                markPipeline(pipelineName, variableName, indicator);
+            }
+        });
     }
     
     /**
