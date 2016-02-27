@@ -15,6 +15,7 @@
  */
 package de.uni_hildesheim.sse.qmApp.treeView;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -23,6 +24,7 @@ import org.eclipse.swt.widgets.Display;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
+import de.uni_hildesheim.sse.qmApp.pipelineUtils.StatusHighlighter;
 import de.uni_hildesheim.sse.qmApp.runtime.DispatcherAdapter;
 import de.uni_hildesheim.sse.qmApp.runtime.IInfrastructureListener;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
@@ -41,6 +43,8 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
 
     private ConfigurableElements elements;
     private TreeViewer elementsViewer;
+    private Map<String, Map<String, ElementStatusIndicator>> pipelineElementStates 
+        = new HashMap<String, Map<String, ElementStatusIndicator>>();
     
     /**
      * Creates a configurable elements dispatcher.
@@ -120,8 +124,8 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
         if (pos > 0 && pos + 1 < part.length()) {
             String pipelineName = part.substring(0, pos);
             String pipelineElementName = part.substring(pos + 1);
-/*            markPipeline(pipelineName, pipelineElementName, 
-                getPipelineStatusIndicator(pipelineName, observations));*/
+            markPipeline(pipelineName, pipelineElementName, 
+                getPipelineStatusIndicator(pipelineName, observations));
         } else {
             ConfigurableElement node = findPipeline(part);
             if (null != node) {
@@ -131,20 +135,37 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
     }
     
     /**
-     * Mark a specific variable within a pipeline given by the corresponding indicator.
+     * Mark a specific variable within a pipeline given by the corresponding indicator. Avoids changing an indicator
+     * if it already has been set.
+     * 
      * @param pipelineName name of the pipeline.
-     * @param variableName name of the variable.
+     * @param elementName name of the pipeline element.
      * @param indicator indicator which indicates the situation of the element.
      */
-    public void markPipeline(final String pipelineName, final String variableName, 
-        final ElementStatusIndicator indicator) {
-        Display.getDefault().asyncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                markPipeline(pipelineName, variableName, indicator);
-            }
-        });
+    public void markPipeline(final String pipelineName, final String elementName, 
+        ElementStatusIndicator indicator) {
+        Map<String, ElementStatusIndicator> pipelineMap = pipelineElementStates.get(pipelineName);
+        if (null == pipelineMap) {
+            pipelineMap = new HashMap<String, ElementStatusIndicator>();
+            pipelineElementStates.put(pipelineName, pipelineMap);
+        }
+        ElementStatusIndicator tmp = pipelineMap.get(elementName);
+        if (tmp == indicator) {
+            tmp = null;
+        } else {
+            pipelineMap.put(elementName, indicator);
+            tmp = indicator;
+        }
+        if (null != tmp) {
+            final ElementStatusIndicator eltIndicator = tmp;
+            Display.getDefault().asyncExec(new Runnable() {
+    
+                @Override
+                public void run() {
+                    StatusHighlighter.INSTANCE.markPipeline(pipelineName, elementName, eltIndicator);
+                }
+            });
+        }
     }
     
     /**
@@ -279,10 +300,12 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
     @Override
     public void handleInformationMessage(InformationMessage msg) {
         if (Infrastructure.isStopPipelineMessage(msg)) {
-            ConfigurableElement element = findPipeline(msg.getPipeline());
+            String pipelineName = msg.getPipeline();
+            ConfigurableElement element = findPipeline(pipelineName);
             if (null != element) {
                 setStatus(element, ElementStatusIndicator.NONE);
             }
+            pipelineElementStates.remove(pipelineName);
         }
     }
 
