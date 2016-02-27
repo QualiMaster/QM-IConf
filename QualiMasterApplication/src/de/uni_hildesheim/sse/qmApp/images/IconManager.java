@@ -74,29 +74,29 @@ public class IconManager {
     public static final String RECTANGLE_GREEN1 = PRE + "green1.png";
     public static final String RECTANGLE_GREEN2 = PRE + "green2.png";
     
-    public static final String SVG_DATAMANAGEMENT_VERY_HIGH = "datamanagement.svg";
-    public static final String SVG_DATAMANAGEMENT_HIGH = "datamanagement2.svg";
-    public static final String SVG_DATAMANAGEMENT_MEDIUM = "datamanagement3.svg";
-    public static final String SVG_DATAMANAGEMENT_LOW = "datamanagement4.svg";
-    public static final String SVG_DATAMANAGEMENT_VERY_LOW = "datamanagement5.svg";
+    public static final String SVG_DATAMANAGEMENT_VERY_HIGH = "datamanagement_very_high.svg";
+    public static final String SVG_DATAMANAGEMENT_HIGH = "datamanagement_high.svg";
+    public static final String SVG_DATAMANAGEMENT_MEDIUM = "datamanagement_medium.svg";
+    public static final String SVG_DATAMANAGEMENT_LOW = "datamanagement_low.svg";
+    public static final String SVG_DATAMANAGEMENT_VERY_LOW = "datamanagement_very_low.svg";
     
-    public static final String SVG_FAMILYELEMENT_VERY_HIGH = "familyelement.svg";
-    public static final String SVG_FAMILYELEMENT_HIGH = "familyelement2.svg";
-    public static final String SVG_FAMILYELEMENT_MEDIUM = "familyelement3.svg";
-    public static final String SVG_FAMILYELEMENT_LOW = "familyelement4.svg";
-    public static final String SVG_FAMILYELEMENT_VERY_LOW = "familyelement5.svg";
+    public static final String SVG_FAMILYELEMENT_VERY_HIGH = "familyelement_very_high.svg";
+    public static final String SVG_FAMILYELEMENT_HIGH = "familyelement_high.svg";
+    public static final String SVG_FAMILYELEMENT_MEDIUM = "familyelement_medium.svg";
+    public static final String SVG_FAMILYELEMENT_LOW = "familyelement_low.svg";
+    public static final String SVG_FAMILYELEMENT_VERY_LOW = "familyelement_very_low.svg";
     
-    public static final String SVG_SINK_VERY_HIGH = "sink.svg";
-    public static final String SVG_SINK_HIGH = "sink2.svg";
-    public static final String SVG_SINK_MEDIUM = "sink3.svg";
-    public static final String SVG_SINK_LOW = "sink4.svg";
-    public static final String SVG_SINK_VERY_LOW = "sink5.svg";
+    public static final String SVG_SINK_VERY_HIGH = "sink_very_high.svg";
+    public static final String SVG_SINK_HIGH = "sink_high.svg";
+    public static final String SVG_SINK_MEDIUM = "sink_medium.svg";
+    public static final String SVG_SINK_LOW = "sink_low.svg";
+    public static final String SVG_SINK_VERY_LOW = "sink_very_low.svg";
     
-    public static final String SVG_SOURCE_VERY_HIGH = "source.svg";
-    public static final String SVG_SOURCE_HIGH = "source2.svg";
-    public static final String SVG_SOURCE_MEDIUM = "source3.svg";
-    public static final String SVG_SOURCE_LOW = "source4.svg";
-    public static final String SVG_SOURCE_VERY_LOW = "source5.svg";
+    public static final String SVG_SOURCE_VERY_HIGH = "source_very_high.svg";
+    public static final String SVG_SOURCE_HIGH = "source_high.svg";
+    public static final String SVG_SOURCE_MEDIUM = "source_medium.svg";
+    public static final String SVG_SOURCE_LOW = "source_low.svg";
+    public static final String SVG_SOURCE_VERY_LOW = "source_very_low.svg";
     
     public static final org.eclipse.swt.graphics.Color DARK_GREEN =
             new org.eclipse.swt.graphics.Color(Display.getCurrent(), 102, 255, 102);

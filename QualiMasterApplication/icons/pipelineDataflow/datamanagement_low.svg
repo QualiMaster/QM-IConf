@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="300pt"
+   height="280pt"
+   viewBox="0 0 300 280"
+   version="1.1"
+   id="svg2"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="datamanagement_low.svg">
+  <metadata
+     id="metadata22">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs20" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="640"
+     inkscape:window-height="480"
+     id="namedview18"
+     showgrid="false"
+     inkscape:zoom="0.67428571"
+     inkscape:cx="187.5"
+     inkscape:cy="175"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg2" />
+  <path
+     fill="#ffffff"
+     d=" M 0.00 0.00 L 300.00 0.00 L 300.00 280.00 L 0.00 280.00 L 0.00 0.00 Z"
+     id="path4" />
+  <path
+     fill="#1b4490"
+     d=" M 127.11 16.17 C 148.36 15.17 169.82 16.69 190.52 21.71 C 203.64 24.98 216.63 29.56 227.97 37.05 C 234.83 41.64 241.19 47.61 244.31 55.41 C 246.75 61.63 246.03 68.88 242.61 74.59 C 237.96 82.77 230.10 88.52 222.02 93.02 C 206.69 101.29 189.58 105.68 172.44 108.25 C 150.62 111.35 128.36 111.38 106.54 108.30 C 89.35 105.75 72.20 101.39 56.81 93.14 C 48.53 88.56 40.46 82.68 35.80 74.24 C 32.50 68.52 31.92 61.29 34.41 55.16 C 37.02 48.73 41.93 43.52 47.39 39.37 C 54.75 33.82 63.17 29.82 71.79 26.62 C 89.53 20.22 108.33 17.18 127.11 16.17 Z"
+     id="path6"
+     style="color:#000000;fill:#87de87;fill-opacity:1;fill-rule:nonzero;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+  <path
+     fill="#1b4490"
+     d=" M 220.74 106.70 C 232.04 100.69 243.90 91.64 245.80 78.08 C 245.69 89.73 245.86 101.39 245.72 113.04 C 245.62 120.55 241.15 127.06 236.01 132.18 C 229.27 132.39 222.43 131.57 215.76 132.76 C 208.83 134.34 203.35 139.99 201.35 146.72 C 196.64 144.33 191.09 143.39 185.98 144.99 C 178.98 146.89 174.66 153.14 169.61 157.86 C 142.95 161.22 115.64 160.38 89.42 154.31 C 75.32 150.89 61.29 146.03 49.28 137.71 C 41.12 131.93 33.20 123.57 32.89 113.00 C 32.75 101.51 32.92 90.03 32.81 78.54 C 34.48 88.83 42.19 96.79 50.55 102.35 C 64.24 111.34 80.15 116.29 96.09 119.51 C 118.09 123.80 140.73 124.60 163.02 122.40 C 182.89 120.29 202.87 115.95 220.74 106.70 Z"
+     id="path8"
+     style="color:#000000;fill:#87de87;fill-opacity:1;fill-rule:nonzero;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+  <path
+     fill="#1b4490"
+     d=" M 32.81 128.02 C 34.60 138.18 42.20 146.04 50.49 151.56 C 62.59 159.58 76.56 164.29 90.61 167.58 C 113.77 172.84 137.77 173.87 161.40 171.83 C 161.10 176.15 161.95 180.46 163.98 184.30 C 158.44 185.94 153.47 189.73 151.07 195.07 C 148.92 199.33 149.13 204.22 149.14 208.86 C 127.83 209.64 106.33 207.95 85.65 202.59 C 71.70 198.89 57.81 193.68 46.33 184.73 C 39.35 179.18 32.98 171.35 32.87 162.01 C 32.77 150.68 32.90 139.35 32.81 128.02 Z"
+     id="path10"
+     style="color:#000000;fill:#87de87;fill-opacity:1;fill-rule:nonzero;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+  <path
+     fill="#1b4490"
+     d=" M 220.38 151.89 C 225.31 151.80 230.24 151.85 235.18 151.84 C 236.23 157.67 237.22 163.51 238.28 169.34 C 242.36 170.51 246.28 172.13 249.98 174.20 C 254.80 170.75 259.58 167.27 264.41 163.85 C 267.88 167.34 271.37 170.81 274.84 174.29 C 271.42 179.15 268.01 184.01 264.60 188.88 C 266.66 192.56 268.27 196.48 269.42 200.54 C 275.27 201.50 281.13 202.47 286.99 203.41 C 287.01 208.33 287.00 213.26 287.00 218.19 C 281.14 219.23 275.27 220.23 269.41 221.28 C 268.27 225.34 266.66 229.26 264.60 232.94 C 268.05 237.77 271.54 242.57 275.00 247.40 C 271.52 250.87 268.06 254.36 264.59 257.84 C 259.71 254.45 254.86 251.03 249.98 247.63 C 246.29 249.70 242.37 251.33 238.31 252.51 C 237.25 258.34 236.24 264.17 235.18 270.00 C 230.26 270.00 225.33 270.01 220.41 269.99 C 219.46 264.17 218.50 258.36 217.52 252.56 C 213.43 251.40 209.49 249.79 205.78 247.72 C 200.94 251.08 196.13 254.48 191.30 257.84 C 187.81 254.36 184.32 250.88 180.85 247.38 C 184.26 242.61 187.68 237.83 191.09 233.05 C 189.09 229.40 187.31 225.60 186.24 221.56 L 185.95 221.22 C 180.25 220.21 174.54 219.20 168.84 218.19 C 168.84 213.26 168.84 208.34 168.85 203.42 C 174.64 202.45 180.43 201.51 186.22 200.51 C 187.37 196.41 189.00 192.46 191.11 188.76 C 187.75 183.92 184.36 179.11 181.00 174.28 C 184.47 170.80 187.95 167.33 191.42 163.85 C 196.24 167.23 201.01 170.70 205.83 174.09 C 209.54 172.04 213.47 170.42 217.56 169.29 C 218.52 163.49 219.50 157.70 220.38 151.89 Z"
+     id="path12"
+     style="color:#000000;fill:#87de87;fill-opacity:1;fill-rule:nonzero;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+  <path
+     fill="#1b4490"
+     d=" M 32.81 177.22 C 34.58 187.37 42.16 195.22 50.43 200.74 C 63.28 209.25 78.18 214.08 93.12 217.36 C 111.59 221.34 130.58 222.50 149.43 221.87 C 150.98 229.20 156.63 235.32 163.86 237.30 C 160.43 243.35 160.51 250.92 163.78 257.01 C 133.13 259.93 101.55 257.96 72.33 247.73 C 60.06 243.18 47.67 237.15 39.14 226.91 C 35.51 222.42 32.82 216.91 32.87 211.02 C 32.78 199.75 32.90 188.49 32.81 177.22 Z"
+     id="path14"
+     style="color:#000000;fill:#87de87;fill-opacity:1;fill-rule:nonzero;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+  <path
+     fill="#ffffff"
+     d=" M 221.32 191.48 C 231.16 187.88 243.05 193.28 246.88 203.02 C 249.88 210.06 248.51 218.72 243.39 224.43 C 238.49 230.17 230.27 232.75 222.96 230.85 C 214.71 228.92 208.20 221.38 207.50 212.93 C 206.41 203.70 212.48 194.31 221.32 191.48 Z"
+     id="path16" />
+</svg>
