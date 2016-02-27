@@ -660,11 +660,6 @@ public class PipelineDiagramUtils {
         List<de.uni_hildesheim.sse.qmApp.pipelineUtils.StatusHighlighter.PipelineDataflowInformationWrapper>
             wrapperList = StatusHighlighter.INSTANCE.getPipelineFlowInfo();
 
-//        PipelineDataflowInformationWrapper test = 
-//                new PipelineDataflowInformationWrapper("priorityPip", "FinancialDataSource",
-//                        ElementStatusIndicator.HIGH);
-//        wrapperList.add(test);
-        
         EObject element = diagram.getDiagram().getElement();
         EList<EObject> eContents = element.eContents();
         
@@ -680,9 +675,7 @@ public class PipelineDiagramUtils {
                    
                     if (wrapper.getVariableName().equals(name)) {
                         highlightDataFlow(eContents.get(j), wrapper.getIndicator());
-                    }   
-                    
-                    
+                    }    
                 }
             }
         }
