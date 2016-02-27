@@ -156,7 +156,7 @@
             <arg value="-artifactRepository" />
             <arg value="file:${basedir}/gen/final" />
             <arg value="-installIU" />
-            <arg value="QualiMasterApplication.application" />
+            <arg value="de.uni-hildesheim.sse.qualiMasterApplication" />
             <arg value="-profileProperties" />
             <arg value="org.eclipse.update.install.features=true" />
         	<arg value="-p2.os" />
