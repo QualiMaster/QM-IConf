@@ -100,7 +100,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         private CircularBufferDataProvider dataProvider;
         private Trace trace;
         private String observable;
-        private int observationTime = 0;
 
         /**
          * Creates the trace.
@@ -152,8 +151,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                 Display.getDefault().asyncExec(new Runnable() {
                     @Override
                     public void run() {
-                        dataProvider.addSample(new Sample(observationTime, observation.doubleValue()));
-                        observationTime++;
+                        dataProvider.addSample(new Sample(System.currentTimeMillis(), observation.doubleValue()));
                     }
                 });
                 
@@ -488,7 +486,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         xyGraph.primaryXAxis.setShowMajorGrid(true);
         xyGraph.primaryXAxis.setTitle("execution time (s)");
         xyGraph.primaryXAxis.setAutoScale(true);
-        xyGraph.primaryXAxis.setFormatPattern("00000");
+        xyGraph.primaryXAxis.setDateEnabled(true);
         
         xyGraph.primaryYAxis.setShowMajorGrid(true);
         xyGraph.primaryYAxis.setTitle("throughput (items/s)");

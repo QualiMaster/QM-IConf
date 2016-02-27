@@ -361,5 +361,19 @@ public class Infrastructure {
         unregisterDispatcher(ViewModelClientDispatcher.INSTANCE);
         unregisterListener(ExecutionMessageHandler.INSTANCE);
     }
+    
+    /**
+     * Returns whether a message indicates stopping of the pipeline given in the message.
+     * 
+     * @param msg the message
+     * @return <code>true</code> for a stop message, <code>false</code> else
+     */
+    public static boolean isStopPipelineMessage(InformationMessage msg) {
+        boolean result = false;
+        if (null != msg.getPipeline() && null == msg.getPipelineElement()) { 
+            result = null != msg && msg.getDescription().equals("stop pipeline successful"); // TODO ugly
+        }
+        return result;
+    }
 
 }

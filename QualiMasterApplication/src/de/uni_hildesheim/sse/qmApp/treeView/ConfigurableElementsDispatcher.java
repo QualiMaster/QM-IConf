@@ -20,20 +20,15 @@ import java.util.Map;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
-import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
-import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Definition;
-import de.uni_hildesheim.sse.qmApp.pipelineUtils.StatusHighlighter;
 import de.uni_hildesheim.sse.qmApp.runtime.DispatcherAdapter;
 import de.uni_hildesheim.sse.qmApp.runtime.IInfrastructureListener;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
+import eu.qualimaster.adaptation.external.InformationMessage;
 import eu.qualimaster.adaptation.external.MonitoringDataMessage;
 import eu.qualimaster.easy.extension.QmObservables;
-import eu.qualimaster.easy.extension.internal.PipelineHelper;
-import eu.qualimaster.easy.extension.internal.VariableHelper;
 
 import static eu.qualimaster.easy.extension.QmObservables.*;
 
@@ -121,50 +116,22 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
      * @param observations the observations
      */
     private void tryHighlightPipeline(String part, Map<String, Double> observations) {
-        de.uni_hildesheim.sse.model.confModel.Configuration cfg = Definition.TOP_LEVEL.getConfiguration();
-        IDecisionVariable var = PipelineHelper.obtainPipelineByName(cfg, part);
-        // TODO ugly extend message accordingly
-        if (null == var) {
-            IDecisionVariable actPipelines = ModelAccess.findTopContainer(Configuration.INFRASTRUCTURE, 
-                Configuration.INFRASTRUCTURE.getProvidedTypes()[0]); // uhh
-            for (int n = 0; n < actPipelines.getNestedElementsCount(); n++) {
-                IDecisionVariable pip = actPipelines.getNestedElement(n);
-                IDecisionVariable elt = PipelineHelper.obtainPipelineElementByName(pip, null, part);
-                if (null != elt) {
-                    String pipelineName = VariableHelper.getName(pip);
-                    String variableName = VariableHelper.getName(elt);
-                    if (null != pipelineName && null != variableName) {
-                        markPipeline(pipelineName, variableName, 
-                            getPipelineStatusIndicator(pipelineName, observations));
-                    }
-                }
-            }
+        int pos = part.indexOf(":");
+        if (pos > 0 && pos + 1 < part.length()) {
+            String pipelineName = part.substring(0, pos);
+            String pipelineElementName = part.substring(pos + 1);
+/*            markPipeline(pipelineName, pipelineElementName, 
+                getPipelineStatusIndicator(pipelineName, observations));*/
         } else {
-            String pipelineName = VariableHelper.getName(var);
-            if (null != pipelineName) {
-                markPipelineStatus(pipelineName, getPipelineStatusIndicator(pipelineName, observations));
+            ConfigurableElement node = findPipeline(part);
+            if (null != node) {
+                setStatus(node, getPipelineStatusIndicator(part, observations));
             }
         }
     }
     
     /**
-     * Mark an pipeline-element.
-     * @param pipelineName name of the pipeline.
-     * @param indicator indicator which indicates the pipelines status.
-     */
-    public void markPipelineStatus(final String pipelineName, final ElementStatusIndicator indicator) {
-        Display.getDefault().asyncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                StatusHighlighter.INSTANCE.markPipelineStatus(pipelineName, indicator);
-            }
-
-        });
-    }
-    
-    /**
-     * mark a specific variable within a pipeline given by the corresponding indicator.
+     * Mark a specific variable within a pipeline given by the corresponding indicator.
      * @param pipelineName name of the pipeline.
      * @param variableName name of the variable.
      * @param indicator indicator which indicates the situation of the element.
@@ -213,6 +180,16 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
     }
     
     /**
+     * Finds a pipeline configurable node of a given <code>pipeline</code> name.
+     * 
+     * @param pipeline the pipeline name
+     * @return the configurable element or <b>null</b> if it does not exist
+     */
+    private ConfigurableElement findPipeline(String pipeline) {
+        return findElement(findTopLevelElement(Configuration.PIPELINES), pipeline, null);        
+    }
+    
+    /**
      * Finds a top-level element.
      * 
      * @param part the model part to search for
@@ -232,17 +209,19 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
     /**
      * Finds an element by name (non-recursive).
      * 
-     * @param parent the parent to search within
+     * @param parent the parent to search within (may be <b>null</b>)
      * @param name the name of the element
      * @param dflt the default value
      * @return the element or if not found <code>dflt</code>
      */
     private ConfigurableElement findElement(ConfigurableElement parent, String name, ConfigurableElement dflt) {
         ConfigurableElement result = null;
-        for (int c = 0; null == result && c < parent.getChildCount(); c++) {
-            ConfigurableElement tmp = parent.getChild(c);
-            if (tmp.getDisplayName().equals(name)) {
-                result = tmp;
+        if (null != parent) {
+            for (int c = 0; null == result && c < parent.getChildCount(); c++) {
+                ConfigurableElement tmp = parent.getChild(c);
+                if (tmp.getDisplayName().equals(name)) {
+                    result = tmp;
+                }
             }
         }
         if (null == result) {
@@ -256,6 +235,7 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
         if (!hasConnection) {
             clearStatus(findTopLevelElement(Configuration.HARDWARE), true);
             clearStatus(findTopLevelElement(Configuration.RECONFIG_HARDWARE), true);
+            clearStatus(findTopLevelElement(Configuration.PIPELINES), true);
         }
     }
     
@@ -296,4 +276,14 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
         }
     }
     
+    @Override
+    public void handleInformationMessage(InformationMessage msg) {
+        if (Infrastructure.isStopPipelineMessage(msg)) {
+            ConfigurableElement element = findPipeline(msg.getPipeline());
+            if (null != element) {
+                setStatus(element, ElementStatusIndicator.NONE);
+            }
+        }
+    }
+
 }
