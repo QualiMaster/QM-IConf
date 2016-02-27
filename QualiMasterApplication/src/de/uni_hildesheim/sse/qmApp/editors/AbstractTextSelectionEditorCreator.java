@@ -13,16 +13,22 @@ import org.eclipse.swt.widgets.Text;
 
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.IEditorCreator;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
+import de.uni_hildesheim.sse.easy_producer.instantiator.Bundle;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.IOverridingEditor;
 import de.uni_hildesheim.sse.model.confModel.AssignmentState;
+import de.uni_hildesheim.sse.model.confModel.Configuration;
 import de.uni_hildesheim.sse.model.confModel.ConfigurationException;
 import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
+import de.uni_hildesheim.sse.model.management.VarModel;
+import de.uni_hildesheim.sse.model.varModel.Project;
 import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.model.varModel.datatypes.StringType;
 import de.uni_hildesheim.sse.model.varModel.values.StringValue;
 import de.uni_hildesheim.sse.model.varModel.values.Value;
 import de.uni_hildesheim.sse.model.varModel.values.ValueDoesNotMatchTypeException;
 import de.uni_hildesheim.sse.model.varModel.values.ValueFactory;
+import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
+import de.uni_hildesheim.sse.utils.modelManagement.IModelListener;
 
 /**
  * The {@link AbstractTextSelectionEditorCreator} creates a composite with a text field and a button.
@@ -94,7 +100,7 @@ public abstract class AbstractTextSelectionEditorCreator implements IEditorCreat
      * @author Holger Eichelberger
      */
     private class ArtifactComposite extends Composite implements ITextUpdater, IDirtyableEditor, 
-        IOverridingEditor {
+        IOverridingEditor, IModelListener<Project> {
 
         private Text textField;
         private Button button;
@@ -115,6 +121,7 @@ public abstract class AbstractTextSelectionEditorCreator implements IEditorCreat
             super(parent, SWT.FILL);
             this.config = config;
             this.variable = variable;
+            VarModel.INSTANCE.events().addModelListener(variable.getConfiguration().getProject(), this);
             this.cellEditor = cellEditor;
 
             final boolean cell = null != cellEditor;
@@ -264,6 +271,16 @@ public abstract class AbstractTextSelectionEditorCreator implements IEditorCreat
             
         }
 
+        @Override
+        public void notifyReplaced(Project oldModel, Project newModel) {
+            IDecisionVariable newVar = Configuration.mapVariable(variable, variable.getConfiguration());
+            if (null != newVar) {
+                variable = newVar;
+            } else {
+                EASyLoggerFactory.INSTANCE.getLogger(getClass(), Bundle.ID)
+                    .error("No variable found in new configuratio, i.e., discontinued mapping!");
+            }
+        }
     }
 
     /**
