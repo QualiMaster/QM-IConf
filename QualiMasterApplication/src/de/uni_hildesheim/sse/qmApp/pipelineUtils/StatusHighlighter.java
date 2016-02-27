@@ -317,22 +317,22 @@ public class StatusHighlighter {
 
             switch(dataflow) {
             case VERYHIGH:  
-                uri += IconManager.SVG_SOURCE;
+                uri += IconManager.SVG_SOURCE_VERY_HIGH;
                 break;
             case HIGH:    
-                uri += IconManager.SVG_SOURCE2;
+                uri += IconManager.SVG_SOURCE_HIGH;
                 break;
             case MEDIUM:            
-                uri += IconManager.SVG_SOURCE3;
+                uri += IconManager.SVG_SOURCE_MEDIUM;
                 break;
             case LOW:                 
-                uri += IconManager.SVG_SOURCE4;
+                uri += IconManager.SVG_SOURCE_LOW;
                 break;
             case VERYLOW:                 
-                uri += IconManager.SVG_SOURCE5;
+                uri += IconManager.SVG_SOURCE_VERY_LOW;
                 break;
             default:                
-                uri += IconManager.SVG_SOURCE;
+                uri += IconManager.SVG_SOURCE_VERY_HIGH;
                 break;
 
             }
@@ -360,22 +360,22 @@ public class StatusHighlighter {
 
             switch(dataflow) {
             case VERYHIGH:  
-                uri += IconManager.SVG_SINK;
+                uri += IconManager.SVG_SINK_VERY_HIGH;
                 break;
             case HIGH:    
-                uri += IconManager.SVG_SINK2;
+                uri += IconManager.SVG_SINK_HIGH;
                 break;
             case MEDIUM:            
-                uri += IconManager.SVG_SINK3;
+                uri += IconManager.SVG_SINK_MEDIUM;
                 break;
             case LOW:                 
-                uri += IconManager.SVG_SINK4;
+                uri += IconManager.SVG_SINK_LOW;
                 break;
             case VERYLOW:                 
-                uri += IconManager.SVG_SINK5;
+                uri += IconManager.SVG_SINK_VERY_LOW;
                 break;
             default:                
-                uri += IconManager.SVG_SINK5;
+                uri += IconManager.SVG_SINK_VERY_LOW;
                 break;
 
             }
@@ -404,22 +404,22 @@ public class StatusHighlighter {
 
             switch(dataflow) {
             case VERYHIGH:  
-                uri += IconManager.SVG_FAMILYELEMENT;
+                uri += IconManager.SVG_FAMILYELEMENT_VERY_HIGH;
                 break;
             case HIGH:    
-                uri += IconManager.SVG_FAMILYELEMENT2;
+                uri += IconManager.SVG_FAMILYELEMENT_HIGH;
                 break;
             case MEDIUM:            
-                uri += IconManager.SVG_FAMILYELEMENT3;
+                uri += IconManager.SVG_FAMILYELEMENT_MEDIUM;
                 break;
             case LOW:                 
-                uri += IconManager.SVG_FAMILYELEMENT4;
+                uri += IconManager.SVG_FAMILYELEMENT_LOW;
                 break;
             case VERYLOW:                 
-                uri += IconManager.SVG_FAMILYELEMENT5;
+                uri += IconManager.SVG_FAMILYELEMENT_VERY_LOW;
                 break;
             default:                
-                uri += IconManager.SVG_FAMILYELEMENT5;
+                uri += IconManager.SVG_FAMILYELEMENT_VERY_LOW;
                 break;
 
             }
