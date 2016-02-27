@@ -184,7 +184,8 @@ public class StatusHighlighter {
             if (element.getDisplayName().toLowerCase().equals(pipelineName.toLowerCase())) {
                 
                 element.setStatus(indicator);
-                ConfigurableElementsView.forceTreeRefresh(); // TODO inefficient, use viewer.refresh(element, true)
+                ConfigurableElementsView.forceTreeRefresh(); 
+                // TODO inefficient, use viewer.refresh(element, true), refresh only if changed, consider UI thread
             }
         } 
     }

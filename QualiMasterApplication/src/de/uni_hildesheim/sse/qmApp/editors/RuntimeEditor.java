@@ -120,7 +120,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             dataProvider.setUpdateDelay(PIPELINE_DISPLAY_DELAY);
             
             //create the latency trace
-            trace = new Trace(label, xAxis, xAxis, dataProvider);
+            trace = new Trace(label, xAxis, yAxis, dataProvider);
             trace.setDataProvider(dataProvider);
             trace.setPointStyle(style);
         }
@@ -483,23 +483,20 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         
         //create a new XY Graph.
         XYGraph xyGraph = new XYGraph();
-        xyGraph.setTitle("Pipeline activitiy");
+        xyGraph.setTitle("Pipeline activity");
+        
         xyGraph.primaryXAxis.setShowMajorGrid(true);
-        xyGraph.primaryXAxis.setTitle("execution time");
+        xyGraph.primaryXAxis.setTitle("execution time (s)");
         xyGraph.primaryXAxis.setAutoScale(true);
-        //xyGraph.primaryXAxis.setDateEnabled(true);
+        xyGraph.primaryXAxis.setFormatPattern("00000");
         
         xyGraph.primaryYAxis.setShowMajorGrid(true);
         xyGraph.primaryYAxis.setTitle("throughput (items/s)");
+        xyGraph.primaryYAxis.setFormatPattern("00000");
         xyGraph.primaryYAxis.setAutoScale(true);
+        //xyGraph.primaryYAxis.setRange(0, 10000);
         xyGraph.primaryYAxis.setForegroundColor(
             XYGraphMediaFactory.getInstance().getColor(XYGraphMediaFactory.COLOR_BLUE));
-
-        /*Axis throughputAxis = new Axis("throughput (items)", true);
-        throughputAxis.setForegroundColor(XYGraphMediaFactory.getInstance().getColor(XYGraphMediaFactory.COLOR_RED));
-        throughputAxis.setTickLableSide(LabelSide.Secondary);
-        throughputAxis.setAutoScale(true);
-        xyGraph.addAxis(throughputAxis);*/
         
         IDecisionVariable actPipelines = ModelAccess.findTopContainer(Configuration.INFRASTRUCTURE, 
             Configuration.INFRASTRUCTURE.getProvidedTypes()[0]); // uhh
