@@ -49,7 +49,8 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     public static final String ID = "de.uni_hildesheim.sse.qmApp.VariableEditor";
     
     private static final String COMPOSITE_STRING = "class org.eclipse.swt.widgets.Composite";
-    private static final int PREFERRED_WIDTH = 590;
+    private static final int MARGIN_RIGHT = 50;
+    //private static final int PREFERRED_WIDTH = 590;
     
     private HashMap<Control, ControlDecoration> flawedControls = new HashMap<Control, ControlDecoration>();
     private ScrolledComposite scroll;
@@ -57,7 +58,6 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     
     private DecisionVariableEditorInput input;
     private IDecisionVariable var;
-    
     
     @Override
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -105,7 +105,8 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     public final void createPartControl(Composite parent) {
     
         scroll = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
-        scroll.setExpandHorizontal(false);
+        //Set expandHorizontal to true, thus the layout will work
+        scroll.setExpandHorizontal(true);
         
         inner = new Composite(scroll, SWT.NONE);
         scroll.setContent(inner);
@@ -115,7 +116,7 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
         GridLayout layout = new GridLayout(2, false);
         
         //Set the margin thus the textfields wont fill completely
-        //layout.marginRight = 80;
+        layout.marginRight = MARGIN_RIGHT;
         
         inner.setLayout(layout);
         
@@ -132,26 +133,12 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
         applyGridData(inner);
         considerReasoningResults(inner);
         Point p = inner.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-        p.x = Math.max(p.x, PREFERRED_WIDTH);
+        //p.x = Math.max(p.x, PREFERRED_WIDTH);
         inner.setSize(p);
         inner.layout();
         
         createAdditionalControls(inner);
-        
-        
-//        inner.addKeyListener(new KeyAdapter() {
-//            @Override
-//            public void keyPressed( KeyEvent exc ) {
-//         
-//                if (exc.keyCode == 'a'
-//                        && ( exc.stateMask & SWT.MODIFIER_MASK ) == SWT.CTRL ) {
-//                    
-//                    collectTextFields(inner);
-//                    applyGridData(inner);
-//                    considerReasoningResults(inner);
-//                }
-//            }
-//        });
+       
     }
 
     /**
@@ -186,9 +173,6 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
      */
     private void collectTextFields(Control ctrl) {
 
-//        GridData data = new GridData();
-//        data.minimumWidth = 1500;
-
         if (!(ctrl instanceof Composite)) {
             final ControlDecoration decorator = new ControlDecoration(ctrl, SWT.RIGHT);
             Image img = IconManager.retrieveImage(IconManager.ERROR);
@@ -215,9 +199,6 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
                     comboDecorator.hide();
                     flawedControls.put(control, comboDecorator);
                 }
-//                if (control instanceof Text) {
-//                    control.setLayoutData(data);
-//                }
                 if (!control.getClass().toString().equals(COMPOSITE_STRING)) {
                     collectTextFields(control);
                 }
@@ -225,15 +206,6 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
         }
     }
     
-//    /**
-//     * Hide all decorators in the editor.
-//     */
-//    private void hideAllDecorators() {
-//        for (int i = 0; i < flawedControls.size(); i++) {
-//            flawedControls.get(i).hide();
-//        }
-//    }
-//    
     /**
      * Start reasoning for this editor.
      * @param parent editors parent.
@@ -243,7 +215,6 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
         for (ControlDecoration decorator : flawedControls.values()) {
             decorator.hide();
         }
-        
         
         //Get map which contains errors(variables and messages)
         HashMap<IDecisionVariable, String> errors = Reasoning.getErrors();
@@ -275,18 +246,6 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
                                 tip.setVisible(true);
                             }
                         });  
-    //                    failedControl.addFocusListener(new FocusListener() {
-    //
-    //                        @Override
-    //                        public void focusLost(FocusEvent exp) {
-    //                            tip.setVisible(false);
-    //                        }
-    //
-    //                        @Override
-    //                        public void focusGained(FocusEvent exp) {
-    //                            tip.setVisible(true);
-    //                        }
-    //                    });
                     }
                 }
             }
@@ -305,6 +264,7 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
                 ctrl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
             } else if (ctrl instanceof Composite) {
                 Composite comp = (Composite) ctrl;
+                
                 for (Control control : comp.getChildren()) {
 
                     if (control instanceof Table) {
