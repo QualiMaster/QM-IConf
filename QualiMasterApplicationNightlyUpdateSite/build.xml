@@ -164,6 +164,8 @@
             <arg value="file:${basedir}/gen/final" />
             <arg value="-artifactRepository" />
             <arg value="file:${basedir}/gen/final" />
+            <arg value="-executables"/>
+            <arg value="${user.home}/Eclipse/qmRepository/org.eclipse.equinox.executable_3.6.200.v20150602-1417.jar" />
             <arg value="-productFile" />
             <arg value="${basedir}/gen/intermediate/QualiMasterApplication.product" />
             <arg value="-flavor" />
@@ -201,7 +203,44 @@
         	<arg value="-p2.arch" />
         	<arg value="x86_64" />
         </java>
-<!-- "gtk.linux.x86_64,win32.win32.x86_64" />-->
+		<!-- copying is a hack -> product configuration based on features using org.eclipse.equinox.executable -->
+        <copy tofile="${basedir}/gen/final/win32.win32.x86_64/QualiMasterApplication.exe" file="${user.home}/Eclipse/qmRepository/binary/bin/win32/win32/x86_64/launcher.exe"/>
+        <copy tofile="${basedir}/gen/final/win32.win32.x86_64/eclipsec.exe" file="${user.home}/Eclipse/qmRepository/binary/bin/win32/win32/x86_64/eclipsec.exe"/>
+        <zip destfile="${basedir}/gen/final/win32.win32.x86_64.zip" basedir="${basedir}/gen/final/win32.win32.x86_64"/>
+        <copy tofile="${basedir}/QM-IConf.win32.win32.x86_64.zip" file="${basedir}/gen/final/win32.win32.x86_64.zip"/>
+
+        <mkdir dir="${basedir}/gen/final/gtk.linux.x86_64"/>
+        <java jar="${eclipse.product.launcher}" fork="true" failonerror="false" maxmemory="128m">
+            <arg value="-application" />
+            <arg value="org.eclipse.equinox.p2.director" />
+            <arg value="-console"/>
+            <arg value="-consolelog"/>
+            <arg value="-repository" />
+            <arg value="${repository}"/>
+            <arg value="-destination"/>
+            <arg value="file:${basedir}/gen/final" />
+            <arg value="-metadataRepository" />
+            <arg value="file:${basedir}/gen/final" />
+            <arg value="-artifactRepository" />
+            <arg value="file:${basedir}/gen/final" />
+            <arg value="-installIU" />
+            <arg value="de.uni-hildesheim.sse.qualiMasterApplication" />
+            <arg value="-destination"/>
+            <arg value="${basedir}/gen/final/gtk.linux.x86_64"/>
+            <arg value="-profileProperties" />
+            <arg value="org.eclipse.update.install.features=true" />
+                <arg value="-p2.os" />
+                <arg value="gtk" />
+                <arg value="-p2.ws" />
+                <arg value="linux" />
+                <arg value="-p2.arch" />
+                <arg value="x86_64" />
+        </java>
+		<!-- copying is a hack -> product configuration based on features using org.eclipse.equinox.executable -->
+        <copy tofile="${basedir}/gen/final/gtk.linux.x86_64/QualiMasterApplication" file="${user.home}/Eclipse/qmRepository/binary/bin/gtk/linux/x86_64/launcher"/>
+        <chmod file="${basedir}/gen/final/gtk.linux.x86_64/QualiMasterApplication" perm="a+x"/>
+        <tar destfile="${basedir}/gen/final/gtk.linux.x86_64.tar.gz" compression="gzip" basedir="${basedir}/gen/final/gtk.linux.x86_64"/>
+        <copy tofile="${basedir}/QM-IConf.gtk.linux.x86_64.zip" file="${basedir}/gen/final/gtk.linux.x86_64.tar.gz"/>
     </target>
     
     <target name="zip.Site">
