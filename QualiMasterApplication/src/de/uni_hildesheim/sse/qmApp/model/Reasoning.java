@@ -334,8 +334,6 @@ public class Reasoning {
         ConfigurableElementsView.saveReasosiningInfoInTreeElementsForPipelines(
                 configurableElementsViewMappingForPipelines);
         
-        //VariableEditor.refreshEditor();
-      
     }
     
     /**

@@ -106,32 +106,27 @@ public class StatusHighlighter {
         
         PipelineDataflowInformationWrapper wrapper = new PipelineDataflowInformationWrapper(
                 pipelineName, variableName, indicator);
-        boolean alreadySaved = false;
         
         //If no variablename is given, then mark the corresponding pipeline in the treeview
         if (variableName == null || variableName.length() < 1) {    
             
             markPipelineStatus(pipelineName, indicator);
+            
         }
         
+        //Go through all saved information
         for (int i = 0; i < pipelineDataflowList.size(); i++) {
             
             PipelineDataflowInformationWrapper existingWrapper = pipelineDataflowList.get(i);
             
-            if (existingWrapper.pipelineName.equals(wrapper.pipelineName)
-                    && existingWrapper.variableName.equals(wrapper.variableName)
-                    && existingWrapper.indicator.equals(wrapper.indicator)) {
-                alreadySaved = true;
-            }
-            
-            //Farbe erneuern
+            // if combination of pipeline and variable is found, change indicator of existing wrapper!
             if (existingWrapper.pipelineName.equals(wrapper.pipelineName)
                     && existingWrapper.variableName.equals(wrapper.variableName)) {
                 
                 existingWrapper.indicator = indicator;
-            }
-            
-            if (!alreadySaved) {
+                
+            } else {
+                //Otherwise create a new information-wrapper in order to highlight a pipeline-element.
                 PipelineDataflowInformationWrapper newWrapper = 
                         new PipelineDataflowInformationWrapper(pipelineName, variableName, indicator);
                 pipelineDataflowList.add(newWrapper);
@@ -337,6 +332,7 @@ public class StatusHighlighter {
 
             }
             svgFigure.setURI(uri);
+            svgFigure.repaint();
         }
     }
 
@@ -380,6 +376,7 @@ public class StatusHighlighter {
 
             }
             svgFigure.setURI(uri);
+            svgFigure.repaint();
         }
     }
 
@@ -424,6 +421,7 @@ public class StatusHighlighter {
 
             }
             svgFigure.setURI(uri);
+            svgFigure.repaint();
         }
     }
 
@@ -467,6 +465,7 @@ public class StatusHighlighter {
 
             }
             svgFigure.setURI(uri);
+            svgFigure.repaint();
         }
     }
 }
