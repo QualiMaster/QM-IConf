@@ -59,19 +59,16 @@ and limitations under the License.
       <plugin id="de.uni-hildesheim.sse.easy.instantiator.velocity"/>
       <plugin id="de.uni-hildesheim.sse.easy.instantiatorCore"/>
       <plugin id="de.uni-hildesheim.sse.easy.instantiatorCore.rt"/>
-      <plugin id="de.uni_hildesheim.sse.EASy-Producer.tests" fragment="true"/>
       <plugin id="de.uni_hildesheim.sse.dslCore"/>
       <plugin id="de.uni_hildesheim.sse.dslCore.ui"/>
       <plugin id="de.uni_hildesheim.sse.easy.instantiator.java"/>
       <plugin id="de.uni_hildesheim.sse.easy.instantiator.maven"/>
       <plugin id="de.uni_hildesheim.sse.easy.ui"/>
       <plugin id="de.uni_hildesheim.sse.easy_producer.core"/>
-      <plugin id="de.uni_hildesheim.sse.easy_producer.core.test" fragment="true"/>
       <plugin id="de.uni_hildesheim.sse.easy_producer.eclipse"/>
       <plugin id="de.uni_hildesheim.sse.ivml"/>
       <plugin id="de.uni_hildesheim.sse.ivml.ui"/>
       <plugin id="de.uni_hildesheim.sse.reasoning.reasoner"/>
-      <plugin id="de.uni_hildesheim.sse.svn.connector.test" fragment="true"/>
       <plugin id="de.uni_hildesheim.sse.utils"/>
       <plugin id="de.uni_hildesheim.sse.varModel"/>
       <plugin id="de.uni_hildesheim.sse.varModel.persistency"/>
@@ -131,29 +128,12 @@ and limitations under the License.
       <plugin id="org.eclipse.core.expressions"/>
       <plugin id="org.eclipse.core.filebuffers"/>
       <plugin id="org.eclipse.core.filesystem"/>
-      <plugin id="org.eclipse.core.filesystem.aix.ppc" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.aix.ppc64" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.hpux.ia64" fragment="true"/>
       <plugin id="org.eclipse.core.filesystem.java7" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.linux.ppc" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.linux.ppc64" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.linux.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.macosx" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.solaris.sparc" fragment="true"/>
-      <plugin id="org.eclipse.core.filesystem.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.core.filesystem.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.core.jobs"/>
       <plugin id="org.eclipse.core.net"/>
-      <plugin id="org.eclipse.core.net.linux.x86" fragment="true"/>
-      <plugin id="org.eclipse.core.net.linux.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.core.net.win32.x86" fragment="true"/>
-      <plugin id="org.eclipse.core.net.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.core.resources"/>
-      <plugin id="org.eclipse.core.resources.win32.x86" fragment="true"/>
-      <plugin id="org.eclipse.core.resources.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.core.runtime"/>
-      <plugin id="org.eclipse.core.runtime.compatibility.auth"/>
       <plugin id="org.eclipse.core.runtime.compatibility.registry" fragment="true"/>
       <plugin id="org.eclipse.core.variables"/>
       <plugin id="org.eclipse.debug.core"/>
@@ -178,7 +158,6 @@ and limitations under the License.
       <plugin id="org.eclipse.e4.ui.workbench"/>
       <plugin id="org.eclipse.e4.ui.workbench.addons.swt"/>
       <plugin id="org.eclipse.e4.ui.workbench.renderers.swt"/>
-      <plugin id="org.eclipse.e4.ui.workbench.renderers.swt.cocoa" fragment="true"/>
       <plugin id="org.eclipse.e4.ui.workbench.swt"/>
       <plugin id="org.eclipse.e4.ui.workbench3"/>
       <plugin id="org.eclipse.ecf"/>
@@ -200,10 +179,6 @@ and limitations under the License.
       <plugin id="org.eclipse.emf.edit.ui"/>
       <plugin id="org.eclipse.emf.mwe.core"/>
       <plugin id="org.eclipse.emf.mwe.utils"/>
-      <plugin id="org.eclipse.emf.mwe2.language"/>
-      <plugin id="org.eclipse.emf.mwe2.launch"/>
-      <plugin id="org.eclipse.emf.mwe2.lib"/>
-      <plugin id="org.eclipse.emf.mwe2.runtime"/>
       <plugin id="org.eclipse.emf.transaction"/>
       <plugin id="org.eclipse.emf.validation"/>
       <plugin id="org.eclipse.emf.workspace"/>
@@ -222,21 +197,7 @@ and limitations under the License.
       <plugin id="org.eclipse.equinox.jsp.jasper"/>
       <plugin id="org.eclipse.equinox.jsp.jasper.registry"/>
       <plugin id="org.eclipse.equinox.launcher"/>
-      <plugin id="org.eclipse.equinox.launcher.cocoa.macosx" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.cocoa.macosx.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.gtk.aix.ppc" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.gtk.aix.ppc64" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.gtk.hpux.ia64" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.gtk.linux.ppc" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.gtk.linux.ppc64" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.gtk.linux.ppc64le" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.gtk.linux.s390" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.gtk.linux.s390x" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.gtk.linux.x86" fragment="true"/>
       <plugin id="org.eclipse.equinox.launcher.gtk.linux.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.gtk.solaris.sparc" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.gtk.solaris.x86" fragment="true"/>
-      <plugin id="org.eclipse.equinox.launcher.win32.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.equinox.launcher.win32.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.equinox.p2.artifact.repository"/>
       <plugin id="org.eclipse.equinox.p2.core"/>
@@ -259,16 +220,12 @@ and limitations under the License.
       <plugin id="org.eclipse.equinox.p2.ui.sdk.scheduler"/>
       <plugin id="org.eclipse.equinox.p2.updatechecker"/>
       <plugin id="org.eclipse.equinox.preferences"/>
-      <plugin id="org.eclipse.equinox.region" fragment="true"/>
       <plugin id="org.eclipse.equinox.registry"/>
       <plugin id="org.eclipse.equinox.security"/>
-      <plugin id="org.eclipse.equinox.security.macosx" fragment="true"/>
       <plugin id="org.eclipse.equinox.security.ui"/>
-      <plugin id="org.eclipse.equinox.security.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.equinox.security.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.equinox.simpleconfigurator"/>
       <plugin id="org.eclipse.equinox.simpleconfigurator.manipulator"/>
-      <plugin id="org.eclipse.equinox.transforms.hook" fragment="true"/>
       <plugin id="org.eclipse.equinox.util"/>
       <plugin id="org.eclipse.equinox.weaving.hook" fragment="true"/>
       <plugin id="org.eclipse.gef"/>
@@ -277,7 +234,6 @@ and limitations under the License.
       <plugin id="org.eclipse.gmf.runtime.common.ui.action"/>
       <plugin id="org.eclipse.gmf.runtime.common.ui.action.ide"/>
       <plugin id="org.eclipse.gmf.runtime.common.ui.printing"/>
-      <plugin id="org.eclipse.gmf.runtime.common.ui.printing.win32" fragment="true"/>
       <plugin id="org.eclipse.gmf.runtime.common.ui.services"/>
       <plugin id="org.eclipse.gmf.runtime.common.ui.services.action"/>
       <plugin id="org.eclipse.gmf.runtime.common.ui.services.properties"/>
@@ -303,9 +259,7 @@ and limitations under the License.
       <plugin id="org.eclipse.gmf.runtime.emf.ui.properties"/>
       <plugin id="org.eclipse.gmf.runtime.gef.ui"/>
       <plugin id="org.eclipse.gmf.runtime.lite"/>
-      <plugin id="org.eclipse.gmf.runtime.lite.source"/>
       <plugin id="org.eclipse.gmf.runtime.lite.svg"/>
-      <plugin id="org.eclipse.gmf.runtime.lite.svg.source"/>
       <plugin id="org.eclipse.gmf.runtime.notation"/>
       <plugin id="org.eclipse.gmf.tooling.runtime"/>
       <plugin id="org.eclipse.help"/>
@@ -340,27 +294,12 @@ and limitations under the License.
       <plugin id="org.eclipse.osgi.services"/>
       <plugin id="org.eclipse.search"/>
       <plugin id="org.eclipse.swt"/>
-      <plugin id="org.eclipse.swt.cocoa.macosx" fragment="true"/>
-      <plugin id="org.eclipse.swt.cocoa.macosx.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.aix.ppc" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.aix.ppc64" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.hpux.ia64" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.ppc" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.ppc64" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.ppc64le" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.s390" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.s390x" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.linux.x86" fragment="true"/>
       <plugin id="org.eclipse.swt.gtk.linux.x86_64" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.solaris.sparc" fragment="true"/>
-      <plugin id="org.eclipse.swt.gtk.solaris.x86" fragment="true"/>
-      <plugin id="org.eclipse.swt.win32.win32.x86" fragment="true"/>
       <plugin id="org.eclipse.swt.win32.win32.x86_64" fragment="true"/>
       <plugin id="org.eclipse.team.core"/>
       <plugin id="org.eclipse.team.ui"/>
       <plugin id="org.eclipse.text"/>
       <plugin id="org.eclipse.ui"/>
-      <plugin id="org.eclipse.ui.cocoa" fragment="true"/>
       <plugin id="org.eclipse.ui.console"/>
       <plugin id="org.eclipse.ui.editors"/>
       <plugin id="org.eclipse.ui.forms"/>

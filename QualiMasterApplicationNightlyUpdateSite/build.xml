@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="QMIConf-Nightly-UpdateSite" default="createUpdateSite" basedir="." xmlns:plugins="antlib:de.uni_hildesheim.sse.easy.standalone.versionReplacement">
     <property file="${user.home}/global-build.properties"/>
+    <property name="configs" value="gtk.linux.x86_64,win32.win32.x86_64" />
+    <property name="repository" value="http://download.eclipse.org/eclipse/updates/4.5" />
 
     <path id ="task.libs">
         <!-- Libs of the Task -->
@@ -31,8 +33,8 @@
         <antcall target="createFeature"/>
         <antcall target="createSiteXML"/>
         <antcall target="createArtifactJars"/>
-        <antcall target="zip.Site"/>
-        <antcall target="publish"/>
+        <!--<antcall target="zip.Site"/>
+        <antcall target="publish"/>-->
     </target>
 	
 	<target name="buildAntTask">
@@ -97,75 +99,109 @@
     	
     	<!-- and now the update site for the RCP application -->
         <product ProductFile="QM/qualiMasterApplication.product" DestinationFile="gen/intermediate/QualiMasterApplication.product" Version="${version}"/>
-
+<!--
         <copy todir="${basedir}/gen/intermediate/plugins">
-            <fileset dir="${user.home}/Eclipse/qmRepository/plugins"/>
+            <fileset dir="${user.home}/Eclipse/ProductBuildEclipse/plugins"/>
         </copy>
         <copy todir="${basedir}/gen/intermediate/plugins">
-            <fileset dir="${user.home}/Eclipse/qmRepository/binary"/>
+            <fileset dir="${user.home}/Eclipse/qmRepository/new"/>
         </copy>
         <copy todir="${basedir}/gen/intermediate/features">
-            <fileset dir="${user.home}/Eclipse/qmRepository/features"/>
+            <fileset dir="${user.home}/Eclipse/ProductBuildEclipse/features"/>
         </copy>
-        <copy todir="${basedir}/gen/intermediate/plugins">
-            <fileset dir="${user.home}/Eclipse/delta-4.3.2/eclipse/plugins"/>
-        </copy>
-    	
+-->    	
+        <!-- create a repository and put all from target platform in it -->
     	<java jar="${eclipse.product.launcher}" fork="true" failonerror="true" maxmemory="128m">
             <arg value="-application" />
             <arg value="org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher" />
+            <arg value="-console"/>
+            <arg value="-consolelog"/>
             <arg value="-metadataRepository" />
             <arg value="file:${basedir}/gen/final" />
             <arg value="-artifactRepository" />
             <arg value="file:${basedir}/gen/final" />
+            <arg value="-configs"/>
+            <arg value="ANY"/>
+            <arg value="-source" />
+            <arg value="${user.home}/Eclipse/qmRepository" />
+            <arg value="-compress" />
+            <arg value="-publishArtifacts" />
+        </java>
+
+        <!-- import the RCP plugin into the repository -->
+        <java jar="${eclipse.product.launcher}" fork="true" failonerror="true" maxmemory="128m">
+            <arg value="-application" />
+            <arg value="org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher" />
+            <arg value="-console"/>
+            <arg value="-consolelog"/>
+            <arg value="-metadataRepository" />
+            <arg value="file:${basedir}/gen/final" />
+            <arg value="-artifactRepository" />
+            <arg value="file:${basedir}/gen/final" />
+            <arg value="-configs"/>
+            <arg value="ANY"/>
             <arg value="-source" />
             <arg value="${basedir}/gen/intermediate" />
             <arg value="-compress" />
             <arg value="-publishArtifacts" />
+            <arg value="-append" />
         </java>
-    	
+
+<!--    	
     	<mkdir dir="${basedir}/gen/final/binary"/>
     	<binary SourceFolder="/var/lib/jenkins/Eclipse/qmRepository/binary" DestinationFolder="${basedir}/gen/final/binary" Version="${version}" Prefix="de.uni-hildesheim.sse.qualiMasterApplication"/>
-
+-->
         <!-- import the RCP product into the repository
              See: http://www.eclipse.org/forums/index.php/t/746045/ -->
         <java jar="${eclipse.product.launcher}" fork="true" failonerror="false" maxmemory="128m">
             <arg value="-application" />
             <arg value="org.eclipse.equinox.p2.publisher.ProductPublisher" />
+            <arg value="-console"/>
+            <arg value="-consolelog"/>
+            <arg value="-repository" />
+            <arg value="${repository}"/>
             <arg value="-metadataRepository" />
             <arg value="file:${basedir}/gen/final" />
             <arg value="-artifactRepository" />
             <arg value="file:${basedir}/gen/final" />
             <arg value="-productFile" />
             <arg value="${basedir}/gen/intermediate/QualiMasterApplication.product" />
-            <arg value="-executables" />
-        	<arg value="${eclipse.delta.executables}"/>
-        	<arg value="-flavor" />
-        	<arg value="tooling" />
-        	<arg value="-configs" />
-        	<arg value="ANY" />
+            <arg value="-flavor" />
+            <arg value="tooling" />
+            <arg value="-configs" />
+            <arg value="${configs}" />
             <arg value="-append"/>
         </java>
-        
+    
+        <mkdir dir="${basedir}/gen/final/win32.win32.x86_64"/>    
         <!-- Creation of a prepacked Eclipse/QM app -->
-        <!--java jar="${eclipse.product.launcher}" fork="true" failonerror="false" maxmemory="128m">
+        <java jar="${eclipse.product.launcher}" fork="true" failonerror="false" maxmemory="128m">
             <arg value="-application" />
             <arg value="org.eclipse.equinox.p2.director" />
+            <arg value="-console"/>
+            <arg value="-consolelog"/>
+            <arg value="-repository" />
+            <arg value="${repository}"/>
+            <arg value="-destination"/>
+            <arg value="file:${basedir}/gen/final" />
             <arg value="-metadataRepository" />
             <arg value="file:${basedir}/gen/final" />
             <arg value="-artifactRepository" />
             <arg value="file:${basedir}/gen/final" />
             <arg value="-installIU" />
             <arg value="de.uni-hildesheim.sse.qualiMasterApplication" />
+            <arg value="-destination"/>
+            <arg value="${basedir}/gen/final/win32.win32.x86_64"/>
             <arg value="-profileProperties" />
             <arg value="org.eclipse.update.install.features=true" />
-        	<arg value="-p2.os" />
-        	<arg value="${test.eclipse.os}" />
+            	<arg value="-p2.os" />
+        	<arg value="win32" />
         	<arg value="-p2.ws" />
-        	<arg value="${test.eclipse.ws}" />
+        	<arg value="win32" />
         	<arg value="-p2.arch" />
-        	<arg value="${test.eclipse.arch}" />
-        </java-->
+        	<arg value="x86_64" />
+        </java>
+<!-- "gtk.linux.x86_64,win32.win32.x86_64" />-->
     </target>
     
     <target name="zip.Site">
