@@ -612,8 +612,10 @@ public class PipelineDiagramUtils {
         
             if (eContents.get(j) instanceof FlowImpl) {
                 adapter.resetFlow(eContents.get(j), param);
+                adapter.removeTooltip(eContents.get(j));
             } else {
                 adapter.resetNode(eContents.get(j), param);
+                adapter.removeTooltip(eContents.get(j));
             }
         }
     }
