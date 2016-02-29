@@ -65,7 +65,7 @@ public class AdaptationEventsLogView extends ViewPart {
         table.setLinesVisible(true);
         table.setHeaderVisible(true);
         String[] titles = {"Time", "Pipeline", "Element", "Description"};
-        int[] defColumnSizes = {180, 75, 75, 280};
+        int[] defColumnSizes = {100, 85, 85, 350};
         Assert.isTrue(titles.length == defColumnSizes.length, "Same amount of titles and column "
             + "sizes must be specified.");
         for (int i = 0; i < titles.length; i++) {

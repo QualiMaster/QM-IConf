@@ -17,6 +17,7 @@ package de.uni_hildesheim.sse.qmApp.tabbedViews.adaptation;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -120,10 +121,11 @@ public class AdaptationEventsViewModel implements IStructuredContentProvider  {
     public void save(File target) throws IOException {
         CSVWriter writer = null;
         try {
+            SimpleDateFormat dateFormater = new SimpleDateFormat("EEE, MMM d, ''yy 'at' HH:mm:ss z");
             writer = new CSVWriter(target, true, ";", "\n");
             for (int i = 0, end = items.size(); i < end; i++) {
                 AdaptationViewItem item = items.get(i);
-                writer.writeLine(AdaptationColumnProvider.FORMATER.format(new Date(item.getTimestamp())),
+                writer.writeLine(dateFormater.format(new Date(item.getTimestamp())),
                     item.getPipelineName(), item.getElement(), item.getDescription());
             }
         } finally {
