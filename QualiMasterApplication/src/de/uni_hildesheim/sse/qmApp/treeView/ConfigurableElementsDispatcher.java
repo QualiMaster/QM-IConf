@@ -125,11 +125,11 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
             String pipelineName = part.substring(0, pos);
             String pipelineElementName = part.substring(pos + 1);
             markPipeline(pipelineName, pipelineElementName, 
-                getPipelineStatusIndicator(pipelineName, observations));
+                getPipelineStatusIndicator(pipelineName, pipelineElementName, observations));
         } else {
             ConfigurableElement node = findPipeline(part);
             if (null != node) {
-                setStatus(node, getPipelineStatusIndicator(part, observations));
+                setStatus(node, getPipelineStatusIndicator(part, null, observations));
             }
         }
     }
@@ -171,26 +171,38 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
     /**
      * Returns a heuristic pipeline status indicator.
      * 
-     * @param part the part name
+     * @param pipeline the name of the pipeline
+     * @param element the pipeline element (may be <b>null</b>)
      * @param observations the actual observations to derive the indicator from
      * @return the status indicator
      */
-    private ElementStatusIndicator getPipelineStatusIndicator(String part, Map<String, Double> observations) {
+    private ElementStatusIndicator getPipelineStatusIndicator(String pipeline, String element, 
+        Map<String, Double> observations) {
         ElementStatusIndicator result = ElementStatusIndicator.NONE;
         Double throughput = observations.get(QmObservables.TIMEBEHAVIOR_THROUGHPUT_ITEMS);
+        
+        double center = 500;
+        /*if ("SwitchPip".equals(pipeline)) {
+            center = 500;
+        } else {
+            center = 1000;
+        }*/
+        double low = center * 0.8;
+        double high = center * 0.8;
+        
         Double items = observations.get(QmObservables.SCALABILITY_ITEMS);
         if (null == throughput || null == items) {
             result = ElementStatusIndicator.NONE;
         } else {
             if (null != items) {
-                if (items < 800) {
-                    result = ElementStatusIndicator.HIGH;
-                } else if (items < 1000) {
+                if (items < low) {
                     result = ElementStatusIndicator.LOW;
-                } else if (items < 1200) {
+                } else if (items < center) {
                     result = ElementStatusIndicator.MEDIUM;
+                } else if (items < high) {
+                    result = ElementStatusIndicator.LOW;
                 } else {
-                    result = ElementStatusIndicator.HIGH;
+                    result = ElementStatusIndicator.VERYLOW;
                 }
             } 
             if (null != throughput && throughput < 10) {
