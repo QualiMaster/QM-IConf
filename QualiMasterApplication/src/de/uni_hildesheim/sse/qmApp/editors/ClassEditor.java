@@ -15,6 +15,14 @@
  */
 package de.uni_hildesheim.sse.qmApp.editors;
 
+import static eu.qualimaster.easy.extension.QmConstants.SLOT_ALGORITHM_TOPOLOGYCLASS;
+import static eu.qualimaster.easy.extension.QmConstants.SLOT_INPUT;
+import static eu.qualimaster.easy.extension.QmConstants.SLOT_OUTPUT;
+import static eu.qualimaster.easy.extension.QmConstants.SLOT_PARAMETERS;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_ALGORITHM;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_DATASINK;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_DATASOURCE;
+
 import java.lang.reflect.InvocationTargetException;
 import java.text.Collator;
 import java.util.ArrayList;
@@ -82,13 +90,14 @@ import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.dialogs.DialogsUtil;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
+import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
 import de.uni_hildesheim.sse.utils.progress.ProgressObserver;
-import static eu.qualimaster.easy.extension.QmConstants.*;
 import eu.qualimaster.manifestUtils.ManifestConnection;
 import eu.qualimaster.manifestUtils.data.Field;
 import eu.qualimaster.manifestUtils.data.Item;
 import eu.qualimaster.manifestUtils.data.Manifest.ManifestType;
 import eu.qualimaster.manifestUtils.data.Parameter;
+import qualimasterapplication.Activator;
 
 /**
  * The {@link ArtifactEditor} specializes {@link AbstractTextSelectionEditorCreator} to select from a 
@@ -133,9 +142,22 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             int res = dlg.open();
             String cls = dlg.getFirstResult();
             if (Window.OK == res && null != cls) {
-                updater.updateText(cls);
+                boolean changed = false;
+                try {
+                    Value clsValue = ValueFactory.createValue(context.getDeclaration().getType(), cls);
+                    context.setValue(clsValue, AssignmentState.ASSIGNED);
+                    changed = true;
+                } catch (ValueDoesNotMatchTypeException e) {
+                    EASyLoggerFactory.INSTANCE.getLogger(ClassEditor.class, Activator.PLUGIN_ID).exception(e);
+                } catch (ConfigurationException e) {
+                    EASyLoggerFactory.INSTANCE.getLogger(ClassEditor.class, Activator.PLUGIN_ID).exception(e);
+                }
                 updateArtifactInfo(cls, ManifestConnection.getArtifactId(artifact), context);
-                updateEditors(getTitle(context));
+                if (changed) {
+                    updateEditors(getTitle(context));
+                } else {
+                    updater.updateText(cls);
+                }
             }
             
         } else {
@@ -158,13 +180,6 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             IEditorPart editor = allOpenEditors[i].getEditor(false);
             if (editor instanceof VariableEditor && editor.getTitle().equals(title)) {
                 VariableEditor varEditor = (VariableEditor) editor;
-//                for (int j = 0; j < varEditor.getEditorCount(); j++) {
-//                    if (varEditor.getEditor(j) instanceof ParameterEditor) {
-//                        ((ParameterEditor) varEditor.getEditor(j)).refresh();
-//                    } else if (varEditor.getEditor(j) instanceof TuplesEditor) {
-//                        ((TuplesEditor) varEditor.getEditor(j)).refresh();
-//                    }
-//                }
                 varEditor.refreshNestedEditors();
                 informEditor(varEditor);
             }
