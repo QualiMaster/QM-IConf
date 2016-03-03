@@ -110,8 +110,24 @@ public class PipelineTranslationOperations {
      * 
      * @param fileURI the Eclipse URI to create the IVML file
      * @return the name of the pipeline in <code>fileURI</code> (may be <b>null</b> if not found / configured)
+     * @throws PipelineTranslationException in case of illegal pipeline structures
      */
-    public static String translationFromEcoregraphToIVMLfile(URI fileURI) {
+    public static String translationFromEcoregraphToIVMLfile(URI fileURI) throws PipelineTranslationException {
+        // get pipeline list - one editor for one pipeline
+        List<Pipeline> pipelineList = PipelineDiagramUtils.getPipeline(fileURI);
+        return translationFromEcoregraphToIVMLfile(fileURI, pipelineList);
+    }
+    
+    /**
+     * Translates the Ecore pipeline diagram to IVML model file.
+     * 
+     * @param fileURI the Eclipse URI to create the IVML file
+     * @param pipelineList write the given pipelines
+     * @return the name of the pipeline in <code>fileURI</code> (may be <b>null</b> if not found / configured)
+     * @throws PipelineTranslationException in case of illegal pipeline structures
+     */
+    public static String translationFromEcoregraphToIVMLfile(URI fileURI, List<Pipeline> pipelineList) 
+        throws PipelineTranslationException {
         sourceCount = 0;
         flowCount = 0;
         familyelementCount = 0;
@@ -123,8 +139,6 @@ public class PipelineTranslationOperations {
         processedflows = new ArrayList<Flow>();
         // create a temporary IVML project (not registered with VarModel, no model listeners)
         Project newProject = new Project(PipelineDiagramUtils.getModelName(fileURI) + QmConstants.CFG_POSTFIX);
-        // get pipeline list - one editor for one pipeline
-        List<Pipeline> pipelineList = PipelineDiagramUtils.getPipeline(fileURI);
         // for collecting all freezables
         freezables = new ArrayList<IFreezable>();
         // add imports
@@ -257,8 +271,9 @@ public class PipelineTranslationOperations {
     /**
      * Handles the disconnected elements in the pipeline.
      * @param newProject the project to write
+     * @throws PipelineTranslationException in case of illegal pipeline structures
      */
-    public static void handleDisconnectedElements(Project newProject) {
+    public static void handleDisconnectedElements(Project newProject) throws PipelineTranslationException {
         flows.removeAll(processedflows); //remove all already-processed flows
         //handle the pipeline element linked to the unprocessed flows
         if (flows.size() > 0) {                
@@ -306,8 +321,10 @@ public class PipelineTranslationOperations {
      * Handle the pipeline node translating to IVML notation.
      * @param pipelineNode the pipeline node to be handled
      * @param destProject the project to be written
+     * @throws PipelineTranslationException in case of illegal pipeline structures
      */
-    public static void handlePipelineNodes(PipelineNode pipelineNode, Project destProject) {
+    public static void handlePipelineNodes(PipelineNode pipelineNode, Project destProject) 
+        throws PipelineTranslationException {
         if ((pipelineNode instanceof Source) && !(pipProcessedNodes.contains((Source) pipelineNode))) {
             Source source = (Source) pipelineNode;
             addPipelineElement(source, destProject);
@@ -340,6 +357,21 @@ public class PipelineTranslationOperations {
     }   
     
     /**
+     * Turns an EList into a list in order to avoid accidental model write operations.
+     * 
+     * @param <T> thel element type
+     * @param list the list
+     * @return the result list
+     */
+    private static <T> List<T> toList(EList<T> list) {
+        List<T> result = new ArrayList<T>();
+        for (int e = 0; e < list.size(); e++) {
+            result.add(list.get(e));
+        }
+        return result;
+    }
+    
+    /**
      * Adds <code>pipeline</code> to the project.
      * 
      * @param pipeline
@@ -347,9 +379,10 @@ public class PipelineTranslationOperations {
      * @param destProject
      *            the project to add pipeline element to
      * @return the variable name of the pipeline
+     * @throws PipelineTranslationException in case of illegal pipeline structures
      */
     public static DecisionVariableDeclaration addPipelineElement(
-            Pipeline pipeline, Project destProject) {
+            Pipeline pipeline, Project destProject) throws PipelineTranslationException {
 
         // define pipeline
         DecisionVariableDeclaration pipelineVariable = IVMLModelOperations
@@ -358,8 +391,8 @@ public class PipelineTranslationOperations {
         freezables.add(pipelineVariable);
         destProject.add(pipelineVariable);
         //get all pipeline nodes and flows
-        pipNodes = pipeline.getNodes();
-        flows = pipeline.getFlows();
+        pipNodes = toList(pipeline.getNodes());
+        flows = toList(pipeline.getFlows());
         // construct the compound variables
         Map<String, Object> pipelineCompound = new HashMap<String, Object>();
         if (pipeline.getName() != null) {
@@ -424,8 +457,9 @@ public class PipelineTranslationOperations {
      * @param destProject
      *            the project to add to
      * @return the variable name of the source
+     * @throws PipelineTranslationException in case of illegal pipeline structures
      */
-    public static String addPipelineElement(Source source, Project destProject) {
+    public static String addPipelineElement(Source source, Project destProject) throws PipelineTranslationException {
         DecisionVariableDeclaration decisionVariable = null;
         // define source
         decisionVariable = IVMLModelOperations.getDecisionVariable(
@@ -478,8 +512,9 @@ public class PipelineTranslationOperations {
      * @param destProject
      *            the project to add to
      * @return the variable name of the flow
+     * @throws PipelineTranslationException in case of illegal flows
      */
-    public static String addPipelineElement(Flow flow, Project destProject) {
+    public static String addPipelineElement(Flow flow, Project destProject) throws PipelineTranslationException {
 
         // define flow
         DecisionVariableDeclaration flowVariable = IVMLModelOperations
@@ -503,7 +538,12 @@ public class PipelineTranslationOperations {
             flowCompound.put("grouping", grouping[flow.getGrouping()].name());
         }
         String destination = null;
-        if (flow.getDestination() instanceof FamilyElement) {
+        
+        if (flow.getDestination() instanceof Source) {
+            throw new PipelineTranslationException("Illegal flow target (source).");
+        } else if (flow.getSource() instanceof Sink) {
+            throw new PipelineTranslationException("Illegal flow source (sink).");
+        } else if (flow.getDestination() instanceof FamilyElement) {
             FamilyElement fe = (FamilyElement) flow.getDestination();
             if (!(familyNodesAndName.containsKey(fe))) {
                 destination = addPipelineElement(
@@ -515,12 +555,14 @@ public class PipelineTranslationOperations {
         } else if (flow.getDestination() instanceof DataManagementElement) {
             destination = addPipelineElement((DataManagementElement) flow.getDestination(),
                     destProject);
+        } else if (flow.getDestination() instanceof Source) {
+            throw new PipelineTranslationException("Illegal flow target");
         } else {
-            if (!(sinkNodesAndName.containsKey((Sink) flow.getDestination()))) {
-                destination = addPipelineElement((Sink) flow.getDestination(),
-                         destProject);
+            Sink sink = (Sink) flow.getDestination();
+            if (!(sinkNodesAndName.containsKey(sink))) {
+                destination = addPipelineElement(sink, destProject);
             } else {
-                destination = sinkNodesAndName.get((Sink) flow.getDestination());
+                destination = sinkNodesAndName.get(sink);
             }
         }
         if (destination != null) {
@@ -545,9 +587,10 @@ public class PipelineTranslationOperations {
      * @param destProject
      *            the project to add to
      * @return the variable name of the family element
+     * @throws PipelineTranslationException in case of illegal pipeline structures
      */
     public static String addPipelineElement(FamilyElement familyElement,
-            Project destProject) {
+            Project destProject) throws PipelineTranslationException {
         DecisionVariableDeclaration decisionVariable = null;
         // define familyelement
         decisionVariable = IVMLModelOperations.getDecisionVariable(
@@ -605,8 +648,10 @@ public class PipelineTranslationOperations {
      * @param destProject
      *            the project to add to
      * @return the variable name of the dataManagementElement
+     * @throws PipelineTranslationException in case of illegal pipeline structures
      */
-    public static String addPipelineElement(DataManagementElement dataManagementElement, Project destProject) {
+    public static String addPipelineElement(DataManagementElement dataManagementElement, Project destProject) 
+        throws PipelineTranslationException {
         DecisionVariableDeclaration decisionVariable = null;
         // define dataManagementElement
         decisionVariable = IVMLModelOperations.getDecisionVariable(
@@ -661,8 +706,9 @@ public class PipelineTranslationOperations {
      * @param destProject
      *            the project to add to
      * @return the variable name of the sink
+     * @throws PipelineTranslationException in case of illegal pipeline structures
      */
-    public static String addPipelineElement(Sink sink, Project destProject) {
+    public static String addPipelineElement(Sink sink, Project destProject) throws PipelineTranslationException {
         DecisionVariableDeclaration decisionVariable = null;
         // define sink
         decisionVariable = IVMLModelOperations.getDecisionVariable(
@@ -698,6 +744,10 @@ public class PipelineTranslationOperations {
                 decisionVariable, destProject));
         sinkNodesAndName.put(sink, decisionVariable.getName());
         pipProcessedNodes.add(sink);
+        List<Flow> srcOutput = getOutput(sink);
+        if (!srcOutput.isEmpty()) {
+            throw new PipelineTranslationException("Illegal outgoing flows from sink '" + sink.getName() + "'");
+        }
         return decisionVariable.getName();
     }
     
