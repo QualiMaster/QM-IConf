@@ -24,6 +24,8 @@ public class Manifest extends Algorithm {
     private String provider = null;
     /**The manifestType.*/
     private ManifestType mType = ManifestType.UNKNOWN;
+    /**The description of the manifest.*/
+    private String description = null;
     
     /**
      * Represents the type of manifest that was read.
@@ -162,6 +164,14 @@ public class Manifest extends Algorithm {
     }
     
     /**
+     * Sets the Description of the manifest. Can be set to null.
+     * @param desc The actual description as String. Can be null.
+     */
+    public void setDescription(String desc) {
+        this.description = desc;
+    }
+    
+    /**
      * Sets the provider of this manifest. Can be null.
      * @param provider The provider as String or null.
      */
@@ -219,6 +229,14 @@ public class Manifest extends Algorithm {
      */
     public ManifestType getType() {
         return this.mType;
+    }
+    
+    /**
+     * Returns the description of the manifest. Can be null.
+     * @return The description of the manifest. Can be null.
+     */
+    public String getDescription() {
+        return this.description;
     }
     
     
