@@ -282,14 +282,14 @@ public class ConstraintsEditor extends AbstractTableEditor {
      */
     static TableViewer createTableViewer(Composite parent, boolean columnTitle) {
         TableViewer tableViewer = new TableViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
-        Table table = tableViewer.getTable(); // TODO increase size to 3 lines
+        Table table = tableViewer.getTable();
         TableLayout layout = new TableLayout();
         table.setLayout(layout);
         table.setHeaderVisible(columnTitle);
         table.setLinesVisible(true);
 
         TableColumn objectColumn = new TableColumn(table, SWT.NONE);
-        layout.addColumnData(new ColumnWeightData(3, 30, true));
+        layout.addColumnData(new ColumnWeightData(3, 500, true));
         if (!columnTitle) {
             objectColumn.setText("constraint"); 
         }
