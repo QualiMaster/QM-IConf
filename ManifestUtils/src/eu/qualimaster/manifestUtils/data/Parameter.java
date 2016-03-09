@@ -1,6 +1,5 @@
 package eu.qualimaster.manifestUtils.data;
 
-//TODO: default value!!!
 /**
  * Represents a singular Parameter of an Algorithm.
  * @author pastuschek

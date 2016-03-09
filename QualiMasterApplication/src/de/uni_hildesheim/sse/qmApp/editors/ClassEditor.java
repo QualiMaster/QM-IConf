@@ -15,6 +15,7 @@
  */
 package de.uni_hildesheim.sse.qmApp.editors;
 
+import static eu.qualimaster.easy.extension.QmConstants.SLOT_ALGORITHM_DESCRIPTION;
 import static eu.qualimaster.easy.extension.QmConstants.SLOT_ALGORITHM_TOPOLOGYCLASS;
 import static eu.qualimaster.easy.extension.QmConstants.SLOT_INPUT;
 import static eu.qualimaster.easy.extension.QmConstants.SLOT_OUTPUT;
@@ -36,7 +37,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -95,6 +95,7 @@ import de.uni_hildesheim.sse.utils.progress.ProgressObserver;
 import eu.qualimaster.manifestUtils.ManifestConnection;
 import eu.qualimaster.manifestUtils.data.Field;
 import eu.qualimaster.manifestUtils.data.Item;
+import eu.qualimaster.manifestUtils.data.Manifest;
 import eu.qualimaster.manifestUtils.data.Manifest.ManifestType;
 import eu.qualimaster.manifestUtils.data.Parameter;
 import qualimasterapplication.Activator;
@@ -132,7 +133,7 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             
             createProgressDialog(DialogsUtil.getActiveShell());
             
-            List<String> list = con.getAllValidClasses();
+            List<String> list = con.getAllValidClasses(ManifestConnection.getArtifactId(artifact));
             for (String s : list) {
                 classes.add(s);
             }
@@ -207,12 +208,20 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
      * @param context The current context.
      */
     private void updateArtifactInfo(String className, String artifactId, IDecisionVariable context) {
+        
         List<Item> input = con.getInput(className, artifactId);
         List<Item> output = con.getOutput(className, artifactId);
         List<Parameter> param = con.getParameters(className, artifactId);
-        ManifestType type = con.getType(className, artifactId);
+        Manifest uManifest = con.getUnderlyingManifest(artifactId);
+        ManifestType type = ManifestType.UNKNOWN;
         
         IDecisionVariable var = (IDecisionVariable) context.getParent();
+        
+        if (null == uManifest) {
+            Dialogs.showErrorDialog("No manifest", "No manifest could be found!");
+        } else {
+            type = uManifest.getType();
+        }
         
         if (takeOverValues(var, type)) {
             createMap(var);
@@ -245,10 +254,12 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             addInOut(output, outputVars, false);
             addParameter(param, parameterVars);
             setTopoClass(var, type, className);
-            System.out.println("Updated INPUT...");
+            if (null != uManifest) {
+                setDescription(var, uManifest.getDescription());
+            }
             ModelAccess.freezeAgain(var);
         }
-        // TODO information message if there is no manifest?
+        
     }
 
     /**
@@ -301,7 +312,7 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             if (!result) {
                 int msgCode = Dialogs.showInfoConfirmDialog(ERROR_PREFIX, "Type in manifest does not match type of "
                     + "configurable element. Take manifest information over (where applicable) anyway?");
-                if (Dialog.OK == msgCode) {
+                if (SWT.YES == msgCode) {
                     result = true;
                 }
             }
@@ -338,7 +349,25 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
                 topo.setValue(value, AssignmentState.ASSIGNED);
             }
         } catch (ConfigurationException | ValueDoesNotMatchTypeException e) {
-            Dialogs.showErrorDialog(ERROR_PREFIX, "Cannot set topology name" + e.getMessage());
+            Dialogs.showErrorDialog(ERROR_PREFIX, "Cannot set topology name: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Sets the description (usually extracted from the manifest).
+     * 
+     * @param var The decision variable to modify.
+     * @param description The actual description.
+     */
+    private void setDescription(IDecisionVariable var, String description) {
+        if (null != var && null != description && !description.isEmpty()) {
+            try {
+                IDecisionVariable descVar = var.getNestedElement(SLOT_ALGORITHM_DESCRIPTION);
+                Value value = ValueFactory.createValue(StringType.TYPE, description);
+                descVar.setValue(value, AssignmentState.ASSIGNED);
+            } catch (ConfigurationException | ValueDoesNotMatchTypeException e) {
+                Dialogs.showErrorDialog(ERROR_PREFIX, "Cannot set description: " + e.getMessage());
+            }
         }
     }
     

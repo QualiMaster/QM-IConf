@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +43,7 @@ public class ManifestParser {
     private static final String PROVIDES = "provides";
     private static final String ALGORITHM = "algorithm";
     private static final String BYPASS = "bypass";
+    private static final String DESCRIPTION = "description";
     //private static final String STATIC = "static";
     private static final String INPUT = "input";
     private static final String OUTPUT = "output";
@@ -122,7 +122,8 @@ public class ManifestParser {
                 
             }
             
-            doc.getDocumentElement(); //Element elem = 
+            
+            //doc.getDocumentElement(); //Element elem = 
             
             //printTree(elem);
             family = analyseManifest(doc);
@@ -211,7 +212,7 @@ public class ManifestParser {
      */
     private Manifest analyseManifest(Document doc) {
         
-        Manifest family = new Manifest("Test");
+        Manifest family = new Manifest("Manifest");
         ManifestType mType = null;
         
         Element elem = doc.getDocumentElement();
@@ -243,7 +244,7 @@ public class ManifestParser {
             
         }
         
-        if (family.getMembers().size() > 1 && mType == ManifestType.SINGLE_HARDWARE) {
+        if (null != family.getMembers() && family.getMembers().size() > 1 && mType == ManifestType.SINGLE_HARDWARE) {
             
             mType = ManifestType.MULTI_HARDWARE;
             
@@ -300,12 +301,11 @@ public class ManifestParser {
      */
     private void readProvides(ManifestType mType, Node node, Manifest family) {
         
-        if (PROVIDES.equals(node.getNodeName())) {
+        if (null != node && PROVIDES.equals(node.getNodeName())) {
             
-            Node item = node.getAttributes().item(0);
-            
+            Node item = node.getAttributes().item(0);   
             mType = readClass(mType, item, family);
-            if (null != mType) {
+            if (null != mType && null != family) {
                 family.setType(mType);
                 family.setProvider(item.getNodeValue());
             }
@@ -334,13 +334,12 @@ public class ManifestParser {
                             
                             String name = subNode2.getAttributes().getNamedItem(NAME).getNodeValue();
                             String type = subNode2.getAttributes().getNamedItem(TYPE).getNodeValue();
-                            
                             try {     
                                 Parameter param = new Parameter(name, Parameter.ParameterType
                                         .valueOf(type.toUpperCase()));
                                 algorithm.addParameter(param);               
                             } catch (IllegalArgumentException exc) {  
-                                System.out.println("[ERROR:] Illegal Parameter: ");   
+                                System.out.println("[ERROR:] Illegal Parameter: " + type);   
                             }  
                             
                         } else if (FLOW.equals(subNode2.getNodeName())) {       
@@ -356,11 +355,13 @@ public class ManifestParser {
                             }              
                         }                  
                     }              
-                    if (null != algorithm) {
+                    if (null != algorithm && null != family) {
                         family.addMember(algorithm);
                     }       
                 } else if (COMPONENT.equals(subNode.getNodeName())) {             
                     subNode.getAttributes().getNamedItem(CLASS).getNodeValue(); //String fgn =        
+                } else if (DESCRIPTION.equals(subNode.getNodeName())) {
+                    family.setDescription(ManifestParser.normalizeText(subNode.getTextContent()));
                 }
                 
             }
@@ -375,13 +376,13 @@ public class ManifestParser {
      */
     private void readQuality(Node node) {
         
-        if (QUALITY.equals(node.getNodeName())) {
+        if (null != node && QUALITY.equals(node.getNodeName())) {
             
             for (int j = 0; j < node.getChildNodes().getLength(); j++) {
                 
                 Node subNode = node.getChildNodes().item(j);
             
-                if (BYPASS.equals(subNode.getNodeName())) {
+                if (null != subNode && BYPASS.equals(subNode.getNodeName())) {
                     System.out.println("");   //TODO: handle this                 
                 } else if (QUALITY_PARAMETER.equals(subNode.getNodeName())) {
                     
@@ -859,33 +860,63 @@ public class ManifestParser {
     }
     
     /**
+     * Normalizes XML text content.
+     * @param text The original text content. Null will return null.
+     * @return The normalized text content. If null is the input, null will be the output aswell.
+     */
+    public static String normalizeText(String text) {
+        
+        String result = "";
+        
+        if (null != text) {
+            
+            String[] splitted = text.split("\r?\n|\r");
+            for (int i = 0; i < splitted.length; i++) {
+                result += splitted[i].trim();
+                if (i < splitted.length - 1) {
+                    result += System.lineSeparator();
+                }
+            }
+            
+        } else {
+            result = null;
+        }
+        
+        return result;
+        
+    }
+    
+    /**
      * Just for testing purposes!
      * @param args main args.
      */
     public static void main(String[] args) {
         
+//        ManifestParser mp = new ManifestParser();
+//        String name = "eu.qualimaster.algorithms.imp.correlation.hardwaresubtopology.
+        //TopoHardwareCorrelationFinancial";
+//        
+//        List<URL> urls = mp.loadJars("C:/.m2/repository/ivy");
+//        URL[] u = new URL[1];
+//        
+//        Class<?> cs = null;
+//        URLClassLoader loader = new URLClassLoader(urls.toArray(u));
+//
+//        try {
+//            cs = loader.loadClass(name);
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        
+//        Manifest manifest = mp.createFromClass(cs);
+//        mp.writeToFile(new File("C:/Test/manifest.xml"), manifest);
+//        try {
+//            loader.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         ManifestParser mp = new ManifestParser();
-        String name = "eu.qualimaster.algorithms.imp.correlation.hardwaresubtopology.TopoHardwareCorrelationFinancial";
-        
-        List<URL> urls = mp.loadJars("C:/.m2/repository/ivy");
-        URL[] u = new URL[1];
-        
-        Class<?> cs = null;
-        URLClassLoader loader = new URLClassLoader(urls.toArray(u));
-
-        try {
-            cs = loader.loadClass(name);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        
-        Manifest manifest = mp.createFromClass(cs);
-        mp.writeToFile(new File("C:/Test/manifest.xml"), manifest);
-        try {
-            loader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        mp.parseFile(new File("C:/Test/manifest.xml"));
         
     }
     
