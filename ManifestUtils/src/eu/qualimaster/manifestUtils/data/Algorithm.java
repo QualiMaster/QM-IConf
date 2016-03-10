@@ -25,7 +25,7 @@ public class Algorithm {
     private List<Item> input = new ArrayList<Item>();
     /**A list of output items.*/
     private List<Item> output = new ArrayList<Item>();
-    
+    /**A list of all parameters of this algorithm.*/
     private List<Parameter> parameters = new ArrayList<Parameter>();
     
     /**Empty (default) constructor.*/

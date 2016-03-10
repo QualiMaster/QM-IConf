@@ -51,7 +51,6 @@ import eu.qualimaster.manifestUtils.data.FieldType;
 import eu.qualimaster.manifestUtils.data.Item;
 import eu.qualimaster.manifestUtils.data.JarInfo;
 import eu.qualimaster.manifestUtils.data.Manifest;
-import eu.qualimaster.manifestUtils.data.Manifest.ManifestType;
 import eu.qualimaster.manifestUtils.data.Parameter;
 import eu.qualimaster.manifestUtils.data.Parameter.ParameterType;
 
@@ -254,6 +253,22 @@ public class ManifestConnection {
         ivySettings.setDefaultResolver(chainResolver.getName());
         this.ivy = Ivy.newInstance(ivySettings);
         
+    }
+    
+    /**
+     * Returns the underlying manifest (i.e the one that was provided).
+     * @param artifactId the id of the artifact for which the manifest is required.
+     * @return The underlying manifest, or null.
+     */
+    public Manifest getUnderlyingManifest(String artifactId) {
+        Manifest manifest = null;
+        
+        if (null != artifactId && extractManifest(artifactId)) {
+            ManifestParser mp = new ManifestParser();
+            manifest = mp.parseFile(new File(out + "/manifest.xml"));
+        } 
+        
+        return manifest;
     }
     
     /**
@@ -497,15 +512,7 @@ public class ManifestConnection {
         
         try {
             URL[] urls = new URL[1];
-            loader = new URLClassLoader(loadJars(out.getAbsolutePath()).toArray(urls));
-            
-            if (extractManifest(artifactId)) {
-                ManifestParser mp = new ManifestParser();
-                Manifest manifest = mp.parseFile(new File(out + "/manifest.xml"));
-                if (null != manifest.getProvider()) {
-                    name = manifest.getProvider();
-                }    
-            } 
+            loader = new URLClassLoader(loadJars(out.getAbsolutePath()).toArray(urls)); 
             
             if (null != name && !name.isEmpty()) {
                 
@@ -529,41 +536,6 @@ public class ManifestConnection {
             }             
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } finally {
-            if (null != loader) {
-                try {
-                    loader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return result;      
-    }
-    
-    /**
-     * Returns the type of the manifest.
-     * 
-     * @param name The name of the class. Can be null?
-     * @param artifactId the id of the artifact.
-     * @return the type or {@link ManifestType#UNKNOWN}
-     */
-    public ManifestType getType(String name, String artifactId) {
-        ManifestType result = ManifestType.UNKNOWN;
-
-        // TODO REFACTOR - load Manifest only once!
-        URLClassLoader loader = null;
-        try {
-            URL[] urls = new URL[1];
-            loader = new URLClassLoader(loadJars(out.getAbsolutePath()).toArray(urls));
-
-            if (extractManifest(artifactId)) {
-                ManifestParser mp = new ManifestParser();
-                Manifest manifest = mp.parseFile(new File(out + "/manifest.xml"));
-                result = manifest.getType();
-            }
         } catch (SecurityException e) {
             e.printStackTrace();
         } finally {
@@ -1517,12 +1489,54 @@ public class ManifestConnection {
     public List<String> getAllValidClasses() {
      
         List<String> result = new ArrayList<String>();
-     
+        
         //getAllValidClasses would only choose classes with a calculate method, getAllClasses will get ALL classes.
         result.addAll(getAllClasses(this.getJarFiles(this.getLastReport())));
      
         return result;
      
+    }
+    
+    /**
+     * Returns all valid classes for the given artifactID.
+     * i.e. Checks the manifest for information about the implementing class.
+     * @param artifactId The name of the artifact.
+     * @return A list of possible implementing classes (if the manifest specifies the implementing class,
+     * then the list should only contain a single element). If the manifest does not specify an implementing class,
+     * or the specified class does not exist, then all classes inside the main artifact(jar) are returned.
+     */
+    public List<String> getAllValidClasses(String artifactId) {
+        
+        String className = null;
+        List<String> result = new ArrayList<String>();
+        List<String> preResult = getAllValidClasses();
+        
+        //Check for implementing classes defined by the manifest.
+        if (null != artifactId && extractManifest(artifactId)) {
+            ManifestParser mp = new ManifestParser();
+            Manifest manifest = mp.parseFile(new File(out + "/manifest.xml"));
+            if (null != manifest && null != manifest.getProvider()) {
+                className = manifest.getProvider();
+            }    
+        } 
+        
+        //Check for defined implementing classes (if available)
+        if (null != className) {
+            for (int i = 0; i < preResult.size(); i++) {
+                if (preResult.get(i).equals(className)) {
+                    result.add(preResult.get(i));
+                    break;
+                }
+            }
+        }
+        
+        //if no implementing class was found/available show all possible classes.
+        if (result.isEmpty()) {
+            result.addAll(preResult);
+        }
+        
+        return result;
+        
     }
     
     /**
@@ -1533,18 +1547,13 @@ public class ManifestConnection {
     public List<File> getJarFiles(ResolveReport report) {
      
         List<File> fileList = new ArrayList<File>();
-//        List<String> list = getJarList(report);
      
         String s = report.getArtifacts().get(0).toString();
-     
-         // for (String s : list) {
-//        System.out.println(s);
      
         String wip = s.substring(s.lastIndexOf('!') + 1);
      
         fileList.add(new File(this.out.getAbsolutePath() + "/"
              + wip.substring(0, wip.lastIndexOf(".jar") + 4)));
-         // }
      
         return fileList;
      

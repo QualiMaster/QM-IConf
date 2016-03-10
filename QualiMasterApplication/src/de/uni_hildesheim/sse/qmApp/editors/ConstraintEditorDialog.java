@@ -167,7 +167,7 @@ class ConstraintEditorDialog extends Dialog implements IValidationStateListener 
         tableViewer.getTable().setLayoutData(gridData);
         
         label = new Label(composite, SWT.NONE);
-        label.setText("Constraint (OCL-like syntax, see IVML spec, <Strg>+<Space> = content assist):");
+        label.setText("Constraint (OCL-like syntax, see Help, <Strg>+<Space> = content assist):");
         
         editor = createConstraintEditor(composite, context, constraint);
         gridData = new GridData();
