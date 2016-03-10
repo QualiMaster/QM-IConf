@@ -67,7 +67,7 @@ public class ConnectDialog extends AbstractDialog implements Serializable {
         super(parentShell);
         setBlockOnOpen(true);
     }
-
+    
     /**
      * Creates a Label with the parameter composite as parent and the parameter text as text.
      * @param composite parent composite.
@@ -219,5 +219,12 @@ public class ConnectDialog extends AbstractDialog implements Serializable {
     protected String getTitle() {
         return "Infrastructure connection";
     }
-
+    
+    @Override
+    protected Control createContents(Composite parent) { 
+        Control result = super.createContents(parent);
+        getShell().pack();
+        return result;
+    }
+    
 }
