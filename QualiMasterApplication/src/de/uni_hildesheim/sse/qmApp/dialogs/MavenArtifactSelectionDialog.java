@@ -1,6 +1,5 @@
 package de.uni_hildesheim.sse.qmApp.dialogs;
 
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -63,7 +62,9 @@ import de.uni_hildesheim.sse.repositoryConnector.maven.MavenFetcher.TreeElement;
  */
 public class MavenArtifactSelectionDialog extends Dialog {
 
-    private static final long ACTUAL_TREE_TIME_DIFF = 12 * 60 * 60 * 1000; // 12h in ms
+    private static final long ACTUAL_TREE_TIME_DIFF = 12 * 60 * 60 * 1000; // 12h
+                                                                           // in
+                                                                           // ms
     private static final String REGEX = "^\\d+(\\.\\d+)+(\\-([a-zA-Z])*){0,1}?$";
     private List<TreeElement> mavenList = new ArrayList<TreeElement>();
     private Composite treeContainer;
@@ -80,19 +81,21 @@ public class MavenArtifactSelectionDialog extends Dialog {
     private String initialGroupId;
     private String initialArtifactId;
     private String initialVersion;
-    
+
     /**
      * Constructor.
      * 
-     * @param parentShell the parent shell.
-     * @param artifactEditorUpdater updates the textfield.
+     * @param parentShell
+     *            the parent shell.
+     * @param artifactEditorUpdater
+     *            updates the textfield.
      *
      */
     public MavenArtifactSelectionDialog(Shell parentShell, ITextUpdater artifactEditorUpdater) {
         super(parentShell);
         this.artifactEditorUpdater = artifactEditorUpdater;
     }
-    
+
     /**
      * Returns whether the Maven artifact editor is configured.
      * 
@@ -101,7 +104,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
     public static boolean isConfigured() {
         return MavenFetcher.isConfigured();
     }
- 
+
     /**
      * Run.
      */
@@ -114,7 +117,8 @@ public class MavenArtifactSelectionDialog extends Dialog {
     /**
      * Fill the list with all maven artifacts.
      * 
-     * @param monitor the actual progress monitor
+     * @param monitor
+     *            the actual progress monitor
      */
     private void collectMavenArtifactsOnline(IProgressMonitor monitor) {
         EclipseProgressObserver obs = new EclipseProgressObserver();
@@ -130,8 +134,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
      */
     class ProgressDialogOperation implements IRunnableWithProgress {
         @Override
-        public void run(final IProgressMonitor monitor)
-            throws InvocationTargetException, InterruptedException {
+        public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
             // time consuming work here
             collectMavenArtifactsOnline(monitor);
             monitor.done();
@@ -150,8 +153,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
 
                 @Override
                 protected void setShellStyle(int newShellStyle) {
-                    super.setShellStyle(SWT.CLOSE | SWT.INDETERMINATE
-                            | SWT.BORDER | SWT.TITLE);
+                    super.setShellStyle(SWT.CLOSE | SWT.INDETERMINATE | SWT.BORDER | SWT.TITLE);
                     setBlockOnOpen(false);
                 }
             };
@@ -159,8 +161,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
         } catch (final InvocationTargetException e) {
             MessageDialog.openError(parent.getShell(), "Error", e.getMessage());
         } catch (final InterruptedException e) {
-            MessageDialog.openInformation(parent.getShell(), "Cancelled",
-                    e.getMessage());
+            MessageDialog.openInformation(parent.getShell(), "Cancelled", e.getMessage());
         }
     }
 
@@ -172,15 +173,16 @@ public class MavenArtifactSelectionDialog extends Dialog {
      * @return composite The parent composite.
      */
     protected Control createDialogArea(Composite parent) {
-        if (!getTreeFile().exists()) {
+        if (!getTreeFile().exists()
+                || System.currentTimeMillis() - getTreeFile().lastModified() > ACTUAL_TREE_TIME_DIFF) {
             createProgressDialog(getParentShell());
-        }
+        } 
         final Composite composite = (Composite) super.createDialogArea(parent);
         Image icon = IconManager.retrieveImage(IconManager.MAVEN_DIALOG_ICON);
         composite.getShell().setImage(icon);
         composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         composite.setLayout(new GridLayout(1, true));
-        
+
         treeContainer = new Composite(composite, SWT.BORDER);
         GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
         gridData.widthHint = 500;
@@ -189,19 +191,19 @@ public class MavenArtifactSelectionDialog extends Dialog {
         treeContainer.setLayout(new GridLayout(1, true));
         createTreeViewer(treeContainer);
         setViewerInput(treeContainer);
-        
+
         Composite labels = new Composite(composite, SWT.BORDER);
         labels.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
         labels.setLayout(new GridLayout(1, true));
-        
+
         Composite cacheUpdate = new Composite(composite, SWT.BORDER);
         cacheUpdate.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
         cacheUpdate.setLayout(new GridLayout(1, true));
         Label lastUpdate = new Label(cacheUpdate, SWT.NONE);
         lastUpdate.setText(getLastUpdateToolTipText());
-        
+
         createUserInterface(labels);
-        
+
         composite.addListener(SWT.Traverse, new Listener() {
 
             public void handleEvent(Event evt) {
@@ -212,7 +214,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
         });
         return composite;
     };
-    
+
     /**
      * Set the input for the viewer.
      * 
@@ -238,7 +240,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
             } else {
                 openLocal = true;
             }
-        } 
+        }
         if (openLocal) {
             // open error dialog
             loadTreeLocally();
@@ -288,7 +290,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
         }
         viewer.refresh();
     }
-    
+
     /**
      * Returns the file for storing the Maven tree persistently (offline use).
      * 
@@ -402,7 +404,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
         groupIDToReturn += treePathString.get(0).toString();
         return groupIDToReturn;
     }
-    
+
     /**
      * Returns the cache update tooltip text.
      * 
@@ -441,13 +443,13 @@ public class MavenArtifactSelectionDialog extends Dialog {
                 String artifactID = artifactIDText.getText();
                 String versionID = versionText.getText();
                 if (!groupID.isEmpty() && !artifactID.isEmpty() && !versionID.isEmpty()) {
-                
+
                     if (groupID.endsWith("/") || groupID.endsWith(".")) {
                         groupID = groupID.substring(0, groupID.length() - 1);
                     }
                     artifactEditorUpdater.updateTextAndModel(groupID + ":" + artifactID + ":" + versionID);
-                    
-                    //TODO: notify the ClassEditor! 
+
+                    // TODO: notify the ClassEditor!
                     MavenArtifactSelectionDialog.this.close();
                 } else {
                     Dialogs.showErrorDialog("No artifact selected", "No artifact selected. Please select a file.");
@@ -488,8 +490,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
     public void createUserInterface(Composite labelsContainer) {
         Label header = new Label(labelsContainer, SWT.NONE);
         header.setText("Maven Artifact: ");
-        Font boldFont = new Font(header.getDisplay(), new FontData("Arial", 11,
-                SWT.BOLD));
+        Font boldFont = new Font(header.getDisplay(), new FontData("Arial", 11, SWT.BOLD));
         header.setFont(boldFont);
 
         Composite textArea = new Composite(labelsContainer, SWT.FILL);
@@ -500,8 +501,8 @@ public class MavenArtifactSelectionDialog extends Dialog {
         GridData data = new GridData(GridData.FILL_HORIZONTAL);
         data.widthHint = 350;
         Label groupIDLabel = new Label(textArea, SWT.NONE);
-        groupIDLabel.setText("Group ID:"); 
-        groupIDText = new Text(textArea, SWT.BORDER);  
+        groupIDLabel.setText("Group ID:");
+        groupIDText = new Text(textArea, SWT.BORDER);
         groupIDText.setLayoutData(data);
         if (null != initialGroupId) {
             groupIDText.setText(initialGroupId);
@@ -523,7 +524,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
             versionText.setText(initialVersion);
         }
         createUserInterfaceListeners();
-    }   
+    }
 
     /**
      * Creat5es the listeners for the user interface elements.
@@ -545,12 +546,12 @@ public class MavenArtifactSelectionDialog extends Dialog {
                 if (!updatingTreeSelection) {
                     String groupText = groupIDText.getText().replaceAll("/", ".");
                     String artifactText = artifactIDText.getText().replaceAll("/", ".");
-                    
+
                     if (groupText.endsWith(".")) {
                         groupText = cutOfflastCharacter(groupText);
                     }
                     if (artifactText.endsWith(".")) {
-                        artifactText = cutOfflastCharacter(artifactText); 
+                        artifactText = cutOfflastCharacter(artifactText);
                     }
                     String itemPath = groupText + "." + artifactText;
                     String[] selectedItemPath = itemPath.split("\\.");
@@ -564,13 +565,13 @@ public class MavenArtifactSelectionDialog extends Dialog {
                 if (!updatingTreeSelection) {
                     String groupText = groupIDText.getText().replaceAll("/", ".");
                     String artifactText = artifactIDText.getText().replaceAll("/", ".");
-                    String verText = versionText.getText().replaceAll("/", ".");               
+                    String verText = versionText.getText().replaceAll("/", ".");
                     if (groupText.endsWith(".")) {
                         groupText = cutOfflastCharacter(groupText);
                     }
                     if (artifactText.endsWith(".")) {
-                        artifactText = cutOfflastCharacter(artifactText); 
-                    } //use _ as separator because the versionid contains dots. 
+                        artifactText = cutOfflastCharacter(artifactText);
+                    } // use _ as separator because the versionid contains dots.
                     String itemPath = groupText + "_" + artifactText + "_" + verText;
                     String[] selectedItemPath = itemPath.split("\\_");
                     highlightTreePath(selectedItemPath);
@@ -578,11 +579,12 @@ public class MavenArtifactSelectionDialog extends Dialog {
             }
         });
     }
-    
+
     /**
      * Defines the optional (initial) tree path.
      * 
-     * @param initialTreePath the selected tree path in terms of a Maven artifact spec
+     * @param initialTreePath
+     *            the selected tree path in terms of a Maven artifact spec
      */
     public void setInitialTreePath(String initialTreePath) {
         String[] selectedItemPath = initialTreePath.split(":");
@@ -590,14 +592,17 @@ public class MavenArtifactSelectionDialog extends Dialog {
             initialGroupId = selectedItemPath[0];
             initialArtifactId = selectedItemPath[1];
             initialVersion = selectedItemPath[2];
-            
+
             String[] selector = initialGroupId.split("\\.");
             if (null != selector && selector.length > 0) {
                 List<String> tmp = new ArrayList<String>();
                 for (int s = 0; s < selector.length; s++) {
                     tmp.add(selector[s]);
                 }
-                for (int s = 1; s < selectedItemPath.length; s++) { // selector = [0] -> start with 1
+                for (int s = 1; s < selectedItemPath.length; s++) { // selector
+                                                                    // = [0] ->
+                                                                    // start
+                                                                    // with 1
                     tmp.add(selectedItemPath[s]);
                 }
                 selectedItemPath = new String[tmp.size()];
@@ -609,7 +614,9 @@ public class MavenArtifactSelectionDialog extends Dialog {
 
     /**
      * Highlight a given path in the {@link TreeViewer}.
-     * @param selectedItemPath Given path.
+     * 
+     * @param selectedItemPath
+     *            Given path.
      */
     private void highlightTreePath(String[] selectedItemPath) {
         TreeElement[] treeList = find(viewer, selectedItemPath);
@@ -619,35 +626,40 @@ public class MavenArtifactSelectionDialog extends Dialog {
             viewer.setSelection(new TreeSelection(new TreePath(treeList)));
         }
     }
-    
+
     /**
      * Cut off the last character if it is a ".".
-     * @param input the input-String.
+     * 
+     * @param input
+     *            the input-String.
      * @return The String without ".".
      */
     private String cutOfflastCharacter(String input) {
         String toReturn = "";
-        
+
         if (input.length() > 0 && input.endsWith(".")) {
             toReturn = input.substring(0, input.length() - 1);
         }
-        
+
         return toReturn;
     }
-    
+
     /**
-     * Find the elements in the {@link Viewer} given by their names
-     * in order to highlight their path.
-     * @param viewer The {@link Tree}´s viewer.
-     * @param searchStrings THe item-names to search for.
+     * Find the elements in the {@link Viewer} given by their names in order to
+     * highlight their path.
+     * 
+     * @param viewer
+     *            The {@link Tree}´s viewer.
+     * @param searchStrings
+     *            THe item-names to search for.
      * @return TreeElement[] the found Tree-elements.
      */
     private TreeElement[] find(TreeViewer viewer, String[] searchStrings) {
         List<TreeElement> tmp = new ArrayList<TreeElement>();
-        
+
         boolean found = false;
-        //List<TreeElement> mavenList = MavenFetcher.getElementTree();
-        
+        // List<TreeElement> mavenList = MavenFetcher.getElementTree();
+
         for (int i = 0; !found && i < mavenList.size(); i++) {
             found = find(mavenList.get(i), searchStrings, 0, tmp);
         }
@@ -664,15 +676,19 @@ public class MavenArtifactSelectionDialog extends Dialog {
     }
 
     /**
-     * Recursive method in order to grab the whole tree.
-     * In this recursion all tree-elements are compared with the Strings from the user-input.
-     * Upon that a list with Tree-elements is built which functions as path for the tree.
-     * This tree-path will then be openend.
+     * Recursive method in order to grab the whole tree. In this recursion all
+     * tree-elements are compared with the Strings from the user-input. Upon
+     * that a list with Tree-elements is built which functions as path for the
+     * tree. This tree-path will then be openend.
      * 
-     * @param item Current {@link TreeItem}.
-     * @param searchStrings All the string to look for.
-     * @param pos The current position in the tree.
-     * @param path The path in which we store the several items.
+     * @param item
+     *            Current {@link TreeItem}.
+     * @param searchStrings
+     *            All the string to look for.
+     * @param pos
+     *            The current position in the tree.
+     * @param path
+     *            The path in which we store the several items.
      * @return result true if found. false if not.
      */
     private boolean find(TreeElement item, String[] searchStrings, int pos, List<TreeElement> path) {
@@ -680,7 +696,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
         // if item matches searchStrings[pos]
         boolean result = false;
         String itemName = item.getName();
-        
+
         if (itemName.endsWith("/")) {
             if (itemName.length() > 0) {
                 itemName = itemName.substring(0, itemName.length() - 1);
@@ -695,7 +711,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
         }
         return result;
     }
-    
+
     @Override
     protected void configureShell(Shell newShell) {
 
@@ -792,15 +808,10 @@ public class MavenArtifactSelectionDialog extends Dialog {
                 TreeElement treeElement = (TreeElement) element;
 
                 if (treeElement.getName().matches(REGEX)
-                        || treeElement
-                                .getName()
-                                .substring(0,
-                                        treeElement.getName().length() - 1)
-                                .matches(REGEX)) {
+                        || treeElement.getName().substring(0, treeElement.getName().length() - 1).matches(REGEX)) {
                     toReturn = IconManager.retrieveImage(IconManager.TREE_FILE);
                 } else {
-                    toReturn = IconManager
-                            .retrieveImage(IconManager.TREE_FOLDER);
+                    toReturn = IconManager.retrieveImage(IconManager.TREE_FOLDER);
                 }
             }
             return toReturn;
@@ -812,10 +823,8 @@ public class MavenArtifactSelectionDialog extends Dialog {
             if (element instanceof TreeElement) {
                 TreeElement treeElement = (TreeElement) element;
 
-                if (treeElement.getName() != null
-                        && treeElement.getName().endsWith("/")) {
-                    toReturn = treeElement.getName().substring(0,
-                            treeElement.getName().length() - 1);
+                if (treeElement.getName() != null && treeElement.getName().endsWith("/")) {
+                    toReturn = treeElement.getName().substring(0, treeElement.getName().length() - 1);
                 }
             } else {
                 toReturn = null;
