@@ -779,7 +779,7 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
     }
         
     /**
-     * Adds a hardware machine into within its grouping.
+     * Adds a hardware machine into its grouping.
      * 
      * @param element the configurable element representing the machine
      * @param group the group name (must not be <b>null</b>)
