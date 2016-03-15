@@ -187,7 +187,6 @@ public class MultipleLineText {
      */
     private static class MultiLineCellEditor extends UpdatingCellEditor {
 
-        private IDecisionVariable variable;
         private MultiLineComposite composite;
 
         /**
@@ -198,13 +197,12 @@ public class MultipleLineText {
          * @param parent the UI parent element
          */
         MultiLineCellEditor(UIConfiguration config, IDecisionVariable variable, Composite parent) {
-            super(parent);
-            this.variable = variable;
+            super(config, variable, parent);
         }
         
         @Override
         protected Control createControl(Composite parent) {
-            this.composite = new MultiLineComposite(parent, variable, true);
+            this.composite = new MultiLineComposite(parent, getVariable(), true);
             return composite;
         }
 
@@ -232,11 +230,6 @@ public class MultipleLineText {
                 composite.setValue(value.toString());
                 super.doSetValue(value);
             }
-        }
-
-        @Override
-        public IDecisionVariable getVariable() {
-            return variable;
         }
         
     }

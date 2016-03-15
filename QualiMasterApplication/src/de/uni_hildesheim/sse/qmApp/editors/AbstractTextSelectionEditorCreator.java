@@ -290,8 +290,6 @@ public abstract class AbstractTextSelectionEditorCreator implements IEditorCreat
      */
     private class ArtifactCellEditor extends UpdatingCellEditor {
 
-        private UIConfiguration config;
-        private IDecisionVariable variable;
         private ArtifactComposite composite;
 
         /**
@@ -302,14 +300,12 @@ public abstract class AbstractTextSelectionEditorCreator implements IEditorCreat
          * @param parent the UI parent element
          */
         ArtifactCellEditor(UIConfiguration config, IDecisionVariable variable, Composite parent) {
-            super(parent);
-            this.config = config;
-            this.variable = variable;
+            super(config, variable, parent);
         }
         
         @Override
         protected Control createControl(Composite parent) {
-            this.composite = new ArtifactComposite(config, variable, parent, this);
+            this.composite = new ArtifactComposite(getUiConfiguration(), getVariable(), parent, this);
             return composite;
         }
 
@@ -337,11 +333,6 @@ public abstract class AbstractTextSelectionEditorCreator implements IEditorCreat
                 composite.setValue(value.toString());
                 super.doSetValue(value);
             }
-        }
-
-        @Override
-        public IDecisionVariable getVariable() {
-            return variable;
         }
         
     }
