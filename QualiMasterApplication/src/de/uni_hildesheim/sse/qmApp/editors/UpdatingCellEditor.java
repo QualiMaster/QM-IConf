@@ -20,6 +20,8 @@ import org.eclipse.swt.widgets.Composite;
 
 import de.uni_hildesheim.sse.easy.ui.productline_editor.IUpdateListener;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.IUpdateProvider;
+import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
+import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
 
 /**
  * Implements a cell editor with basic update provider capabilities. Intended as a base class for implementing
@@ -32,36 +34,59 @@ import de.uni_hildesheim.sse.easy.ui.productline_editor.IUpdateProvider;
 public abstract class UpdatingCellEditor extends CellEditor implements IUpdateProvider {
 
     private IUpdateListener listener;
+    private UIConfiguration config;
+    private IDecisionVariable variable;
 
     /**
      * Creates a new cell editor with no control The cell editor has no cell
      * validator.
+
+     * @param config the UI configuration
+     * @param variable the decision variable to create the editor for
      */
-    protected UpdatingCellEditor() {
+    protected UpdatingCellEditor(UIConfiguration config, IDecisionVariable variable) {
         super();
+        this.config = config;
+        this.variable = variable;
     }
 
     /**
      * Creates a new cell editor under the given parent control. The cell editor
      * has no cell validator.
      *
+     * @param config the UI configuration
+     * @param variable the decision variable to create the editor for
      * @param parent the parent control
      */
-    protected UpdatingCellEditor(Composite parent) {
+    protected UpdatingCellEditor(UIConfiguration config, IDecisionVariable variable, Composite parent) {
         super(parent);
+        this.config = config;
+        this.variable = variable;
+        create(parent);
     }
 
     /**
      * Creates a new cell editor under the given parent control. The cell editor
      * has no cell validator.
      *
+     * @param config the UI configuration
+     * @param variable the decision variable to create the editor for
      * @param parent the parent control
      * @param style the style bits
      */
-    protected UpdatingCellEditor(Composite parent, int style) {
+    protected UpdatingCellEditor(UIConfiguration config, IDecisionVariable variable, Composite parent, int style) {
         super(parent, style);
+        this.config = config;
+        this.variable = variable;
     }
-    
+
+    @Override
+    public void create(Composite parent) {
+        if (null != variable) { // defer call into this class until attributes are defined
+            super.create(parent);
+        }
+    }
+
     @Override
     public void refresh() {
         // not relevant here, the value change is the interesting part
@@ -86,4 +111,18 @@ public abstract class UpdatingCellEditor extends CellEditor implements IUpdatePr
         }
     }
 
+    /**
+     * Returns the actual UI configuration.
+     * 
+     * @return the UI configuration
+     */
+    protected UIConfiguration getUiConfiguration() {
+        return config;
+    }
+    
+    @Override
+    public IDecisionVariable getVariable() {
+        return variable;
+    }
+    
 }
