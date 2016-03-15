@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
@@ -386,7 +385,7 @@ class ConstraintEditorDialog extends Dialog implements IValidationStateListener 
      * in the dialog is/are on project level, they will be stated on project level. Else, a refining
      * compound is created and the constraint(s) is/are placed within. We place each constraint into an own 
      * parenthesis and cut this out of the model into prefix / postfix in order to implicitly narrow down the 
-     * content assist 13:43proposal scope.
+     * content assist proposal scope.
      * 
      * @param context the context of the constraint in terms of a variable (potentially a container of 
      *   constraint variables)
@@ -664,14 +663,15 @@ class ConstraintEditorDialog extends Dialog implements IValidationStateListener 
 
     @Override
     public void notifyValidationState(final boolean hasErrors) {
-        getShell().getDisplay().asyncExec(new Runnable() {
+        // not regularly called, button state may be wrong
+        /*getShell().getDisplay().asyncExec(new Runnable() {
 
             @Override
             public void run() {
                 getButton(IDialogConstants.OK_ID).setEnabled(!hasErrors);
             }
             
-        });
+        });*/
     }
     
     @Override
