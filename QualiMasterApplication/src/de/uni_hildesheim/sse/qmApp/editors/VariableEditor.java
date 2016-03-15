@@ -1,13 +1,17 @@
 
 package de.uni_hildesheim.sse.qmApp.editors;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -50,7 +54,10 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     
     private static final String COMPOSITE_STRING = "class org.eclipse.swt.widgets.Composite";
     private static final int MARGIN_RIGHT = 50;
-    //private static final int PREFERRED_WIDTH = 590;
+    
+    //minimum width. If the ScrolledComposites width violates this width, the scrollbar appears.
+    //If ScrolledComposites width is greater than the minimum width, scrollbar is deactivated.
+    private static final int MIN_WIDTH = 600;
     
     private HashMap<Control, ControlDecoration> flawedControls = new HashMap<Control, ControlDecoration>();
     private ScrolledComposite scroll;
@@ -58,6 +65,8 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     
     private DecisionVariableEditorInput input;
     private IDecisionVariable var;
+    
+    private List<ToolTip> tooltipList = new ArrayList<ToolTip>();
     
     @Override
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -105,7 +114,8 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     public final void createPartControl(Composite parent) {
     
         scroll = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
-        //Set expandHorizontal to true, thus the layout will work
+        
+        //Set expandHorizontal to true, thus the layout will work. Take up horizontal space.
         scroll.setExpandHorizontal(true);
         
         inner = new Composite(scroll, SWT.NONE);
@@ -115,7 +125,8 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
         //GridLayout for the editor with two columns
         GridLayout layout = new GridLayout(2, false);
         
-        //Set the margin thus the textfields wont fill completely
+        //Set the margin thus the textfields wont fill completely. 
+        //Thus error-decorators can be shown.
         layout.marginRight = MARGIN_RIGHT;
         
         inner.setLayout(layout);
@@ -133,10 +144,18 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
         applyGridData(inner);
         considerReasoningResults(inner);
         Point p = inner.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-        //p.x = Math.max(p.x, PREFERRED_WIDTH);
         inner.setSize(p);
         inner.layout();
-        
+             
+        scroll.addControlListener(new ControlAdapter() {
+            public void controlResized(ControlEvent exc) {
+
+                //Set minimum width in order to preserve possibility of scrollbar
+                scroll.setMinSize(MIN_WIDTH, SWT.DEFAULT);
+                
+            }
+        });
+
         createAdditionalControls(inner);
        
     }
@@ -216,13 +235,16 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
             decorator.hide();
         }
         
+        //Remove all tooltips
+        for (ToolTip tip : tooltipList) {
+            tip.dispose();
+        }
+
         //Get map which contains errors(variables and messages)
         HashMap<IDecisionVariable, String> errors = Reasoning.getErrors();
         Set<IDecisionVariable> keys = errors.keySet();
  
         if (keys != null && !keys.isEmpty()) {
-        
-            //hideAllDecorators();
         
             for (IDecisionVariable variable : keys) {
 
@@ -243,9 +265,13 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
                               
                             public void handleEvent(Event exc) {
                                 //Set tooltip
-                                tip.setVisible(true);
+                                if (!tip.isDisposed()) {
+                                    tip.setVisible(true); 
+                                }
                             }
                         });  
+                        tooltipList.add(tip);
+                        
                     }
                 }
             }
@@ -312,7 +338,7 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
             setConfiguration(var.getConfiguration());
         } else {
             EASyLoggerFactory.INSTANCE.getLogger(getClass(), Bundle.ID)
-                .error("No variable found in new configuratio, i.e., discontinued mapping!");
+                .error("No variable found in new configuration, i.e., discontinued mapping!");
         }
     }
 }
