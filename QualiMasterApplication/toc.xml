@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?NLS TYPE="org.eclipse.help.toc"?>
 
-<toc label="QM-IConf Documentation" topic="html/main_page.html">
-	<topic label="QM-IConf User Guide" href="html/user_guide.html"/>
-	<topic label="Constraint Guide" href="html/constraint_guide.html"/>
+<toc label="QM-IConf Documentation" topic="help/main_page.html">
+	<topic label="QM-IConf User Guide" href="help/user_guide.html"/>
+	<topic label="Constraint Guide" href="help/constraint_guide.html"/>
 </toc>
