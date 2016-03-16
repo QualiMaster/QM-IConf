@@ -2,7 +2,7 @@ package de.uni_hildesheim.sse.qmApp.dialogs;
 
 import de.uni_hildesheim.sse.easy.ui.productline_editor.EclipseConsole;
 import de.uni_hildesheim.sse.easy_producer.instantiator.model.buildlangModel.IBuildlangElement;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.buildlangModel.MapExpression;
+import de.uni_hildesheim.sse.easy_producer.instantiator.model.buildlangModel.IEnumeratingLoop;
 import de.uni_hildesheim.sse.easy_producer.instantiator.model.buildlangModel.Rule;
 import de.uni_hildesheim.sse.easy_producer.instantiator.model.buildlangModel.Script;
 import de.uni_hildesheim.sse.easy_producer.instantiator.model.common.RuntimeEnvironment;
@@ -157,20 +157,6 @@ public class UiTracerFactory extends TracerFactory {
         }
 
         @Override
-        public void visitMap(MapExpression map, RuntimeEnvironment environment) {
-        }
-
-        @Override
-        public void visitMapIteratorAssignment(
-            de.uni_hildesheim.sse.easy_producer.instantiator.model.buildlangModel.VariableDeclaration var,
-            Object value) {
-        }
-
-        @Override
-        public void visitedMap(MapExpression map, RuntimeEnvironment environment) {
-        }
-
-        @Override
         public Collection<?> adjustSequenceForMap(Collection<?> collection) {
             return collection;
         }
@@ -208,6 +194,28 @@ public class UiTracerFactory extends TracerFactory {
         @Override
         public void traceError(String message) {
             write(message);
+        }
+
+        @Override
+        public void visitLoop(IEnumeratingLoop loop, RuntimeEnvironment environment) {
+        }
+
+        @Override
+        public void visitIteratorAssignment(IEnumeratingLoop loop,
+            de.uni_hildesheim.sse.easy_producer.instantiator.model.buildlangModel.VariableDeclaration var,
+            Object value) {
+        }
+
+        @Override
+        public void visitedLoop(IEnumeratingLoop loop, RuntimeEnvironment environment) {
+        }
+
+        @Override
+        public void visitWhileBody() {
+        }
+
+        @Override
+        public void visitedWhileBody() {
         }
 
     }
