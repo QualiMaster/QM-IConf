@@ -219,12 +219,8 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
             this.fallback = fallback;
         }
         
-        /**
-         * Returns the actual variable.
-         * 
-         * @return the variable
-         */
-        protected IDecisionVariable getVariable() {
+        @Override
+        public IDecisionVariable getVariable() {
             IDecisionVariable var = creator.getVariable();
             if (null == var) {
                 var = fallback;

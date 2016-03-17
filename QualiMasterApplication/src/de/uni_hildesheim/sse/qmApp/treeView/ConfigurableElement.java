@@ -423,6 +423,24 @@ public class ConfigurableElement { // unsure whether this shall be a resource
     }
     
     /**
+     * Whether the given configurable element holds the same variable.
+     * 
+     * @param element the element to check for (may be <b>null</b>)
+     * @return <code>true</code> if same, <code>false</code> else
+     */
+    public boolean holdsSame(ConfigurableElement element) {
+        boolean result = false;
+        if (null != input) {
+            IDecisionVariable iVar = input.getVariable();
+            if (null != iVar && null != element && null != element.input) {
+                IDecisionVariable eVar = element.input.getVariable();
+                result = eVar.equals(iVar);
+            }
+        }
+        return result;
+    }
+    
+    /**
      * Returns whether the underlying element is referenced in the given <code>modelPart</code>.
      * 
      * @param modelPart the part to search in

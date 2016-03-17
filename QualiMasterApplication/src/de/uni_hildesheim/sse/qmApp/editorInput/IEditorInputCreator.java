@@ -188,4 +188,11 @@ public interface IEditorInputCreator {
      */
     public IMenuContributor getMenuContributor();
 
+    /**
+     * Returns the actual variable.
+     * 
+     * @return the variable (may be <b>null</b>)
+     */
+    public IDecisionVariable getVariable();
+
 }

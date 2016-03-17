@@ -796,7 +796,7 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
             for (int c = 0; c < hwParent.getChildCount(); c++) {
                 ConfigurableElement grp = hwParent.getChild(c);
                 String grpName = grp.getDisplayName();
-                ConfigurableElement tmp = getByName(grp, name);
+                ConfigurableElement tmp = getByName(grp, name, element);
                 if (name.equals(grpName)) {
                     // if grouped and still in general ungrouped list (children if hwParent) - remove from ungrouped
                     hwParent.deleteFromChildren(element);
@@ -812,8 +812,9 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                 } else {
                     // if it's not the right group but stored within, remove as name changed
                     if (null != tmp) {
-                        grp.deleteFromChildren(tmp);
-                        viewer.refresh(grp, true);
+                        ConfigurableElement par = tmp.getParent(); // serves group and real parent
+                        par.deleteFromChildren(tmp);
+                        viewer.refresh(par, true);
                         done = true;
                     }
                 }
@@ -836,17 +837,34 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
      * 
      * @param element the element for return the child for
      * @param name the name of the element
+     * @param existing the existing element to be checked for equality (may be <b>null</b>)
      * @return the element or <b>null</b> if not found
      */
-    private static ConfigurableElement getByName(ConfigurableElement element, String name) {
+    private static ConfigurableElement getByName(ConfigurableElement element, String name, 
+        ConfigurableElement existing) {
         ConfigurableElement result = null;
+        if (matches(element, name, existing)) {
+            result = element;
+        }
         for (int c = 0; null == result && c < element.getChildCount(); c++) {
             ConfigurableElement tmp = element.getChild(c);
-            if (name.equals(tmp.getDisplayName())) {
+            if (matches(tmp, name, existing)) {
                 result = tmp;
             }
         }
         return result;
+    }
+
+    /**
+     * Returns whether the given configurable elements match.
+     * 
+     * @param iter the element to match
+     * @param name the name <code>iter</code> shall match
+     * @param existing the configurable element to match against
+     * @return <code>true</code> if matches, <code>false</code> else
+     */
+    private static boolean matches(ConfigurableElement iter, String name, ConfigurableElement existing) {
+        return name.equals(iter.getDisplayName()) || iter.holdsSame(existing);
     }
     
     /**

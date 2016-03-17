@@ -88,4 +88,9 @@ public abstract class AbstractNonVariableEditorInputCreator implements IEditorIn
         return null;
     }
 
+    @Override
+    public IDecisionVariable getVariable() {
+        return null;
+    }
+
 }
