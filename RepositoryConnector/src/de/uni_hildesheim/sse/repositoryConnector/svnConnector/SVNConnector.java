@@ -299,6 +299,11 @@ public class SVNConnector implements IRepositoryConnector {
         // logger.exception(e);
         // }
         final List<File> changeLists = new ArrayList<File>();
+        /*
+         * Windows/Linux behave differently: On Linux the authentication manager disappears
+         * For this reason, we set the authentication manager to ensure that the correct one was specified
+         */
+        svnClientManager.setAuthenticationManager(repository.getAuthenticationManager());
         SVNStatusClient statusclient = svnClientManager.getStatusClient();
         boolean remote = true;
         boolean reportAll = false;
