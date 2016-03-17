@@ -118,6 +118,8 @@ public class Manifest extends Algorithm {
     public String toString() {
         String result = "";
         result += ("Algorithm Family: " + this.name + "\n");
+        result += ("Description: " + this.description + "\n");
+        result += ("Provider: " + this.provider + "\n");
         result += super.toString();
         for (Algorithm alg : members) {        
             result += alg.toString();         

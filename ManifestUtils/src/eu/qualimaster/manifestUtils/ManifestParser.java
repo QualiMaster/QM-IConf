@@ -20,6 +20,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -68,6 +69,7 @@ public class ManifestParser {
     private static final String PARAM = "param";
     private static final String NAME = "name";
     private static final String TYPE = "type";
+    private static final String DEFAULT_VALUE = "defaultValue";
     private static final String TO = "to";
     private static final String CPU = "cpu";
     private static final String DFE = "dfe";
@@ -98,43 +100,36 @@ public class ManifestParser {
     }
     
     /**
-     * Parses a manifest into a representative family data structure.
+     * Parses a manifest into a representative manifest data structure.
      * @param file The file of the manifest.
-     * @return Family The representative family.
+     * @return Manifest The representative manifest.
      */
     public Manifest parseFile(File file) {
         
-        Manifest family = null;
+        Manifest manifest = null;
         
         if (file != null && file.length() > 0) {
             
             try { 
                 
                 doc = builder.parse(file);
+                manifest = analyseManifest(doc);
                 
-            } catch (SAXException exc) {
-                
+            } catch (SAXException exc) {           
+                exc.printStackTrace();           
+            } catch (IOException exc) {             
+                exc.printStackTrace();       
+            } catch (IllegalArgumentException exc) {
                 exc.printStackTrace();
-                
-            } catch (IOException exc) {
-                
-                exc.printStackTrace();
-                
             }
-            
-            
-            //doc.getDocumentElement(); //Element elem = 
-            
-            //printTree(elem);
-            family = analyseManifest(doc);
             
         } else {
             
-            System.out.println("FAILED!");
+            System.out.println("Unable to parse manifest!");
             
         }
         
-        return family;
+        return manifest;
         
     }
     
@@ -215,39 +210,44 @@ public class ManifestParser {
         Manifest family = new Manifest("Manifest");
         ManifestType mType = null;
         
-        Element elem = doc.getDocumentElement();
+        if (null != doc) {
         
-        if (MANIFEST.equals(elem.getNodeName())) {
+            Element elem = doc.getDocumentElement();
             
-            for (int i = 0; i < elem.getChildNodes().getLength(); i++) {
+            if (null != elem && MANIFEST.equals(elem.getNodeName())) {
                 
-                Node node = elem.getChildNodes().item(i);
-                
-                readProvides(mType, node, family);
-                
-                if (REQUIRES.equals(node.getNodeName())) {
+                for (int i = 0; i < elem.getChildNodes().getLength(); i++) {
                     
-                    try {
+                    Node node = elem.getChildNodes().item(i);
+                    
+                    readProvides(mType, node, family);
+                    
+                    if (null != node && REQUIRES.equals(node.getNodeName())) {
                         
-                        node.getAttributes().getNamedItem(CPU).getNodeValue(); //String cpu = 
-                        node.getAttributes().getNamedItem(DFE).getNodeValue(); //String dfe = 
+                        try {
+                            
+                            node.getAttributes().getNamedItem(CPU).getNodeValue(); //String cpu = 
+                            node.getAttributes().getNamedItem(DFE).getNodeValue(); //String dfe = 
+                            
+                        } catch (NullPointerException exc) {
+                            //is optional, so nothing to worry here!
+                        }
                         
-                    } catch (NullPointerException exc) {
-                        //is optional, so nothing to worry here!
                     }
+                    
+                    readQuality(node);
                     
                 }
                 
-                readQuality(node);
-                
             }
             
-        }
+            if (null != family.getMembers() && family.getMembers().size() > 1 
+                    && mType == ManifestType.SINGLE_HARDWARE) {
+                
+                mType = ManifestType.MULTI_HARDWARE;
+                
+            }
         
-        if (null != family.getMembers() && family.getMembers().size() > 1 && mType == ManifestType.SINGLE_HARDWARE) {
-            
-            mType = ManifestType.MULTI_HARDWARE;
-            
         }
         
         return family;
@@ -297,75 +297,124 @@ public class ManifestParser {
      * Reads the PROVIDES information of the Manifest.
      * @param mType The ManifestType to store gained information.
      * @param node The node to read from.
-     * @param family The family to store gained information to.
+     * @param manifest The family to store gained information to.
      */
-    private void readProvides(ManifestType mType, Node node, Manifest family) {
+    private void readProvides(ManifestType mType, Node node, Manifest manifest) {
         
         if (null != node && PROVIDES.equals(node.getNodeName())) {
             
-            Node item = node.getAttributes().item(0);   
-            mType = readClass(mType, item, family);
-            if (null != mType && null != family) {
-                family.setType(mType);
-                family.setProvider(item.getNodeValue());
+            if (null != node.getAttributes() && node.getAttributes().getLength() > 0) {
+                Node item = node.getAttributes().item(0);   
+                mType = readClass(mType, item, manifest);
+                if (null != mType && null != manifest) {
+                    manifest.setType(mType);
+                    manifest.setProvider(item.getNodeValue());
+                }
             }
             
             for (int j = 0; j < node.getChildNodes().getLength(); j++) {      
                 Node subNode = node.getChildNodes().item(j);
-                if (ALGORITHM.equals(subNode.getNodeName())) {
+                if (null != subNode && ALGORITHM.equals(subNode.getNodeName())) {
                     
-                    Algorithm algorithm;
-                    algorithm = new Algorithm(subNode.getAttributes().getNamedItem(FAMILY)
-                            .getNodeValue(), null, null, null);
-                    
-                    for (int k = 0; k < subNode.getChildNodes().getLength(); k++) {
+                    Algorithm algorithm = null;
+                    if (null != subNode.getAttributes()) {
                         
-                        Node subNode2 = subNode.getChildNodes().item(k);
+                        String algName = "";
+                        Node algNameNode = subNode.getAttributes().getNamedItem(FAMILY);
                         
-                        if (INPUT.equals(subNode2.getNodeName())) {   
-                            for (Item it : getTuples(subNode2)) {
-                                algorithm.addInput(it);
-                            }     
-                        } else if (OUTPUT.equals(subNode2.getNodeName())) {       
-                            for (Item it : getTuples(subNode2)) {
-                                algorithm.addOutput(it);
-                            }                      
-                        } else if (PARAMETER.equals(subNode2.getNodeName())) {
+                        if (null != algNameNode) {
+                            algName = algNameNode.getNodeValue();
+                        }
+                        
+                        algorithm = new Algorithm(algName, null, null, null);
+                        
+                        for (int k = 0; k < subNode.getChildNodes().getLength(); k++) {
                             
-                            String name = subNode2.getAttributes().getNamedItem(NAME).getNodeValue();
-                            String type = subNode2.getAttributes().getNamedItem(TYPE).getNodeValue();
-                            try {     
-                                Parameter param = new Parameter(name, Parameter.ParameterType
-                                        .valueOf(type.toUpperCase()));
-                                algorithm.addParameter(param);               
-                            } catch (IllegalArgumentException exc) {  
-                                System.out.println("[ERROR:] Illegal Parameter: " + type);   
-                            }  
-                            
-                        } else if (FLOW.equals(subNode2.getNodeName())) {       
-                            try {
-                                subNode2.getAttributes().getNamedItem(TO).getNodeValue(); //String flow = 
-                            } catch (NullPointerException exc) {
-                            }                
-                        } else if (BYPASS.equals(subNode2.getNodeName())) {              
-                            try {
-                                subNode2.getFirstChild().getNextSibling().getAttributes()
-                                        .getNamedItem(PARAM).getNodeValue(); //String bypass = 
-                            } catch (NullPointerException exc) {
-                            }              
-                        }                  
-                    }              
-                    if (null != algorithm && null != family) {
-                        family.addMember(algorithm);
+                            Node subNode2 = subNode.getChildNodes().item(k);
+                            readAdditionalInfo(subNode2, algorithm);
+                                              
+                        }  
+                        
+                    }
+             
+                    if (null != algorithm && null != manifest) {
+                        manifest.addMember(algorithm);
                     }       
-                } else if (COMPONENT.equals(subNode.getNodeName())) {             
+                } else if (null != subNode && COMPONENT.equals(subNode.getNodeName())) {             
                     subNode.getAttributes().getNamedItem(CLASS).getNodeValue(); //String fgn =        
-                } else if (DESCRIPTION.equals(subNode.getNodeName())) {
-                    family.setDescription(ManifestParser.normalizeText(subNode.getTextContent()));
+                } else if (null != subNode && DESCRIPTION.equals(subNode.getNodeName())) {
+                    manifest.setDescription(ManifestParser.normalizeText(subNode.getTextContent()));
                 }
                 
             }
             
+        }
+        
+    }
+    
+    /**
+     * Analysis the In-/ Output, Parameter and some additional information from a node.
+     * @param node The node to analyze.
+     * @param algorithm Extracted info will be added to this algorithm.
+     */
+    private void readAdditionalInfo(Node node, Algorithm algorithm) {
+        
+        if (null != algorithm) {
+            if (INPUT.equals(node.getNodeName())) {   
+                for (Item it : getTuples(node)) {
+                    algorithm.addInput(it);
+                }     
+            } else if (OUTPUT.equals(node.getNodeName())) {       
+                for (Item it : getTuples(node)) {
+                    algorithm.addOutput(it);
+                }                      
+            } else if (PARAMETER.equals(node.getNodeName())) {
+                
+                NamedNodeMap map = node.getAttributes();
+                if (null != map) {
+                    
+                    String name = null;
+                    String type = null;
+                    String defaultValue = null;
+                    
+                    if (null != map.getNamedItem(NAME)) {
+                        name = node.getAttributes().getNamedItem(NAME).getNodeValue();
+                    }
+                    
+                    if (null != map.getNamedItem(TYPE)) {
+                        type = node.getAttributes().getNamedItem(TYPE).getNodeValue();
+                    }
+                    
+                    if (null != map.getNamedItem(DEFAULT_VALUE)) {
+                        defaultValue = node.getAttributes().getNamedItem(DEFAULT_VALUE).getNodeValue();
+                    }
+                    
+                    try { 
+                        if (null != name && null != type) {
+                            Parameter param = new Parameter(name, Parameter.ParameterType
+                                    .valueOf(type.toUpperCase()));
+                            param.setValue(defaultValue);
+                            algorithm.addParameter(param); 
+                        }
+                                      
+                    } catch (IllegalArgumentException exc) {  
+                        System.out.println("[ERROR:] Illegal Parameter: " + type);   
+                    } 
+                    
+                }      
+                
+            } else if (FLOW.equals(node.getNodeName())) {       
+                try {
+                    node.getAttributes().getNamedItem(TO).getNodeValue(); //String flow = 
+                } catch (NullPointerException exc) {
+                }                
+            } else if (BYPASS.equals(node.getNodeName())) {              
+                try {
+                    node.getFirstChild().getNextSibling().getAttributes()
+                            .getNamedItem(PARAM).getNodeValue(); //String bypass = 
+                } catch (NullPointerException exc) {
+                }              
+            }
         }
         
     }
@@ -916,7 +965,9 @@ public class ManifestParser {
 //            e.printStackTrace();
 //        }
         ManifestParser mp = new ManifestParser();
-        mp.parseFile(new File("C:/Test/manifest.xml"));
+        Manifest manifest = mp.parseFile(new File("C:/Test/manifest.xml"));
+        System.out.println(manifest);
+        
         
     }
     

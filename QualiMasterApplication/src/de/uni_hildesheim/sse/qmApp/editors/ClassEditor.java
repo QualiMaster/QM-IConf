@@ -233,7 +233,7 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             List<IDecisionVariable> outputVars = getIDecisionVariable(var, SLOT_OUTPUT);
             List<IDecisionVariable> parameterVars = getIDecisionVariable(var, SLOT_PARAMETERS);
             
-            if (type.isSource() || type.isSink()) { // follow the conventions of the model
+            if (type.isSource() || type.isSink()) {
                 List<IDecisionVariable> tmp = inputVars;
                 inputVars = outputVars;
                 outputVars = tmp;
