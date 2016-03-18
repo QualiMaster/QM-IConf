@@ -281,7 +281,7 @@ public class ManifestConnection {
     }
     
     /**
-     * Sets the retireval folder where jars are retrieved to, even if they exist in the local Maven repos, 
+     * Sets the retrieval folder where jars are retrieved to, even if they exist in the local Maven repos, 
      * due to bugs in the naming conventions by ivy/maven.
      * @param folder The desired folder.
      */
@@ -351,6 +351,21 @@ public class ManifestConnection {
             .addCredentials("Sonatype Nexus Repository Manager", "nexus.sse.uni-hildesheim.de", 
                 username, password);
         
+    }
+    
+    /**
+     * Creates an String, which can be used to access elements of an JAR archive, via creating an URL object.
+     * @param repositoryLocation The location of the repository, which is currently used.
+     * @param artifactID The name of the jar, which shall be accessed.
+     * @return An platform independent URL for accessing elements inside the archive. Elements of the archive
+     * must be appended to the end of this String.
+     */
+    private static String createJarAccessorURLString(File repositoryLocation, String artifactID) {
+    	String outPath = repositoryLocation.getAbsolutePath();
+    	String accessURL = (outPath.charAt(0) == '/') ? "jar:file:" : "jar:file:/";
+    	accessURL += outPath + "/" + artifactID + ".jar!";
+    	
+    	return accessURL;
     }
     
     /**
@@ -783,8 +798,9 @@ public class ManifestConnection {
         for (File file : dir.listFiles()) {
             
             if (!file.isDirectory()) {
-                try {
-                    list.add(new URL("file:///" + out.getAbsolutePath() + "\\" + file.getName()));
+                String outPath = out.getAbsolutePath();
+            	try {
+                    list.add(new URL("file:" + (outPath.charAt(0) == '/' ? "" : "///" ) + outPath + "/" + file.getName()));
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }
@@ -889,7 +905,7 @@ public class ManifestConnection {
         
         File ivyFile = new File(pomFile);
         ivyFile = ivyFile.getParentFile();
-        ivyFile = new File(ivyFile.getAbsolutePath() + "\\ivy.xml");
+        ivyFile = new File(ivyFile.getAbsolutePath() + "/ivy.xml");
         
         System.out.println("Publishing with POM...");
         
@@ -965,13 +981,13 @@ public class ManifestConnection {
         
         try {
             
-            url = new URL("jar:file:/" + out.getAbsolutePath() + "/" + artifactId + ".jar!/manifest.xml");
+            url = new URL(createJarAccessorURLString(out, artifactId) + "/manifest.xml");
             InputStream is;
             try {
                 is = url.openStream();
             } catch (IOException e) {
                 // fallback
-                url = new URL("jar:file:/" + out.getAbsolutePath() + "/" + artifactId + ".jar!/META-INF/manifest.xml");
+                url = new URL(createJarAccessorURLString(out, artifactId) + "/META-INF/manifest.xml");
                 is = url.openStream();
             }
             byte[] buffer = new byte[is.available()];
@@ -1334,7 +1350,7 @@ public class ManifestConnection {
     }
     
     /**
-     * Retrieves the artifact Id from an artifat name.
+     * Retrieves the artifact Id from an artifact name.
      * @param artifact The full artifact name.
      * @return The retrieved artifactId, or null.
      */
