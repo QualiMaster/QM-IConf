@@ -812,11 +812,20 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                 } else {
                     // if it's not the right group but stored within, remove as name changed
                     if (null != tmp) {
-                        ConfigurableElement par = tmp.getParent(); // serves group and real parent
-                        par.deleteFromChildren(tmp);
-                        viewer.refresh(par, true);
+                        if (!grp.deleteFromChildren(tmp)) {
+                            ConfigurableElement par = tmp.getParent(); // getByName matches element + contained
+                            if (par.deleteFromChildren(tmp)) {
+                                viewer.refresh(par, true);
+                            }
+                        } else {
+                            viewer.refresh(grp, true);
+                        }
                         done = true;
                     }
+                }
+                if (grpName.contains(".") && 0 == grp.getChildCount()) {
+                    hwParent.deleteFromChildren(grp);
+                    viewer.refresh(hwParent, true);
                 }
             }
             if (null == groupElement) {
