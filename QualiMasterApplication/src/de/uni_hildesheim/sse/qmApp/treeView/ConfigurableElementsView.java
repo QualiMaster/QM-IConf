@@ -831,7 +831,7 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
             if (null == groupElement) {
                 // if there is no group, create one and add it
                 groupElement = new ConfigurableElement(group, null, null, Configuration.HARDWARE);
-                groupElement.setImage(ImageRegistry.INSTANCE.getImage(Configuration.HARDWARE));
+                groupElement.setImage(IconManager.filterImage(ImageRegistry.INSTANCE.getImage(Configuration.HARDWARE)));
                 hwParent.addChild(groupElement);
                 groupElement.addChild(element);
                 viewer.add(groupElement, element);
