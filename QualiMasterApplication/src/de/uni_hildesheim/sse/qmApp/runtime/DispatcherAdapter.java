@@ -26,6 +26,8 @@ import eu.qualimaster.adaptation.external.LoggingFilterRequest;
 import eu.qualimaster.adaptation.external.LoggingMessage;
 import eu.qualimaster.adaptation.external.MonitoringDataMessage;
 import eu.qualimaster.adaptation.external.PipelineMessage;
+import eu.qualimaster.adaptation.external.PipelineStatusRequest;
+import eu.qualimaster.adaptation.external.PipelineStatusResponse;
 import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
 
 /**
@@ -77,6 +79,14 @@ public abstract class DispatcherAdapter implements IClientDispatcher {
 
     @Override
     public void handleInformationMessage(InformationMessage arg0) {
+    }
+
+    @Override
+    public void handlePipelineStatusRequest(PipelineStatusRequest arg0) {
+    }
+
+    @Override
+    public void handlePipelineStatusResponse(PipelineStatusResponse arg0) {
     }
 
 }

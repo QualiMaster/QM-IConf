@@ -57,6 +57,8 @@ import eu.qualimaster.adaptation.external.LoggingFilterRequest;
 import eu.qualimaster.adaptation.external.LoggingMessage;
 import eu.qualimaster.adaptation.external.MonitoringDataMessage;
 import eu.qualimaster.adaptation.external.PipelineMessage;
+import eu.qualimaster.adaptation.external.PipelineStatusRequest;
+import eu.qualimaster.adaptation.external.PipelineStatusResponse;
 import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
 import eu.qualimaster.easy.extension.QmObservables;
 
@@ -653,6 +655,14 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     @Override
     public void handleInformationMessage(InformationMessage arg0) {
         // show along with executed commands
+    }
+
+    @Override
+    public void handlePipelineStatusRequest(PipelineStatusRequest arg0) {
+    }
+
+    @Override
+    public void handlePipelineStatusResponse(PipelineStatusResponse arg0) {
     }
 
 }

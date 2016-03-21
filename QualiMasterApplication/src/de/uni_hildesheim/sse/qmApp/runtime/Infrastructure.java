@@ -41,6 +41,8 @@ import eu.qualimaster.adaptation.external.LoggingMessage;
 import eu.qualimaster.adaptation.external.Message;
 import eu.qualimaster.adaptation.external.MonitoringDataMessage;
 import eu.qualimaster.adaptation.external.PipelineMessage;
+import eu.qualimaster.adaptation.external.PipelineStatusRequest;
+import eu.qualimaster.adaptation.external.PipelineStatusResponse;
 import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
 import qualimasterapplication.Activator;
 
@@ -159,6 +161,20 @@ public class Infrastructure {
         public void handleInformationMessage(InformationMessage message) {
             for (int d = 0; d < dispatchers.size(); d++) {
                 dispatchers.get(d).handleInformationMessage(message);
+            }
+        }
+
+        @Override
+        public void handlePipelineStatusRequest(PipelineStatusRequest message) {
+            for (int d = 0, n = dispatchers.size(); d < n; d++) {
+                dispatchers.get(d).handlePipelineStatusRequest(message);
+            }
+        }
+
+        @Override
+        public void handlePipelineStatusResponse(PipelineStatusResponse message) {
+            for (int d = 0, n = dispatchers.size(); d < n; d++) {
+                dispatchers.get(d).handlePipelineStatusResponse(message);
             }
         }
         
