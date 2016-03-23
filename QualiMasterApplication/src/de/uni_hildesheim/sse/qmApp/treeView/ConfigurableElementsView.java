@@ -237,6 +237,15 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                         selectedElement.delete(ConfigurableElementsView.this);                     
                         // to not set data again/refresh - this collapses tree
                         viewer.remove(selectedElement);
+                        // Delete this element from data model, otherwise it will re-occur after refreshing the view
+                        ConfigurableElement parent = selectedElement.getParent();
+                        if (null != parent) {
+                            boolean done = parent.deleteFromChildren(selectedElement);
+                            for (int i = 0, end = parent.getChildCount(); i < end && !done; i++) {
+                                ConfigurableElement intermediateParent = parent.getChild(i);
+                                done = intermediateParent.deleteFromChildren(selectedElement);
+                            }
+                        }
                     }
                 }
             };
