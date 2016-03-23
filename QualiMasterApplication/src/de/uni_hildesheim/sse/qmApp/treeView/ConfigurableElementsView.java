@@ -145,8 +145,12 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                     //insertValidationAction(manager, selectedElement); // global validation is sufficient
                     selectedElement.contributeToPopup(manager);
                     // entry level
-                    insertDeleteAction(manager, selectedElement);
                     insertCloneAction(manager, selectedElement);
+                    if (selectedElement.isDeletable()) {
+                        insertDeleteAction(manager, selectedElement);
+                    }
+//                    if (selectedElement.isCloneable() != CloneMode.NONE) {
+//                    }
                 }
             }
         }

@@ -369,7 +369,7 @@ public class ConfigurableElement { // unsure whether this shall be a resource
      * @return the clone mode
      */
     public CloneMode isCloneable() {
-        return input.isCloneable();
+        return (null != input) ? input.isCloneable() : CloneMode.NONE;
     }
 
     /**
@@ -380,7 +380,7 @@ public class ConfigurableElement { // unsure whether this shall be a resource
      */
     public boolean isDeletable() {
         // top-level elements are not deletable
-        return null != getParent() && input.isDeletable() && !isVirtualSubGroup(); 
+        return null != getParent() && null != input && input.isDeletable() && !isVirtualSubGroup(); 
     }
     
     /**
