@@ -384,8 +384,12 @@ public class LoginDialog {
                 } else {
                     if (authenticate(username.getText(), password.getText())) {
                         // check if local data was used before
-                        checkIfLocalDataWasUsed(shell);
-                        new Thread(new ModelUpdate(shell)).start();
+                        if (!checkIfLocalDataWasUsed(shell)) {
+                            new Thread(new ModelUpdate(shell)).start();
+                        } else {
+                            loadRoles();
+                            shell.dispose();
+                        }
                     } else {
                         // showLoginError(shell);
                         logger.warn("Login failed");
@@ -393,15 +397,6 @@ public class LoginDialog {
                     }
                 }
             }
-
-            // private void showLoginError(final Shell shell) {
-            // MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION |
-            // SWT.OK | SWT.CANCEL);
-            // dialog.setText("Login failed");
-            // dialog.setMessage("The login failed. Please make sure you have "
-            // + "a working internet connection and check your credentials.");
-            // dialog.open();
-            // }
         });
     }
 
@@ -410,10 +405,12 @@ public class LoginDialog {
      * 
      * @param shell
      *            The shell
+     * @return either true or false if the user wants to stay in local mode
      */
-    private void checkIfLocalDataWasUsed(Shell shell) {
+    private boolean checkIfLocalDataWasUsed(Shell shell) {
         boolean localData = Boolean
                 .valueOf(EclipsePrefUtils.INSTANCE.getPreference(EclipsePrefUtils.LOCAL_DATA_PREF_KEY));
+        boolean stayInLocalMode = false;
         if (localData) {
             MessageBox dialog = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.YES | SWT.NO);
             dialog.setText("Warning");
@@ -421,6 +418,7 @@ public class LoginDialog {
             int buttonID = dialog.open();
             switch (buttonID) {
             case SWT.YES:
+                stayInLocalMode = true;
                 break;
             case SWT.NO:
                 try {
@@ -433,6 +431,7 @@ public class LoginDialog {
                 break;
             }
         }
+        return stayInLocalMode;
     }
 
     /**
