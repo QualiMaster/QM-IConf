@@ -11,14 +11,12 @@ import de.uni_hildesheim.sse.ConstraintSyntaxException;
 import de.uni_hildesheim.sse.ModelUtility;
 import de.uni_hildesheim.sse.model.confModel.ContainerVariable;
 import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.cst.AttributeVariable;
 import de.uni_hildesheim.sse.model.cst.CSTSemanticException;
 import de.uni_hildesheim.sse.model.cst.ConstantValue;
 import de.uni_hildesheim.sse.model.cst.ConstraintSyntaxTree;
 import de.uni_hildesheim.sse.model.cst.OCLFeatureCall;
 import de.uni_hildesheim.sse.model.cst.Variable;
 import de.uni_hildesheim.sse.model.varModel.AbstractVariable;
-import de.uni_hildesheim.sse.model.varModel.Attribute;
 import de.uni_hildesheim.sse.model.varModel.Constraint;
 import de.uni_hildesheim.sse.model.varModel.ContainableModelElement;
 import de.uni_hildesheim.sse.model.varModel.DecisionVariableDeclaration;
@@ -31,8 +29,6 @@ import de.uni_hildesheim.sse.model.varModel.Project;
 import de.uni_hildesheim.sse.model.varModel.ProjectImport;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Compound;
 import de.uni_hildesheim.sse.model.varModel.datatypes.ConstraintType;
-import de.uni_hildesheim.sse.model.varModel.datatypes.EnumLiteral;
-import de.uni_hildesheim.sse.model.varModel.datatypes.FreezeVariableType;
 import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.model.varModel.datatypes.OclKeyWords;
 import de.uni_hildesheim.sse.model.varModel.datatypes.Reference;
@@ -44,6 +40,7 @@ import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
 import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
 import eu.qualimaster.easy.extension.QmConstants;
+import eu.qualimaster.easy.extension.internal.Utils;
 
 /**
  * The methods to operate the IVML model for obtaining IVML elements information.
@@ -380,15 +377,7 @@ public class IVMLModelOperations {
     public static boolean addRuntimeAttributeToProject(Project project, Project fallbackForType) {
         boolean success = false;
         try {
-            //attribute BindingTime bindingTime = BindingTime.compile to PriorityPipCfg;
-            de.uni_hildesheim.sse.model.varModel.datatypes.Enum type = ModelQuery.findEnum(project, "BindingTime");
-            if (null == type && null != fallbackForType) {
-                type = ModelQuery.findEnum(fallbackForType, "BindingTime");
-            }
-            EnumLiteral literal = type.get("compile");
-            Attribute attr = new Attribute("bindingTime", type, project, project);
-            attr.setValue(new ConstantValue(ValueFactory.createValue(type, literal)));
-            project.add(attr);
+            Utils.addRuntimeAttributeToProject(project, fallbackForType);
             success = true;
         } catch (CSTSemanticException e) {
             getLogger().exception(e);
@@ -411,7 +400,8 @@ public class IVMLModelOperations {
     public static FreezeBlock createFreezeBlock(IFreezable[] freezables, Project project, Project fallbackForType) {
         FreezeBlock result = null;
         try {
-            FreezeVariableType iterType = new FreezeVariableType(freezables, project);
+            result = Utils.createFreezeBlock(freezables, project, fallbackForType);
+            /*FreezeVariableType iterType = new FreezeVariableType(freezables, project);
             DecisionVariableDeclaration iter = new DecisionVariableDeclaration("f", iterType, project);
             de.uni_hildesheim.sse.model.varModel.datatypes.Enum type = ModelQuery.findEnum(project, "BindingTime");
             if (null == type && null != fallbackForType) {
@@ -427,7 +417,7 @@ public class IVMLModelOperations {
             Variable iterEx = new AttributeVariable(new Variable(iter), iterType.getAttribute("bindingTime"));
             OCLFeatureCall op = new OCLFeatureCall(iterEx, butOperation, runtime);
             op.inferDatatype();
-            result = new FreezeBlock(freezables, iter, op, project);
+            result = new FreezeBlock(freezables, iter, op, project);*/
         } catch (CSTSemanticException e) {
             getLogger().exception(e);
         } catch (ValueDoesNotMatchTypeException e) {
