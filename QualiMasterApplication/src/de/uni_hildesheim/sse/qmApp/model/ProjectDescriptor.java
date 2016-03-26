@@ -1,16 +1,10 @@
 package de.uni_hildesheim.sse.qmApp.model;
 
 import java.io.File;
-import java.util.List;
 
-import de.uni_hildesheim.sse.easy_producer.core.persistence.standard.PersistenceConstants;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.buildlangModel.BuildModel;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.buildlangModel.Script;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.vilTypes.IProjectDescriptor;
 import de.uni_hildesheim.sse.model.confModel.Configuration;
-import de.uni_hildesheim.sse.utils.modelManagement.ModelInfo;
 import de.uni_hildesheim.sse.utils.modelManagement.ModelManagementException;
-import de.uni_hildesheim.sse.utils.progress.ProgressObserver;
+import eu.qualimaster.easy.extension.internal.QmProjectDescriptor;
 
 /**
  * Implements a descriptor for the source and target VIL project locations.
@@ -21,11 +15,7 @@ import de.uni_hildesheim.sse.utils.progress.ProgressObserver;
  * 
  * @author Holger Eichelberger
  */
-public class ProjectDescriptor implements IProjectDescriptor {
-
-    private ProjectDescriptor parent;
-    private File base;
-    private Script vilScript;
+public class ProjectDescriptor extends QmProjectDescriptor {
 
     /**
      * Creates the default project descriptor for the QM model to be instantiated.
@@ -34,20 +24,7 @@ public class ProjectDescriptor implements IProjectDescriptor {
      *   information etc failed.
      */
     public ProjectDescriptor() throws ModelManagementException {
-        this.parent = null;
-        this.base = Location.getModelLocationFile();
-
-        BuildModel repository = BuildModel.INSTANCE;
-        IModelPart topLevel = VariabilityModel.Definition.TOP_LEVEL;
-        // by convention the same name, ignore versions for now
-        List<ModelInfo<Script>> vilScripts = repository.availableModels().getModelInfo(topLevel.getModelName());
-        if (null == vilScripts || vilScripts.isEmpty()) {
-            throw new ModelManagementException("Cannot resolve main instantiation script", 
-                ModelManagementException.ID_CANNOT_RESOLVE);
-        } else {
-            ModelInfo<Script> info = vilScripts.get(0); // primitive, ok for now
-            vilScript = repository.load(info);
-        }
+        super(Location.getModelLocationFile());
     }
 
     /**
@@ -58,62 +35,9 @@ public class ProjectDescriptor implements IProjectDescriptor {
      * @param base the folder to instantiate into
      */
     public ProjectDescriptor(ProjectDescriptor parent, File base) {
-        this.parent = parent;
-        this.base = base;
-        if (!base.exists()) {
-            base.mkdirs();
-        }
-        this.vilScript = parent.getMainVilScript();
-    }
-    
-    @Override
-    public File getBase() {
-        return base;
+        super(parent, base);
     }
 
-    @Override
-    public int getPredecessorCount() {
-        return null != parent ? 1 : 0;
-    }
-
-    @Override
-    public IProjectDescriptor getPredecessor(int index) {
-        if (index < 0 || index >= getPredecessorCount()) {
-            throw new IndexOutOfBoundsException();
-        }
-        return parent;
-    }
-
-    @Override
-    public Script getMainVilScript() {
-        return vilScript;
-    }
-
-    @Override
-    public ProgressObserver createObserver() {
-        return ProgressObserver.NO_OBSERVER; // TODO check, preliminary
-    }
-
-    @Override
-    public String getModelFolder(ModelKind kind) {
-        String result;
-        switch (kind) {
-        case IVML:
-            result = PersistenceConstants.EASY_FILES_DEFAULT;
-            break;
-        case VIL:
-            result = PersistenceConstants.EASY_FILES_DEFAULT;
-            break;
-        case VTL:
-            result = PersistenceConstants.EASY_FILES_DEFAULT;
-            break;
-        default:
-            result = null;
-            break;
-        }
-        return result;
-    }
-    
     /**
      * Returns the top-level QM configuration.
      * 
