@@ -15,8 +15,8 @@ import de.uni_hildesheim.sse.qmApp.model.Location;
 import de.uni_hildesheim.sse.qmApp.model.Utils;
 import de.uni_hildesheim.sse.qmApp.model.Utils.ConfigurationProperties;
 import de.uni_hildesheim.sse.repositoryConnector.Bundle;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
 
 /**
  * The handler for the reset model command.

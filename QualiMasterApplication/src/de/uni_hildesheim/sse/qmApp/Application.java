@@ -16,9 +16,9 @@ import de.uni_hildesheim.sse.qmApp.dialogs.BootstrappingDialog;
 import de.uni_hildesheim.sse.qmApp.dialogs.LoginDialog;
 import de.uni_hildesheim.sse.qmApp.model.Utils.ConfigurationProperties;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
-import de.uni_hildesheim.sse.utils.logger.AdvancedJavaLogger;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
-import de.uni_hildesheim.sse.utils.logger.ILogger;
+import net.ssehub.easy.basics.logger.AdvancedJavaLogger;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.logger.ILogger;
 
 /**
  * This class controls all aspects of the application's execution.

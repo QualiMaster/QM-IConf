@@ -21,33 +21,33 @@ import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditor
 import de.uni_hildesheim.sse.easy.ui.productline_editor.DelegatingEasyEditorPage;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.IRefreshableEditor;
 import de.uni_hildesheim.sse.easy_producer.instantiator.Bundle;
-import de.uni_hildesheim.sse.model.confModel.Configuration;
-import de.uni_hildesheim.sse.model.confModel.DisplayNameProvider;
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.management.VarModel;
-import de.uni_hildesheim.sse.model.varModel.AbstractVariable;
-import de.uni_hildesheim.sse.model.varModel.ContainableModelElement;
-import de.uni_hildesheim.sse.model.varModel.DecisionVariableDeclaration;
-import de.uni_hildesheim.sse.model.varModel.Project;
-import de.uni_hildesheim.sse.model.varModel.datatypes.Compound;
-import de.uni_hildesheim.sse.model.varModel.datatypes.ConstraintType;
-import de.uni_hildesheim.sse.model.varModel.datatypes.Container;
-import de.uni_hildesheim.sse.model.varModel.datatypes.Enum;
-import de.uni_hildesheim.sse.model.varModel.datatypes.EnumLiteral;
-import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
-import de.uni_hildesheim.sse.model.varModel.datatypes.Reference;
-import de.uni_hildesheim.sse.model.varModel.datatypes.StringType;
-import de.uni_hildesheim.sse.model.varModel.filter.ReferenceValuesFinder;
-import de.uni_hildesheim.sse.model.varModel.values.CompoundValue;
-import de.uni_hildesheim.sse.model.varModel.values.Value;
-import de.uni_hildesheim.sse.model.varModel.values.ValueDoesNotMatchTypeException;
-import de.uni_hildesheim.sse.model.varModel.values.ValueFactory;
-import de.uni_hildesheim.sse.persistency.StringProvider;
 import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
-import de.uni_hildesheim.sse.utils.modelManagement.IModelListener;
 import eu.qualimaster.easy.extension.QmConstants;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.modelManagement.IModelListener;
+import net.ssehub.easy.varModel.confModel.Configuration;
+import net.ssehub.easy.varModel.confModel.DisplayNameProvider;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.management.VarModel;
+import net.ssehub.easy.varModel.model.AbstractVariable;
+import net.ssehub.easy.varModel.model.ContainableModelElement;
+import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
+import net.ssehub.easy.varModel.model.Project;
+import net.ssehub.easy.varModel.model.datatypes.Compound;
+import net.ssehub.easy.varModel.model.datatypes.ConstraintType;
+import net.ssehub.easy.varModel.model.datatypes.Container;
+import net.ssehub.easy.varModel.model.datatypes.Enum;
+import net.ssehub.easy.varModel.model.datatypes.EnumLiteral;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
+import net.ssehub.easy.varModel.model.datatypes.Reference;
+import net.ssehub.easy.varModel.model.datatypes.StringType;
+import net.ssehub.easy.varModel.model.filter.ReferenceValuesFinder;
+import net.ssehub.easy.varModel.model.values.CompoundValue;
+import net.ssehub.easy.varModel.model.values.Value;
+import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
+import net.ssehub.easy.varModel.model.values.ValueFactory;
+import net.ssehub.easy.varModel.persistency.StringProvider;
 import qualimasterapplication.Activator;
 
 /**
@@ -63,7 +63,7 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
     private TableViewer tableViewer;
     private int prefWidth = -1;
     private int prefHeight = 80;
-    private de.uni_hildesheim.sse.model.confModel.Configuration tmpConfig;
+    private net.ssehub.easy.varModel.confModel.Configuration tmpConfig;
     private UIConfiguration uiCfg;
     private List<SelectionListener> dirtyListener = new ArrayList<SelectionListener>();
     private Map<UIParameter, Object> parentParameters;
@@ -230,7 +230,7 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
             tmpModel.add(tmpDecl);
         }
         augmentTemporaryModel(tmpModel);
-        tmpConfig = new de.uni_hildesheim.sse.model.confModel.Configuration(tmpModel);
+        tmpConfig = new net.ssehub.easy.varModel.confModel.Configuration(tmpModel);
         uiCfg = ConfigurationTableEditorFactory.createConfiguration(tmpConfig, 
             new DelegatingEasyEditorPage(tableViewer.getTable()), parentParameters);
     }
@@ -506,7 +506,7 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
 
         private final TableViewer viewer;
         private IDecisionVariable var;
-        private de.uni_hildesheim.sse.model.varModel.datatypes.Enum type;
+        private net.ssehub.easy.varModel.model.datatypes.Enum type;
     
         /**
          * Constructor.
@@ -518,8 +518,8 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
             var = getTemporaryDecisionVariable(SLOT_TYPE);
             if (null != var) {
                 IDatatype varType = var.getDeclaration().getType();
-                if (varType instanceof de.uni_hildesheim.sse.model.varModel.datatypes.Enum) {
-                    type = (de.uni_hildesheim.sse.model.varModel.datatypes.Enum) varType;
+                if (varType instanceof net.ssehub.easy.varModel.model.datatypes.Enum) {
+                    type = (net.ssehub.easy.varModel.model.datatypes.Enum) varType;
                 }
             }
         }

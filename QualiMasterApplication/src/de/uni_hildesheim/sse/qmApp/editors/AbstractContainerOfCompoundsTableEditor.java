@@ -21,11 +21,11 @@ import java.util.Map;
 import org.eclipse.swt.widgets.Composite;
 
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.varModel.datatypes.Compound;
-import de.uni_hildesheim.sse.model.varModel.values.CompoundValue;
-import de.uni_hildesheim.sse.model.varModel.values.ContainerValue;
-import de.uni_hildesheim.sse.model.varModel.values.Value;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.datatypes.Compound;
+import net.ssehub.easy.varModel.model.values.CompoundValue;
+import net.ssehub.easy.varModel.model.values.ContainerValue;
+import net.ssehub.easy.varModel.model.values.Value;
 
 /**
  * A container of compounds editor.

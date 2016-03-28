@@ -25,7 +25,7 @@ import de.uni_hildesheim.sse.qmApp.model.ProjectDescriptor;
 import de.uni_hildesheim.sse.qmApp.model.Reasoning;
 import de.uni_hildesheim.sse.qmApp.model.SessionModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
-import de.uni_hildesheim.sse.utils.modelManagement.ModelManagementException;
+import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 
 /**
  * An abstract handler for local instantiation commands. This class supports the explicit selection

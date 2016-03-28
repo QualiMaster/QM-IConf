@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Shell;
 
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 
 /**
  * Implements a generic variable selector dialog.

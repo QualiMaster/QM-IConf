@@ -6,10 +6,6 @@ import java.util.List;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.swt.graphics.Image;
 
-import de.uni_hildesheim.sse.model.confModel.ContainerVariable;
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.varModel.datatypes.Compound;
-import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.qmApp.editorInput.CompoundVariableEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.ContainerVariableEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator;
@@ -17,6 +13,10 @@ import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator.CloneMode;
 import de.uni_hildesheim.sse.qmApp.editorInput.IVariableEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
+import net.ssehub.easy.varModel.confModel.ContainerVariable;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.datatypes.Compound;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 
 /**
  * Class manages a list of configurable elements which we populate in order to show these elements

@@ -2,10 +2,10 @@ package de.uni_hildesheim.sse.qmApp.model;
 
 import java.io.Writer;
 
-import de.uni_hildesheim.sse.model.varModel.DecisionVariableDeclaration;
-import de.uni_hildesheim.sse.model.varModel.datatypes.ConstraintType;
-import de.uni_hildesheim.sse.model.varModel.values.Value;
-import de.uni_hildesheim.sse.persistency.IVMLWriter;
+import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
+import net.ssehub.easy.varModel.model.datatypes.ConstraintType;
+import net.ssehub.easy.varModel.model.values.Value;
+import net.ssehub.easy.varModel.persistency.IVMLWriter;
 
 /**
  * Implements an IVML writer which does not write constraint variables / values. Actually, this is just a workaround.

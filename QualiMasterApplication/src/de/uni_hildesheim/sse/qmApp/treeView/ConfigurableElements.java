@@ -3,12 +3,6 @@ package de.uni_hildesheim.sse.qmApp.treeView;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uni_hildesheim.sse.model.confModel.CompoundVariable;
-import de.uni_hildesheim.sse.model.confModel.Configuration;
-import de.uni_hildesheim.sse.model.confModel.ContainerVariable;
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.varModel.AbstractVariable;
-import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.qmApp.editorInput.CompoundVariableEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.ContainerVariableEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator;
@@ -19,6 +13,12 @@ import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.QualiMasterDisplayNameProvider;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
+import net.ssehub.easy.varModel.confModel.CompoundVariable;
+import net.ssehub.easy.varModel.confModel.Configuration;
+import net.ssehub.easy.varModel.confModel.ContainerVariable;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.AbstractVariable;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 
 /**
  * Collects the set of {@link ConfigurableElement configurable elements} and provides

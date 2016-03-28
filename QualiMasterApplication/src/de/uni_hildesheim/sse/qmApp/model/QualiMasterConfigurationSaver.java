@@ -6,45 +6,45 @@ import java.util.Map;
 import java.util.Set;
 
 import qualimasterapplication.Activator;
-import de.uni_hildesheim.sse.model.confModel.Configuration;
-import de.uni_hildesheim.sse.model.confModel.ConfigurationException;
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.cst.CSTSemanticException;
-import de.uni_hildesheim.sse.model.cst.ConstantValue;
-import de.uni_hildesheim.sse.model.cst.ConstraintSyntaxTree;
-import de.uni_hildesheim.sse.model.cst.CopyVisitor;
-import de.uni_hildesheim.sse.model.cst.OCLFeatureCall;
-import de.uni_hildesheim.sse.model.cst.Variable;
-import de.uni_hildesheim.sse.model.varModel.AbstractVariable;
-import de.uni_hildesheim.sse.model.varModel.ContainableModelElement;
-import de.uni_hildesheim.sse.model.varModel.DecisionVariableDeclaration;
-import de.uni_hildesheim.sse.model.varModel.FreezeBlock;
-import de.uni_hildesheim.sse.model.varModel.IFreezable;
-import de.uni_hildesheim.sse.model.varModel.Project;
-import de.uni_hildesheim.sse.model.varModel.ProjectImport;
-import de.uni_hildesheim.sse.model.varModel.datatypes.ConstraintType;
-import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
-import de.uni_hildesheim.sse.model.varModel.datatypes.IntegerType;
-import de.uni_hildesheim.sse.model.varModel.datatypes.OclKeyWords;
-import de.uni_hildesheim.sse.model.varModel.datatypes.Reference;
-import de.uni_hildesheim.sse.model.varModel.datatypes.Sequence;
-import de.uni_hildesheim.sse.model.varModel.values.ContainerValue;
-import de.uni_hildesheim.sse.model.varModel.values.Value;
-import de.uni_hildesheim.sse.model.varModel.values.ValueDoesNotMatchTypeException;
-import de.uni_hildesheim.sse.model.varModel.values.ValueFactory;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
-import de.uni_hildesheim.sse.utils.modelManagement.IVersionRestriction;
-import de.uni_hildesheim.sse.utils.modelManagement.ModelManagementException;
-import de.uni_hildesheim.sse.utils.modelManagement.RestrictionEvaluationException;
 import eu.qualimaster.easy.extension.QmConstants;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
+import net.ssehub.easy.basics.modelManagement.IVersionRestriction;
+import net.ssehub.easy.basics.modelManagement.ModelManagementException;
+import net.ssehub.easy.basics.modelManagement.RestrictionEvaluationException;
+import net.ssehub.easy.varModel.confModel.Configuration;
+import net.ssehub.easy.varModel.confModel.ConfigurationException;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.cst.CSTSemanticException;
+import net.ssehub.easy.varModel.cst.ConstantValue;
+import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
+import net.ssehub.easy.varModel.cst.CopyVisitor;
+import net.ssehub.easy.varModel.cst.OCLFeatureCall;
+import net.ssehub.easy.varModel.cst.Variable;
+import net.ssehub.easy.varModel.model.AbstractVariable;
+import net.ssehub.easy.varModel.model.ContainableModelElement;
+import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
+import net.ssehub.easy.varModel.model.FreezeBlock;
+import net.ssehub.easy.varModel.model.IFreezable;
+import net.ssehub.easy.varModel.model.Project;
+import net.ssehub.easy.varModel.model.ProjectImport;
+import net.ssehub.easy.varModel.model.datatypes.ConstraintType;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
+import net.ssehub.easy.varModel.model.datatypes.IntegerType;
+import net.ssehub.easy.varModel.model.datatypes.OclKeyWords;
+import net.ssehub.easy.varModel.model.datatypes.Reference;
+import net.ssehub.easy.varModel.model.datatypes.Sequence;
+import net.ssehub.easy.varModel.model.values.ContainerValue;
+import net.ssehub.easy.varModel.model.values.Value;
+import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
+import net.ssehub.easy.varModel.model.values.ValueFactory;
 
 /**
  * Specializes the default configuration saver. Create an instance and call {@link #getSavedConfiguration()}
- * for writing via {@link de.uni_hildesheim.sse.persistency.IVMLWriter}.
+ * for writing via {@link net.ssehub.easy.varModel.persistency.IVMLWriter}.
  * 
  * @author Holger Eichelberger
  */
-public class QualiMasterConfigurationSaver extends de.uni_hildesheim.sse.model.confModel.ConfigurationSaver {
+public class QualiMasterConfigurationSaver extends net.ssehub.easy.varModel.confModel.ConfigurationSaver {
 
     private static final EASyLogger LOGGER = Activator.getLogger(QualiMasterConfigurationSaver.class);
 

@@ -5,8 +5,8 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
 import de.uni_hildesheim.sse.easy_producer.instantiator.Bundle;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
 
 /**
  * Utility class for the {@link IEclipsePreferences}. This class provides access to the preferences. Also it allows to

@@ -20,8 +20,8 @@ import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
-import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.qmApp.treeView.ElementStatusIndicator;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 
 /**
  * Class for managing icons.

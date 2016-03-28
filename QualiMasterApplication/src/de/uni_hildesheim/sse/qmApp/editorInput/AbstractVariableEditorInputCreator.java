@@ -21,8 +21,6 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IMemento;
 
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.qmApp.editors.DecisionVariableEditorInput;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
@@ -30,6 +28,8 @@ import de.uni_hildesheim.sse.qmApp.model.Utils;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager;
 import de.uni_hildesheim.sse.qmApp.treeView.IMenuContributor;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 
 /**
  * An abstract variable editor input creator holding a specified model variable.

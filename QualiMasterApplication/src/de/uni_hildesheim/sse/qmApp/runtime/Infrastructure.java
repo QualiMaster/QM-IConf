@@ -23,8 +23,6 @@ import java.util.List;
 
 import de.uni_hildesheim.sse.qmApp.dialogs.EclipsePrefUtils;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
 import eu.qualimaster.adaptation.external.AlgorithmChangedMessage;
 import eu.qualimaster.adaptation.external.AuthenticateMessage;
 import eu.qualimaster.adaptation.external.ChangeParameterRequest;
@@ -44,6 +42,8 @@ import eu.qualimaster.adaptation.external.PipelineMessage;
 import eu.qualimaster.adaptation.external.PipelineStatusRequest;
 import eu.qualimaster.adaptation.external.PipelineStatusResponse;
 import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
 import qualimasterapplication.Activator;
 
 /**

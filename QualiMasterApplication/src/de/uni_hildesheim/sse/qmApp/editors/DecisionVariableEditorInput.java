@@ -9,12 +9,12 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.PlatformUI;
 
-import de.uni_hildesheim.sse.model.confModel.Configuration;
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.qmApp.editorInput.IVariableEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.images.ImageRegistry;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
+import net.ssehub.easy.varModel.confModel.Configuration;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 
 /**
  * Wraps a configured IVML variable into an editor input.

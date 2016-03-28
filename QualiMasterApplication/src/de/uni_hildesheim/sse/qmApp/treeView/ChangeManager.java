@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIChangeListener;
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.varModel.AbstractVariable;
-import de.uni_hildesheim.sse.model.varModel.datatypes.Container;
-import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.AbstractVariable;
+import net.ssehub.easy.varModel.model.datatypes.Container;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 
 /**
  * Implements a central change manager in order to keep UI elements up to date.

@@ -18,14 +18,6 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 
-import de.uni_hildesheim.sse.model.confModel.CompoundVariable;
-import de.uni_hildesheim.sse.model.confModel.Configuration;
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.management.VarModel;
-import de.uni_hildesheim.sse.model.varModel.Project;
-import de.uni_hildesheim.sse.model.varModel.ProjectImport;
-import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
-import de.uni_hildesheim.sse.persistency.StringProvider;
 import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.IVariableEditorInput;
@@ -42,10 +34,18 @@ import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
 import de.uni_hildesheim.sse.qmApp.runtime.UIUtils;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
-import de.uni_hildesheim.sse.utils.modelManagement.ModelInfo;
 import eu.qualimaster.adaptation.external.PipelineMessage;
 import eu.qualimaster.easy.extension.QmConstants;
 import eu.qualimaster.manifestUtils.ManifestConnection;
+import net.ssehub.easy.basics.modelManagement.ModelInfo;
+import net.ssehub.easy.varModel.confModel.CompoundVariable;
+import net.ssehub.easy.varModel.confModel.Configuration;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.management.VarModel;
+import net.ssehub.easy.varModel.model.Project;
+import net.ssehub.easy.varModel.model.ProjectImport;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
+import net.ssehub.easy.varModel.persistency.StringProvider;
 
 /**
  * Implements the configuration element factory for pipelines.

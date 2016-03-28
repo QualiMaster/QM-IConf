@@ -3,13 +3,13 @@ package de.uni_hildesheim.sse.qmApp.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uni_hildesheim.sse.model.confModel.Configuration;
-import de.uni_hildesheim.sse.model.confModel.DisplayNameProvider;
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.varModel.AbstractVariable;
-import de.uni_hildesheim.sse.model.varModel.IModelElement;
-import de.uni_hildesheim.sse.model.varModel.datatypes.EnumLiteral;
-import de.uni_hildesheim.sse.model.varModel.datatypes.Enum;
+import net.ssehub.easy.varModel.confModel.Configuration;
+import net.ssehub.easy.varModel.confModel.DisplayNameProvider;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.AbstractVariable;
+import net.ssehub.easy.varModel.model.IModelElement;
+import net.ssehub.easy.varModel.model.datatypes.Enum;
+import net.ssehub.easy.varModel.model.datatypes.EnumLiteral;
 
 /**
  * Implements a specific display name provider in order to hide details

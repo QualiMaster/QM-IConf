@@ -14,16 +14,6 @@ import pipeline.impl.PipelineImpl;
 import pipeline.impl.SinkImpl;
 import pipeline.impl.SourceImpl;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory;
-import de.uni_hildesheim.sse.model.confModel.IConfiguration;
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.varModel.AbstractVariable;
-import de.uni_hildesheim.sse.model.varModel.datatypes.ConstraintType;
-import de.uni_hildesheim.sse.model.varModel.datatypes.EnumLiteral;
-import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
-import de.uni_hildesheim.sse.model.varModel.datatypes.StringType;
-import de.uni_hildesheim.sse.model.varModel.values.BooleanValue;
-import de.uni_hildesheim.sse.model.varModel.values.EnumValue;
-import de.uni_hildesheim.sse.model.varModel.values.Value;
 import de.uni_hildesheim.sse.qmApp.editorInput.EmptyEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator.CloneMode;
@@ -52,6 +42,17 @@ import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElements.IElementReferre
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.ApplicationRole;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.Role;
+import net.ssehub.easy.varModel.confModel.IConfiguration;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.AbstractVariable;
+import net.ssehub.easy.varModel.model.datatypes.ConstraintType;
+import net.ssehub.easy.varModel.model.datatypes.EnumLiteral;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
+import net.ssehub.easy.varModel.model.datatypes.StringType;
+import net.ssehub.easy.varModel.model.values.BooleanValue;
+import net.ssehub.easy.varModel.model.values.EnumValue;
+import net.ssehub.easy.varModel.model.values.Value;
+
 import static eu.qualimaster.easy.extension.QmConstants.*;
 
 /**
@@ -211,7 +212,7 @@ public class VariabilityModel {
         }
 
         @Override
-        public de.uni_hildesheim.sse.model.confModel.Configuration getConfiguration() {
+        public net.ssehub.easy.varModel.confModel.Configuration getConfiguration() {
             return ModelAccess.getConfiguration(this);
         }
 
@@ -292,7 +293,7 @@ public class VariabilityModel {
         }
 
         @Override
-        public de.uni_hildesheim.sse.model.confModel.Configuration getConfiguration() {
+        public net.ssehub.easy.varModel.confModel.Configuration getConfiguration() {
             return ModelAccess.getConfiguration(this);
         }
 
@@ -687,7 +688,7 @@ public class VariabilityModel {
      * @param config the configuration to check
      * @return <code>true</code> if <code>config</code> is readable, <code>false</code> else
      */
-    public static boolean isWritable(de.uni_hildesheim.sse.model.confModel.Configuration config) {
+    public static boolean isWritable(net.ssehub.easy.varModel.confModel.Configuration config) {
         boolean writable = false;
         String name = config.getProject().getName();
         Set<Role> roles = UserContext.INSTANCE.getRoles();
@@ -851,7 +852,7 @@ public class VariabilityModel {
      * @return the dereferenced variable (<b>null</b> if <code>var</code> was <b>null</b>)
      */
     public static IDecisionVariable dereference(IDecisionVariable var) {
-        return de.uni_hildesheim.sse.model.confModel.Configuration.dereference(var);
+        return net.ssehub.easy.varModel.confModel.Configuration.dereference(var);
     }
     
     /**
@@ -862,7 +863,7 @@ public class VariabilityModel {
      * @return the dereferenced value
      */
     public static Value dereference(IConfiguration config, Value value) {
-        return de.uni_hildesheim.sse.model.confModel.Configuration.dereference(config, value);
+        return net.ssehub.easy.varModel.confModel.Configuration.dereference(config, value);
     }
     
     /**
@@ -877,7 +878,7 @@ public class VariabilityModel {
      * @return the instance name (may be empty if <code>var == <b>null</b></code>
      */
     public static String getInstanceName(IDecisionVariable var) {
-        return de.uni_hildesheim.sse.model.confModel.Configuration.getInstanceName(var);
+        return net.ssehub.easy.varModel.confModel.Configuration.getInstanceName(var);
     }
 
     /**
@@ -890,7 +891,7 @@ public class VariabilityModel {
         Set<String> referencedAlgs = new HashSet<String>();
         final IModelPart families = Configuration.FAMILIES;
         List<AbstractVariable> decls = families.getPossibleValues();
-        de.uni_hildesheim.sse.model.confModel.Configuration cfg = families.getConfiguration();
+        net.ssehub.easy.varModel.confModel.Configuration cfg = families.getConfiguration();
         for (AbstractVariable decl : decls) {
             IDecisionVariable var = cfg.getDecision(decl);
             for (int n = 0; n < var.getNestedElementsCount(); n++) {

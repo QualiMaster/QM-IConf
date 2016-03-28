@@ -19,10 +19,10 @@ import java.util.List;
 
 import org.eclipse.ui.IEditorInput;
 
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.treeView.IMenuContributor;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 
 /**
  * Allows deferring the creation of editor inputs. The background is that editor inputs shall be provided shortly

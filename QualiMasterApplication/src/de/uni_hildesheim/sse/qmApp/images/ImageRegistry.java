@@ -5,10 +5,10 @@ import java.util.Map;
 
 import org.eclipse.swt.graphics.Image;
 
-import de.uni_hildesheim.sse.model.varModel.datatypes.Container;
-import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
-import de.uni_hildesheim.sse.model.varModel.datatypes.Reference;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
+import net.ssehub.easy.varModel.model.datatypes.Container;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
+import net.ssehub.easy.varModel.model.datatypes.Reference;
 
 /**
  * Implements a generic image registry to store and provide the images and icons for 

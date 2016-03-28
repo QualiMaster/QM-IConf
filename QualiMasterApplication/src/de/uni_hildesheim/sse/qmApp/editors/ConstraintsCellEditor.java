@@ -7,11 +7,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.values.ContainerValue;
+import net.ssehub.easy.varModel.model.values.Value;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.IUpdateListener;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.IUpdateProvider;
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.varModel.values.ContainerValue;
-import de.uni_hildesheim.sse.model.varModel.values.Value;
 
 /**
  * Implements a cell editor for constraints.

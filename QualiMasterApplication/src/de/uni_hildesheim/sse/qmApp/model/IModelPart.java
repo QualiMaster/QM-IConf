@@ -2,10 +2,10 @@ package de.uni_hildesheim.sse.qmApp.model;
 
 import java.util.List;
 
-import de.uni_hildesheim.sse.model.confModel.Configuration;
-import de.uni_hildesheim.sse.model.varModel.AbstractVariable;
-import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.qmApp.treeView.IConfigurableElementFactory;
+import net.ssehub.easy.varModel.confModel.Configuration;
+import net.ssehub.easy.varModel.model.AbstractVariable;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 
 /**
  * Defines the interface for a model part.

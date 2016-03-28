@@ -19,9 +19,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
 import de.uni_hildesheim.sse.qmApp.dialogs.DialogsUtil;
 import de.uni_hildesheim.sse.qmApp.model.PipelineDiagramUtils;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 
 /**
  * Implements an (cell) editor dialog for modifying a set of constraints. Constraints 

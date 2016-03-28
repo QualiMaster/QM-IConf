@@ -15,7 +15,7 @@
  */
 package de.uni_hildesheim.sse.qmApp.editorInput;
 
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 
 /**
  * A variable editor input based on a decision variable.

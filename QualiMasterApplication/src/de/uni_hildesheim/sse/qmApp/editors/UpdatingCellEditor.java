@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Composite;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.IUpdateListener;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.IUpdateProvider;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 
 /**
  * Implements a cell editor with basic update provider capabilities. Intended as a base class for implementing

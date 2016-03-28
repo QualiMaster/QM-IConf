@@ -9,22 +9,6 @@ import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditor
 import de.uni_hildesheim.sse.easy.ui.productline_editor.DelegatingEasyEditorPage;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.IUpdateListener;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.IUpdateProvider;
-import de.uni_hildesheim.sse.model.confModel.AssignmentState;
-import de.uni_hildesheim.sse.model.confModel.CompoundVariable;
-import de.uni_hildesheim.sse.model.confModel.Configuration;
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.varModel.DecisionVariableDeclaration;
-import de.uni_hildesheim.sse.model.varModel.IvmlKeyWords;
-import de.uni_hildesheim.sse.model.varModel.ModelQuery;
-import de.uni_hildesheim.sse.model.varModel.ModelQueryException;
-import de.uni_hildesheim.sse.model.varModel.Project;
-import de.uni_hildesheim.sse.model.varModel.ProjectImport;
-import de.uni_hildesheim.sse.model.varModel.datatypes.Compound;
-import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
-import de.uni_hildesheim.sse.model.varModel.datatypes.Reference;
-import de.uni_hildesheim.sse.model.varModel.filter.FilterType;
-import de.uni_hildesheim.sse.model.varModel.filter.mandatoryVars.MandatoryDeclarationClassifier;
-import de.uni_hildesheim.sse.model.varModel.filter.mandatoryVars.VariableContainer;
 import de.uni_hildesheim.sse.qmApp.editors.EditorUtils;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
@@ -33,6 +17,22 @@ import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.EventKind;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.IChangeListener;
 import eu.qualimaster.easy.extension.QmConstants;
+import net.ssehub.easy.varModel.confModel.AssignmentState;
+import net.ssehub.easy.varModel.confModel.CompoundVariable;
+import net.ssehub.easy.varModel.confModel.Configuration;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
+import net.ssehub.easy.varModel.model.IvmlKeyWords;
+import net.ssehub.easy.varModel.model.ModelQuery;
+import net.ssehub.easy.varModel.model.ModelQueryException;
+import net.ssehub.easy.varModel.model.Project;
+import net.ssehub.easy.varModel.model.ProjectImport;
+import net.ssehub.easy.varModel.model.datatypes.Compound;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
+import net.ssehub.easy.varModel.model.datatypes.Reference;
+import net.ssehub.easy.varModel.model.filter.FilterType;
+import net.ssehub.easy.varModel.model.filter.mandatoryVars.MandatoryDeclarationClassifier;
+import net.ssehub.easy.varModel.model.filter.mandatoryVars.VariableContainer;
 
 /**
  * Implements a generic property editor creator for pipeline diagram elements.

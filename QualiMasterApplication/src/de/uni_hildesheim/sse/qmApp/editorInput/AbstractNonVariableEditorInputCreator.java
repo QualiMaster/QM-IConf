@@ -17,10 +17,10 @@ package de.uni_hildesheim.sse.qmApp.editorInput;
 
 import java.util.List;
 
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.treeView.IMenuContributor;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 
 /**
  * Provides an abstract implementation of a non-variable-based editor input creator.

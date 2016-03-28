@@ -23,27 +23,27 @@ import pipeline.PipelineNode;
 import pipeline.Sink;
 import pipeline.Source;
 import qualimasterapplication.Activator;
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.management.VarModel;
-import de.uni_hildesheim.sse.model.varModel.ContainableModelElement;
-import de.uni_hildesheim.sse.model.varModel.DecisionVariableDeclaration;
-import de.uni_hildesheim.sse.model.varModel.IFreezable;
-import de.uni_hildesheim.sse.model.varModel.ModelQuery;
-import de.uni_hildesheim.sse.model.varModel.ModelQueryException;
-import de.uni_hildesheim.sse.model.varModel.Project;
-import de.uni_hildesheim.sse.model.varModel.ProjectImport;
-import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
-import de.uni_hildesheim.sse.model.varModel.datatypes.TypeQueries;
-import de.uni_hildesheim.sse.model.varModel.values.StringValue;
-import de.uni_hildesheim.sse.model.varModel.values.Value;
-import de.uni_hildesheim.sse.persistency.StringProvider;
 import de.uni_hildesheim.sse.qmApp.editors.QMPipelineEditor;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Definition;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
-import de.uni_hildesheim.sse.utils.modelManagement.ModelManagementException;
 import eu.qualimaster.easy.extension.QmConstants;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
+import net.ssehub.easy.basics.modelManagement.ModelManagementException;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.management.VarModel;
+import net.ssehub.easy.varModel.model.ContainableModelElement;
+import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
+import net.ssehub.easy.varModel.model.IFreezable;
+import net.ssehub.easy.varModel.model.ModelQuery;
+import net.ssehub.easy.varModel.model.ModelQueryException;
+import net.ssehub.easy.varModel.model.Project;
+import net.ssehub.easy.varModel.model.ProjectImport;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
+import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
+import net.ssehub.easy.varModel.model.values.StringValue;
+import net.ssehub.easy.varModel.model.values.Value;
+import net.ssehub.easy.varModel.persistency.StringProvider;
 
 /**
  * The operations of translating the Ecore pipeline diagram to IVML project.
@@ -210,7 +210,7 @@ public class PipelineTranslationOperations {
                 if (elt instanceof DecisionVariableDeclaration) {
                     DecisionVariableDeclaration dec = (DecisionVariableDeclaration) elt;
                     if (TypeQueries.sameTypes(type, dec.getType())) {
-                        de.uni_hildesheim.sse.model.confModel.Configuration cfg = ModelAccess.getConfiguration(dec);
+                        net.ssehub.easy.varModel.confModel.Configuration cfg = ModelAccess.getConfiguration(dec);
                         if (null != cfg) {
                             changed = cfg.getDecision(dec);
                         }

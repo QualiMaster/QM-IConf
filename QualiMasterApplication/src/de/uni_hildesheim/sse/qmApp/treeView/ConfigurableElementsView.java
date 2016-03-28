@@ -40,10 +40,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
-import de.uni_hildesheim.sse.model.confModel.ContainerVariable;
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.varModel.AbstractVariable;
-import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
 import de.uni_hildesheim.sse.qmApp.commands.AbstractConfigurableHandler;
 import de.uni_hildesheim.sse.qmApp.commands.InstantiateLocal;
 import de.uni_hildesheim.sse.qmApp.dialogs.CloneNumberInputDialog;
@@ -63,6 +59,10 @@ import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.EventKind;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.IChangeListener;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import eu.qualimaster.easy.extension.QmConstants;
+import net.ssehub.easy.varModel.confModel.ContainerVariable;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.AbstractVariable;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 import pipeline.diagram.part.PipelineDiagramEditor;
 
 /**
@@ -708,7 +708,7 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
     @Override
     public void variableChanged(EventKind kind, IDecisionVariable variable, int globalIndex) {
         if (enableChangeEventProcessing 
-            && variable.getParent() instanceof de.uni_hildesheim.sse.model.confModel.Configuration) {
+            && variable.getParent() instanceof net.ssehub.easy.varModel.confModel.Configuration) {
             ConfigurableElement element = elements.findElement(variable);
             boolean done;
             if (null != element) {

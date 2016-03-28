@@ -17,7 +17,7 @@ package de.uni_hildesheim.sse.qmApp.editorInput;
 
 import org.eclipse.ui.IPersistableElement;
 
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 
 /**
  * A specialized editor input creator for IVML decision variables.

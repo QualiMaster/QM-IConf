@@ -17,9 +17,9 @@ package de.uni_hildesheim.sse.qmApp.editorInput;
 
 import org.eclipse.ui.IMemento;
 
-import de.uni_hildesheim.sse.model.confModel.Configuration;
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
+import net.ssehub.easy.varModel.confModel.Configuration;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 
 /**
  * Allows to defer the creation of an editor input instance for a container variable.

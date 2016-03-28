@@ -24,21 +24,21 @@ import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditor
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIParameter;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.DelegatingEasyEditorPage;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.DelegatingEasyEditorPage.IDirtyListener;
-import de.uni_hildesheim.sse.model.confModel.Configuration;
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.varModel.AbstractVariable;
-import de.uni_hildesheim.sse.model.varModel.datatypes.Compound;
-import de.uni_hildesheim.sse.model.varModel.datatypes.Container;
-import de.uni_hildesheim.sse.model.varModel.datatypes.IDatatype;
-import de.uni_hildesheim.sse.model.varModel.filter.FilterType;
-import de.uni_hildesheim.sse.model.varModel.filter.mandatoryVars.MandatoryClassifierSettings;
-import de.uni_hildesheim.sse.model.varModel.filter.mandatoryVars.MandatoryDeclarationClassifier;
-import de.uni_hildesheim.sse.model.varModel.filter.mandatoryVars.VariableContainer;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.EventKind;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.IChangeListener;
+import net.ssehub.easy.varModel.confModel.Configuration;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.AbstractVariable;
+import net.ssehub.easy.varModel.model.datatypes.Compound;
+import net.ssehub.easy.varModel.model.datatypes.Container;
+import net.ssehub.easy.varModel.model.datatypes.IDatatype;
+import net.ssehub.easy.varModel.model.filter.FilterType;
+import net.ssehub.easy.varModel.model.filter.mandatoryVars.MandatoryClassifierSettings;
+import net.ssehub.easy.varModel.model.filter.mandatoryVars.MandatoryDeclarationClassifier;
+import net.ssehub.easy.varModel.model.filter.mandatoryVars.VariableContainer;
 
 /**
  * Provides some abstract model editor capabilities for variability model related editors.

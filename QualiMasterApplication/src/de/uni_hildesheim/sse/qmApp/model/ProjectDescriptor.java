@@ -2,9 +2,9 @@ package de.uni_hildesheim.sse.qmApp.model;
 
 import java.io.File;
 
-import de.uni_hildesheim.sse.model.confModel.Configuration;
-import de.uni_hildesheim.sse.utils.modelManagement.ModelManagementException;
 import eu.qualimaster.easy.extension.internal.QmProjectDescriptor;
+import net.ssehub.easy.basics.modelManagement.ModelManagementException;
+import net.ssehub.easy.varModel.confModel.Configuration;
 
 /**
  * Implements a descriptor for the source and target VIL project locations.

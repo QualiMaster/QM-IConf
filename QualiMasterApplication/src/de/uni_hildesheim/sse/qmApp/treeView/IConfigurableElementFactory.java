@@ -1,7 +1,7 @@
 package de.uni_hildesheim.sse.qmApp.treeView;
 
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
 import de.uni_hildesheim.sse.qmApp.editorInput.IVariableEditorInputCreator;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 
 /**
  * A simple factory for creating {@link ConfigurableElement configurable elements} within a model.

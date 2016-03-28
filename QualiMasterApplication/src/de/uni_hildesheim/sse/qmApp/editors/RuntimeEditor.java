@@ -34,13 +34,6 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.varModel.values.CompoundValue;
-import de.uni_hildesheim.sse.model.varModel.values.ContainerValue;
-import de.uni_hildesheim.sse.model.varModel.values.EnumValue;
-import de.uni_hildesheim.sse.model.varModel.values.IntValue;
-import de.uni_hildesheim.sse.model.varModel.values.StringValue;
-import de.uni_hildesheim.sse.model.varModel.values.Value;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
@@ -61,6 +54,13 @@ import eu.qualimaster.adaptation.external.PipelineStatusRequest;
 import eu.qualimaster.adaptation.external.PipelineStatusResponse;
 import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
 import eu.qualimaster.easy.extension.QmObservables;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.values.CompoundValue;
+import net.ssehub.easy.varModel.model.values.ContainerValue;
+import net.ssehub.easy.varModel.model.values.EnumValue;
+import net.ssehub.easy.varModel.model.values.IntValue;
+import net.ssehub.easy.varModel.model.values.StringValue;
+import net.ssehub.easy.varModel.model.values.Value;
 
 import static eu.qualimaster.easy.extension.QmConstants.*;
 import static eu.qualimaster.easy.extension.QmObservables.*;

@@ -1,9 +1,9 @@
 package de.uni_hildesheim.sse.qmApp.treeView;
 
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
 import de.uni_hildesheim.sse.qmApp.editorInput.IVariableEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editors.VariableEditor;
 import de.uni_hildesheim.sse.qmApp.images.ImageRegistry;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 
 /**
  * A default decision variable element factory using {@link ConfigurableElement#getDisplayName(IDecisionVariable)}

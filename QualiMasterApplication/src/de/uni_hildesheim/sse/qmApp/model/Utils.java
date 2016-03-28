@@ -16,12 +16,12 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import de.uni_hildesheim.sse.model.confModel.IDecisionVariable;
-import de.uni_hildesheim.sse.model.varModel.AbstractVariable;
 import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.AbstractVariable;
 
 /**
  * Some utilities.
@@ -312,7 +312,7 @@ public class Utils {
         boolean holds = isSame(otherDecl, variable.getDeclaration());
         if (!holds) {
             for (int e = 0; !holds && e < variable.getNestedElementsCount(); e++) {
-                IDecisionVariable elt = de.uni_hildesheim.sse.model.confModel.Configuration.dereference(
+                IDecisionVariable elt = net.ssehub.easy.varModel.confModel.Configuration.dereference(
                     variable.getNestedElement(e));
                 holds = isSame(otherDecl, elt.getDeclaration());
             }

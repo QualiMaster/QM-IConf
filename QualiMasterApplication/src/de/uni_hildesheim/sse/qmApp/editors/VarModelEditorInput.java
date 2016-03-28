@@ -4,8 +4,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 
-import de.uni_hildesheim.sse.model.confModel.Configuration;
-import de.uni_hildesheim.sse.model.management.VarModel;
+import net.ssehub.easy.varModel.confModel.Configuration;
+import net.ssehub.easy.varModel.management.VarModel;
 
 /**
  * Wraps an IVML configuration into an editor input.

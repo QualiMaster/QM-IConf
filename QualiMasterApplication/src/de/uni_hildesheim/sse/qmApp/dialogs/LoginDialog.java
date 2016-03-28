@@ -40,8 +40,8 @@ import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.Role;
 import de.uni_hildesheim.sse.repositoryConnector.svnConnector.ConnectorException;
 import de.uni_hildesheim.sse.repositoryConnector.svnConnector.RepositoryEventHandler;
 import de.uni_hildesheim.sse.repositoryConnector.svnConnector.SVNConnector;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
 
 /**
  * Login Dialog that pops up when the applications starts.
