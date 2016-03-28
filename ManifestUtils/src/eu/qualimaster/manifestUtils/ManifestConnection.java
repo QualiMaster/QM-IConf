@@ -206,12 +206,7 @@ public class ManifestConnection {
         IvySettings ivySettings = new IvySettings();
         
         //Set the maven repository as default.
-        String mavenPath = System.getenv("M2_REPO");
-        if (null == mavenPath || mavenPath.isEmpty()) {
-            
-            mavenPath = System.getProperty("user.home") + "/.m2/repository";
-            System.out.println("No Systemvariable for Maven Repository found! Assuming location in: " + mavenPath);
-        }
+        String mavenPath = MavenUtils.mavenRepository();
         
         if (null == ivyOut) {
             //setRetrievalFolder(new File("C:/Test/out"));
@@ -361,11 +356,10 @@ public class ManifestConnection {
      * must be appended to the end of this String.
      */
     private static String createJarAccessorURLString(File repositoryLocation, String artifactID) {
-    	String outPath = repositoryLocation.getAbsolutePath();
-    	String accessURL = (outPath.charAt(0) == '/') ? "jar:file:" : "jar:file:/";
-    	accessURL += outPath + "/" + artifactID + ".jar!";
-    	
-    	return accessURL;
+        String outPath = repositoryLocation.getAbsolutePath();
+        String accessURL = (outPath.charAt(0) == '/') ? "jar:file:" : "jar:file:/";
+        accessURL += outPath + "/" + artifactID + ".jar!";
+        return accessURL;
     }
     
     /**
@@ -799,8 +793,9 @@ public class ManifestConnection {
             
             if (!file.isDirectory()) {
                 String outPath = out.getAbsolutePath();
-            	try {
-                    list.add(new URL("file:" + (outPath.charAt(0) == '/' ? "" : "///" ) + outPath + "/" + file.getName()));
+                try {
+                    list.add(new URL("file:" + (outPath.charAt(0) == '/' ? "" : "///" ) 
+                        + outPath + "/" + file.getName()));
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }
