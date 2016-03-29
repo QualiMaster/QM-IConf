@@ -11,10 +11,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import de.uni_hildesheim.sse.repositoryConnector.Bundle;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
-import de.uni_hildesheim.sse.utils.progress.ProgressObserver;
-import de.uni_hildesheim.sse.utils.progress.ProgressObserver.ISubtask;
-import de.uni_hildesheim.sse.utils.progress.ProgressObserver.ITask;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.progress.ProgressObserver;
+import net.ssehub.easy.basics.progress.ProgressObserver.ISubtask;
+import net.ssehub.easy.basics.progress.ProgressObserver.ITask;
 
 /**
  * Class that collects the directories within the given Maven-Repository

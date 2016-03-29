@@ -25,10 +25,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
-import qualimasterapplication.Activator;
 import de.uni_hildesheim.sse.BuildLangModelUtility;
 import de.uni_hildesheim.sse.ModelUtility;
-import de.uni_hildesheim.sse.dslCore.EclipseResourceInitializer;
 import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory;
 import de.uni_hildesheim.sse.easy_producer.PLPWorkspaceListener;
 import de.uni_hildesheim.sse.easy_producer.instantiator.model.buildlangModel.BuildModel;
@@ -45,6 +43,7 @@ import net.ssehub.easy.basics.modelManagement.IModelListener;
 import net.ssehub.easy.basics.modelManagement.ModelInfo;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.basics.progress.ProgressObserver;
+import net.ssehub.easy.dslCore.EclipseResourceInitializer;
 import net.ssehub.easy.varModel.confModel.AllFreezeSelector;
 import net.ssehub.easy.varModel.confModel.AssignmentState;
 import net.ssehub.easy.varModel.confModel.CompoundVariable;
@@ -76,6 +75,7 @@ import net.ssehub.easy.varModel.model.values.Value;
 import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
 import net.ssehub.easy.varModel.model.values.ValueFactory;
 import net.ssehub.easy.varModel.persistency.IVMLWriter;
+import qualimasterapplication.Activator;
 
 /**
  * Provides generic access to EASy models.

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import qualimasterapplication.Activator;
 import de.uni_hildesheim.sse.ConstraintSyntaxException;
 import de.uni_hildesheim.sse.ModelUtility;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager;
@@ -41,6 +40,7 @@ import net.ssehub.easy.varModel.model.values.ReferenceValue;
 import net.ssehub.easy.varModel.model.values.Value;
 import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
 import net.ssehub.easy.varModel.model.values.ValueFactory;
+import qualimasterapplication.Activator;
 
 /**
  * The methods to operate the IVML model for obtaining IVML elements information.

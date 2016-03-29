@@ -19,13 +19,13 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.swt.widgets.Display;
 
-import de.uni_hildesheim.sse.dslCore.TopLevelModelAccessor;
-import de.uni_hildesheim.sse.dslcore.ui.ConfigurationEditorFactory;
 import de.uni_hildesheim.sse.qmApp.treeView.IMenuContributor;
 import de.uni_hildesheim.sse.vil.rt.ui.embed.EditorUtils;
 import de.uni_hildesheim.sse.vil.rt.ui.embed.NamedViewerFilter;
 import de.uni_hildesheim.sse.vil.rt.ui.embed.SimulatorUi;
 import net.ssehub.easy.basics.modelManagement.ModelInfo;
+import net.ssehub.easy.dslCore.TopLevelModelAccessor;
+import net.ssehub.easy.dslCore.ui.ConfigurationEditorFactory;
 
 /**
  * Implements the menu contributor for rt-VIL.

@@ -13,10 +13,10 @@ import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
 import de.uni_hildesheim.sse.ModelUtility;
-import de.uni_hildesheim.sse.dslCore.EclipseResourceInitializer;
 import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
+import net.ssehub.easy.dslCore.EclipseResourceInitializer;
 
 /**
  * Public class for configuring the window of the Qualimaster-App.

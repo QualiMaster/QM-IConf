@@ -27,9 +27,6 @@ import org.eclipse.swt.widgets.Text;
 
 import de.uni_hildesheim.sse.ConstraintSyntaxException;
 import de.uni_hildesheim.sse.ModelUtility;
-import de.uni_hildesheim.sse.dslcore.ui.Activator;
-import de.uni_hildesheim.sse.dslcore.ui.editors.IEmbeddedEditor;
-import de.uni_hildesheim.sse.dslcore.ui.editors.IEmbeddedEditor.IValidationStateListener;
 import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.dialogs.DialogsUtil;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
@@ -37,6 +34,9 @@ import de.uni_hildesheim.sse.ui.embed.EditorUtils;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
 import net.ssehub.easy.basics.modelManagement.ModelInfo;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
+import net.ssehub.easy.dslCore.ui.Activator;
+import net.ssehub.easy.dslCore.ui.editors.IEmbeddedEditor;
+import net.ssehub.easy.dslCore.ui.editors.IEmbeddedEditor.IValidationStateListener;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.cst.CSTSemanticException;
 import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
@@ -57,9 +57,9 @@ import net.ssehub.easy.varModel.model.datatypes.Container;
 import net.ssehub.easy.varModel.model.values.ConstraintValue;
 import net.ssehub.easy.varModel.model.values.ContainerValue;
 import net.ssehub.easy.varModel.model.values.Value;
+import net.ssehub.easy.varModel.persistency.ConstraintSplitWriter.IConstraintFilter;
 import net.ssehub.easy.varModel.persistency.IVMLWriter;
 import net.ssehub.easy.varModel.persistency.StringProvider;
-import net.ssehub.easy.varModel.persistency.ConstraintSplitWriter.IConstraintFilter;
 
 /**
  * Implements an (cell) editor dialog for modifying a single constraints. 

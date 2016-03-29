@@ -21,8 +21,8 @@ import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.Role;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.Root;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.User;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory;
-import de.uni_hildesheim.sse.utils.logger.EASyLoggerFactory.EASyLogger;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
 
 /**
  * Fetches the users and the aligned roles from a XML file that is located in
