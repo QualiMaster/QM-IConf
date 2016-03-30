@@ -3,8 +3,8 @@ package de.uni_hildesheim.sse.qmApp.treeView;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIChangeListener;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
+import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.UIChangeListener;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.datatypes.Container;
@@ -101,7 +101,7 @@ public class ChangeManager {
     
     /**
      * Returns a usable UI change listener which informs this
-     * class about changes on UI variables in EASy (see {@link de.uni_hildesheim.sse.easy.ui.productline_editor.
+     * class about changes on UI variables in EASy (see {@link net.ssehub.easy.producer.ui.productline_editor.
      * ConfigurationTableEditorFactory.UIConfiguration#commitValues(UIChangeListener)}).
      * 
      * @return the UI change listener

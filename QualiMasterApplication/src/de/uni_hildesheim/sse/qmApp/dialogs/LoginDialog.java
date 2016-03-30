@@ -27,8 +27,6 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-//this shall be the Activator.PLUGIN_ID but then the roles are away
-import de.uni_hildesheim.sse.easy_producer.instantiator.Bundle;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.qmApp.model.Location;
 import de.uni_hildesheim.sse.qmApp.model.Utils;
@@ -42,6 +40,7 @@ import de.uni_hildesheim.sse.repositoryConnector.svnConnector.RepositoryEventHan
 import de.uni_hildesheim.sse.repositoryConnector.svnConnector.SVNConnector;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
+import net.ssehub.easy.instantiation.core.Bundle;
 
 /**
  * Login Dialog that pops up when the applications starts.

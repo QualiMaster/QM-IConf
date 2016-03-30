@@ -9,8 +9,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 
-import de.uni_hildesheim.sse.easy_producer.instantiator.Bundle;
-import de.uni_hildesheim.sse.easy_producer.persistency.ResourcesMgmt;
 import de.uni_hildesheim.sse.qmApp.commands.ResetModel;
 import de.uni_hildesheim.sse.qmApp.dialogs.BootstrappingDialog;
 import de.uni_hildesheim.sse.qmApp.dialogs.LoginDialog;
@@ -19,6 +17,8 @@ import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
 import net.ssehub.easy.basics.logger.AdvancedJavaLogger;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
 import net.ssehub.easy.basics.logger.ILogger;
+import net.ssehub.easy.instantiation.core.Bundle;
+import net.ssehub.easy.producer.eclipse.persistency.ResourcesMgmt;
 
 /**
  * This class controls all aspects of the application's execution.

@@ -18,7 +18,7 @@ package de.uni_hildesheim.sse.qmApp.editors;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIParameter;
+import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.UIParameter;
 
 /**
  * Refines the variable editor for algorithm families.

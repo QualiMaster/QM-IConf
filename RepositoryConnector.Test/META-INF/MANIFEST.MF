@@ -7,6 +7,6 @@ Bundle-Vendor: University of Hildesheim - SSE
 Fragment-Host: RepositoryConnector;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.junit,
- de.uni_hildesheim.sse.dslCore;bundle-version="1.0.0"
+ net.ssehub.easy.dslCore;bundle-version="1.0.0"
 Bundle-ClassPath: .,
  lib/commons-io-2.4.jar

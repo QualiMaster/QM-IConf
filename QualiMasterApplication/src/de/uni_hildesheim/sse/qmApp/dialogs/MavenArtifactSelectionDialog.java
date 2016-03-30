@@ -47,12 +47,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
 
-import de.uni_hildesheim.sse.easy_producer.observer.EclipseProgressObserver;
 import de.uni_hildesheim.sse.qmApp.WorkspaceUtils;
 import de.uni_hildesheim.sse.qmApp.editors.ITextUpdater;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.repositoryConnector.maven.MavenFetcher;
 import de.uni_hildesheim.sse.repositoryConnector.maven.MavenFetcher.TreeElement;
+import net.ssehub.easy.producer.eclipse.observer.EclipseProgressObserver;
 
 /**
  * This editor allows the user to select a maven-artifact directory out of the

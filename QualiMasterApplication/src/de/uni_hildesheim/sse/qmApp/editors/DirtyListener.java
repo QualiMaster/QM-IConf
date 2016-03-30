@@ -21,7 +21,7 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 
-import de.uni_hildesheim.sse.easy.ui.productline_editor.DelegatingEasyEditorPage;
+import net.ssehub.easy.producer.ui.productline_editor.DelegatingEasyEditorPage;
 
 /**
  * A listener that turns the editor into the dirty state.

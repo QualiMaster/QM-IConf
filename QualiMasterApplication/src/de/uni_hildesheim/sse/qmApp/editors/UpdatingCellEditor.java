@@ -18,9 +18,9 @@ package de.uni_hildesheim.sse.qmApp.editors;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.swt.widgets.Composite;
 
-import de.uni_hildesheim.sse.easy.ui.productline_editor.IUpdateListener;
-import de.uni_hildesheim.sse.easy.ui.productline_editor.IUpdateProvider;
-import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
+import net.ssehub.easy.producer.ui.productline_editor.IUpdateListener;
+import net.ssehub.easy.producer.ui.productline_editor.IUpdateProvider;
+import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 
 /**

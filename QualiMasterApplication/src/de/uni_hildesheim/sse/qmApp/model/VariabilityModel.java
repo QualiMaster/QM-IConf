@@ -13,7 +13,6 @@ import pipeline.impl.FlowImpl;
 import pipeline.impl.PipelineImpl;
 import pipeline.impl.SinkImpl;
 import pipeline.impl.SourceImpl;
-import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory;
 import de.uni_hildesheim.sse.qmApp.editorInput.EmptyEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator.CloneMode;
@@ -42,6 +41,7 @@ import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElements.IElementReferre
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.ApplicationRole;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.Role;
+import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory;
 import net.ssehub.easy.varModel.confModel.IConfiguration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.model.AbstractVariable;

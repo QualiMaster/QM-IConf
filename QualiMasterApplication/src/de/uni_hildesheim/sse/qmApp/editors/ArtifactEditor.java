@@ -1,8 +1,8 @@
 package de.uni_hildesheim.sse.qmApp.editors;
 
-import de.uni_hildesheim.sse.easy.ui.productline_editor.ConfigurationTableEditorFactory.IEditorCreator;
 import de.uni_hildesheim.sse.qmApp.dialogs.DialogsUtil;
 import de.uni_hildesheim.sse.qmApp.dialogs.MavenArtifactSelectionDialog;
+import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.IEditorCreator;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 
 /**

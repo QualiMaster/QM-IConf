@@ -1,24 +1,24 @@
 package de.uni_hildesheim.sse.qmApp.dialogs;
 
-import de.uni_hildesheim.sse.easy.ui.productline_editor.EclipseConsole;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.buildlangModel.IBuildlangElement;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.buildlangModel.IEnumeratingLoop;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.buildlangModel.Rule;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.buildlangModel.Script;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.common.RuntimeEnvironment;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.common.VariableDeclaration;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.common.VilException;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.execution.IInstantiatorTracer;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.execution.TracerFactory;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.expressions.CallExpression.CallType;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.expressions.Expression;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.templateModel.Def;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.templateModel.ITemplateLangElement;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.templateModel.ITracer;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.templateModel.Template;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.vilTypes.Collection;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.vilTypes.FieldDescriptor;
-import de.uni_hildesheim.sse.easy_producer.instantiator.model.vilTypes.OperationDescriptor;
+import net.ssehub.easy.instantiation.core.model.buildlangModel.IBuildlangElement;
+import net.ssehub.easy.instantiation.core.model.buildlangModel.IEnumeratingLoop;
+import net.ssehub.easy.instantiation.core.model.buildlangModel.Rule;
+import net.ssehub.easy.instantiation.core.model.buildlangModel.Script;
+import net.ssehub.easy.instantiation.core.model.common.RuntimeEnvironment;
+import net.ssehub.easy.instantiation.core.model.common.VariableDeclaration;
+import net.ssehub.easy.instantiation.core.model.common.VilException;
+import net.ssehub.easy.instantiation.core.model.execution.IInstantiatorTracer;
+import net.ssehub.easy.instantiation.core.model.execution.TracerFactory;
+import net.ssehub.easy.instantiation.core.model.expressions.Expression;
+import net.ssehub.easy.instantiation.core.model.expressions.CallExpression.CallType;
+import net.ssehub.easy.instantiation.core.model.templateModel.Def;
+import net.ssehub.easy.instantiation.core.model.templateModel.ITemplateLangElement;
+import net.ssehub.easy.instantiation.core.model.templateModel.ITracer;
+import net.ssehub.easy.instantiation.core.model.templateModel.Template;
+import net.ssehub.easy.instantiation.core.model.vilTypes.Collection;
+import net.ssehub.easy.instantiation.core.model.vilTypes.FieldDescriptor;
+import net.ssehub.easy.instantiation.core.model.vilTypes.OperationDescriptor;
+import net.ssehub.easy.producer.ui.productline_editor.EclipseConsole;
 
 /**
  * Implements a simplified tracer factory for the QM configuration application.
@@ -48,7 +48,7 @@ public class UiTracerFactory extends TracerFactory {
     }
 
     @Override
-    protected de.uni_hildesheim.sse.easy_producer.instantiator.model.buildlangModel.ITracer
+    protected net.ssehub.easy.instantiation.core.model.buildlangModel.ITracer
         createBuildLanguageTracerImpl() {
         return TRACER;
     }
@@ -73,8 +73,8 @@ public class UiTracerFactory extends TracerFactory {
      * @author Holger Eichelberger
      */
     private static class Tracer implements 
-        de.uni_hildesheim.sse.easy_producer.instantiator.model.buildlangModel.ITracer, 
-        de.uni_hildesheim.sse.easy_producer.instantiator.model.templateModel.ITracer, IInstantiatorTracer {
+        net.ssehub.easy.instantiation.core.model.buildlangModel.ITracer, 
+        net.ssehub.easy.instantiation.core.model.templateModel.ITracer, IInstantiatorTracer {
 
         @Override
         public void trace(String text) {
@@ -202,7 +202,7 @@ public class UiTracerFactory extends TracerFactory {
 
         @Override
         public void visitIteratorAssignment(IEnumeratingLoop loop,
-            de.uni_hildesheim.sse.easy_producer.instantiator.model.buildlangModel.VariableDeclaration var,
+            net.ssehub.easy.instantiation.core.model.buildlangModel.VariableDeclaration var,
             Object value) {
         }
 

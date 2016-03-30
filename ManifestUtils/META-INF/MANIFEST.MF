@@ -11,4 +11,4 @@ Bundle-ClassPath: .,
  lib/ant-1.8.2.jar
 Export-Package: eu.qualimaster.manifestUtils,
  eu.qualimaster.manifestUtils.data
-Require-Bundle: de.uni_hildesheim.sse.utils;bundle-version="1.0.0"
+Require-Bundle: net.ssehub.easy.basics;bundle-version="1.0.0"
