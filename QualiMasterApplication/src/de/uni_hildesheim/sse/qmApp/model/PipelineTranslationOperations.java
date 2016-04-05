@@ -1,6 +1,7 @@
 package de.uni_hildesheim.sse.qmApp.model;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -14,15 +15,6 @@ import java.util.Set;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 
-import pipeline.DataManagementElement;
-import pipeline.FamilyElement;
-import pipeline.Flow;
-import pipeline.Pipeline;
-import pipeline.PipelineElement;
-import pipeline.PipelineNode;
-import pipeline.Sink;
-import pipeline.Source;
-import qualimasterapplication.Activator;
 import de.uni_hildesheim.sse.qmApp.editors.QMPipelineEditor;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Definition;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager;
@@ -43,7 +35,16 @@ import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
 import net.ssehub.easy.varModel.model.values.StringValue;
 import net.ssehub.easy.varModel.model.values.Value;
-import net.ssehub.easy.varModel.persistency.StringProvider;
+import net.ssehub.easy.varModel.persistency.IVMLWriter;
+import pipeline.DataManagementElement;
+import pipeline.FamilyElement;
+import pipeline.Flow;
+import pipeline.Pipeline;
+import pipeline.PipelineElement;
+import pipeline.PipelineNode;
+import pipeline.Sink;
+import pipeline.Source;
+import qualimasterapplication.Activator;
 
 /**
  * The operations of translating the Ecore pipeline diagram to IVML project.
@@ -170,16 +171,23 @@ public class PipelineTranslationOperations {
                 IVMLModelOperations.ADD, pImport);
         // adds the pipeline to the main project
         IVMLModelOperations.addPipelineToMainProject(pipelineVariable);
-
-        String output = StringProvider.toIvmlString(newProject);
         // writes the new IVML project to a file
-        String filePath = PipelineDiagramUtils.getFolderDirectory(fileURI)
-                + newProject.getName() + EXTENSION;
+        String filePath = PipelineDiagramUtils.getFolderDirectory(fileURI) + newProject.getName() + EXTENSION;
         File file = new File(filePath);
         boolean exists = file.exists();
-        writeIVMLStringToFile(output, filePath);
+        // Write
+        try {
+            FileWriter fWriter = new FileWriter(file);
+            IVMLWriter iWriter = new QualiMasterIvmlWriter(fWriter);
+            iWriter.setFormatInitializer(true);
+            iWriter.forceComponundTypes(true);
+            newProject.accept(iWriter);
+            iWriter.flush();
+        } catch (IOException e) {
+            getLogger().info(e.getMessage());
+        }
         Project prj = ModelAccess.reloadModel(newProject, file.toURI());
-        // print to IVML
+        // Reload model
         if (!exists) {
             try {
                 VarModel.INSTANCE.locations().updateModelInformation();
