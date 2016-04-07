@@ -67,8 +67,7 @@ public class PipelineTranslationOperations {
     private static IModelPart datamanagementModelPart = VariabilityModel.Configuration.DATA_MANAGEMENT;
     private static IModelPart pipelineModelPart = VariabilityModel.Configuration.PIPELINES;
     
-    private static Project modelProject = pipelineModelPart.getConfiguration()
-            .getProject();
+    private static Project modelProject = pipelineModelPart.getConfiguration().getProject();
     private static List<IFreezable> freezables;
     private static Map<FamilyElement, String> familyNodesAndName = new HashMap<FamilyElement, String>();
     private static List<PipelineNode> pipNodes;

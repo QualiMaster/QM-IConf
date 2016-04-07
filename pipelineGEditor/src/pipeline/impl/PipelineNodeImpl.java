@@ -51,7 +51,7 @@ public abstract class PipelineNodeImpl extends PipelineElementImpl implements Pi
 	 * @generated
 	 * @ordered
 	 */
-	protected static final Integer NUMTASKS_EDEFAULT = new Integer(1);
+	protected static final Integer NUMTASKS_EDEFAULT = new Integer(0);
 	/**
 	 * The cached value of the '{@link #getNumtasks() <em>Numtasks</em>}' attribute.
 	 * <!-- begin-user-doc -->

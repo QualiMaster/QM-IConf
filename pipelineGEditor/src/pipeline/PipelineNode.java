@@ -51,7 +51,7 @@ public interface PipelineNode extends PipelineElement {
 
 	/**
 	 * Returns the value of the '<em><b>Numtasks</b></em>' attribute.
-	 * The default value is <code>"1"</code>.
+	 * The default value is <code>"0"</code>.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Numtasks</em>' attribute isn't clear,
@@ -61,7 +61,7 @@ public interface PipelineNode extends PipelineElement {
 	 * @return the value of the '<em>Numtasks</em>' attribute.
 	 * @see #setNumtasks(Integer)
 	 * @see pipeline.PipelinePackage#getPipelineNode_Numtasks()
-	 * @model default="1"
+	 * @model default="0"
 	 * @generated
 	 */
 	Integer getNumtasks();
