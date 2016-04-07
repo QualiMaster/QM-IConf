@@ -17,26 +17,26 @@ public abstract class ProcessingElementTest extends PipelineNodeTest
 {
 
   /**
-     * Constructs a new Processing Element test case with the given name.
-     * <!-- begin-user-doc -->
+	 * Constructs a new Processing Element test case with the given name.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   public ProcessingElementTest(String name)
   {
-        super(name);
-    }
+		super(name);
+	}
 
   /**
-     * Returns the fixture for this Processing Element test case.
-     * <!-- begin-user-doc -->
+	 * Returns the fixture for this Processing Element test case.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   @Override
   protected ProcessingElement getFixture()
   {
-        return (ProcessingElement)fixture;
-    }
+		return (ProcessingElement)fixture;
+	}
 
 } //ProcessingElementTest

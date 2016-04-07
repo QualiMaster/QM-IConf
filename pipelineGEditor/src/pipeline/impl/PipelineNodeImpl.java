@@ -17,6 +17,7 @@ import pipeline.PipelinePackage;
  * The following features are implemented:
  * <ul>
  *   <li>{@link pipeline.impl.PipelineNodeImpl#getParallelism <em>Parallelism</em>}</li>
+ *   <li>{@link pipeline.impl.PipelineNodeImpl#getNumtasks <em>Numtasks</em>}</li>
  * </ul>
  * </p>
  *
@@ -24,136 +25,187 @@ import pipeline.PipelinePackage;
  */
 public abstract class PipelineNodeImpl extends PipelineElementImpl implements PipelineNode {
     /**
-     * The default value of the '{@link #getParallelism() <em>Parallelism</em>}' attribute.
-     * <!-- begin-user-doc -->
+	 * The default value of the '{@link #getParallelism() <em>Parallelism</em>}' attribute.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-     * @see #getParallelism()
-     * @generated
-     * @ordered
-     */
+	 * @see #getParallelism()
+	 * @generated
+	 * @ordered
+	 */
 	protected static final Integer PARALLELISM_EDEFAULT = new Integer(1);
 	/**
-     * The cached value of the '{@link #getParallelism() <em>Parallelism</em>}' attribute.
-     * <!-- begin-user-doc -->
+	 * The cached value of the '{@link #getParallelism() <em>Parallelism</em>}' attribute.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-     * @see #getParallelism()
-     * @generated
-     * @ordered
-     */
+	 * @see #getParallelism()
+	 * @generated
+	 * @ordered
+	 */
 	protected Integer parallelism = PARALLELISM_EDEFAULT;
 
 				/**
-     * <!-- begin-user-doc -->
+	 * The default value of the '{@link #getNumtasks() <em>Numtasks</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getNumtasks()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final Integer NUMTASKS_EDEFAULT = new Integer(1);
+	/**
+	 * The cached value of the '{@link #getNumtasks() <em>Numtasks</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getNumtasks()
+	 * @generated
+	 * @ordered
+	 */
+	protected Integer numtasks = NUMTASKS_EDEFAULT;
+				/**
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     protected PipelineNodeImpl() {
-        super();
-    }
+		super();
+	}
 
     /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     @Override
     protected EClass eStaticClass() {
-        return PipelinePackage.Literals.PIPELINE_NODE;
-    }
+		return PipelinePackage.Literals.PIPELINE_NODE;
+	}
 
 				/**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
 	public Integer getParallelism() {
-        return parallelism;
-    }
+		return parallelism;
+	}
 
 				/**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
 	public void setParallelism(Integer newParallelism) {
-        Integer oldParallelism = parallelism;
-        parallelism = newParallelism;
-        if (eNotificationRequired())
-            eNotify(new ENotificationImpl(this, Notification.SET, PipelinePackage.PIPELINE_NODE__PARALLELISM, oldParallelism, parallelism));
-    }
+		Integer oldParallelism = parallelism;
+		parallelism = newParallelism;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, PipelinePackage.PIPELINE_NODE__PARALLELISM, oldParallelism, parallelism));
+	}
 
 				/**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
+	public Integer getNumtasks() {
+		return numtasks;
+	}
+
+				/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setNumtasks(Integer newNumtasks) {
+		Integer oldNumtasks = numtasks;
+		numtasks = newNumtasks;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, PipelinePackage.PIPELINE_NODE__NUMTASKS, oldNumtasks, numtasks));
+	}
+
+				/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-        switch (featureID) {
-            case PipelinePackage.PIPELINE_NODE__PARALLELISM:
-                return getParallelism();
-        }
-        return super.eGet(featureID, resolve, coreType);
-    }
+		switch (featureID) {
+			case PipelinePackage.PIPELINE_NODE__PARALLELISM:
+				return getParallelism();
+			case PipelinePackage.PIPELINE_NODE__NUMTASKS:
+				return getNumtasks();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
 
 				/**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
 	@Override
 	public void eSet(int featureID, Object newValue) {
-        switch (featureID) {
-            case PipelinePackage.PIPELINE_NODE__PARALLELISM:
-                setParallelism((Integer)newValue);
-                return;
-        }
-        super.eSet(featureID, newValue);
-    }
+		switch (featureID) {
+			case PipelinePackage.PIPELINE_NODE__PARALLELISM:
+				setParallelism((Integer)newValue);
+				return;
+			case PipelinePackage.PIPELINE_NODE__NUMTASKS:
+				setNumtasks((Integer)newValue);
+				return;
+		}
+		super.eSet(featureID, newValue);
+	}
 
 				/**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
 	@Override
 	public void eUnset(int featureID) {
-        switch (featureID) {
-            case PipelinePackage.PIPELINE_NODE__PARALLELISM:
-                setParallelism(PARALLELISM_EDEFAULT);
-                return;
-        }
-        super.eUnset(featureID);
-    }
+		switch (featureID) {
+			case PipelinePackage.PIPELINE_NODE__PARALLELISM:
+				setParallelism(PARALLELISM_EDEFAULT);
+				return;
+			case PipelinePackage.PIPELINE_NODE__NUMTASKS:
+				setNumtasks(NUMTASKS_EDEFAULT);
+				return;
+		}
+		super.eUnset(featureID);
+	}
 
 				/**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
 	@Override
 	public boolean eIsSet(int featureID) {
-        switch (featureID) {
-            case PipelinePackage.PIPELINE_NODE__PARALLELISM:
-                return PARALLELISM_EDEFAULT == null ? parallelism != null : !PARALLELISM_EDEFAULT.equals(parallelism);
-        }
-        return super.eIsSet(featureID);
-    }
+		switch (featureID) {
+			case PipelinePackage.PIPELINE_NODE__PARALLELISM:
+				return PARALLELISM_EDEFAULT == null ? parallelism != null : !PARALLELISM_EDEFAULT.equals(parallelism);
+			case PipelinePackage.PIPELINE_NODE__NUMTASKS:
+				return NUMTASKS_EDEFAULT == null ? numtasks != null : !NUMTASKS_EDEFAULT.equals(numtasks);
+		}
+		return super.eIsSet(featureID);
+	}
 
 				/**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
 	@Override
 	public String toString() {
-        if (eIsProxy()) return super.toString();
+		if (eIsProxy()) return super.toString();
 
-        StringBuffer result = new StringBuffer(super.toString());
-        result.append(" (parallelism: ");
-        result.append(parallelism);
-        result.append(')');
-        return result.toString();
-    }
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (parallelism: ");
+		result.append(parallelism);
+		result.append(", numtasks: ");
+		result.append(numtasks);
+		result.append(')');
+		return result.toString();
+	}
 
 } //PipelineNodeImpl

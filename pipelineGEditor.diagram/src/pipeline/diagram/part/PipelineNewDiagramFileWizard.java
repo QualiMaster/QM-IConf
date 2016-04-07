@@ -1,11 +1,7 @@
-/*
- * 
- */
 package pipeline.diagram.part;
 
 import java.io.IOException;
 import java.util.LinkedList;
-
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.OperationHistoryFactory;
 import org.eclipse.core.resources.IFile;
@@ -30,7 +26,6 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
-
 import pipeline.diagram.edit.parts.PipelineEditPart;
 
 /**
@@ -38,166 +33,166 @@ import pipeline.diagram.edit.parts.PipelineEditPart;
  */
 public class PipelineNewDiagramFileWizard extends Wizard {
 
-    /**
-     * @generated
-     */
-    private WizardNewFileCreationPage myFileCreationPage;
+	/**
+	 * @generated
+	 */
+	private WizardNewFileCreationPage myFileCreationPage;
 
-    /**
-     * @generated
-     */
-    private ModelElementSelectionPage diagramRootElementSelectionPage;
+	/**
+	 * @generated
+	 */
+	private ModelElementSelectionPage diagramRootElementSelectionPage;
 
-    /**
-     * @generated
-     */
-    private TransactionalEditingDomain myEditingDomain;
+	/**
+	 * @generated
+	 */
+	private TransactionalEditingDomain myEditingDomain;
 
-    /**
-     * @generated
-     */
-    public PipelineNewDiagramFileWizard(URI domainModelURI,
-            EObject diagramRoot, TransactionalEditingDomain editingDomain) {
-        assert domainModelURI != null : "Domain model uri must be specified"; //$NON-NLS-1$
-        assert diagramRoot != null : "Doagram root element must be specified"; //$NON-NLS-1$
-        assert editingDomain != null : "Editing domain must be specified"; //$NON-NLS-1$
+	/**
+	 * @generated
+	 */
+	public PipelineNewDiagramFileWizard(URI domainModelURI,
+			EObject diagramRoot, TransactionalEditingDomain editingDomain) {
+		assert domainModelURI != null : "Domain model uri must be specified"; //$NON-NLS-1$
+		assert diagramRoot != null : "Doagram root element must be specified"; //$NON-NLS-1$
+		assert editingDomain != null : "Editing domain must be specified"; //$NON-NLS-1$
 
-        myFileCreationPage = new WizardNewFileCreationPage(
-                Messages.PipelineNewDiagramFileWizard_CreationPageName,
-                StructuredSelection.EMPTY);
-        myFileCreationPage
-                .setTitle(Messages.PipelineNewDiagramFileWizard_CreationPageTitle);
-        myFileCreationPage.setDescription(NLS.bind(
-                Messages.PipelineNewDiagramFileWizard_CreationPageDescription,
-                PipelineEditPart.MODEL_ID));
-        IPath filePath;
-        String fileName = URI.decode(domainModelURI.trimFileExtension()
-                .lastSegment());
-        if (domainModelURI.isPlatformResource()) {
-            filePath = new Path(domainModelURI.trimSegments(1)
-                    .toPlatformString(true));
-        } else if (domainModelURI.isFile()) {
-            filePath = new Path(domainModelURI.trimSegments(1).toFileString());
-        } else {
-            // TODO : use some default path
-            throw new IllegalArgumentException(
-                    "Unsupported URI: " + domainModelURI); //$NON-NLS-1$
-        }
-        myFileCreationPage.setContainerFullPath(filePath);
-        myFileCreationPage.setFileName(PipelineDiagramEditorUtil
-                .getUniqueFileName(filePath, fileName, "pipeline_diagram")); //$NON-NLS-1$
+		myFileCreationPage = new WizardNewFileCreationPage(
+				Messages.PipelineNewDiagramFileWizard_CreationPageName,
+				StructuredSelection.EMPTY);
+		myFileCreationPage
+				.setTitle(Messages.PipelineNewDiagramFileWizard_CreationPageTitle);
+		myFileCreationPage.setDescription(NLS.bind(
+				Messages.PipelineNewDiagramFileWizard_CreationPageDescription,
+				PipelineEditPart.MODEL_ID));
+		IPath filePath;
+		String fileName = URI.decode(domainModelURI.trimFileExtension()
+				.lastSegment());
+		if (domainModelURI.isPlatformResource()) {
+			filePath = new Path(domainModelURI.trimSegments(1)
+					.toPlatformString(true));
+		} else if (domainModelURI.isFile()) {
+			filePath = new Path(domainModelURI.trimSegments(1).toFileString());
+		} else {
+			// TODO : use some default path
+			throw new IllegalArgumentException(
+					"Unsupported URI: " + domainModelURI); //$NON-NLS-1$
+		}
+		myFileCreationPage.setContainerFullPath(filePath);
+		myFileCreationPage.setFileName(PipelineDiagramEditorUtil
+				.getUniqueFileName(filePath, fileName, "pipeline_diagram")); //$NON-NLS-1$
 
-        diagramRootElementSelectionPage = new DiagramRootElementSelectionPage(
-                Messages.PipelineNewDiagramFileWizard_RootSelectionPageName);
-        diagramRootElementSelectionPage
-                .setTitle(Messages.PipelineNewDiagramFileWizard_RootSelectionPageTitle);
-        diagramRootElementSelectionPage
-                .setDescription(Messages.PipelineNewDiagramFileWizard_RootSelectionPageDescription);
-        diagramRootElementSelectionPage.setModelElement(diagramRoot);
+		diagramRootElementSelectionPage = new DiagramRootElementSelectionPage(
+				Messages.PipelineNewDiagramFileWizard_RootSelectionPageName);
+		diagramRootElementSelectionPage
+				.setTitle(Messages.PipelineNewDiagramFileWizard_RootSelectionPageTitle);
+		diagramRootElementSelectionPage
+				.setDescription(Messages.PipelineNewDiagramFileWizard_RootSelectionPageDescription);
+		diagramRootElementSelectionPage.setModelElement(diagramRoot);
 
-        myEditingDomain = editingDomain;
-    }
+		myEditingDomain = editingDomain;
+	}
 
-    /**
-     * @generated
-     */
-    public void addPages() {
-        addPage(myFileCreationPage);
-        addPage(diagramRootElementSelectionPage);
-    }
+	/**
+	 * @generated
+	 */
+	public void addPages() {
+		addPage(myFileCreationPage);
+		addPage(diagramRootElementSelectionPage);
+	}
 
-    /**
-     * @generated
-     */
-    public boolean performFinish() {
-        LinkedList<IFile> affectedFiles = new LinkedList<IFile>();
-        IFile diagramFile = myFileCreationPage.createNewFile();
-        PipelineDiagramEditorUtil.setCharset(diagramFile);
-        affectedFiles.add(diagramFile);
-        URI diagramModelURI = URI.createPlatformResourceURI(diagramFile
-                .getFullPath().toString(), true);
-        ResourceSet resourceSet = myEditingDomain.getResourceSet();
-        final Resource diagramResource = resourceSet
-                .createResource(diagramModelURI);
-        AbstractTransactionalCommand command = new AbstractTransactionalCommand(
-                myEditingDomain,
-                Messages.PipelineNewDiagramFileWizard_InitDiagramCommand,
-                affectedFiles) {
+	/**
+	 * @generated
+	 */
+	public boolean performFinish() {
+		LinkedList<IFile> affectedFiles = new LinkedList<IFile>();
+		IFile diagramFile = myFileCreationPage.createNewFile();
+		PipelineDiagramEditorUtil.setCharset(diagramFile);
+		affectedFiles.add(diagramFile);
+		URI diagramModelURI = URI.createPlatformResourceURI(diagramFile
+				.getFullPath().toString(), true);
+		ResourceSet resourceSet = myEditingDomain.getResourceSet();
+		final Resource diagramResource = resourceSet
+				.createResource(diagramModelURI);
+		AbstractTransactionalCommand command = new AbstractTransactionalCommand(
+				myEditingDomain,
+				Messages.PipelineNewDiagramFileWizard_InitDiagramCommand,
+				affectedFiles) {
 
-            protected CommandResult doExecuteWithResult(
-                    IProgressMonitor monitor, IAdaptable info)
-                    throws ExecutionException {
-                int diagramVID = PipelineVisualIDRegistry
-                        .getDiagramVisualID(diagramRootElementSelectionPage
-                                .getModelElement());
-                if (diagramVID != PipelineEditPart.VISUAL_ID) {
-                    return CommandResult
-                            .newErrorCommandResult(Messages.PipelineNewDiagramFileWizard_IncorrectRootError);
-                }
-                Diagram diagram = ViewService.createDiagram(
-                        diagramRootElementSelectionPage.getModelElement(),
-                        PipelineEditPart.MODEL_ID,
-                        PipelineDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT);
-                diagramResource.getContents().add(diagram);
-                return CommandResult.newOKCommandResult();
-            }
-        };
-        try {
-            OperationHistoryFactory.getOperationHistory().execute(command,
-                    new NullProgressMonitor(), null);
-            diagramResource.save(PipelineDiagramEditorUtil.getSaveOptions());
-            PipelineDiagramEditorUtil.openDiagram(diagramResource);
-        } catch (ExecutionException e) {
-            PipelineDiagramEditorPlugin.getInstance().logError(
-                    "Unable to create model and diagram", e); //$NON-NLS-1$
-        } catch (IOException ex) {
-            PipelineDiagramEditorPlugin.getInstance().logError(
-                    "Save operation failed for: " + diagramModelURI, ex); //$NON-NLS-1$
-        } catch (PartInitException ex) {
-            PipelineDiagramEditorPlugin.getInstance().logError(
-                    "Unable to open editor", ex); //$NON-NLS-1$
-        }
-        return true;
-    }
+			protected CommandResult doExecuteWithResult(
+					IProgressMonitor monitor, IAdaptable info)
+					throws ExecutionException {
+				int diagramVID = PipelineVisualIDRegistry
+						.getDiagramVisualID(diagramRootElementSelectionPage
+								.getModelElement());
+				if (diagramVID != PipelineEditPart.VISUAL_ID) {
+					return CommandResult
+							.newErrorCommandResult(Messages.PipelineNewDiagramFileWizard_IncorrectRootError);
+				}
+				Diagram diagram = ViewService.createDiagram(
+						diagramRootElementSelectionPage.getModelElement(),
+						PipelineEditPart.MODEL_ID,
+						PipelineDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT);
+				diagramResource.getContents().add(diagram);
+				return CommandResult.newOKCommandResult();
+			}
+		};
+		try {
+			OperationHistoryFactory.getOperationHistory().execute(command,
+					new NullProgressMonitor(), null);
+			diagramResource.save(PipelineDiagramEditorUtil.getSaveOptions());
+			PipelineDiagramEditorUtil.openDiagram(diagramResource);
+		} catch (ExecutionException e) {
+			PipelineDiagramEditorPlugin.getInstance().logError(
+					"Unable to create model and diagram", e); //$NON-NLS-1$
+		} catch (IOException ex) {
+			PipelineDiagramEditorPlugin.getInstance().logError(
+					"Save operation failed for: " + diagramModelURI, ex); //$NON-NLS-1$
+		} catch (PartInitException ex) {
+			PipelineDiagramEditorPlugin.getInstance().logError(
+					"Unable to open editor", ex); //$NON-NLS-1$
+		}
+		return true;
+	}
 
-    /**
-     * @generated
-     */
-    private static class DiagramRootElementSelectionPage extends
-            ModelElementSelectionPage {
+	/**
+	 * @generated
+	 */
+	private static class DiagramRootElementSelectionPage extends
+			ModelElementSelectionPage {
 
-        /**
-         * @generated
-         */
-        protected DiagramRootElementSelectionPage(String pageName) {
-            super(pageName);
-        }
+		/**
+		 * @generated
+		 */
+		protected DiagramRootElementSelectionPage(String pageName) {
+			super(pageName);
+		}
 
-        /**
-         * @generated
-         */
-        protected String getSelectionTitle() {
-            return Messages.PipelineNewDiagramFileWizard_RootSelectionPageSelectionTitle;
-        }
+		/**
+		 * @generated
+		 */
+		protected String getSelectionTitle() {
+			return Messages.PipelineNewDiagramFileWizard_RootSelectionPageSelectionTitle;
+		}
 
-        /**
-         * @generated
-         */
-        protected boolean validatePage() {
-            if (getModelElement() == null) {
-                setErrorMessage(Messages.PipelineNewDiagramFileWizard_RootSelectionPageNoSelectionMessage);
-                return false;
-            }
-            boolean result = ViewService
-                    .getInstance()
-                    .provides(
-                            new CreateDiagramViewOperation(
-                                    new EObjectAdapter(getModelElement()),
-                                    PipelineEditPart.MODEL_ID,
-                                    PipelineDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT));
-            setErrorMessage(result ? null
-                    : Messages.PipelineNewDiagramFileWizard_RootSelectionPageInvalidSelectionMessage);
-            return result;
-        }
-    }
+		/**
+		 * @generated
+		 */
+		protected boolean validatePage() {
+			if (getModelElement() == null) {
+				setErrorMessage(Messages.PipelineNewDiagramFileWizard_RootSelectionPageNoSelectionMessage);
+				return false;
+			}
+			boolean result = ViewService
+					.getInstance()
+					.provides(
+							new CreateDiagramViewOperation(
+									new EObjectAdapter(getModelElement()),
+									PipelineEditPart.MODEL_ID,
+									PipelineDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT));
+			setErrorMessage(result ? null
+					: Messages.PipelineNewDiagramFileWizard_RootSelectionPageInvalidSelectionMessage);
+			return result;
+		}
+	}
 }

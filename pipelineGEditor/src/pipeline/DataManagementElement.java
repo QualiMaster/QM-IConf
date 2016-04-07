@@ -21,30 +21,30 @@ package pipeline;
  */
 public interface DataManagementElement extends ProcessingElement {
     /**
-     * Returns the value of the '<em><b>Data Management</b></em>' attribute.
-     * The default value is <code>"-1"</code>.
-     * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Data Management</b></em>' attribute.
+	 * The default value is <code>"-1"</code>.
+	 * <!-- begin-user-doc -->
      * <p>
      * If the meaning of the '<em>Data Management</em>' attribute isn't clear,
      * there really should be more of a description here...
      * </p>
      * <!-- end-user-doc -->
-     * @return the value of the '<em>Data Management</em>' attribute.
-     * @see #setDataManagement(Integer)
-     * @see pipeline.PipelinePackage#getDataManagementElement_DataManagement()
-     * @model default="-1"
-     * @generated
-     */
+	 * @return the value of the '<em>Data Management</em>' attribute.
+	 * @see #setDataManagement(Integer)
+	 * @see pipeline.PipelinePackage#getDataManagementElement_DataManagement()
+	 * @model default="-1"
+	 * @generated
+	 */
     Integer getDataManagement();
 
     /**
-     * Sets the value of the '{@link pipeline.DataManagementElement#getDataManagement <em>Data Management</em>}' attribute.
-     * <!-- begin-user-doc -->
+	 * Sets the value of the '{@link pipeline.DataManagementElement#getDataManagement <em>Data Management</em>}' attribute.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @param value the new value of the '<em>Data Management</em>' attribute.
-     * @see #getDataManagement()
-     * @generated
-     */
+	 * @param value the new value of the '<em>Data Management</em>' attribute.
+	 * @see #getDataManagement()
+	 * @generated
+	 */
     void setDataManagement(Integer value);
 
 } // DataManagementElement

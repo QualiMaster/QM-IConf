@@ -1,6 +1,3 @@
-/*
- * 
- */
 package pipeline.diagram.part;
 
 import org.eclipse.gmf.tooling.runtime.part.DefaultModelElementSelectionPage;
@@ -11,20 +8,20 @@ import org.eclipse.gmf.tooling.runtime.part.DefaultModelElementSelectionPage;
  */
 public class ModelElementSelectionPage extends DefaultModelElementSelectionPage {
 
-    /**
-     * @generated
-     */
-    public ModelElementSelectionPage(String pageName) {
-        super(PipelineDiagramEditorPlugin.getInstance()
-                .getItemProvidersAdapterFactory(), pageName);
-    }
+	/**
+	 * @generated
+	 */
+	public ModelElementSelectionPage(String pageName) {
+		super(PipelineDiagramEditorPlugin.getInstance()
+				.getItemProvidersAdapterFactory(), pageName);
+	}
 
-    /**
-     * Override to provide custom model element description.
-     * @generated
-     */
-    protected String getSelectionTitle() {
-        return Messages.ModelElementSelectionPageMessage;
-    }
+	/**
+	 * Override to provide custom model element description.
+	 * @generated
+	 */
+	protected String getSelectionTitle() {
+		return Messages.ModelElementSelectionPageMessage;
+	}
 
 }

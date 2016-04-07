@@ -28,190 +28,190 @@ import pipeline.PipelinePackage;
  */
 public abstract class PipelineElementImpl extends EObjectImpl implements PipelineElement {
     /**
-     * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-     * <!-- begin-user-doc -->
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @see #getName()
-     * @generated
-     * @ordered
-     */
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
     protected static final String NAME_EDEFAULT = "";
 
     /**
-     * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-     * <!-- begin-user-doc -->
+	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @see #getName()
-     * @generated
-     * @ordered
-     */
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
     protected String name = NAME_EDEFAULT;
 
     /**
-     * The default value of the '{@link #getConstraints() <em>Constraints</em>}' attribute.
-     * <!-- begin-user-doc -->
+	 * The default value of the '{@link #getConstraints() <em>Constraints</em>}' attribute.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @see #getConstraints()
-     * @generated
-     * @ordered
-     */
+	 * @see #getConstraints()
+	 * @generated
+	 * @ordered
+	 */
     protected static final String CONSTRAINTS_EDEFAULT = "";
 
     /**
-     * The cached value of the '{@link #getConstraints() <em>Constraints</em>}' attribute.
-     * <!-- begin-user-doc -->
+	 * The cached value of the '{@link #getConstraints() <em>Constraints</em>}' attribute.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @see #getConstraints()
-     * @generated
-     * @ordered
-     */
+	 * @see #getConstraints()
+	 * @generated
+	 * @ordered
+	 */
     protected String constraints = CONSTRAINTS_EDEFAULT;
 
     /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     protected PipelineElementImpl() {
-        super();
-    }
+		super();
+	}
 
     /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     @Override
     protected EClass eStaticClass() {
-        return PipelinePackage.Literals.PIPELINE_ELEMENT;
-    }
+		return PipelinePackage.Literals.PIPELINE_ELEMENT;
+	}
 
     /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     public String getName() {
-        return name;
-    }
+		return name;
+	}
 
     /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     public void setName(String newName) {
-        String oldName = name;
-        name = newName;
-        if (eNotificationRequired())
-            eNotify(new ENotificationImpl(this, Notification.SET, PipelinePackage.PIPELINE_ELEMENT__NAME, oldName, name));
-    }
+		String oldName = name;
+		name = newName;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, PipelinePackage.PIPELINE_ELEMENT__NAME, oldName, name));
+	}
 
     /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     public String getConstraints() {
-        return constraints;
-    }
+		return constraints;
+	}
 
     /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     public void setConstraints(String newConstraints) {
-        String oldConstraints = constraints;
-        constraints = newConstraints;
-        if (eNotificationRequired())
-            eNotify(new ENotificationImpl(this, Notification.SET, PipelinePackage.PIPELINE_ELEMENT__CONSTRAINTS, oldConstraints, constraints));
-    }
+		String oldConstraints = constraints;
+		constraints = newConstraints;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, PipelinePackage.PIPELINE_ELEMENT__CONSTRAINTS, oldConstraints, constraints));
+	}
 
     /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     @Override
     public Object eGet(int featureID, boolean resolve, boolean coreType) {
-        switch (featureID) {
-            case PipelinePackage.PIPELINE_ELEMENT__NAME:
-                return getName();
-            case PipelinePackage.PIPELINE_ELEMENT__CONSTRAINTS:
-                return getConstraints();
-        }
-        return super.eGet(featureID, resolve, coreType);
-    }
+		switch (featureID) {
+			case PipelinePackage.PIPELINE_ELEMENT__NAME:
+				return getName();
+			case PipelinePackage.PIPELINE_ELEMENT__CONSTRAINTS:
+				return getConstraints();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
 
     /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     @Override
     public void eSet(int featureID, Object newValue) {
-        switch (featureID) {
-            case PipelinePackage.PIPELINE_ELEMENT__NAME:
-                setName((String)newValue);
-                return;
-            case PipelinePackage.PIPELINE_ELEMENT__CONSTRAINTS:
-                setConstraints((String)newValue);
-                return;
-        }
-        super.eSet(featureID, newValue);
-    }
+		switch (featureID) {
+			case PipelinePackage.PIPELINE_ELEMENT__NAME:
+				setName((String)newValue);
+				return;
+			case PipelinePackage.PIPELINE_ELEMENT__CONSTRAINTS:
+				setConstraints((String)newValue);
+				return;
+		}
+		super.eSet(featureID, newValue);
+	}
 
     /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     @Override
     public void eUnset(int featureID) {
-        switch (featureID) {
-            case PipelinePackage.PIPELINE_ELEMENT__NAME:
-                setName(NAME_EDEFAULT);
-                return;
-            case PipelinePackage.PIPELINE_ELEMENT__CONSTRAINTS:
-                setConstraints(CONSTRAINTS_EDEFAULT);
-                return;
-        }
-        super.eUnset(featureID);
-    }
+		switch (featureID) {
+			case PipelinePackage.PIPELINE_ELEMENT__NAME:
+				setName(NAME_EDEFAULT);
+				return;
+			case PipelinePackage.PIPELINE_ELEMENT__CONSTRAINTS:
+				setConstraints(CONSTRAINTS_EDEFAULT);
+				return;
+		}
+		super.eUnset(featureID);
+	}
 
     /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     @Override
     public boolean eIsSet(int featureID) {
-        switch (featureID) {
-            case PipelinePackage.PIPELINE_ELEMENT__NAME:
-                return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-            case PipelinePackage.PIPELINE_ELEMENT__CONSTRAINTS:
-                return CONSTRAINTS_EDEFAULT == null ? constraints != null : !CONSTRAINTS_EDEFAULT.equals(constraints);
-        }
-        return super.eIsSet(featureID);
-    }
+		switch (featureID) {
+			case PipelinePackage.PIPELINE_ELEMENT__NAME:
+				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
+			case PipelinePackage.PIPELINE_ELEMENT__CONSTRAINTS:
+				return CONSTRAINTS_EDEFAULT == null ? constraints != null : !CONSTRAINTS_EDEFAULT.equals(constraints);
+		}
+		return super.eIsSet(featureID);
+	}
 
     /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     @Override
     public String toString() {
-        if (eIsProxy()) return super.toString();
+		if (eIsProxy()) return super.toString();
 
-        StringBuffer result = new StringBuffer(super.toString());
-        result.append(" (name: ");
-        result.append(name);
-        result.append(", constraints: ");
-        result.append(constraints);
-        result.append(')');
-        return result.toString();
-    }
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (name: ");
+		result.append(name);
+		result.append(", constraints: ");
+		result.append(constraints);
+		result.append(')');
+		return result.toString();
+	}
 
 } //PipelineElementImpl

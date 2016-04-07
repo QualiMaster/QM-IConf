@@ -15,41 +15,41 @@ import pipeline.PipelineElement;
 public abstract class PipelineElementTest extends TestCase {
 
     /**
-     * The fixture for this Element test case.
-     * <!-- begin-user-doc -->
+	 * The fixture for this Element test case.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     protected PipelineElement fixture = null;
 
     /**
-     * Constructs a new Element test case with the given name.
-     * <!-- begin-user-doc -->
+	 * Constructs a new Element test case with the given name.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     public PipelineElementTest(String name) {
-        super(name);
-    }
+		super(name);
+	}
 
     /**
-     * Sets the fixture for this Element test case.
-     * <!-- begin-user-doc -->
+	 * Sets the fixture for this Element test case.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     protected void setFixture(PipelineElement fixture) {
-        this.fixture = fixture;
-    }
+		this.fixture = fixture;
+	}
 
     /**
-     * Returns the fixture for this Element test case.
-     * <!-- begin-user-doc -->
+	 * Returns the fixture for this Element test case.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     protected PipelineElement getFixture() {
-        return fixture;
-    }
+		return fixture;
+	}
 
 } //PipelineElementTest

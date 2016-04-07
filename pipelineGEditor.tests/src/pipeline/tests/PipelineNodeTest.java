@@ -13,24 +13,24 @@ import pipeline.PipelineNode;
 public abstract class PipelineNodeTest extends PipelineElementTest {
 
     /**
-     * Constructs a new Node test case with the given name.
-     * <!-- begin-user-doc -->
+	 * Constructs a new Node test case with the given name.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     public PipelineNodeTest(String name) {
-        super(name);
-    }
+		super(name);
+	}
 
     /**
-     * Returns the fixture for this Node test case.
-     * <!-- begin-user-doc -->
+	 * Returns the fixture for this Node test case.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     @Override
     protected PipelineNode getFixture() {
-        return (PipelineNode)fixture;
-    }
+		return (PipelineNode)fixture;
+	}
 
 } //PipelineNodeTest

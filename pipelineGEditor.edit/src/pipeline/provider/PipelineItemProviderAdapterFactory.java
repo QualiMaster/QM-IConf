@@ -35,300 +35,300 @@ import pipeline.util.PipelineAdapterFactory;
 public class PipelineItemProviderAdapterFactory extends PipelineAdapterFactory implements ComposeableAdapterFactory, IChangeNotifier, IDisposable
 {
   /**
-     * This keeps track of the root adapter factory that delegates to this adapter factory.
-     * <!-- begin-user-doc -->
+	 * This keeps track of the root adapter factory that delegates to this adapter factory.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   protected ComposedAdapterFactory parentAdapterFactory;
 
   /**
-     * This is used to implement {@link org.eclipse.emf.edit.provider.IChangeNotifier}.
-     * <!-- begin-user-doc -->
+	 * This is used to implement {@link org.eclipse.emf.edit.provider.IChangeNotifier}.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   protected IChangeNotifier changeNotifier = new ChangeNotifier();
 
   /**
-     * This keeps track of all the supported types checked by {@link #isFactoryForType isFactoryForType}.
-     * <!-- begin-user-doc -->
+	 * This keeps track of all the supported types checked by {@link #isFactoryForType isFactoryForType}.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   protected Collection<Object> supportedTypes = new ArrayList<Object>();
 
   /**
-     * This constructs an instance.
-     * <!-- begin-user-doc -->
+	 * This constructs an instance.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   public PipelineItemProviderAdapterFactory()
   {
-        supportedTypes.add(IEditingDomainItemProvider.class);
-        supportedTypes.add(IStructuredItemContentProvider.class);
-        supportedTypes.add(ITreeItemContentProvider.class);
-        supportedTypes.add(IItemLabelProvider.class);
-        supportedTypes.add(IItemPropertySource.class);
-    }
+		supportedTypes.add(IEditingDomainItemProvider.class);
+		supportedTypes.add(IStructuredItemContentProvider.class);
+		supportedTypes.add(ITreeItemContentProvider.class);
+		supportedTypes.add(IItemLabelProvider.class);
+		supportedTypes.add(IItemPropertySource.class);
+	}
 
   /**
-     * This keeps track of the one adapter used for all {@link pipeline.Pipeline} instances.
-     * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link pipeline.Pipeline} instances.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   protected PipelineItemProvider pipelineItemProvider;
 
   /**
-     * This creates an adapter for a {@link pipeline.Pipeline}.
-     * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link pipeline.Pipeline}.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   @Override
   public Adapter createPipelineAdapter()
   {
-        if (pipelineItemProvider == null) {
-            pipelineItemProvider = new PipelineItemProvider(this);
-        }
+		if (pipelineItemProvider == null) {
+			pipelineItemProvider = new PipelineItemProvider(this);
+		}
 
-        return pipelineItemProvider;
-    }
+		return pipelineItemProvider;
+	}
 
   /**
-     * This keeps track of the one adapter used for all {@link pipeline.Flow} instances.
-     * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link pipeline.Flow} instances.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   protected FlowItemProvider flowItemProvider;
 
   /**
-     * This creates an adapter for a {@link pipeline.Flow}.
-     * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link pipeline.Flow}.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   @Override
   public Adapter createFlowAdapter()
   {
-        if (flowItemProvider == null) {
-            flowItemProvider = new FlowItemProvider(this);
-        }
+		if (flowItemProvider == null) {
+			flowItemProvider = new FlowItemProvider(this);
+		}
 
-        return flowItemProvider;
-    }
+		return flowItemProvider;
+	}
 
   /**
-     * This keeps track of the one adapter used for all {@link pipeline.Source} instances.
-     * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link pipeline.Source} instances.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   protected SourceItemProvider sourceItemProvider;
 
   /**
-     * This creates an adapter for a {@link pipeline.Source}.
-     * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link pipeline.Source}.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   @Override
   public Adapter createSourceAdapter()
   {
-        if (sourceItemProvider == null) {
-            sourceItemProvider = new SourceItemProvider(this);
-        }
+		if (sourceItemProvider == null) {
+			sourceItemProvider = new SourceItemProvider(this);
+		}
 
-        return sourceItemProvider;
-    }
+		return sourceItemProvider;
+	}
 
   /**
-     * This keeps track of the one adapter used for all {@link pipeline.Sink} instances.
-     * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link pipeline.Sink} instances.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   protected SinkItemProvider sinkItemProvider;
 
   /**
-     * This creates an adapter for a {@link pipeline.Sink}.
-     * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link pipeline.Sink}.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   @Override
   public Adapter createSinkAdapter()
   {
-        if (sinkItemProvider == null) {
-            sinkItemProvider = new SinkItemProvider(this);
-        }
+		if (sinkItemProvider == null) {
+			sinkItemProvider = new SinkItemProvider(this);
+		}
 
-        return sinkItemProvider;
-    }
+		return sinkItemProvider;
+	}
 
   /**
-     * This keeps track of the one adapter used for all {@link pipeline.FamilyElement} instances.
-     * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link pipeline.FamilyElement} instances.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     protected FamilyElementItemProvider familyElementItemProvider;
 
 /**
-     * This creates an adapter for a {@link pipeline.FamilyElement}.
-     * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link pipeline.FamilyElement}.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     @Override
     public Adapter createFamilyElementAdapter() {
-        if (familyElementItemProvider == null) {
-            familyElementItemProvider = new FamilyElementItemProvider(this);
-        }
+		if (familyElementItemProvider == null) {
+			familyElementItemProvider = new FamilyElementItemProvider(this);
+		}
 
-        return familyElementItemProvider;
-    }
+		return familyElementItemProvider;
+	}
 
 /**
-     * This keeps track of the one adapter used for all {@link pipeline.DataManagementElement} instances.
-     * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link pipeline.DataManagementElement} instances.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     protected DataManagementElementItemProvider dataManagementElementItemProvider;
 
 /**
-     * This creates an adapter for a {@link pipeline.DataManagementElement}.
-     * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link pipeline.DataManagementElement}.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     @Override
     public Adapter createDataManagementElementAdapter() {
-        if (dataManagementElementItemProvider == null) {
-            dataManagementElementItemProvider = new DataManagementElementItemProvider(this);
-        }
+		if (dataManagementElementItemProvider == null) {
+			dataManagementElementItemProvider = new DataManagementElementItemProvider(this);
+		}
 
-        return dataManagementElementItemProvider;
-    }
+		return dataManagementElementItemProvider;
+	}
 
 /**
-     * This returns the root adapter factory that contains this factory.
-     * <!-- begin-user-doc -->
+	 * This returns the root adapter factory that contains this factory.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   public ComposeableAdapterFactory getRootAdapterFactory()
   {
-        return parentAdapterFactory == null ? this : parentAdapterFactory.getRootAdapterFactory();
-    }
+		return parentAdapterFactory == null ? this : parentAdapterFactory.getRootAdapterFactory();
+	}
 
   /**
-     * This sets the composed adapter factory that contains this factory.
-     * <!-- begin-user-doc -->
+	 * This sets the composed adapter factory that contains this factory.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   public void setParentAdapterFactory(ComposedAdapterFactory parentAdapterFactory)
   {
-        this.parentAdapterFactory = parentAdapterFactory;
-    }
+		this.parentAdapterFactory = parentAdapterFactory;
+	}
 
   /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   @Override
   public boolean isFactoryForType(Object type)
   {
-        return supportedTypes.contains(type) || super.isFactoryForType(type);
-    }
+		return supportedTypes.contains(type) || super.isFactoryForType(type);
+	}
 
   /**
-     * This implementation substitutes the factory itself as the key for the adapter.
-     * <!-- begin-user-doc -->
+	 * This implementation substitutes the factory itself as the key for the adapter.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   @Override
   public Adapter adapt(Notifier notifier, Object type)
   {
-        return super.adapt(notifier, this);
-    }
+		return super.adapt(notifier, this);
+	}
 
   /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   @Override
   public Object adapt(Object object, Object type)
   {
-        if (isFactoryForType(type)) {
-            Object adapter = super.adapt(object, type);
-            if (!(type instanceof Class<?>) || (((Class<?>)type).isInstance(adapter))) {
-                return adapter;
-            }
-        }
+		if (isFactoryForType(type)) {
+			Object adapter = super.adapt(object, type);
+			if (!(type instanceof Class<?>) || (((Class<?>)type).isInstance(adapter))) {
+				return adapter;
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
   /**
-     * This adds a listener.
-     * <!-- begin-user-doc -->
+	 * This adds a listener.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   public void addListener(INotifyChangedListener notifyChangedListener)
   {
-        changeNotifier.addListener(notifyChangedListener);
-    }
+		changeNotifier.addListener(notifyChangedListener);
+	}
 
   /**
-     * This removes a listener.
-     * <!-- begin-user-doc -->
+	 * This removes a listener.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   public void removeListener(INotifyChangedListener notifyChangedListener)
   {
-        changeNotifier.removeListener(notifyChangedListener);
-    }
+		changeNotifier.removeListener(notifyChangedListener);
+	}
 
   /**
-     * This delegates to {@link #changeNotifier} and to {@link #parentAdapterFactory}.
-     * <!-- begin-user-doc -->
+	 * This delegates to {@link #changeNotifier} and to {@link #parentAdapterFactory}.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   public void fireNotifyChanged(Notification notification)
   {
-        changeNotifier.fireNotifyChanged(notification);
+		changeNotifier.fireNotifyChanged(notification);
 
-        if (parentAdapterFactory != null) {
-            parentAdapterFactory.fireNotifyChanged(notification);
-        }
-    }
+		if (parentAdapterFactory != null) {
+			parentAdapterFactory.fireNotifyChanged(notification);
+		}
+	}
 
   /**
-     * This disposes all of the item providers created by this factory. 
-     * <!-- begin-user-doc -->
+	 * This disposes all of the item providers created by this factory. 
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   public void dispose()
   {
-        if (pipelineItemProvider != null) pipelineItemProvider.dispose();
-        if (flowItemProvider != null) flowItemProvider.dispose();
-        if (sourceItemProvider != null) sourceItemProvider.dispose();
-        if (sinkItemProvider != null) sinkItemProvider.dispose();
-        if (familyElementItemProvider != null) familyElementItemProvider.dispose();
-        if (dataManagementElementItemProvider != null) dataManagementElementItemProvider.dispose();
-    }
+		if (pipelineItemProvider != null) pipelineItemProvider.dispose();
+		if (flowItemProvider != null) flowItemProvider.dispose();
+		if (sourceItemProvider != null) sourceItemProvider.dispose();
+		if (sinkItemProvider != null) sinkItemProvider.dispose();
+		if (familyElementItemProvider != null) familyElementItemProvider.dispose();
+		if (dataManagementElementItemProvider != null) dataManagementElementItemProvider.dispose();
+	}
 
 }

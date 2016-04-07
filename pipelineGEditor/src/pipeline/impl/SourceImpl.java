@@ -30,144 +30,144 @@ import pipeline.Source;
 public class SourceImpl extends PipelineNodeImpl implements Source
 {
   /**
-     * The default value of the '{@link #getSource() <em>Source</em>}' attribute.
-     * <!-- begin-user-doc -->
+	 * The default value of the '{@link #getSource() <em>Source</em>}' attribute.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @see #getSource()
-     * @generated
-     * @ordered
-     */
+	 * @see #getSource()
+	 * @generated
+	 * @ordered
+	 */
     protected static final Integer SOURCE_EDEFAULT = new Integer(-1);
 
 /**
-     * The cached value of the '{@link #getSource() <em>Source</em>}' attribute.
-     * <!-- begin-user-doc -->
+	 * The cached value of the '{@link #getSource() <em>Source</em>}' attribute.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @see #getSource()
-     * @generated
-     * @ordered
-     */
+	 * @see #getSource()
+	 * @generated
+	 * @ordered
+	 */
     protected Integer source = SOURCE_EDEFAULT;
 
 /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   protected SourceImpl()
   {
-        super();
-    }
+		super();
+	}
 
   /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   @Override
   protected EClass eStaticClass()
   {
-        return PipelinePackage.Literals.SOURCE;
-    }
+		return PipelinePackage.Literals.SOURCE;
+	}
 
   /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     public Integer getSource() {
-        return source;
-    }
+		return source;
+	}
 
 /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     public void setSource(Integer newSource) {
-        Integer oldSource = source;
-        source = newSource;
-        if (eNotificationRequired())
-            eNotify(new ENotificationImpl(this, Notification.SET, PipelinePackage.SOURCE__SOURCE, oldSource, source));
-    }
+		Integer oldSource = source;
+		source = newSource;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, PipelinePackage.SOURCE__SOURCE, oldSource, source));
+	}
 
 /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   @Override
   public Object eGet(int featureID, boolean resolve, boolean coreType)
   {
-        switch (featureID) {
-            case PipelinePackage.SOURCE__SOURCE:
-                return getSource();
-        }
-        return super.eGet(featureID, resolve, coreType);
-    }
+		switch (featureID) {
+			case PipelinePackage.SOURCE__SOURCE:
+				return getSource();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
 
   /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   @SuppressWarnings("unchecked")
   @Override
   public void eSet(int featureID, Object newValue)
   {
-        switch (featureID) {
-            case PipelinePackage.SOURCE__SOURCE:
-                setSource((Integer)newValue);
-                return;
-        }
-        super.eSet(featureID, newValue);
-    }
+		switch (featureID) {
+			case PipelinePackage.SOURCE__SOURCE:
+				setSource((Integer)newValue);
+				return;
+		}
+		super.eSet(featureID, newValue);
+	}
 
   /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   @Override
   public void eUnset(int featureID)
   {
-        switch (featureID) {
-            case PipelinePackage.SOURCE__SOURCE:
-                setSource(SOURCE_EDEFAULT);
-                return;
-        }
-        super.eUnset(featureID);
-    }
+		switch (featureID) {
+			case PipelinePackage.SOURCE__SOURCE:
+				setSource(SOURCE_EDEFAULT);
+				return;
+		}
+		super.eUnset(featureID);
+	}
 
   /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   @Override
   public boolean eIsSet(int featureID)
   {
-        switch (featureID) {
-            case PipelinePackage.SOURCE__SOURCE:
-                return SOURCE_EDEFAULT == null ? source != null : !SOURCE_EDEFAULT.equals(source);
-        }
-        return super.eIsSet(featureID);
-    }
+		switch (featureID) {
+			case PipelinePackage.SOURCE__SOURCE:
+				return SOURCE_EDEFAULT == null ? source != null : !SOURCE_EDEFAULT.equals(source);
+		}
+		return super.eIsSet(featureID);
+	}
 
 /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     @Override
     public String toString() {
-        if (eIsProxy()) return super.toString();
+		if (eIsProxy()) return super.toString();
 
-        StringBuffer result = new StringBuffer(super.toString());
-        result.append(" (source: ");
-        result.append(source);
-        result.append(')');
-        return result.toString();
-    }
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (source: ");
+		result.append(source);
+		result.append(')');
+		return result.toString();
+	}
 
 } //SourceImpl

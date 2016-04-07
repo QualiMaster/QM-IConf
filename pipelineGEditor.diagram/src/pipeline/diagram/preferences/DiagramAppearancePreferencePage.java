@@ -1,10 +1,6 @@
-/*
- * 
- */
 package pipeline.diagram.preferences;
 
 import org.eclipse.gmf.runtime.diagram.ui.preferences.AppearancePreferencePage;
-
 import pipeline.diagram.part.PipelineDiagramEditorPlugin;
 
 /**
@@ -12,11 +8,11 @@ import pipeline.diagram.part.PipelineDiagramEditorPlugin;
  */
 public class DiagramAppearancePreferencePage extends AppearancePreferencePage {
 
-    /**
-     * @generated
-     */
-    public DiagramAppearancePreferencePage() {
-        setPreferenceStore(PipelineDiagramEditorPlugin.getInstance()
-                .getPreferenceStore());
-    }
+	/**
+	 * @generated
+	 */
+	public DiagramAppearancePreferencePage() {
+		setPreferenceStore(PipelineDiagramEditorPlugin.getInstance()
+				.getPreferenceStore());
+	}
 }

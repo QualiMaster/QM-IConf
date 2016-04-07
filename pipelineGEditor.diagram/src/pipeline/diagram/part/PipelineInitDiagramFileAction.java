@@ -1,6 +1,3 @@
-/*
- * 
- */
 package pipeline.diagram.part;
 
 import org.eclipse.core.resources.IFile;
@@ -20,7 +17,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
-
 import pipeline.diagram.edit.parts.PipelineEditPart;
 
 /**
@@ -28,73 +24,73 @@ import pipeline.diagram.edit.parts.PipelineEditPart;
  */
 public class PipelineInitDiagramFileAction implements IObjectActionDelegate {
 
-    /**
-     * @generated
-     */
-    private IWorkbenchPart targetPart;
+	/**
+	 * @generated
+	 */
+	private IWorkbenchPart targetPart;
 
-    /**
-     * @generated
-     */
-    private URI domainModelURI;
+	/**
+	 * @generated
+	 */
+	private URI domainModelURI;
 
-    /**
-     * @generated
-     */
-    public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-        this.targetPart = targetPart;
-    }
+	/**
+	 * @generated
+	 */
+	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+		this.targetPart = targetPart;
+	}
 
-    /**
-     * @generated
-     */
-    public void selectionChanged(IAction action, ISelection selection) {
-        domainModelURI = null;
-        action.setEnabled(false);
-        if (selection instanceof IStructuredSelection == false
-                || selection.isEmpty()) {
-            return;
-        }
-        IFile file = (IFile) ((IStructuredSelection) selection)
-                .getFirstElement();
-        domainModelURI = URI.createPlatformResourceURI(file.getFullPath()
-                .toString(), true);
-        action.setEnabled(true);
-    }
+	/**
+	 * @generated
+	 */
+	public void selectionChanged(IAction action, ISelection selection) {
+		domainModelURI = null;
+		action.setEnabled(false);
+		if (selection instanceof IStructuredSelection == false
+				|| selection.isEmpty()) {
+			return;
+		}
+		IFile file = (IFile) ((IStructuredSelection) selection)
+				.getFirstElement();
+		domainModelURI = URI.createPlatformResourceURI(file.getFullPath()
+				.toString(), true);
+		action.setEnabled(true);
+	}
 
-    /**
-     * @generated
-     */
-    private Shell getShell() {
-        return targetPart.getSite().getShell();
-    }
+	/**
+	 * @generated
+	 */
+	private Shell getShell() {
+		return targetPart.getSite().getShell();
+	}
 
-    /**
-     * @generated
-     */
-    public void run(IAction action) {
-        TransactionalEditingDomain editingDomain = GMFEditingDomainFactory.INSTANCE
-                .createEditingDomain();
-        ResourceSet resourceSet = editingDomain.getResourceSet();
-        EObject diagramRoot = null;
-        try {
-            Resource resource = resourceSet.getResource(domainModelURI, true);
-            diagramRoot = (EObject) resource.getContents().get(0);
-        } catch (WrappedException ex) {
-            PipelineDiagramEditorPlugin.getInstance().logError(
-                    "Unable to load resource: " + domainModelURI, ex); //$NON-NLS-1$
-        }
-        if (diagramRoot == null) {
-            MessageDialog.openError(getShell(),
-                    Messages.InitDiagramFile_ResourceErrorDialogTitle,
-                    Messages.InitDiagramFile_ResourceErrorDialogMessage);
-            return;
-        }
-        Wizard wizard = new PipelineNewDiagramFileWizard(domainModelURI,
-                diagramRoot, editingDomain);
-        wizard.setWindowTitle(NLS.bind(Messages.InitDiagramFile_WizardTitle,
-                PipelineEditPart.MODEL_ID));
-        PipelineDiagramEditorUtil.runWizard(getShell(), wizard,
-                "InitDiagramFile"); //$NON-NLS-1$
-    }
+	/**
+	 * @generated
+	 */
+	public void run(IAction action) {
+		TransactionalEditingDomain editingDomain = GMFEditingDomainFactory.INSTANCE
+				.createEditingDomain();
+		ResourceSet resourceSet = editingDomain.getResourceSet();
+		EObject diagramRoot = null;
+		try {
+			Resource resource = resourceSet.getResource(domainModelURI, true);
+			diagramRoot = (EObject) resource.getContents().get(0);
+		} catch (WrappedException ex) {
+			PipelineDiagramEditorPlugin.getInstance().logError(
+					"Unable to load resource: " + domainModelURI, ex); //$NON-NLS-1$
+		}
+		if (diagramRoot == null) {
+			MessageDialog.openError(getShell(),
+					Messages.InitDiagramFile_ResourceErrorDialogTitle,
+					Messages.InitDiagramFile_ResourceErrorDialogMessage);
+			return;
+		}
+		Wizard wizard = new PipelineNewDiagramFileWizard(domainModelURI,
+				diagramRoot, editingDomain);
+		wizard.setWindowTitle(NLS.bind(Messages.InitDiagramFile_WizardTitle,
+				PipelineEditPart.MODEL_ID));
+		PipelineDiagramEditorUtil.runWizard(getShell(), wizard,
+				"InitDiagramFile"); //$NON-NLS-1$
+	}
 }

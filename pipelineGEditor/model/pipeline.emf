@@ -29,6 +29,7 @@ class Flow extends PipelineElement{
 @gmf.node()
 abstract class PipelineNode extends PipelineElement {
   attr Integer parallelism = 1;
+  attr Integer numtasks = 1;
 }
 
 @gmf.node(figure="svg", svg.uri="platform:/plugin/pipelineGEditor/svg/source.svg", size="60,60")

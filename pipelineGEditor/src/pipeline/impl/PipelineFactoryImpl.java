@@ -21,140 +21,140 @@ import pipeline.*;
 public class PipelineFactoryImpl extends EFactoryImpl implements PipelineFactory
 {
   /**
-     * Creates the default factory implementation.
-     * <!-- begin-user-doc -->
+	 * Creates the default factory implementation.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   public static PipelineFactory init()
   {
-        try {
-            PipelineFactory thePipelineFactory = (PipelineFactory)EPackage.Registry.INSTANCE.getEFactory(PipelinePackage.eNS_URI);
-            if (thePipelineFactory != null) {
-                return thePipelineFactory;
-            }
-        }
-        catch (Exception exception) {
-            EcorePlugin.INSTANCE.log(exception);
-        }
-        return new PipelineFactoryImpl();
-    }
+		try {
+			PipelineFactory thePipelineFactory = (PipelineFactory)EPackage.Registry.INSTANCE.getEFactory(PipelinePackage.eNS_URI);
+			if (thePipelineFactory != null) {
+				return thePipelineFactory;
+			}
+		}
+		catch (Exception exception) {
+			EcorePlugin.INSTANCE.log(exception);
+		}
+		return new PipelineFactoryImpl();
+	}
 
   /**
-     * Creates an instance of the factory.
-     * <!-- begin-user-doc -->
+	 * Creates an instance of the factory.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   public PipelineFactoryImpl()
   {
-        super();
-    }
+		super();
+	}
 
   /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   @Override
   public EObject create(EClass eClass)
   {
-        switch (eClass.getClassifierID()) {
-            case PipelinePackage.PIPELINE: return createPipeline();
-            case PipelinePackage.FLOW: return createFlow();
-            case PipelinePackage.SOURCE: return createSource();
-            case PipelinePackage.SINK: return createSink();
-            case PipelinePackage.FAMILY_ELEMENT: return createFamilyElement();
-            case PipelinePackage.DATA_MANAGEMENT_ELEMENT: return createDataManagementElement();
-            default:
-                throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
-        }
-    }
+		switch (eClass.getClassifierID()) {
+			case PipelinePackage.PIPELINE: return createPipeline();
+			case PipelinePackage.FLOW: return createFlow();
+			case PipelinePackage.SOURCE: return createSource();
+			case PipelinePackage.SINK: return createSink();
+			case PipelinePackage.FAMILY_ELEMENT: return createFamilyElement();
+			case PipelinePackage.DATA_MANAGEMENT_ELEMENT: return createDataManagementElement();
+			default:
+				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+		}
+	}
 
   /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   public Pipeline createPipeline()
   {
-        PipelineImpl pipeline = new PipelineImpl();
-        return pipeline;
-    }
+		PipelineImpl pipeline = new PipelineImpl();
+		return pipeline;
+	}
 
   /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   public Flow createFlow()
   {
-        FlowImpl flow = new FlowImpl();
-        return flow;
-    }
+		FlowImpl flow = new FlowImpl();
+		return flow;
+	}
 
   /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   public Source createSource()
   {
-        SourceImpl source = new SourceImpl();
-        return source;
-    }
+		SourceImpl source = new SourceImpl();
+		return source;
+	}
 
   /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   public Sink createSink()
   {
-        SinkImpl sink = new SinkImpl();
-        return sink;
-    }
+		SinkImpl sink = new SinkImpl();
+		return sink;
+	}
 
   /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     public FamilyElement createFamilyElement() {
-        FamilyElementImpl familyElement = new FamilyElementImpl();
-        return familyElement;
-    }
+		FamilyElementImpl familyElement = new FamilyElementImpl();
+		return familyElement;
+	}
 
 /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     public DataManagementElement createDataManagementElement() {
-        DataManagementElementImpl dataManagementElement = new DataManagementElementImpl();
-        return dataManagementElement;
-    }
+		DataManagementElementImpl dataManagementElement = new DataManagementElementImpl();
+		return dataManagementElement;
+	}
 
 /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   public PipelinePackage getPipelinePackage()
   {
-        return (PipelinePackage)getEPackage();
-    }
+		return (PipelinePackage)getEPackage();
+	}
 
   /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @deprecated
-     * @generated
-     */
+	 * @deprecated
+	 * @generated
+	 */
   @Deprecated
   public static PipelinePackage getPackage()
   {
-        return PipelinePackage.eINSTANCE;
-    }
+		return PipelinePackage.eINSTANCE;
+	}
 
 } //PipelineFactoryImpl

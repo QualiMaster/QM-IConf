@@ -1,6 +1,3 @@
-/*
- * 
- */
 package pipeline.diagram.part;
 
 import org.eclipse.emf.common.ui.URIEditorInput;
@@ -14,26 +11,26 @@ import org.eclipse.ui.PartInitException;
  */
 public class PipelineMatchingStrategy implements IEditorMatchingStrategy {
 
-    /**
-     * @generated
-     */
-    public boolean matches(IEditorReference editorRef, IEditorInput input) {
-        IEditorInput editorInput;
-        try {
-            editorInput = editorRef.getEditorInput();
-        } catch (PartInitException e) {
-            return false;
-        }
+	/**
+	 * @generated
+	 */
+	public boolean matches(IEditorReference editorRef, IEditorInput input) {
+		IEditorInput editorInput;
+		try {
+			editorInput = editorRef.getEditorInput();
+		} catch (PartInitException e) {
+			return false;
+		}
 
-        if (editorInput.equals(input)) {
-            return true;
-        }
-        if (editorInput instanceof URIEditorInput
-                && input instanceof URIEditorInput) {
-            return ((URIEditorInput) editorInput).getURI().equals(
-                    ((URIEditorInput) input).getURI());
-        }
-        return false;
-    }
+		if (editorInput.equals(input)) {
+			return true;
+		}
+		if (editorInput instanceof URIEditorInput
+				&& input instanceof URIEditorInput) {
+			return ((URIEditorInput) editorInput).getURI().equals(
+					((URIEditorInput) input).getURI());
+		}
+		return false;
+	}
 
 }

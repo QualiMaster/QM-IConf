@@ -29,24 +29,24 @@ import pipeline.ProcessingElement;
 public abstract class ProcessingElementImpl extends PipelineNodeImpl implements ProcessingElement
 {
   /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   protected ProcessingElementImpl()
   {
-        super();
-    }
+		super();
+	}
 
   /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
   @Override
   protected EClass eStaticClass()
   {
-        return PipelinePackage.Literals.PROCESSING_ELEMENT;
-    }
+		return PipelinePackage.Literals.PROCESSING_ELEMENT;
+	}
 
 } //ProcessingElementImpl

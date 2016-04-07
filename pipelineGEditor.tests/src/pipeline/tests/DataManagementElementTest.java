@@ -16,55 +16,55 @@ import pipeline.PipelineFactory;
 public class DataManagementElementTest extends ProcessingElementTest {
 
     /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     public static void main(String[] args) {
-        TestRunner.run(DataManagementElementTest.class);
-    }
+		TestRunner.run(DataManagementElementTest.class);
+	}
 
     /**
-     * Constructs a new Data Management Element test case with the given name.
-     * <!-- begin-user-doc -->
+	 * Constructs a new Data Management Element test case with the given name.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     public DataManagementElementTest(String name) {
-        super(name);
-    }
+		super(name);
+	}
 
     /**
-     * Returns the fixture for this Data Management Element test case.
-     * <!-- begin-user-doc -->
+	 * Returns the fixture for this Data Management Element test case.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @generated
-     */
+	 * @generated
+	 */
     @Override
     protected DataManagementElement getFixture() {
-        return (DataManagementElement)fixture;
-    }
+		return (DataManagementElement)fixture;
+	}
 
     /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @see junit.framework.TestCase#setUp()
-     * @generated
-     */
+	 * @see junit.framework.TestCase#setUp()
+	 * @generated
+	 */
     @Override
     protected void setUp() throws Exception {
-        setFixture(PipelineFactory.eINSTANCE.createDataManagementElement());
-    }
+		setFixture(PipelineFactory.eINSTANCE.createDataManagementElement());
+	}
 
     /**
-     * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @see junit.framework.TestCase#tearDown()
-     * @generated
-     */
+	 * @see junit.framework.TestCase#tearDown()
+	 * @generated
+	 */
     @Override
     protected void tearDown() throws Exception {
-        setFixture(null);
-    }
+		setFixture(null);
+	}
 
 } //DataManagementElementTest

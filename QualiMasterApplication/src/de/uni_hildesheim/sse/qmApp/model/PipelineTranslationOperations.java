@@ -50,20 +50,17 @@ import qualimasterapplication.Activator;
  * The operations of translating the Ecore pipeline diagram to IVML project.
  * 
  * @author Cui Qin
+ * @author El-Sharkawy
  */
 public class PipelineTranslationOperations {
 
     public static final String EXTENSION = ".ivml";
     
     // static imports
-    private static ProjectImport basicsImport = new ProjectImport(
-            "Basics", null);
-    private static ProjectImport pipelinesImport = new ProjectImport(
-            "Pipelines", null);
-    private static ProjectImport familiesImport = new ProjectImport(
-            "FamiliesCfg", null);
-    private static ProjectImport datamanagementImport = new ProjectImport(
-            "DataManagementCfg", null);
+    private static ProjectImport basicsImport = new ProjectImport(QmConstants.PROJECT_BASICS, null);
+    private static ProjectImport pipelinesImport = new ProjectImport(QmConstants.PROJECT_PIPELINES, null);
+    private static ProjectImport familiesImport = new ProjectImport(QmConstants.PROJECT_FAMILIESCFG, null);
+    private static ProjectImport datamanagementImport = new ProjectImport(QmConstants.PROJECT_DATAMGTCFG, null);
     
     // static model parts
     private static IModelPart familyModelPart = VariabilityModel.Configuration.FAMILIES;
@@ -367,7 +364,7 @@ public class PipelineTranslationOperations {
     /**
      * Turns an EList into a list in order to avoid accidental model write operations.
      * 
-     * @param <T> thel element type
+     * @param <T> the element type
      * @param list the list
      * @return the result list
      */
@@ -458,6 +455,24 @@ public class PipelineTranslationOperations {
     }
 
     /**
+     * Generic part of the <tt>addPipelineElement</tt> methods to process the generic part of
+     * {@link PipelineNode}s.
+     * @param node The node to process, e.g., {@link Source} or {@link Sink}. Must not be <tt>null</tt>.
+     * @param nodeValue A map which is later used to create the compound value. Must not be <tt>null</tt>.
+     */
+    private static void processPipelineNodeValue(PipelineNode node, Map<String, Object> nodeValue) {
+        if (node.getName() != null) {
+            nodeValue.put("name", node.getName());
+        }
+        if (node.getParallelism() > 0) {
+            nodeValue.put(QmConstants.SLOT_PIPELINE_NODE_PARALLELISM, node.getParallelism());
+        }
+        if (node.getNumtasks() > 0) {
+            nodeValue.put(QmConstants.SLOT_PIPELINE_NODE_NUMBER_OF_TAKS, node.getNumtasks());
+        }
+    }
+    
+    /**
      * Adds <code>Source</code> to the project.
      * 
      * @param source
@@ -484,12 +499,7 @@ public class PipelineTranslationOperations {
                 source.getSource());
         // construct the compound value from the pipeline editor graph
         Map<String, Object> sourceCompound = new HashMap<String, Object>();
-        if (source.getName() != null) {
-            sourceCompound.put("name", source.getName());
-        }
-        if (source.getParallelism() > 0) {
-            sourceCompound.put("parallelism", source.getParallelism());
-        }        
+        processPipelineNodeValue(source, sourceCompound);
         if (sourceVariable != null) {
             sourceCompound.put("source",
                 IVMLModelOperations.getDeclaration(sourceVariable).getName());
@@ -502,12 +512,8 @@ public class PipelineTranslationOperations {
         if (!fList.isEmpty()) {
             sourceCompound.put("output", fList.toArray());
         }        
-        Object[] sourceObject = IVMLModelOperations.configureCompoundValues(
-                decisionVariable, sourceCompound);
-        //add the configuration of constraints
-        sourceObject = addConstraintToValues(source, sourceObject, decisionVariable);
-        destProject.add(IVMLModelOperations.getConstraint(sourceObject,
-                decisionVariable, destProject)); 
+
+        addPipelineElementToProject(source, destProject, decisionVariable, sourceCompound);
         pipProcessedNodes.add(source);
         return decisionVariable.getName();
     }
@@ -576,12 +582,8 @@ public class PipelineTranslationOperations {
         if (destination != null) {
             flowCompound.put("destination", destination);
         }
-        Object[] flowObject = IVMLModelOperations.configureCompoundValues(
-                flowVariable, flowCompound);
-        //add the configuration of constraints
-        flowObject = addConstraintToValues(flow, flowObject, flowVariable);
-        destProject.add(IVMLModelOperations.getConstraint(flowObject,
-                flowVariable, destProject));
+        addPipelineElementToProject(flow, destProject, flowVariable, flowCompound);
+        
         //removed the already-handled flow
         processedflows.add(flow);
         return flowVariable.getName();
@@ -616,12 +618,7 @@ public class PipelineTranslationOperations {
 
         // construct the compound value from the pipeline editor graph
         Map<String, Object> familyElementCompound = new HashMap<String, Object>();
-        if (familyElement.getName() != null) {
-            familyElementCompound.put("name", familyElement.getName());
-        }
-        if (familyElement.getParallelism() > 0) {
-            familyElementCompound.put("parallelism", familyElement.getParallelism());
-        }        
+        processPipelineNodeValue(familyElement, familyElementCompound);
         if (familyVariable != null) {
             familyElementCompound.put("family",
                 IVMLModelOperations.getDeclaration(familyVariable).getName());
@@ -634,15 +631,8 @@ public class PipelineTranslationOperations {
         if (fList != null) {
             familyElementCompound.put("output", fList.toArray());
         }
-        //familyElementCompound.put("input", familyElement.getInput().toArray()); // to be solved with actual variable
-                                                                                // name
-        Object[] familyElementObject = IVMLModelOperations
-                .configureCompoundValues(decisionVariable,
-                        familyElementCompound);
-        //add the configuration of constraints
-        familyElementObject = addConstraintToValues(familyElement, familyElementObject, decisionVariable);
-        destProject.add(IVMLModelOperations.getConstraint(familyElementObject,
-                decisionVariable, destProject));
+        
+        addPipelineElementToProject(familyElement, destProject, decisionVariable, familyElementCompound);
         familyNodesAndName.put(familyElement, decisionVariable.getName());
         pipProcessedNodes.add(familyElement);
         return decisionVariable.getName();
@@ -676,12 +666,7 @@ public class PipelineTranslationOperations {
 
         // construct the compound value from the pipeline editor graph
         Map<String, Object> dataManagementElementCompound = new HashMap<String, Object>();
-        if (dataManagementElement.getName() != null) {
-            dataManagementElementCompound.put("name", dataManagementElement.getName());
-        }
-        if (dataManagementElement.getParallelism() > 0) {
-            dataManagementElementCompound.put("parallelism", dataManagementElement.getParallelism());
-        } 
+        processPipelineNodeValue(dataManagementElement, dataManagementElementCompound);
         if (dataManagementElementVariable != null) {
             dataManagementElementCompound.put("dataManagement",
                 IVMLModelOperations.getDeclaration(dataManagementElementVariable).getName());
@@ -695,13 +680,8 @@ public class PipelineTranslationOperations {
             dataManagementElementCompound.put("output", fList.toArray());
         }        
 
-        Object[] dataManagementElementObject = IVMLModelOperations.configureCompoundValues(
-                decisionVariable, dataManagementElementCompound);
-        //add the configuration of constraints
-        dataManagementElementObject = addConstraintToValues(dataManagementElement, dataManagementElementObject, 
-                decisionVariable);
-        destProject.add(IVMLModelOperations.getConstraint(dataManagementElementObject,
-                decisionVariable, destProject));
+        addPipelineElementToProject(dataManagementElement, destProject, decisionVariable,
+            dataManagementElementCompound);
         pipProcessedNodes.add(dataManagementElement);
         return decisionVariable.getName();
     }    
@@ -733,23 +713,13 @@ public class PipelineTranslationOperations {
 
         // construct the compound value from the pipeline editor graph
         Map<String, Object> sinkCompound = new HashMap<String, Object>();
-        if (sink.getName() != null) {
-            sinkCompound.put("name", sink.getName());
-        }
-        if (sink.getParallelism() > 0) {
-            sinkCompound.put("parallelism", sink.getParallelism());
-        }        
+        processPipelineNodeValue(sink, sinkCompound);
         //sinkCompound.put("input", sink.getInput().toArray()); // to be solved with actual variable name
         if (sinkVariable != null) {
             sinkCompound.put("sink",
                 IVMLModelOperations.getDeclaration(sinkVariable).getName());
         }
-        Object[] sinkObject = IVMLModelOperations.configureCompoundValues(
-                decisionVariable, sinkCompound);
-        //add the configuration of constraints
-        sinkObject = addConstraintToValues(sink, sinkObject, decisionVariable);
-        destProject.add(IVMLModelOperations.getConstraint(sinkObject,
-                decisionVariable, destProject));
+        addPipelineElementToProject(sink, destProject, decisionVariable, sinkCompound);
         sinkNodesAndName.put(sink, decisionVariable.getName());
         pipProcessedNodes.add(sink);
         List<Flow> srcOutput = getOutput(sink);
@@ -757,6 +727,23 @@ public class PipelineTranslationOperations {
             throw new PipelineTranslationException("Illegal outgoing flows from sink '" + sink.getName() + "'");
         }
         return decisionVariable.getName();
+    }
+
+    /**
+     * Generic part of the addPipelineElement methods to create a compound value, add constraints, and add this value
+     * to the given project.
+     * @param pipElement The node to process, e.g., {@link Source} or {@link Sink}. Must not be <tt>null</tt>.
+     * @param destProject The project, where the compound value shall be saved to. Must not be <tt>null</tt>.
+     * @param declaration The declaration of the compound variable.
+     * @param compoundValueMapping The mapping of configured values (slot name, slot value), except the constraints.
+     */
+    private static void addPipelineElementToProject(PipelineElement pipElement, Project destProject,
+        DecisionVariableDeclaration declaration, Map<String, Object> compoundValueMapping) {
+
+        Object[] compoundValue = IVMLModelOperations.configureCompoundValues(declaration, compoundValueMapping);
+        //add the configuration of constraints
+        compoundValue = addConstraintToValues(pipElement, compoundValue, declaration);
+        destProject.add(IVMLModelOperations.getConstraint(compoundValue, declaration, destProject));
     }
     
     /**
@@ -770,7 +757,8 @@ public class PipelineTranslationOperations {
      * @return a list of Value with complete information of the configuration of the element
      */
     public static Object[] addConstraintToValues(PipelineElement pipelineElm, Object[] preObjectList, 
-            DecisionVariableDeclaration parent) {
+        DecisionVariableDeclaration parent) {
+        
         //get constraintString
         String constraintString = pipelineElm.getConstraints();
         //turn the constraint strings from UI to a list of Constraint values        
@@ -783,11 +771,17 @@ public class PipelineTranslationOperations {
             }
         }
         //add the constraints into the preObjectList
-        ArrayList<Object> objList = new ArrayList<Object>(Arrays.asList(preObjectList));
-        objList.add("constraints");
-        objList.add(cstValList.toArray());
+        Object[] postObjectList = new Object[preObjectList.length + 2];
+        System.arraycopy(preObjectList, 0, postObjectList, 0, preObjectList.length);
+        postObjectList[preObjectList.length] = "constraints";
+        postObjectList[preObjectList.length] = cstValList.toArray();
         
-        return objList.toArray();
+//        ArrayList<Object> objList = new ArrayList<Object>(Arrays.asList(preObjectList));
+//        objList.add("constraints");
+//        objList.add(cstValList.toArray());
+//        return objList.toArray();
+
+        return postObjectList;
     }
 
     /**

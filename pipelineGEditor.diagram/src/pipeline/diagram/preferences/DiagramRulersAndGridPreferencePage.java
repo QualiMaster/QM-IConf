@@ -1,10 +1,6 @@
-/*
- * 
- */
 package pipeline.diagram.preferences;
 
 import org.eclipse.gmf.runtime.diagram.ui.preferences.RulerGridPreferencePage;
-
 import pipeline.diagram.part.PipelineDiagramEditorPlugin;
 
 /**
@@ -12,11 +8,11 @@ import pipeline.diagram.part.PipelineDiagramEditorPlugin;
  */
 public class DiagramRulersAndGridPreferencePage extends RulerGridPreferencePage {
 
-    /**
-     * @generated
-     */
-    public DiagramRulersAndGridPreferencePage() {
-        setPreferenceStore(PipelineDiagramEditorPlugin.getInstance()
-                .getPreferenceStore());
-    }
+	/**
+	 * @generated
+	 */
+	public DiagramRulersAndGridPreferencePage() {
+		setPreferenceStore(PipelineDiagramEditorPlugin.getInstance()
+				.getPreferenceStore());
+	}
 }

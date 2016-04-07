@@ -1,6 +1,3 @@
-/*
- * 
- */
 package pipeline.diagram.part;
 
 import org.eclipse.emf.ecore.EObject;
@@ -11,20 +8,20 @@ import org.eclipse.gmf.tooling.runtime.update.UpdaterLinkDescriptor;
  * @generated
  */
 public class PipelineLinkDescriptor extends UpdaterLinkDescriptor {
-    /**
-     * @generated
-     */
-    public PipelineLinkDescriptor(EObject source, EObject destination,
-            IElementType elementType, int linkVID) {
-        super(source, destination, elementType, linkVID);
-    }
+	/**
+	 * @generated
+	 */
+	public PipelineLinkDescriptor(EObject source, EObject destination,
+			IElementType elementType, int linkVID) {
+		super(source, destination, elementType, linkVID);
+	}
 
-    /**
-     * @generated
-     */
-    public PipelineLinkDescriptor(EObject source, EObject destination,
-            EObject linkElement, IElementType elementType, int linkVID) {
-        super(source, destination, linkElement, elementType, linkVID);
-    }
+	/**
+	 * @generated
+	 */
+	public PipelineLinkDescriptor(EObject source, EObject destination,
+			EObject linkElement, IElementType elementType, int linkVID) {
+		super(source, destination, linkElement, elementType, linkVID);
+	}
 
 }

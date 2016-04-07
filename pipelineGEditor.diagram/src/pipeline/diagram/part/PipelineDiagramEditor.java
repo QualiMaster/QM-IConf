@@ -1,13 +1,9 @@
-/*
- * 
- */
 package pipeline.diagram.part;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -60,337 +56,336 @@ import org.eclipse.ui.navigator.resources.ProjectExplorer;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.IShowInTargetList;
 import org.eclipse.ui.part.ShowInContext;
-
 import pipeline.diagram.navigator.PipelineNavigatorItem;
 
 /**
  * @generated
  */
 public class PipelineDiagramEditor extends DiagramDocumentEditor implements
-        IGotoMarker {
+		IGotoMarker {
 
-    /**
-     * @generated
-     */
-    public static final String ID = "pipeline.diagram.part.PipelineDiagramEditorID"; //$NON-NLS-1$
+	/**
+	 * @generated
+	 */
+	public static final String ID = "pipeline.diagram.part.PipelineDiagramEditorID"; //$NON-NLS-1$
 
-    /**
-     * @generated
-     */
-    public static final String CONTEXT_ID = "pipeline.diagram.ui.diagramContext"; //$NON-NLS-1$
+	/**
+	 * @generated
+	 */
+	public static final String CONTEXT_ID = "pipeline.diagram.ui.diagramContext"; //$NON-NLS-1$
 
-    /**
-     * @generated
-     */
-    public PipelineDiagramEditor() {
-        super(true);
-    }
+	/**
+	 * @generated
+	 */
+	public PipelineDiagramEditor() {
+		super(true);
+	}
 
-    /**
-     * @generated
-     */
-    protected String getContextID() {
-        return CONTEXT_ID;
-    }
+	/**
+	 * @generated
+	 */
+	protected String getContextID() {
+		return CONTEXT_ID;
+	}
 
-    /**
-     * @generated
-     */
-    protected PaletteRoot createPaletteRoot(PaletteRoot existingPaletteRoot) {
-        PaletteRoot root = super.createPaletteRoot(existingPaletteRoot);
-        new PipelinePaletteFactory().fillPalette(root);
-        return root;
-    }
+	/**
+	 * @generated
+	 */
+	protected PaletteRoot createPaletteRoot(PaletteRoot existingPaletteRoot) {
+		PaletteRoot root = super.createPaletteRoot(existingPaletteRoot);
+		new PipelinePaletteFactory().fillPalette(root);
+		return root;
+	}
 
-    /**
-     * @generated
-     */
-    protected PreferencesHint getPreferencesHint() {
-        return PipelineDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT;
-    }
+	/**
+	 * @generated
+	 */
+	protected PreferencesHint getPreferencesHint() {
+		return PipelineDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT;
+	}
 
-    /**
-     * @generated
-     */
-    public String getContributorId() {
-        return PipelineDiagramEditorPlugin.ID;
-    }
+	/**
+	 * @generated
+	 */
+	public String getContributorId() {
+		return PipelineDiagramEditorPlugin.ID;
+	}
 
-    /**
-     * @generated
-     */
-    @SuppressWarnings("rawtypes")
-    public Object getAdapter(Class type) {
-        if (type == IShowInTargetList.class) {
-            return new IShowInTargetList() {
-                public String[] getShowInTargetIds() {
-                    return new String[] { ProjectExplorer.VIEW_ID };
-                }
-            };
-        }
-        return super.getAdapter(type);
-    }
+	/**
+	 * @generated
+	 */
+	@SuppressWarnings("rawtypes")
+	public Object getAdapter(Class type) {
+		if (type == IShowInTargetList.class) {
+			return new IShowInTargetList() {
+				public String[] getShowInTargetIds() {
+					return new String[] { ProjectExplorer.VIEW_ID };
+				}
+			};
+		}
+		return super.getAdapter(type);
+	}
 
-    /**
-     * @generated
-     */
-    protected IDocumentProvider getDocumentProvider(IEditorInput input) {
-        if (input instanceof IFileEditorInput
-                || input instanceof URIEditorInput) {
-            return PipelineDiagramEditorPlugin.getInstance()
-                    .getDocumentProvider();
-        }
-        return super.getDocumentProvider(input);
-    }
+	/**
+	 * @generated
+	 */
+	protected IDocumentProvider getDocumentProvider(IEditorInput input) {
+		if (input instanceof IFileEditorInput
+				|| input instanceof URIEditorInput) {
+			return PipelineDiagramEditorPlugin.getInstance()
+					.getDocumentProvider();
+		}
+		return super.getDocumentProvider(input);
+	}
 
-    /**
-     * @generated
-     */
-    public TransactionalEditingDomain getEditingDomain() {
-        IDocument document = getEditorInput() != null ? getDocumentProvider()
-                .getDocument(getEditorInput()) : null;
-        if (document instanceof IDiagramDocument) {
-            return ((IDiagramDocument) document).getEditingDomain();
-        }
-        return super.getEditingDomain();
-    }
+	/**
+	 * @generated
+	 */
+	public TransactionalEditingDomain getEditingDomain() {
+		IDocument document = getEditorInput() != null ? getDocumentProvider()
+				.getDocument(getEditorInput()) : null;
+		if (document instanceof IDiagramDocument) {
+			return ((IDiagramDocument) document).getEditingDomain();
+		}
+		return super.getEditingDomain();
+	}
 
-    /**
-     * @generated
-     */
-    protected void setDocumentProvider(IEditorInput input) {
-        if (input instanceof IFileEditorInput
-                || input instanceof URIEditorInput) {
-            setDocumentProvider(PipelineDiagramEditorPlugin.getInstance()
-                    .getDocumentProvider());
-        } else {
-            super.setDocumentProvider(input);
-        }
-    }
+	/**
+	 * @generated
+	 */
+	protected void setDocumentProvider(IEditorInput input) {
+		if (input instanceof IFileEditorInput
+				|| input instanceof URIEditorInput) {
+			setDocumentProvider(PipelineDiagramEditorPlugin.getInstance()
+					.getDocumentProvider());
+		} else {
+			super.setDocumentProvider(input);
+		}
+	}
 
-    /**
-     * @generated
-     */
-    public void gotoMarker(IMarker marker) {
-        MarkerNavigationService.getInstance().gotoMarker(this, marker);
-    }
+	/**
+	 * @generated
+	 */
+	public void gotoMarker(IMarker marker) {
+		MarkerNavigationService.getInstance().gotoMarker(this, marker);
+	}
 
-    /**
-     * @generated
-     */
-    public boolean isSaveAsAllowed() {
-        return true;
-    }
+	/**
+	 * @generated
+	 */
+	public boolean isSaveAsAllowed() {
+		return true;
+	}
 
-    /**
-     * @generated
-     */
-    public void doSaveAs() {
-        performSaveAs(new NullProgressMonitor());
-    }
+	/**
+	 * @generated
+	 */
+	public void doSaveAs() {
+		performSaveAs(new NullProgressMonitor());
+	}
 
-    /**
-     * @generated
-     */
-    protected void performSaveAs(IProgressMonitor progressMonitor) {
-        Shell shell = getSite().getShell();
-        IEditorInput input = getEditorInput();
-        SaveAsDialog dialog = new SaveAsDialog(shell);
-        IFile original = input instanceof IFileEditorInput ? ((IFileEditorInput) input)
-                .getFile() : null;
-        if (original != null) {
-            dialog.setOriginalFile(original);
-        }
-        dialog.create();
-        IDocumentProvider provider = getDocumentProvider();
-        if (provider == null) {
-            // editor has been programmatically closed while the dialog was open
-            return;
-        }
-        if (provider.isDeleted(input) && original != null) {
-            String message = NLS.bind(
-                    Messages.PipelineDiagramEditor_SavingDeletedFile,
-                    original.getName());
-            dialog.setErrorMessage(null);
-            dialog.setMessage(message, IMessageProvider.WARNING);
-        }
-        if (dialog.open() == Window.CANCEL) {
-            if (progressMonitor != null) {
-                progressMonitor.setCanceled(true);
-            }
-            return;
-        }
-        IPath filePath = dialog.getResult();
-        if (filePath == null) {
-            if (progressMonitor != null) {
-                progressMonitor.setCanceled(true);
-            }
-            return;
-        }
-        IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-        IFile file = workspaceRoot.getFile(filePath);
-        final IEditorInput newInput = new FileEditorInput(file);
-        // Check if the editor is already open
-        IEditorMatchingStrategy matchingStrategy = getEditorDescriptor()
-                .getEditorMatchingStrategy();
-        IEditorReference[] editorRefs = PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getActivePage()
-                .getEditorReferences();
-        for (int i = 0; i < editorRefs.length; i++) {
-            if (matchingStrategy.matches(editorRefs[i], newInput)) {
-                MessageDialog.openWarning(shell,
-                        Messages.PipelineDiagramEditor_SaveAsErrorTitle,
-                        Messages.PipelineDiagramEditor_SaveAsErrorMessage);
-                return;
-            }
-        }
-        boolean success = false;
-        try {
-            provider.aboutToChange(newInput);
-            getDocumentProvider(newInput).saveDocument(progressMonitor,
-                    newInput,
-                    getDocumentProvider().getDocument(getEditorInput()), true);
-            success = true;
-        } catch (CoreException x) {
-            IStatus status = x.getStatus();
-            if (status == null || status.getSeverity() != IStatus.CANCEL) {
-                ErrorDialog.openError(shell,
-                        Messages.PipelineDiagramEditor_SaveErrorTitle,
-                        Messages.PipelineDiagramEditor_SaveErrorMessage,
-                        x.getStatus());
-            }
-        } finally {
-            provider.changed(newInput);
-            if (success) {
-                setInput(newInput);
-            }
-        }
-        if (progressMonitor != null) {
-            progressMonitor.setCanceled(!success);
-        }
-    }
+	/**
+	 * @generated
+	 */
+	protected void performSaveAs(IProgressMonitor progressMonitor) {
+		Shell shell = getSite().getShell();
+		IEditorInput input = getEditorInput();
+		SaveAsDialog dialog = new SaveAsDialog(shell);
+		IFile original = input instanceof IFileEditorInput ? ((IFileEditorInput) input)
+				.getFile() : null;
+		if (original != null) {
+			dialog.setOriginalFile(original);
+		}
+		dialog.create();
+		IDocumentProvider provider = getDocumentProvider();
+		if (provider == null) {
+			// editor has been programmatically closed while the dialog was open
+			return;
+		}
+		if (provider.isDeleted(input) && original != null) {
+			String message = NLS.bind(
+					Messages.PipelineDiagramEditor_SavingDeletedFile,
+					original.getName());
+			dialog.setErrorMessage(null);
+			dialog.setMessage(message, IMessageProvider.WARNING);
+		}
+		if (dialog.open() == Window.CANCEL) {
+			if (progressMonitor != null) {
+				progressMonitor.setCanceled(true);
+			}
+			return;
+		}
+		IPath filePath = dialog.getResult();
+		if (filePath == null) {
+			if (progressMonitor != null) {
+				progressMonitor.setCanceled(true);
+			}
+			return;
+		}
+		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		IFile file = workspaceRoot.getFile(filePath);
+		final IEditorInput newInput = new FileEditorInput(file);
+		// Check if the editor is already open
+		IEditorMatchingStrategy matchingStrategy = getEditorDescriptor()
+				.getEditorMatchingStrategy();
+		IEditorReference[] editorRefs = PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow().getActivePage()
+				.getEditorReferences();
+		for (int i = 0; i < editorRefs.length; i++) {
+			if (matchingStrategy.matches(editorRefs[i], newInput)) {
+				MessageDialog.openWarning(shell,
+						Messages.PipelineDiagramEditor_SaveAsErrorTitle,
+						Messages.PipelineDiagramEditor_SaveAsErrorMessage);
+				return;
+			}
+		}
+		boolean success = false;
+		try {
+			provider.aboutToChange(newInput);
+			getDocumentProvider(newInput).saveDocument(progressMonitor,
+					newInput,
+					getDocumentProvider().getDocument(getEditorInput()), true);
+			success = true;
+		} catch (CoreException x) {
+			IStatus status = x.getStatus();
+			if (status == null || status.getSeverity() != IStatus.CANCEL) {
+				ErrorDialog.openError(shell,
+						Messages.PipelineDiagramEditor_SaveErrorTitle,
+						Messages.PipelineDiagramEditor_SaveErrorMessage,
+						x.getStatus());
+			}
+		} finally {
+			provider.changed(newInput);
+			if (success) {
+				setInput(newInput);
+			}
+		}
+		if (progressMonitor != null) {
+			progressMonitor.setCanceled(!success);
+		}
+	}
 
-    /**
-     * @generated
-     */
-    public ShowInContext getShowInContext() {
-        return new ShowInContext(getEditorInput(), getNavigatorSelection());
-    }
+	/**
+	 * @generated
+	 */
+	public ShowInContext getShowInContext() {
+		return new ShowInContext(getEditorInput(), getNavigatorSelection());
+	}
 
-    /**
-     * @generated
-     */
-    private ISelection getNavigatorSelection() {
-        IDiagramDocument document = getDiagramDocument();
-        if (document == null) {
-            return StructuredSelection.EMPTY;
-        }
-        Diagram diagram = document.getDiagram();
-        if (diagram == null || diagram.eResource() == null) {
-            return StructuredSelection.EMPTY;
-        }
-        IFile file = WorkspaceSynchronizer.getFile(diagram.eResource());
-        if (file != null) {
-            PipelineNavigatorItem item = new PipelineNavigatorItem(diagram,
-                    file, false);
-            return new StructuredSelection(item);
-        }
-        return StructuredSelection.EMPTY;
-    }
+	/**
+	 * @generated
+	 */
+	private ISelection getNavigatorSelection() {
+		IDiagramDocument document = getDiagramDocument();
+		if (document == null) {
+			return StructuredSelection.EMPTY;
+		}
+		Diagram diagram = document.getDiagram();
+		if (diagram == null || diagram.eResource() == null) {
+			return StructuredSelection.EMPTY;
+		}
+		IFile file = WorkspaceSynchronizer.getFile(diagram.eResource());
+		if (file != null) {
+			PipelineNavigatorItem item = new PipelineNavigatorItem(diagram,
+					file, false);
+			return new StructuredSelection(item);
+		}
+		return StructuredSelection.EMPTY;
+	}
 
-    /**
-     * @generated
-     */
-    protected void configureGraphicalViewer() {
-        super.configureGraphicalViewer();
-        DiagramEditorContextMenuProvider provider = new DiagramEditorContextMenuProvider(
-                this, getDiagramGraphicalViewer());
-        getDiagramGraphicalViewer().setContextMenu(provider);
-        getSite().registerContextMenu(ActionIds.DIAGRAM_EDITOR_CONTEXT_MENU,
-                provider, getDiagramGraphicalViewer());
-    }
+	/**
+	 * @generated
+	 */
+	protected void configureGraphicalViewer() {
+		super.configureGraphicalViewer();
+		DiagramEditorContextMenuProvider provider = new DiagramEditorContextMenuProvider(
+				this, getDiagramGraphicalViewer());
+		getDiagramGraphicalViewer().setContextMenu(provider);
+		getSite().registerContextMenu(ActionIds.DIAGRAM_EDITOR_CONTEXT_MENU,
+				provider, getDiagramGraphicalViewer());
+	}
 
-    /**
-     * @generated
-     */
-    protected void initializeGraphicalViewer() {
-        super.initializeGraphicalViewer();
-        getDiagramGraphicalViewer().addDropTargetListener(
-                new DropTargetListener(getDiagramGraphicalViewer(),
-                        LocalSelectionTransfer.getTransfer()) {
+	/**
+	 * @generated
+	 */
+	protected void initializeGraphicalViewer() {
+		super.initializeGraphicalViewer();
+		getDiagramGraphicalViewer().addDropTargetListener(
+				new DropTargetListener(getDiagramGraphicalViewer(),
+						LocalSelectionTransfer.getTransfer()) {
 
-                    protected Object getJavaObject(TransferData data) {
-                        return LocalSelectionTransfer.getTransfer()
-                                .nativeToJava(data);
-                    }
+					protected Object getJavaObject(TransferData data) {
+						return LocalSelectionTransfer.getTransfer()
+								.nativeToJava(data);
+					}
 
-                });
-        getDiagramGraphicalViewer().addDropTargetListener(
-                new DropTargetListener(getDiagramGraphicalViewer(),
-                        LocalTransfer.getInstance()) {
+				});
+		getDiagramGraphicalViewer().addDropTargetListener(
+				new DropTargetListener(getDiagramGraphicalViewer(),
+						LocalTransfer.getInstance()) {
 
-                    protected Object getJavaObject(TransferData data) {
-                        return LocalTransfer.getInstance().nativeToJava(data);
-                    }
+					protected Object getJavaObject(TransferData data) {
+						return LocalTransfer.getInstance().nativeToJava(data);
+					}
 
-                });
-    }
+				});
+	}
 
-    /**
-     * @generated
-     */
-    private abstract class DropTargetListener extends DiagramDropTargetListener {
+	/**
+	 * @generated
+	 */
+	private abstract class DropTargetListener extends DiagramDropTargetListener {
 
-        /**
-         * @generated
-         */
-        public DropTargetListener(EditPartViewer viewer, Transfer xfer) {
-            super(viewer, xfer);
-        }
+		/**
+		 * @generated
+		 */
+		public DropTargetListener(EditPartViewer viewer, Transfer xfer) {
+			super(viewer, xfer);
+		}
 
-        /**
-         * @generated
-         */
-        protected List getObjectsBeingDropped() {
-            TransferData data = getCurrentEvent().currentDataType;
-            HashSet<URI> uris = new HashSet<URI>();
+		/**
+		 * @generated
+		 */
+		protected List getObjectsBeingDropped() {
+			TransferData data = getCurrentEvent().currentDataType;
+			HashSet<URI> uris = new HashSet<URI>();
 
-            Object transferedObject = getJavaObject(data);
-            if (transferedObject instanceof IStructuredSelection) {
-                IStructuredSelection selection = (IStructuredSelection) transferedObject;
-                for (Iterator<?> it = selection.iterator(); it.hasNext();) {
-                    Object nextSelectedObject = it.next();
-                    if (nextSelectedObject instanceof PipelineNavigatorItem) {
-                        View view = ((PipelineNavigatorItem) nextSelectedObject)
-                                .getView();
-                        nextSelectedObject = view.getElement();
-                    } else if (nextSelectedObject instanceof IAdaptable) {
-                        IAdaptable adaptable = (IAdaptable) nextSelectedObject;
-                        nextSelectedObject = adaptable
-                                .getAdapter(EObject.class);
-                    }
+			Object transferedObject = getJavaObject(data);
+			if (transferedObject instanceof IStructuredSelection) {
+				IStructuredSelection selection = (IStructuredSelection) transferedObject;
+				for (Iterator<?> it = selection.iterator(); it.hasNext();) {
+					Object nextSelectedObject = it.next();
+					if (nextSelectedObject instanceof PipelineNavigatorItem) {
+						View view = ((PipelineNavigatorItem) nextSelectedObject)
+								.getView();
+						nextSelectedObject = view.getElement();
+					} else if (nextSelectedObject instanceof IAdaptable) {
+						IAdaptable adaptable = (IAdaptable) nextSelectedObject;
+						nextSelectedObject = adaptable
+								.getAdapter(EObject.class);
+					}
 
-                    if (nextSelectedObject instanceof EObject) {
-                        EObject modelElement = (EObject) nextSelectedObject;
-                        uris.add(EcoreUtil.getURI(modelElement));
-                    }
-                }
-            }
+					if (nextSelectedObject instanceof EObject) {
+						EObject modelElement = (EObject) nextSelectedObject;
+						uris.add(EcoreUtil.getURI(modelElement));
+					}
+				}
+			}
 
-            ArrayList<EObject> result = new ArrayList<EObject>(uris.size());
-            for (URI nextURI : uris) {
-                EObject modelObject = getEditingDomain().getResourceSet()
-                        .getEObject(nextURI, true);
-                result.add(modelObject);
-            }
-            return result;
-        }
+			ArrayList<EObject> result = new ArrayList<EObject>(uris.size());
+			for (URI nextURI : uris) {
+				EObject modelObject = getEditingDomain().getResourceSet()
+						.getEObject(nextURI, true);
+				result.add(modelObject);
+			}
+			return result;
+		}
 
-        /**
-         * @generated
-         */
-        protected abstract Object getJavaObject(TransferData data);
+		/**
+		 * @generated
+		 */
+		protected abstract Object getJavaObject(TransferData data);
 
-    }
+	}
 
 }

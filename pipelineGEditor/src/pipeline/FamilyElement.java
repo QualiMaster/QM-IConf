@@ -21,30 +21,30 @@ package pipeline;
  */
 public interface FamilyElement extends ProcessingElement {
     /**
-     * Returns the value of the '<em><b>Family</b></em>' attribute.
-     * The default value is <code>"-1"</code>.
-     * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Family</b></em>' attribute.
+	 * The default value is <code>"-1"</code>.
+	 * <!-- begin-user-doc -->
      * <p>
      * If the meaning of the '<em>Family</em>' attribute isn't clear,
      * there really should be more of a description here...
      * </p>
      * <!-- end-user-doc -->
-     * @return the value of the '<em>Family</em>' attribute.
-     * @see #setFamily(Integer)
-     * @see pipeline.PipelinePackage#getFamilyElement_Family()
-     * @model default="-1"
-     * @generated
-     */
+	 * @return the value of the '<em>Family</em>' attribute.
+	 * @see #setFamily(Integer)
+	 * @see pipeline.PipelinePackage#getFamilyElement_Family()
+	 * @model default="-1"
+	 * @generated
+	 */
     Integer getFamily();
 
     /**
-     * Sets the value of the '{@link pipeline.FamilyElement#getFamily <em>Family</em>}' attribute.
-     * <!-- begin-user-doc -->
+	 * Sets the value of the '{@link pipeline.FamilyElement#getFamily <em>Family</em>}' attribute.
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
-     * @param value the new value of the '<em>Family</em>' attribute.
-     * @see #getFamily()
-     * @generated
-     */
+	 * @param value the new value of the '<em>Family</em>' attribute.
+	 * @see #getFamily()
+	 * @generated
+	 */
     void setFamily(Integer value);
 
 } // FamilyElement
