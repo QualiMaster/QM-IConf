@@ -53,6 +53,7 @@ import eu.qualimaster.adaptation.external.PipelineMessage;
 import eu.qualimaster.adaptation.external.PipelineStatusRequest;
 import eu.qualimaster.adaptation.external.PipelineStatusResponse;
 import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
+import eu.qualimaster.adaptation.external.UpdateCloudResourceMessage;
 import eu.qualimaster.easy.extension.QmObservables;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.model.values.CompoundValue;
@@ -663,6 +664,10 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
     @Override
     public void handlePipelineStatusResponse(PipelineStatusResponse arg0) {
+    }
+
+    @Override
+    public void handleUpdateCloudResourceMessage(UpdateCloudResourceMessage arg0) {
     }
 
 }

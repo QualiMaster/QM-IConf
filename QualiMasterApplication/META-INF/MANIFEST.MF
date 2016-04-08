@@ -73,6 +73,6 @@ Import-Package: org.apache.commons.lang,
  org.eclipse.equinox.internal.p2.ui,
  org.eclipse.equinox.internal.p2.ui.sdk
 Bundle-ClassPath: .,
- lib/adaptationLayer-external-0.5-20160321-162642.jar,
+ lib/adaptationLayer-external-0.5-20160408-170034.jar,
  lib/xygraph/org.csstudio.swt.widgets_2.1.0.201209121549.jar,
  lib/xygraph/org.csstudio.swt.xygraph_2.1.0.201209121540.jar

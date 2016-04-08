@@ -29,6 +29,7 @@ import eu.qualimaster.adaptation.external.PipelineMessage;
 import eu.qualimaster.adaptation.external.PipelineStatusRequest;
 import eu.qualimaster.adaptation.external.PipelineStatusResponse;
 import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
+import eu.qualimaster.adaptation.external.UpdateCloudResourceMessage;
 
 /**
  * An empty dispatcher.
@@ -87,6 +88,10 @@ public abstract class DispatcherAdapter implements IClientDispatcher {
 
     @Override
     public void handlePipelineStatusResponse(PipelineStatusResponse arg0) {
+    }
+
+    @Override
+    public void handleUpdateCloudResourceMessage(UpdateCloudResourceMessage arg0) {
     }
 
 }

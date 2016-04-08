@@ -42,6 +42,7 @@ import eu.qualimaster.adaptation.external.PipelineMessage;
 import eu.qualimaster.adaptation.external.PipelineStatusRequest;
 import eu.qualimaster.adaptation.external.PipelineStatusResponse;
 import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
+import eu.qualimaster.adaptation.external.UpdateCloudResourceMessage;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
 import qualimasterapplication.Activator;
@@ -176,6 +177,11 @@ public class Infrastructure {
             for (int d = 0, n = dispatchers.size(); d < n; d++) {
                 dispatchers.get(d).handlePipelineStatusResponse(message);
             }
+        }
+
+        @Override
+        public void handleUpdateCloudResourceMessage(UpdateCloudResourceMessage arg0) {
+            // do not forward
         }
         
     }
