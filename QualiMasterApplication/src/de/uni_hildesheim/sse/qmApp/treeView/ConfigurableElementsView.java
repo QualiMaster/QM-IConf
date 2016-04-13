@@ -158,7 +158,9 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
 
     @Override
     public void dispose() {
-        elementsDispatcher.unregister();
+        if (null != elementsDispatcher) {
+            elementsDispatcher.unregister();
+        }
         if (null != menuManager) {
             menuManager.dispose();
         }
