@@ -69,12 +69,12 @@ public class PipelineTranslationOperations {
     
     private static Project modelProject = pipelineModelPart.getConfiguration().getProject();
     private static List<IFreezable> freezables;
-    private static Map<FamilyElement, String> familyNodesAndName = new HashMap<FamilyElement, String>();
+//    private static Map<FamilyElement, String> familyNodesAndName = new HashMap<FamilyElement, String>();
     private static List<PipelineNode> pipNodes;
     private static List<PipelineNode> pipProcessedNodes;
     private static List<Flow> flows;
     private static List<Flow> processedflows;
-    private static Map<Sink, String> sinkNodesAndName = new HashMap<Sink, String>();
+//    private static Map<Sink, String> sinkNodesAndName = new HashMap<Sink, String>();
     private static int sourceCount;
     private static int flowCount;
     private static int familyelementCount;
@@ -558,12 +558,12 @@ public class PipelineTranslationOperations {
             throw new PipelineTranslationException("Illegal flow source (sink).");
         } else if (flow.getDestination() instanceof FamilyElement) {
             FamilyElement fe = (FamilyElement) flow.getDestination();
-            if (!(familyNodesAndName.containsKey(fe))) {
-                destination = addPipelineElement(
-                        fe, destProject);
-            } else {
-                destination = familyNodesAndName.get(fe);
-            }
+            destination = addPipelineElement(fe, destProject);
+//            if (!(familyNodesAndName.containsKey(fe))) {
+//                destination = addPipelineElement(fe, destProject);
+//            } else {
+//                destination = familyNodesAndName.get(fe);
+//            }
             
         } else if (flow.getDestination() instanceof DataManagementElement) {
             destination = addPipelineElement((DataManagementElement) flow.getDestination(),
@@ -572,11 +572,12 @@ public class PipelineTranslationOperations {
             throw new PipelineTranslationException("Illegal flow target");
         } else {
             Sink sink = (Sink) flow.getDestination();
-            if (!(sinkNodesAndName.containsKey(sink))) {
-                destination = addPipelineElement(sink, destProject);
-            } else {
-                destination = sinkNodesAndName.get(sink);
-            }
+            destination = addPipelineElement(sink, destProject);
+//            if (!(sinkNodesAndName.containsKey(sink))) {
+//                destination = addPipelineElement(sink, destProject);
+//            } else {
+//                destination = sinkNodesAndName.get(sink);
+//            }
         }
         if (destination != null) {
             flowCompound.put("destination", destination);
@@ -632,7 +633,7 @@ public class PipelineTranslationOperations {
         }
         
         addPipelineElementToProject(familyElement, destProject, decisionVariable, familyElementCompound);
-        familyNodesAndName.put(familyElement, decisionVariable.getName());
+//        familyNodesAndName.put(familyElement, decisionVariable.getName());
         pipProcessedNodes.add(familyElement);
         return decisionVariable.getName();
     }
@@ -719,7 +720,7 @@ public class PipelineTranslationOperations {
                 IVMLModelOperations.getDeclaration(sinkVariable).getName());
         }
         addPipelineElementToProject(sink, destProject, decisionVariable, sinkCompound);
-        sinkNodesAndName.put(sink, decisionVariable.getName());
+//        sinkNodesAndName.put(sink, decisionVariable.getName());
         pipProcessedNodes.add(sink);
         List<Flow> srcOutput = getOutput(sink);
         if (!srcOutput.isEmpty()) {
