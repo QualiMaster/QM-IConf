@@ -2,6 +2,8 @@ package de.uni_hildesheim.sse.qmApp.commands;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -21,11 +23,37 @@ import de.uni_hildesheim.sse.qmApp.model.ProjectDescriptor;
 import de.uni_hildesheim.sse.qmApp.model.Reasoning;
 import de.uni_hildesheim.sse.qmApp.model.SessionModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
+import eu.qualimaster.easy.extension.QmConstants;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.instantiation.core.model.common.VilException;
 import net.ssehub.easy.instantiation.core.model.execution.Executor;
 import net.ssehub.easy.instantiation.core.model.execution.TracerFactory;
+import net.ssehub.easy.producer.core.persistence.IVMLFileWriter;
 import net.ssehub.easy.producer.ui.productline_editor.EclipseConsole;
+import net.ssehub.easy.varModel.confModel.Configuration;
+import net.ssehub.easy.varModel.cst.AttributeVariable;
+import net.ssehub.easy.varModel.cst.ConstantValue;
+import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
+import net.ssehub.easy.varModel.cst.OCLFeatureCall;
+import net.ssehub.easy.varModel.cst.Variable;
+import net.ssehub.easy.varModel.model.AbstractVariable;
+import net.ssehub.easy.varModel.model.Attribute;
+import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
+import net.ssehub.easy.varModel.model.FreezeBlock;
+import net.ssehub.easy.varModel.model.IFreezable;
+import net.ssehub.easy.varModel.model.Project;
+import net.ssehub.easy.varModel.model.datatypes.EnumLiteral;
+import net.ssehub.easy.varModel.model.datatypes.OclKeyWords;
+import net.ssehub.easy.varModel.model.datatypes.OrderedEnum;
+import net.ssehub.easy.varModel.model.filter.DeclarationFinder;
+import net.ssehub.easy.varModel.model.filter.DeclarationFinder.VisibilityType;
+import net.ssehub.easy.varModel.model.filter.FilterType;
+import net.ssehub.easy.varModel.model.rewrite.ProjectCopyVisitor;
+import net.ssehub.easy.varModel.model.rewrite.ProjectRewriteVisitor;
+import net.ssehub.easy.varModel.model.rewrite.RewriteContext;
+import net.ssehub.easy.varModel.model.rewrite.modifier.IProjectModifier;
+import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
+import net.ssehub.easy.varModel.model.values.ValueFactory;
 
 /**
  * An abstract handler for local instantiation commands. This class supports the explicit selection
@@ -35,8 +63,80 @@ import net.ssehub.easy.producer.ui.productline_editor.EclipseConsole;
  * @author Holger Eichelberger
  */
 public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandler {
+    
+    /**
+     * This modifier is used to freeze all relevant declarations inside the CFG projects of Qualimaster.
+     * @author El-Sharkawy
+     *
+     */
+    private static class ProjectFreezeModifier implements IProjectModifier {
+
+        private List<DecisionVariableDeclaration> declarations;
+        
+        @Override
+        public void modifyProject(Project project, RewriteContext context) {
+            // Freeze only in configuration projects
+            String pName = project.getName();
+            if (pName.endsWith(QmConstants.CFG_POSTFIX) && !pName.equals(QmConstants.PROJECT_ADAPTIVITYCFG)) {
+                String namespace = pName.substring(0, pName.length() - QmConstants.CFG_POSTFIX.length());
+                
+                // Filter for relevant declarations
+                List<IFreezable> toFreeze = new ArrayList<IFreezable>();
+                for (int i = 0, end = declarations.size(); i < end; i++) {
+                    DecisionVariableDeclaration decl = declarations.get(i);
+                    if (decl.getNameSpace().equals(namespace)) {
+                        toFreeze.add((IFreezable) decl);
+                    }
+                }
+                IFreezable[] freezes = toFreeze.toArray(new IFreezable[0]);
+                
+                // Create selector
+                DecisionVariableDeclaration itr = null;
+                ConstraintSyntaxTree selector = null;
+                Attribute annotation = null;
+                for (int i = 0, end = project.getAttributesCount(); i < end && annotation == null; i++) {
+                    Attribute tmpAnnotation = project.getAttribute(i);
+                    if (tmpAnnotation.getName().equals(QmConstants.ANNOTATION_BINDING_TIME)) {
+                        annotation = tmpAnnotation;
+                    }
+                }
+                if (null != annotation && annotation.getType() instanceof OrderedEnum) {
+                    OrderedEnum btType = (OrderedEnum) annotation.getType();
+                    EnumLiteral lit = null;
+                    ConstantValue cVal = null;
+                    for (int i = 0, end = btType.getLiteralCount(); i < end && null == lit; i++) {
+                        if (btType.getLiteral(i).getName().equals(QmConstants.CONST_BINDING_TIME_RUNTIME_MON)) {
+                            lit = btType.getLiteral(i);
+                            try {
+                                cVal = new ConstantValue(ValueFactory.createValue(btType, lit));
+                            } catch (ValueDoesNotMatchTypeException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    if (null != cVal) {
+                        itr = new DecisionVariableDeclaration("bt", null, null);
+                        AttributeVariable attrExpr = new AttributeVariable(new Variable(itr), annotation);
+                        selector = new OCLFeatureCall(attrExpr, OclKeyWords.GREATER_EQUALS, cVal);
+                    }
+                }
+                
+                FreezeBlock block = new FreezeBlock(freezes, itr, selector, project);
+                project.add(block);
+            }
+        }
+        
+    }
+    
+    /**
+     * Experimental: <tt>true</tt> use copied and cleaned up configuration for instantiation, 
+     * <tt>false</tt> use underlying model and configuration.
+     */
+    private static final boolean PRUNE_CONFIG = false;
 
     private static String lastTargetLocation = Location.getModelLocation();
+    
     
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -63,11 +163,14 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
                     try {
+                        File trgFolder = new File(targetLocation);
                         ProjectDescriptor source = new ProjectDescriptor();
-                        ProjectDescriptor target = new ProjectDescriptor(source, new File(targetLocation));
+                        ProjectDescriptor target = new ProjectDescriptor(source, trgFolder);
+                        Configuration config = PRUNE_CONFIG ? getConfiguration(trgFolder)
+                            : VariabilityModel.Definition.TOP_LEVEL.getConfiguration();
                         Executor executor = new Executor(source.getMainVilScript())
                             .addSource(source).addTarget(target)
-                            .addConfiguration(source.getConfiguration());
+                            .addConfiguration(config);
                         String startRuleName = getStartRuleName();
                         if (null != startRuleName) {
                             executor.addStartRuleName(startRuleName);
@@ -85,6 +188,53 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
             };
             job.schedule();
         }
+    }
+    
+    /**
+     * Prepares the underlying IVML {@link Project} for instantiation and generates a pruned 
+     * {@link Configuration}, which should be used for the instantiation of the QM model.
+     * @param targetLocation The destination folder where to instantiate all artifacts
+     * @return {@link Configuration}, which should be used for the instantiation of the QM model
+     */
+    protected Configuration getConfiguration(File targetLocation) {
+        // Copy base project
+        Project baseProject = VariabilityModel.Definition.TOP_LEVEL.getConfiguration().getProject();
+        ProjectCopyVisitor copier = new ProjectCopyVisitor(baseProject, FilterType.ALL);
+        baseProject.accept(copier);
+        baseProject = copier.getCopiedProject();
+        
+        // Freeze the copy, except for the runtime elements.
+        DeclarationFinder finder = new DeclarationFinder(baseProject, FilterType.ALL, null);
+        List<DecisionVariableDeclaration> allDeclarations = new ArrayList<DecisionVariableDeclaration>();
+        List<AbstractVariable> tmpList = finder.getVariableDeclarations(VisibilityType.ALL);
+        for (int i = 0, end = tmpList.size(); i < end; i++) {
+            AbstractVariable declaration = tmpList.get(i);
+            if (declaration instanceof DecisionVariableDeclaration
+                && !(declaration.getNameSpace().equals(QmConstants.PROJECT_OBSERVABLESCFG)
+                && declaration.getName().equals("qualityParameters"))) {
+                
+                allDeclarations.add((DecisionVariableDeclaration) declaration);
+            }
+        }
+        ProjectRewriteVisitor rewriter = new ProjectRewriteVisitor(baseProject, FilterType.ALL);
+        ProjectFreezeModifier freezer = new ProjectFreezeModifier();
+        freezer.declarations = allDeclarations;
+        rewriter.addProjectModifier(freezer);
+        baseProject.accept(rewriter);
+        
+        // Saved copied projects
+        try {
+            File modelFolder = new File(targetLocation, "QM-Model");
+            if (!modelFolder.exists()) {
+                modelFolder.mkdirs();
+            }
+            IVMLFileWriter writer = new IVMLFileWriter(modelFolder);
+            writer.save(baseProject);
+        } catch (IOException e) {
+            showExceptionDialog("Model could not be saved", e);
+        }
+        // Return a configuration based on the copied, frozen and pruned project
+        return new Configuration(baseProject, true);
     }
     
     /**
