@@ -32,6 +32,7 @@ import net.ssehub.easy.producer.core.persistence.IVMLFileWriter;
 import net.ssehub.easy.producer.ui.productline_editor.EclipseConsole;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.cst.AttributeVariable;
+import net.ssehub.easy.varModel.cst.CSTSemanticException;
 import net.ssehub.easy.varModel.cst.ConstantValue;
 import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
 import net.ssehub.easy.varModel.cst.OCLFeatureCall;
@@ -78,13 +79,13 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
             // Freeze only in configuration projects
             String pName = project.getName();
             if (pName.endsWith(QmConstants.CFG_POSTFIX) && !pName.equals(QmConstants.PROJECT_ADAPTIVITYCFG)) {
-                String namespace = pName.substring(0, pName.length() - QmConstants.CFG_POSTFIX.length());
+                String projectNS = pName.substring(0, pName.length() - QmConstants.CFG_POSTFIX.length());
                 
                 // Filter for relevant declarations
                 List<IFreezable> toFreeze = new ArrayList<IFreezable>();
                 for (int i = 0, end = declarations.size(); i < end; i++) {
                     DecisionVariableDeclaration decl = declarations.get(i);
-                    if (decl.getNameSpace().equals(namespace)) {
+                    if (decl.getNameSpace().equals(projectNS) || decl.getNameSpace().equals(pName)) {
                         toFreeze.add((IFreezable) decl);
                     }
                 }
@@ -116,9 +117,15 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                         }
                     }
                     if (null != cVal) {
-                        itr = new DecisionVariableDeclaration("bt", null, null);
+                        itr = new DecisionVariableDeclaration("var", null, null);
                         AttributeVariable attrExpr = new AttributeVariable(new Variable(itr), annotation);
                         selector = new OCLFeatureCall(attrExpr, OclKeyWords.GREATER_EQUALS, cVal);
+                        try {
+                            selector.inferDatatype();
+                        } catch (CSTSemanticException e) {
+                            itr = null;
+                            selector = null;
+                        }
                     }
                 }
                 
@@ -219,7 +226,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
         ProjectRewriteVisitor rewriter = new ProjectRewriteVisitor(baseProject, FilterType.ALL);
         ProjectFreezeModifier freezer = new ProjectFreezeModifier();
         freezer.declarations = allDeclarations;
-        rewriter.addProjectModifier(freezer);
+        //rewriter.addProjectModifier(freezer);
         baseProject.accept(rewriter);
         
         // Saved copied projects
@@ -229,6 +236,8 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                 modelFolder.mkdirs();
             }
             IVMLFileWriter writer = new IVMLFileWriter(modelFolder);
+            writer.forceComponundTypes(true);
+            writer.setFormatInitializer(true);
             writer.save(baseProject);
         } catch (IOException e) {
             showExceptionDialog("Model could not be saved", e);
