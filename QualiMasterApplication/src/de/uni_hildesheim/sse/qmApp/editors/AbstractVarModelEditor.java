@@ -8,6 +8,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -46,8 +50,14 @@ import net.ssehub.easy.varModel.model.filter.mandatoryVars.VariableContainer;
  * override and call {@link #createPartControl(Composite)}.
  * 
  * @author Holger Eichelberger
+ * @author Sascha El-Sharkawy
  */
 public abstract class AbstractVarModelEditor extends EditorPart implements IChangeListener, IDirtyListener {
+    /**
+     * minimum width. If the ScrolledComposites width violates this width, the scrollbar appears.
+     *If ScrolledComposites width is greater than the minimum width, scrollbar is deactivated.
+     */
+    private static final int MIN_WIDTH = 600;
 
     private Configuration cfg;
     private UIConfiguration uiCfg;
@@ -56,6 +66,29 @@ public abstract class AbstractVarModelEditor extends EditorPart implements IChan
     private boolean enableChangeEventProcessing = true;
     private DirtyListener dirtyListener;
     private VariableContainer importances;
+    
+    /**
+     * Creates a scroll bar to place the individual editors.
+     * Should be called from {@link #createPartControl(Composite)}.
+     * @param parent the parent of {@link #createPartControl(Composite)}
+     * @return The scrolled composite, for the complete editor.
+     */
+    protected ScrolledComposite createScrolledContentArea(Composite parent) {
+        final ScrolledComposite scroll = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+        
+        //Set expandHorizontal to true, thus the layout will work. Take up horizontal space.
+        scroll.setExpandHorizontal(true);
+        scroll.addControlListener(new ControlAdapter() {
+            public void controlResized(ControlEvent exc) {
+
+                //Set minimum width in order to preserve possibility of scrollbar
+                scroll.setMinSize(MIN_WIDTH, SWT.DEFAULT);
+                
+            }
+        });
+        
+        return scroll;
+    }
 
     @Override
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {

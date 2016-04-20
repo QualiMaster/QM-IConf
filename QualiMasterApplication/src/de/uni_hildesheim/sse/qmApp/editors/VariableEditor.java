@@ -10,8 +10,6 @@ import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -47,6 +45,7 @@ import net.ssehub.easy.varModel.model.Project;
  * 
  * @author Niko Nowatzki
  * @author Holger Eichelberger
+ * @author Sascha El-Sharkawy
  */
 public class VariableEditor extends AbstractVarModelEditor implements IModelListener<Project> {
 
@@ -54,10 +53,6 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     
     private static final String COMPOSITE_STRING = "class org.eclipse.swt.widgets.Composite";
     private static final int MARGIN_RIGHT = 50;
-    
-    //minimum width. If the ScrolledComposites width violates this width, the scrollbar appears.
-    //If ScrolledComposites width is greater than the minimum width, scrollbar is deactivated.
-    private static final int MIN_WIDTH = 600;
     
     private HashMap<Control, ControlDecoration> flawedControls = new HashMap<Control, ControlDecoration>();
     private ScrolledComposite scroll;
@@ -113,10 +108,7 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     @Override
     public final void createPartControl(Composite parent) {
     
-        scroll = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
-        
-        //Set expandHorizontal to true, thus the layout will work. Take up horizontal space.
-        scroll.setExpandHorizontal(true);
+        scroll = super.createScrolledContentArea(parent);
         
         inner = new Composite(scroll, SWT.NONE);
         scroll.setContent(inner);
@@ -147,15 +139,6 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
         inner.setSize(p);
         inner.layout();
              
-        scroll.addControlListener(new ControlAdapter() {
-            public void controlResized(ControlEvent exc) {
-
-                //Set minimum width in order to preserve possibility of scrollbar
-                scroll.setMinSize(MIN_WIDTH, SWT.DEFAULT);
-                
-            }
-        });
-
         createAdditionalControls(inner);
        
     }

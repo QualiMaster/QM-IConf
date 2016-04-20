@@ -1,5 +1,8 @@
 package de.uni_hildesheim.sse.qmApp.editors;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
@@ -39,6 +42,7 @@ import net.ssehub.easy.varModel.model.datatypes.Set;
  * 
  * @author Niko Nowatzki
  * @author Holger Eichelberger
+ * @author Sascha El-Sharkawy
  */
 public class ProjectEditor extends AbstractVarModelEditor {
 
@@ -57,8 +61,12 @@ public class ProjectEditor extends AbstractVarModelEditor {
 
     @Override
     public void createPartControl(Composite parent) {
-        super.createPartControl(parent);
-        parent.setLayout(new GridLayout(2, false));
+        ScrolledComposite scroll = super.createScrolledContentArea(parent);
+        Composite inner = new Composite(scroll, SWT.NONE);
+        scroll.setContent(inner);
+        
+        super.createPartControl(inner);
+        inner.setLayout(new GridLayout(2, false));
 
         Configuration cfg = getConfiguration();
         UIConfiguration uiCfg = getUIConfiguration();
@@ -80,6 +88,10 @@ public class ProjectEditor extends AbstractVarModelEditor {
         EditorCreationVisitor vis = new EditorCreationVisitor(uiCfg, cfg);
         project.accept(vis);
         setPartName(input.getName());
+        
+        Point p = inner.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+        inner.setSize(p);
+        inner.layout();
     }
     
 
