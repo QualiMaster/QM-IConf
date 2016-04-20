@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="de.uni-hildesheim.sse.qualiMasterApplication" uid="de.uni-hildesheim.sse.qualiMasterApplication" id="QualiMasterApplication.QualiMasterApplication" application="QualiMasterApplication.application" version="0.9.0" useFeatures="false" includeLaunchers="true">
-
+<product name="de.uni-hildesheim.sse.qualiMasterApplication" uid="de.uni-hildesheim.sse.qualiMasterApplication" id="QualiMasterApplication.QualiMasterApplication" application="QualiMasterApplication.application" version="0.9.5" useFeatures="false" includeLaunchers="true">
 
    <configIni use="default">
    </configIni>
@@ -28,7 +27,6 @@
       </win>
    </launcher>
 
-
    <vm>
       <windows include="false">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</windows>
    </vm>
@@ -52,31 +50,14 @@ and limitations under the License.
    <plugins>
       <plugin id="QualiMaster.Extension"/>
       <plugin id="QualiMasterApplication"/>
-      <plugin id="net.ssehub.easy.reasoning.core"/>
       <plugin id="RepositoryConnector"/>
       <plugin id="com.google.guava"/>
       <plugin id="com.google.inject"/>
       <plugin id="com.google.inject.multibindings" fragment="true"/>
       <plugin id="com.ibm.icu"/>
-      <plugin id="net.ssehub.easy.instantiation.velocity"/>
-      <plugin id="net.ssehub.easy.instantiation.core"/>
       <plugin id="de.uni-hildesheim.sse.easy.instantiatorCore.rt"/>
-      <!--plugin id="de.uni_hildesheim.sse.EASy-Producer.tests" fragment="true"/-->
-      <plugin id="net.ssehub.easy.dslCore"/>
-      <plugin id="net.ssehub.easy.dslCore.ui"/>
-      <plugin id="net.ssehub.easy.instantiation.java"/>
-      <plugin id="net.ssehub.easy.instantiation.maven"/>
-      <plugin id="net.ssehub.easy.producer.ui"/>
-      <plugin id="net.ssehub.easy.producer.core"/>
-      <!--plugin id="de.uni_hildesheim.sse.easy_producer.core.test" fragment="true"/-->
-      <plugin id="net.ssehub.easy.producer.eclipse"/>
       <plugin id="de.uni_hildesheim.sse.ivml"/>
       <plugin id="de.uni_hildesheim.sse.ivml.ui"/>
-      <plugin id="net.ssehub.easy.reasoning.sseReasoner"/>
-      <!-- plugin id="de.uni_hildesheim.sse.svn.connector.test" fragment="true"/-->
-      <plugin id="net.ssehub.easy.basics"/>
-      <plugin id="net.ssehub.easy.varModel"/>
-      <plugin id="net.ssehub.easy.instantiation.serializer.xml"/>
       <plugin id="de.uni_hildesheim.sse.vil.buildlang"/>
       <plugin id="de.uni_hildesheim.sse.vil.buildlang.ui"/>
       <plugin id="de.uni_hildesheim.sse.vil.expressions"/>
@@ -93,6 +74,20 @@ and limitations under the License.
       <plugin id="javax.servlet.jsp"/>
       <plugin id="javax.xml"/>
       <plugin id="lpg.runtime.java"/>
+      <plugin id="net.ssehub.easy.basics"/>
+      <plugin id="net.ssehub.easy.dslCore"/>
+      <plugin id="net.ssehub.easy.dslCore.ui"/>
+      <plugin id="net.ssehub.easy.instantiation.core"/>
+      <plugin id="net.ssehub.easy.instantiation.java"/>
+      <plugin id="net.ssehub.easy.instantiation.maven"/>
+      <plugin id="net.ssehub.easy.instantiation.serializer.xml"/>
+      <plugin id="net.ssehub.easy.instantiation.velocity"/>
+      <plugin id="net.ssehub.easy.producer.core"/>
+      <plugin id="net.ssehub.easy.producer.eclipse"/>
+      <plugin id="net.ssehub.easy.producer.ui"/>
+      <plugin id="net.ssehub.easy.reasoning.core"/>
+      <plugin id="net.ssehub.easy.reasoning.sseReasoner"/>
+      <plugin id="net.ssehub.easy.varModel"/>
       <plugin id="org.antlr.runtime"/>
       <plugin id="org.apache.ant"/>
       <plugin id="org.apache.batik.bridge"/>
