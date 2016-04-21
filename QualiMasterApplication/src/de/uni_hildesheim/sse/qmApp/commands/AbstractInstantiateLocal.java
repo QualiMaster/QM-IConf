@@ -140,7 +140,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
      * Experimental: <tt>true</tt> use copied and cleaned up configuration for instantiation, 
      * <tt>false</tt> use underlying model and configuration.
      */
-    private static final boolean PRUNE_CONFIG = false;
+    private static final boolean PRUNE_CONFIG = true;
 
     private static String lastTargetLocation = Location.getModelLocation();
     

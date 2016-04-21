@@ -1,3 +1,18 @@
+/*
+ * Copyright 2014-2016 University of Hildesheim, Software Systems Engineering
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.uni_hildesheim.sse.qmApp.model;
 
 import java.io.File;
@@ -69,17 +84,13 @@ public class PipelineTranslationOperations {
     
     private static Project modelProject = pipelineModelPart.getConfiguration().getProject();
     private static List<IFreezable> freezables;
-//    private static Map<FamilyElement, String> familyNodesAndName = new HashMap<FamilyElement, String>();
     private static List<PipelineNode> pipNodes;
     private static List<PipelineNode> pipProcessedNodes;
     private static List<Flow> flows;
     private static List<Flow> processedflows;
-//    private static Map<Sink, String> sinkNodesAndName = new HashMap<Sink, String>();
     private static int sourceCount;
     private static int flowCount;
-    private static int familyelementCount;
     private static int dataManagementElementCount;
-    private static int sinkCount;
     private static Pipeline pipeline;
     
     /**
@@ -125,11 +136,11 @@ public class PipelineTranslationOperations {
      */
     public static String translationFromEcoregraphToIVMLfile(URI fileURI, List<Pipeline> pipelineList) 
         throws PipelineTranslationException {
+        
+        PipelineSaveContext context = new PipelineSaveContext();
         sourceCount = 0;
         flowCount = 0;
-        familyelementCount = 0;
         dataManagementElementCount = 0;
-        sinkCount = 0;
         pipNodes = new ArrayList<PipelineNode>();
         pipProcessedNodes = new ArrayList<PipelineNode>();
         flows = new ArrayList<Flow>();
@@ -145,8 +156,8 @@ public class PipelineTranslationOperations {
         if (!pipelineList.isEmpty() && pipelineList.size() == 1) {
             // add pipeline elements
             pipeline = pipelineList.get(0); //defautly only one pipeline in one editor
-            pipelineVariable = addPipelineElement(pipeline, newProject);
-            handleDisconnectedElements(newProject); //handle the disconnected elements in the pipeline
+            pipelineVariable = addPipelineElement(pipeline, newProject, context);
+            handleDisconnectedElements(newProject, context); //handle the disconnected elements in the pipeline
             String pVariableName = pipelineVariable.getName();
             String pDisplayName = pipeline.getName();
             Map<String, String> nameMap = QMPipelineEditor
@@ -275,22 +286,26 @@ public class PipelineTranslationOperations {
     /**
      * Handles the disconnected elements in the pipeline.
      * @param newProject the project to write
+     * @param context Context, which stores information about already translated elements of the translation of a
+     *     complete pipeline from ECORE to IVML.
      * @throws PipelineTranslationException in case of illegal pipeline structures
      */
-    public static void handleDisconnectedElements(Project newProject) throws PipelineTranslationException {
+    private static void handleDisconnectedElements(Project newProject,
+        PipelineSaveContext context) throws PipelineTranslationException {
+        
         flows.removeAll(processedflows); //remove all already-processed flows
         //handle the pipeline element linked to the unprocessed flows
         if (flows.size() > 0) {                
             for (Flow f : flows) {
                 PipelineElement fSrc = f.getSource(); //get the source of the flow
                 PipelineNode p = (PipelineNode) fSrc; //fSrc can be surely casted to a pipeline node.
-                handlePipelineNodes(p, newProject);
+                handlePipelineNodes(p, newProject, context);
             }
         }
         //hanlde disconnected pipeline nodes in the pipeline
         List<PipelineNode> pipUnprocessedNodes = obtainUnprocessedNodes(pipProcessedNodes);
         for (PipelineNode p : pipUnprocessedNodes) {
-            handlePipelineNodes(p, newProject);
+            handlePipelineNodes(p, newProject, context);
         }
     }
     /**
@@ -325,26 +340,28 @@ public class PipelineTranslationOperations {
      * Handle the pipeline node translating to IVML notation.
      * @param pipelineNode the pipeline node to be handled
      * @param destProject the project to be written
+     * @param context Context, which stores information about already translated elements of the translation of a
+     *     complete pipeline from ECORE to IVML.
      * @throws PipelineTranslationException in case of illegal pipeline structures
      */
-    public static void handlePipelineNodes(PipelineNode pipelineNode, Project destProject) 
+    public static void handlePipelineNodes(PipelineNode pipelineNode, Project destProject, PipelineSaveContext context) 
         throws PipelineTranslationException {
         if ((pipelineNode instanceof Source) && !(pipProcessedNodes.contains((Source) pipelineNode))) {
             Source source = (Source) pipelineNode;
-            addPipelineElement(source, destProject);
+            addPipelineElement(source, destProject, context);
         }
         if ((pipelineNode instanceof FamilyElement) && !(pipProcessedNodes.contains((FamilyElement) pipelineNode))) {
             FamilyElement fm = (FamilyElement) pipelineNode;
-            addPipelineElement(fm, destProject);
+            addPipelineElement(fm, destProject, context);
         }
         if ((pipelineNode instanceof DataManagementElement) 
                 && !(pipProcessedNodes.contains((DataManagementElement) pipelineNode))) {
             DataManagementElement dm = (DataManagementElement) pipelineNode;
-            addPipelineElement(dm, destProject);
+            addPipelineElement(dm, destProject, context);
         }
         if ((pipelineNode instanceof Sink) && !(pipProcessedNodes.contains((Sink) pipelineNode))) {
             Sink snk = (Sink) pipelineNode;
-            addPipelineElement(snk, destProject);
+            addPipelineElement(snk, destProject, context);
         }
     }
     /**
@@ -378,20 +395,19 @@ public class PipelineTranslationOperations {
     /**
      * Adds <code>pipeline</code> to the project.
      * 
-     * @param pipeline
-     *            the pipeline to be added
-     * @param destProject
-     *            the project to add pipeline element to
+     * @param pipeline The pipeline to be added
+     * @param destProject The project to add pipeline element to
+     * @param context Context, which stores information about already translated elements of the translation of a
+     * complete pipeline from ECORE to IVML.
      * @return the variable name of the pipeline
      * @throws PipelineTranslationException in case of illegal pipeline structures
      */
-    public static DecisionVariableDeclaration addPipelineElement(
-            Pipeline pipeline, Project destProject) throws PipelineTranslationException {
+    private static DecisionVariableDeclaration addPipelineElement(Pipeline pipeline, Project destProject,
+        PipelineSaveContext context) throws PipelineTranslationException {
 
         // define pipeline
-        DecisionVariableDeclaration pipelineVariable = IVMLModelOperations
-                .getDecisionVariable(modelProject, "Pipeline", null,
-                        destProject);
+        DecisionVariableDeclaration pipelineVariable = IVMLModelOperations.getDecisionVariable(modelProject,
+            "Pipeline", null, destProject);
         freezables.add(pipelineVariable);
         destProject.add(pipelineVariable);
         //get all pipeline nodes and flows
@@ -428,7 +444,7 @@ public class PipelineTranslationOperations {
         for (PipelineNode pipelineNode : pipelineNodes) {
             if (pipelineNode instanceof Source) {
                 source = (Source) pipelineNode;
-                String sourceName = addPipelineElement(source, destProject);
+                String sourceName = addPipelineElement(source, destProject, context);
                 if (sourceName != null) {
                     sourceList.add(sourceName);                    
                 }
@@ -478,10 +494,14 @@ public class PipelineTranslationOperations {
      *            the source to be added
      * @param destProject
      *            the project to add to
+     * @param context Context, which stores information about already translated elements of the translation of a
+     *     complete pipeline from ECORE to IVML.
      * @return the variable name of the source
      * @throws PipelineTranslationException in case of illegal pipeline structures
      */
-    public static String addPipelineElement(Source source, Project destProject) throws PipelineTranslationException {
+    private static String addPipelineElement(Source source, Project destProject, PipelineSaveContext context)
+        throws PipelineTranslationException {
+        
         DecisionVariableDeclaration decisionVariable = null;
         // define source
         decisionVariable = IVMLModelOperations.getDecisionVariable(
@@ -506,7 +526,7 @@ public class PipelineTranslationOperations {
         List<Flow> srcOutput = getOutput(source);
         ArrayList<String> fList = new ArrayList<String>();
         for (Flow flow : srcOutput) {
-            fList.add(addPipelineElement(flow, destProject));
+            fList.add(addPipelineElement(flow, destProject, context));
         }
         if (!fList.isEmpty()) {
             sourceCompound.put("output", fList.toArray());
@@ -524,10 +544,13 @@ public class PipelineTranslationOperations {
      *            the flow to be added
      * @param destProject
      *            the project to add to
+     * @param context Context, which stores information about already translated elements of the translation of a
+     *     complete pipeline from ECORE to IVML.
      * @return the variable name of the flow
      * @throws PipelineTranslationException in case of illegal flows
      */
-    public static String addPipelineElement(Flow flow, Project destProject) throws PipelineTranslationException {
+    private static String addPipelineElement(Flow flow, Project destProject, PipelineSaveContext context)
+        throws PipelineTranslationException {
 
         // define flow
         DecisionVariableDeclaration flowVariable = IVMLModelOperations
@@ -558,26 +581,22 @@ public class PipelineTranslationOperations {
             throw new PipelineTranslationException("Illegal flow source (sink).");
         } else if (flow.getDestination() instanceof FamilyElement) {
             FamilyElement fe = (FamilyElement) flow.getDestination();
-            destination = addPipelineElement(fe, destProject);
-//            if (!(familyNodesAndName.containsKey(fe))) {
-//                destination = addPipelineElement(fe, destProject);
-//            } else {
-//                destination = familyNodesAndName.get(fe);
-//            }
-            
+            if (context.hasFamilyMapping(fe)) {
+                destination = context.getFamilyMapping(fe);
+            } else {
+                destination = addPipelineElement(fe, destProject, context);
+            }
         } else if (flow.getDestination() instanceof DataManagementElement) {
-            destination = addPipelineElement((DataManagementElement) flow.getDestination(),
-                    destProject);
+            destination = addPipelineElement((DataManagementElement) flow.getDestination(), destProject, context);
         } else if (flow.getDestination() instanceof Source) {
             throw new PipelineTranslationException("Illegal flow target");
         } else {
             Sink sink = (Sink) flow.getDestination();
-            destination = addPipelineElement(sink, destProject);
-//            if (!(sinkNodesAndName.containsKey(sink))) {
-//                destination = addPipelineElement(sink, destProject);
-//            } else {
-//                destination = sinkNodesAndName.get(sink);
-//            }
+            if (context.hasSinkMapping(sink)) {
+                destination = context.getSinkMapping(sink);
+            } else {
+                destination = addPipelineElement(sink, destProject, context);
+            }
         }
         if (destination != null) {
             flowCompound.put("destination", destination);
@@ -596,19 +615,21 @@ public class PipelineTranslationOperations {
      *            the family element to be added
      * @param destProject
      *            the project to add to
+     * @param context Context, which stores information about already translated elements of the translation of a
+     *     complete pipeline from ECORE to IVML.
      * @return the variable name of the family element
      * @throws PipelineTranslationException in case of illegal pipeline structures
      */
-    public static String addPipelineElement(FamilyElement familyElement,
-            Project destProject) throws PipelineTranslationException {
+    private static String addPipelineElement(FamilyElement familyElement, Project destProject,
+        PipelineSaveContext context) throws PipelineTranslationException {
+        
         DecisionVariableDeclaration decisionVariable = null;
         // define familyelement
         decisionVariable = IVMLModelOperations.getDecisionVariable(
                 modelProject, "FamilyElement",
-                Integer.toString(familyelementCount), destProject);
+                Integer.toString(context.getFamilyCount()), destProject);
         freezables.add(decisionVariable);
         destProject.add(decisionVariable);
-        familyelementCount++;
 
         Map<String, IDatatype> nameAndTypeMap = IVMLModelOperations
                 .getCompoundNameAndType(decisionVariable);
@@ -626,14 +647,14 @@ public class PipelineTranslationOperations {
         List<Flow> fOutput = getOutput(familyElement);
         List<String> fList = new ArrayList<String>();
         for (Flow flow : fOutput) {
-            fList.add(addPipelineElement(flow, destProject));
+            fList.add(addPipelineElement(flow, destProject, context));
         }
         if (fList != null) {
             familyElementCompound.put("output", fList.toArray());
         }
         
         addPipelineElementToProject(familyElement, destProject, decisionVariable, familyElementCompound);
-//        familyNodesAndName.put(familyElement, decisionVariable.getName());
+        context.addFamilyMapping(familyElement, decisionVariable.getName());
         pipProcessedNodes.add(familyElement);
         return decisionVariable.getName();
     }
@@ -645,11 +666,14 @@ public class PipelineTranslationOperations {
      *            the dataManagementElement to be added
      * @param destProject
      *            the project to add to
+     * @param context Context, which stores information about already translated elements of the translation of a
+     *     complete pipeline from ECORE to IVML.
      * @return the variable name of the dataManagementElement
      * @throws PipelineTranslationException in case of illegal pipeline structures
      */
-    public static String addPipelineElement(DataManagementElement dataManagementElement, Project destProject) 
-        throws PipelineTranslationException {
+    private static String addPipelineElement(DataManagementElement dataManagementElement, Project destProject,
+        PipelineSaveContext context) throws PipelineTranslationException {
+        
         DecisionVariableDeclaration decisionVariable = null;
         // define dataManagementElement
         decisionVariable = IVMLModelOperations.getDecisionVariable(
@@ -674,7 +698,7 @@ public class PipelineTranslationOperations {
         List<Flow> fOutput = getOutput(dataManagementElement);
         List<String> fList = new ArrayList<String>();
         for (Flow flow : fOutput) {
-            fList.add(addPipelineElement(flow, destProject));
+            fList.add(addPipelineElement(flow, destProject, context));
         }
         if (fList != null) {
             dataManagementElementCompound.put("output", fList.toArray());
@@ -693,17 +717,20 @@ public class PipelineTranslationOperations {
      *            the sink to be added
      * @param destProject
      *            the project to add to
+     * @param context Context, which stores information about already translated elements of the translation of a
+     *     complete pipeline from ECORE to IVML.
      * @return the variable name of the sink
      * @throws PipelineTranslationException in case of illegal pipeline structures
      */
-    public static String addPipelineElement(Sink sink, Project destProject) throws PipelineTranslationException {
+    private static String addPipelineElement(Sink sink, Project destProject, PipelineSaveContext context)
+        throws PipelineTranslationException {
+        
         DecisionVariableDeclaration decisionVariable = null;
         // define sink
         decisionVariable = IVMLModelOperations.getDecisionVariable(
-                modelProject, "Sink", Integer.toString(sinkCount), destProject);
+                modelProject, "Sink", Integer.toString(context.getSinkCount()), destProject);
         freezables.add(decisionVariable);
         destProject.add(decisionVariable);
-        sinkCount++;
 
         Map<String, IDatatype> nameAndTypeMap = IVMLModelOperations
                 .getCompoundNameAndType(decisionVariable);
@@ -720,7 +747,7 @@ public class PipelineTranslationOperations {
                 IVMLModelOperations.getDeclaration(sinkVariable).getName());
         }
         addPipelineElementToProject(sink, destProject, decisionVariable, sinkCompound);
-//        sinkNodesAndName.put(sink, decisionVariable.getName());
+        context.addSinkMapping(sink, decisionVariable.getName());
         pipProcessedNodes.add(sink);
         List<Flow> srcOutput = getOutput(sink);
         if (!srcOutput.isEmpty()) {
