@@ -182,7 +182,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                         if (null != startRuleName) {
                             executor.addStartRuleName(startRuleName);
                         }
-                        TracerFactory.setInstance(UiTracerFactory.INSTANCE);
+                        TracerFactory.setDefaultInstance(UiTracerFactory.INSTANCE);
                         executor.execute();
                         notifyInstantiationCompleted(shell);
                     } catch (ModelManagementException e) {

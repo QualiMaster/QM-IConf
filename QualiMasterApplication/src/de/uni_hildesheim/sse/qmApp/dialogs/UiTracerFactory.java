@@ -39,7 +39,7 @@ public class UiTracerFactory extends TracerFactory {
      * as the default tracer.
      */
     private UiTracerFactory() {
-        super.setInstance(this);
+        setDefaultInstance(this);
     }
     
     @Override
