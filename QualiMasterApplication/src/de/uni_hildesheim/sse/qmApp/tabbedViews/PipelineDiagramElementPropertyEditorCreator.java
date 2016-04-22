@@ -355,7 +355,8 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
             // The parent should be the complete pipeline
             if (parent instanceof Pipeline) {
                 Pipeline pipeline = (Pipeline) parent;
-                isVisible = (pipeline.getIsSubPipeline() == 0);
+                // Make it visible if pipeline is sub pipeline or if it is configured inconsistently
+                isVisible = (pipeline.getIsSubPipeline() == 0) || ((FamilyElement) data).getIsConnector();
             }
         }
         return isVisible;
