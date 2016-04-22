@@ -2,6 +2,7 @@ package pipeline.diagram.edit.parts;
 
 import java.util.Collections;
 import java.util.List;
+
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.MarginBorder;
 import org.eclipse.draw2d.PositionConstants;
@@ -9,6 +10,7 @@ import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.StackLayout;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
@@ -29,6 +31,7 @@ import org.eclipse.gmf.runtime.gef.ui.figures.NodeFigure;
 import org.eclipse.gmf.runtime.lite.svg.SVGFigure;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.swt.graphics.Color;
+
 import pipeline.diagram.edit.policies.FamilyElementItemSemanticEditPolicy;
 import pipeline.diagram.part.PipelineVisualIDRegistry;
 
@@ -237,7 +240,30 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
 						.equals(event.getFeature())) {
 			handleMajorSemanticChange();
 		} else {
-			super.handleNotificationEvent(event);
+			
+		    /*
+		     * Not generated -> hand crafted code, copied from
+		     * http://www.eclipse.org/epsilon/doc/articles/eugenia-nodes-with-runtime-images/ ;-)
+		     */
+		    if (event.getFeature() instanceof EAttribute) {
+		        EAttribute eAttribute = (EAttribute) event.getFeature();
+
+		        if (eAttribute.getName().equalsIgnoreCase("isConnector") && this.contentPane instanceof SVGFigure) {
+		            SVGFigure svgFigure = (SVGFigure) contentPane;
+		            Boolean isConnector = (Boolean) event.getNewValue();
+		            if (isConnector) {
+		                svgFigure.setURI("platform:/plugin/pipelineGEditor/svg/end.svg", true);
+		            } else {
+		                svgFigure.setURI("platform:/plugin/pipelineGEditor/svg/familyelement.svg", true);
+		            }
+		            svgFigure.repaint();
+		        }
+		      }
+		    /*
+		     * end of manually added code
+		     */
+		    
+		    super.handleNotificationEvent(event);
 		}
 	}
 
