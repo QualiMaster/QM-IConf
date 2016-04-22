@@ -139,13 +139,22 @@ public interface PipelinePackage extends EPackage
     int PIPELINE__FAST_SERIALIZATION = 7;
 
 /**
+	 * The feature id for the '<em><b>Is Sub Pipeline</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PIPELINE__IS_SUB_PIPELINE = 8;
+
+/**
 	 * The number of structural features of the '<em>Pipeline</em>' class.
 	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-  int PIPELINE_FEATURE_COUNT = 8;
+  int PIPELINE_FEATURE_COUNT = 9;
 
   /**
 	 * The meta object id for the '{@link pipeline.impl.PipelineElementImpl <em>Element</em>}' class.
@@ -543,13 +552,22 @@ public interface PipelinePackage extends EPackage
     int FAMILY_ELEMENT__FAMILY = PROCESSING_ELEMENT_FEATURE_COUNT + 0;
 
         /**
+	 * The feature id for the '<em><b>Is Connector</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FAMILY_ELEMENT__IS_CONNECTOR = PROCESSING_ELEMENT_FEATURE_COUNT + 1;
+
+								/**
 	 * The number of structural features of the '<em>Family Element</em>' class.
 	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-    int FAMILY_ELEMENT_FEATURE_COUNT = PROCESSING_ELEMENT_FEATURE_COUNT + 1;
+    int FAMILY_ELEMENT_FEATURE_COUNT = PROCESSING_ELEMENT_FEATURE_COUNT + 2;
 
         /**
 	 * The meta object id for the '{@link pipeline.impl.DataManagementElementImpl <em>Data Management Element</em>}' class.
@@ -712,6 +730,17 @@ public interface PipelinePackage extends EPackage
 	 * @generated
 	 */
     EAttribute getPipeline_FastSerialization();
+
+/**
+	 * Returns the meta object for the attribute '{@link pipeline.Pipeline#getIsSubPipeline <em>Is Sub Pipeline</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Is Sub Pipeline</em>'.
+	 * @see pipeline.Pipeline#getIsSubPipeline()
+	 * @see #getPipeline()
+	 * @generated
+	 */
+	EAttribute getPipeline_IsSubPipeline();
 
 /**
 	 * Returns the meta object for class '{@link pipeline.PipelineElement <em>Element</em>}'.
@@ -894,6 +923,17 @@ public interface PipelinePackage extends EPackage
     EAttribute getFamilyElement_Family();
 
 /**
+	 * Returns the meta object for the attribute '{@link pipeline.FamilyElement#getIsConnector <em>Is Connector</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Is Connector</em>'.
+	 * @see pipeline.FamilyElement#getIsConnector()
+	 * @see #getFamilyElement()
+	 * @generated
+	 */
+	EAttribute getFamilyElement_IsConnector();
+
+/**
 	 * Returns the meta object for class '{@link pipeline.DataManagementElement <em>Data Management Element</em>}'.
 	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -1012,6 +1052,14 @@ public interface PipelinePackage extends EPackage
         EAttribute PIPELINE__FAST_SERIALIZATION = eINSTANCE.getPipeline_FastSerialization();
 
                 /**
+		 * The meta object literal for the '<em><b>Is Sub Pipeline</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute PIPELINE__IS_SUB_PIPELINE = eINSTANCE.getPipeline_IsSubPipeline();
+
+																/**
 		 * The meta object literal for the '{@link pipeline.impl.PipelineElementImpl <em>Element</em>}' class.
 		 * <!-- begin-user-doc -->
          * <!-- end-user-doc -->
@@ -1162,6 +1210,14 @@ public interface PipelinePackage extends EPackage
         EAttribute FAMILY_ELEMENT__FAMILY = eINSTANCE.getFamilyElement_Family();
 
     /**
+		 * The meta object literal for the '<em><b>Is Connector</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute FAMILY_ELEMENT__IS_CONNECTOR = eINSTANCE.getFamilyElement_IsConnector();
+
+				/**
 		 * The meta object literal for the '{@link pipeline.impl.DataManagementElementImpl <em>Data Management Element</em>}' class.
 		 * <!-- begin-user-doc -->
          * <!-- end-user-doc -->

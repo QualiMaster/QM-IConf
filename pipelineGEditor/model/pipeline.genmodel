@@ -14,6 +14,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Pipeline/constraints"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Pipeline/debug"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Pipeline/fastSerialization"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Pipeline/isSubPipeline"/>
     </genClasses>
     <genClasses image="false" ecoreClass="pipeline.ecore#//PipelineElement">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//PipelineElement/name"/>
@@ -37,6 +38,7 @@
     <genClasses image="false" ecoreClass="pipeline.ecore#//ProcessingElement"/>
     <genClasses ecoreClass="pipeline.ecore#//FamilyElement">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//FamilyElement/family"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//FamilyElement/isConnector"/>
     </genClasses>
     <genClasses ecoreClass="pipeline.ecore#//DataManagementElement">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//DataManagementElement/dataManagement"/>

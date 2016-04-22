@@ -1,5 +1,6 @@
 package de.uni_hildesheim.sse.qmApp.tabbedViews;
 
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.swt.widgets.Composite;
@@ -13,10 +14,10 @@ import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.EventKind;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.IChangeListener;
 import eu.qualimaster.easy.extension.QmConstants;
 import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory;
+import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
 import net.ssehub.easy.producer.ui.productline_editor.DelegatingEasyEditorPage;
 import net.ssehub.easy.producer.ui.productline_editor.IUpdateListener;
 import net.ssehub.easy.producer.ui.productline_editor.IUpdateProvider;
-import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
 import net.ssehub.easy.varModel.confModel.AssignmentState;
 import net.ssehub.easy.varModel.confModel.CompoundVariable;
 import net.ssehub.easy.varModel.confModel.Configuration;
@@ -33,6 +34,9 @@ import net.ssehub.easy.varModel.model.datatypes.Reference;
 import net.ssehub.easy.varModel.model.filter.FilterType;
 import net.ssehub.easy.varModel.model.filter.mandatoryVars.MandatoryDeclarationClassifier;
 import net.ssehub.easy.varModel.model.filter.mandatoryVars.VariableContainer;
+import pipeline.FamilyElement;
+import pipeline.Pipeline;
+import pipeline.impl.FamilyElementImpl;
 
 /**
  * Implements a generic property editor creator for pipeline diagram elements.
@@ -339,6 +343,28 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
             }
         }
         
+    }
+
+    @Override
+    public boolean isVisible(Object data, String propertyIdentifier) {
+        boolean isVisible = true;
+        // isConnector attribute become only relevant if pipeline is a sub pipeline
+        if (data instanceof FamilyElement && "isConnector".equals(propertyIdentifier)) {
+            isVisible = false;
+            EObject parent = ((FamilyElement) data).eContainer();
+            // The parent should be the complete pipeline
+            if (parent instanceof Pipeline) {
+                Pipeline pipeline = (Pipeline) parent;
+                isVisible = (pipeline.getIsSubPipeline() == 0);
+            }
+        }
+        return isVisible;
+    }
+
+    @Override
+    public boolean isFilterable() {
+        // Currently, only elements of the family can be filtered.
+        return reactsOn == FamilyElementImpl.class;
     }
 
 }

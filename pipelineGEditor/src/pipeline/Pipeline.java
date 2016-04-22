@@ -22,6 +22,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link pipeline.Pipeline#getConstraints <em>Constraints</em>}</li>
  *   <li>{@link pipeline.Pipeline#getDebug <em>Debug</em>}</li>
  *   <li>{@link pipeline.Pipeline#getFastSerialization <em>Fast Serialization</em>}</li>
+ *   <li>{@link pipeline.Pipeline#getIsSubPipeline <em>Is Sub Pipeline</em>}</li>
  * </ul>
  * </p>
  *
@@ -224,5 +225,32 @@ public interface Pipeline extends EObject
 	 * @generated
 	 */
     void setFastSerialization(Integer value);
+
+/**
+	 * Returns the value of the '<em><b>Is Sub Pipeline</b></em>' attribute.
+	 * The default value is <code>"1"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Is Sub Pipeline</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Is Sub Pipeline</em>' attribute.
+	 * @see #setIsSubPipeline(Integer)
+	 * @see pipeline.PipelinePackage#getPipeline_IsSubPipeline()
+	 * @model default="1"
+	 * @generated
+	 */
+	Integer getIsSubPipeline();
+
+/**
+	 * Sets the value of the '{@link pipeline.Pipeline#getIsSubPipeline <em>Is Sub Pipeline</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Is Sub Pipeline</em>' attribute.
+	 * @see #getIsSubPipeline()
+	 * @generated
+	 */
+	void setIsSubPipeline(Integer value);
 
 } // Pipeline

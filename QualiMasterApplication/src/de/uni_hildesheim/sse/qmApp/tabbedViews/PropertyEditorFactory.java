@@ -135,6 +135,44 @@ public class PropertyEditorFactory {
     }
     
     /**
+     * Specifies whether the given <tt>propertyIdentifier</tt> shall be displayed at the GUI or not, i.e., whether
+     * this property can be edited by the user or not.
+     * @param data the data object identifying the {@link IPropertyEditorCreator}
+     * @param propertyIdentifier an identifier specifying the property the cell editor shall be returned for 
+     *   inside of <code>data</code>
+     * @return <tt>true</tt> the editor shall be shown, <tt>false</tt> the editor should not be shown in the UI.
+     */
+    public static boolean isVisible(Object data, String propertyIdentifier) {
+        boolean isVisible = true;
+        if (null != data && null != propertyIdentifier) {
+            IPropertyEditorCreator creator = CREATORS.get(data.getClass());
+            if (null != creator) {
+                isVisible = creator.isVisible(data, propertyIdentifier);
+            }
+        }
+        
+        return isVisible;
+    }
+    
+    /**
+     * Specifies whether this kind or Pipeline element can be filtered at all.
+     * @param data the data object identifying the {@link IPropertyEditorCreator}
+     * @return <tt>true</tt> {@link #isVisible(String)} should be considered for all elements, <tt>false</tt> no
+     * filtering needed.
+     */
+    public static boolean isFilterable(Object data) {
+        boolean isFilterable = false;
+        if (null != data) {
+            IPropertyEditorCreator creator = CREATORS.get(data.getClass());
+            if (null != creator) {
+                isFilterable = creator.isFilterable();
+            }
+        }
+        
+        return isFilterable;
+    }
+    
+    /**
      * Returns the label provider, i.e., the label describing the actual object value.
      * 
      * @param data the data object identifying the {@link IPropertyEditorCreator}

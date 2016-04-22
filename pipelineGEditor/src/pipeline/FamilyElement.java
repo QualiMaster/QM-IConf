@@ -12,6 +12,7 @@ package pipeline;
  * The following features are supported:
  * <ul>
  *   <li>{@link pipeline.FamilyElement#getFamily <em>Family</em>}</li>
+ *   <li>{@link pipeline.FamilyElement#getIsConnector <em>Is Connector</em>}</li>
  * </ul>
  * </p>
  *
@@ -46,5 +47,32 @@ public interface FamilyElement extends ProcessingElement {
 	 * @generated
 	 */
     void setFamily(Integer value);
+
+				/**
+	 * Returns the value of the '<em><b>Is Connector</b></em>' attribute.
+	 * The default value is <code>"false"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Is Connector</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Is Connector</em>' attribute.
+	 * @see #setIsConnector(Boolean)
+	 * @see pipeline.PipelinePackage#getFamilyElement_IsConnector()
+	 * @model default="false"
+	 * @generated
+	 */
+	Boolean getIsConnector();
+
+				/**
+	 * Sets the value of the '{@link pipeline.FamilyElement#getIsConnector <em>Is Connector</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Is Connector</em>' attribute.
+	 * @see #getIsConnector()
+	 * @generated
+	 */
+	void setIsConnector(Boolean value);
 
 } // FamilyElement

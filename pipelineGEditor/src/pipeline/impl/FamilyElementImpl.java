@@ -19,6 +19,7 @@ import pipeline.PipelinePackage;
  * The following features are implemented:
  * <ul>
  *   <li>{@link pipeline.impl.FamilyElementImpl#getFamily <em>Family</em>}</li>
+ *   <li>{@link pipeline.impl.FamilyElementImpl#getIsConnector <em>Is Connector</em>}</li>
  * </ul>
  * </p>
  *
@@ -46,6 +47,26 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
     protected Integer family = FAMILY_EDEFAULT;
 
     /**
+	 * The default value of the '{@link #getIsConnector() <em>Is Connector</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getIsConnector()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final Boolean IS_CONNECTOR_EDEFAULT = Boolean.FALSE;
+
+				/**
+	 * The cached value of the '{@link #getIsConnector() <em>Is Connector</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getIsConnector()
+	 * @generated
+	 * @ordered
+	 */
+	protected Boolean isConnector = IS_CONNECTOR_EDEFAULT;
+
+				/**
 	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
 	 * @generated
@@ -87,6 +108,27 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 
     /**
 	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Boolean getIsConnector() {
+		return isConnector;
+	}
+
+				/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setIsConnector(Boolean newIsConnector) {
+		Boolean oldIsConnector = isConnector;
+		isConnector = newIsConnector;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, PipelinePackage.FAMILY_ELEMENT__IS_CONNECTOR, oldIsConnector, isConnector));
+	}
+
+				/**
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -95,6 +137,8 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 		switch (featureID) {
 			case PipelinePackage.FAMILY_ELEMENT__FAMILY:
 				return getFamily();
+			case PipelinePackage.FAMILY_ELEMENT__IS_CONNECTOR:
+				return getIsConnector();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -109,6 +153,9 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 		switch (featureID) {
 			case PipelinePackage.FAMILY_ELEMENT__FAMILY:
 				setFamily((Integer)newValue);
+				return;
+			case PipelinePackage.FAMILY_ELEMENT__IS_CONNECTOR:
+				setIsConnector((Boolean)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -125,6 +172,9 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 			case PipelinePackage.FAMILY_ELEMENT__FAMILY:
 				setFamily(FAMILY_EDEFAULT);
 				return;
+			case PipelinePackage.FAMILY_ELEMENT__IS_CONNECTOR:
+				setIsConnector(IS_CONNECTOR_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -139,6 +189,8 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 		switch (featureID) {
 			case PipelinePackage.FAMILY_ELEMENT__FAMILY:
 				return FAMILY_EDEFAULT == null ? family != null : !FAMILY_EDEFAULT.equals(family);
+			case PipelinePackage.FAMILY_ELEMENT__IS_CONNECTOR:
+				return IS_CONNECTOR_EDEFAULT == null ? isConnector != null : !IS_CONNECTOR_EDEFAULT.equals(isConnector);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -155,6 +207,8 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (family: ");
 		result.append(family);
+		result.append(", isConnector: ");
+		result.append(isConnector);
 		result.append(')');
 		return result.toString();
 	}

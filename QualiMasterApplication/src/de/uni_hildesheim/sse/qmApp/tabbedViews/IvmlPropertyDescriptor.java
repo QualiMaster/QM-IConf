@@ -96,4 +96,22 @@ public class IvmlPropertyDescriptor extends PropertyDescriptor
         return ExtendedImageRegistry.getInstance().getImage(itemLabelProvider.getImage(object));
     }
     
+    /**
+     * Specifies whether the given <tt>propertyIdentifier</tt> shall be displayed at the GUI or not, i.e., whether
+     * this property can be edited by the user or not.
+     * @return <tt>true</tt> the editor shall be shown, <tt>false</tt> the editor should not be shown in the UI.
+     */
+    public boolean isVisible() {
+        return PropertyEditorFactory.isVisible(object, getFieldIdentifier());
+    }
+    
+    /**
+     * Specifies whether this kind or Pipeline element can be filtered at all.
+     * @return <tt>true</tt> {@link #isVisible(String)} should be considered for all elements, <tt>false</tt> no
+     * filtering needed.
+     */
+    public boolean isFilterable() {
+        return PropertyEditorFactory.isFilterable(object);
+    }
+    
 }

@@ -242,6 +242,15 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 
 /**
 	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getPipeline_IsSubPipeline() {
+		return (EAttribute)pipelineEClass.getEStructuralFeatures().get(8);
+	}
+
+/**
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -400,6 +409,15 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 
 /**
 	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getFamilyElement_IsConnector() {
+		return (EAttribute)familyElementEClass.getEStructuralFeatures().get(1);
+	}
+
+/**
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -455,6 +473,7 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 		createEAttribute(pipelineEClass, PIPELINE__CONSTRAINTS);
 		createEAttribute(pipelineEClass, PIPELINE__DEBUG);
 		createEAttribute(pipelineEClass, PIPELINE__FAST_SERIALIZATION);
+		createEAttribute(pipelineEClass, PIPELINE__IS_SUB_PIPELINE);
 
 		pipelineElementEClass = createEClass(PIPELINE_ELEMENT);
 		createEAttribute(pipelineElementEClass, PIPELINE_ELEMENT__NAME);
@@ -479,6 +498,7 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 
 		familyElementEClass = createEClass(FAMILY_ELEMENT);
 		createEAttribute(familyElementEClass, FAMILY_ELEMENT__FAMILY);
+		createEAttribute(familyElementEClass, FAMILY_ELEMENT__IS_CONNECTOR);
 
 		dataManagementElementEClass = createEClass(DATA_MANAGEMENT_ELEMENT);
 		createEAttribute(dataManagementElementEClass, DATA_MANAGEMENT_ELEMENT__DATA_MANAGEMENT);
@@ -531,6 +551,7 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 		initEAttribute(getPipeline_Constraints(), ecorePackage.getEString(), "constraints", "", 0, 1, Pipeline.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPipeline_Debug(), ecorePackage.getEIntegerObject(), "debug", "1", 0, 1, Pipeline.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPipeline_FastSerialization(), ecorePackage.getEIntegerObject(), "fastSerialization", "1", 0, 1, Pipeline.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPipeline_IsSubPipeline(), ecorePackage.getEIntegerObject(), "isSubPipeline", "1", 0, 1, Pipeline.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(pipelineElementEClass, PipelineElement.class, "PipelineElement", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getPipelineElement_Name(), ecorePackage.getEString(), "name", "", 0, 1, PipelineElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -555,6 +576,7 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 
 		initEClass(familyElementEClass, FamilyElement.class, "FamilyElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getFamilyElement_Family(), ecorePackage.getEIntegerObject(), "family", "-1", 0, 1, FamilyElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getFamilyElement_IsConnector(), ecorePackage.getEBooleanObject(), "isConnector", "false", 0, 1, FamilyElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(dataManagementElementEClass, DataManagementElement.class, "DataManagementElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getDataManagementElement_DataManagement(), ecorePackage.getEIntegerObject(), "dataManagement", "-1", 0, 1, DataManagementElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

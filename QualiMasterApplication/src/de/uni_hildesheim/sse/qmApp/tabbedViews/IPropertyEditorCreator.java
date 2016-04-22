@@ -63,5 +63,22 @@ public interface IPropertyEditorCreator {
      */
     public ILabelProvider getLabelProvider(Object data, String propertyIdentifier, Object value, 
         IFallbackImageProvider imageProvider);
+    
+    /**
+     * Specifies whether the given <tt>propertyIdentifier</tt> shall be displayed at the GUI or not, i.e., whether
+     * this property can be edited by the user or not.
+     * @param data the data object identifying the {@link IPropertyEditorCreator}
+     * @param propertyIdentifier an identifier specifying the property the cell editor shall be returned for 
+     *   inside of <code>data</code>
+     * @return <tt>true</tt> the editor shall be shown, <tt>false</tt> the editor should not be shown in the UI.
+     */
+    public boolean isVisible(Object data, String propertyIdentifier);
+    
+    /**
+     * Specifies whether this kind or Pipeline element can be filtered at all.
+     * @return <tt>true</tt> {@link #isVisible(String)} should be considered for all elements, <tt>false</tt> no
+     * filtering needed.
+     */
+    public boolean isFilterable();
 
 }

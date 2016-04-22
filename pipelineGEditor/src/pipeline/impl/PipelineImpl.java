@@ -40,6 +40,7 @@ import pipeline.PipelinePackage;
  *   <li>{@link pipeline.impl.PipelineImpl#getConstraints <em>Constraints</em>}</li>
  *   <li>{@link pipeline.impl.PipelineImpl#getDebug <em>Debug</em>}</li>
  *   <li>{@link pipeline.impl.PipelineImpl#getFastSerialization <em>Fast Serialization</em>}</li>
+ *   <li>{@link pipeline.impl.PipelineImpl#getIsSubPipeline <em>Is Sub Pipeline</em>}</li>
  * </ul>
  * </p>
  *
@@ -186,6 +187,26 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 	 * @ordered
 	 */
     protected Integer fastSerialization = FAST_SERIALIZATION_EDEFAULT;
+
+/**
+	 * The default value of the '{@link #getIsSubPipeline() <em>Is Sub Pipeline</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getIsSubPipeline()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final Integer IS_SUB_PIPELINE_EDEFAULT = new Integer(1);
+
+/**
+	 * The cached value of the '{@link #getIsSubPipeline() <em>Is Sub Pipeline</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getIsSubPipeline()
+	 * @generated
+	 * @ordered
+	 */
+	protected Integer isSubPipeline = IS_SUB_PIPELINE_EDEFAULT;
 
 /**
 	 * <!-- begin-user-doc -->
@@ -362,6 +383,27 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 
 /**
 	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Integer getIsSubPipeline() {
+		return isSubPipeline;
+	}
+
+/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setIsSubPipeline(Integer newIsSubPipeline) {
+		Integer oldIsSubPipeline = isSubPipeline;
+		isSubPipeline = newIsSubPipeline;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, PipelinePackage.PIPELINE__IS_SUB_PIPELINE, oldIsSubPipeline, isSubPipeline));
+	}
+
+/**
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -402,6 +444,8 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 				return getDebug();
 			case PipelinePackage.PIPELINE__FAST_SERIALIZATION:
 				return getFastSerialization();
+			case PipelinePackage.PIPELINE__IS_SUB_PIPELINE:
+				return getIsSubPipeline();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -442,6 +486,9 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 			case PipelinePackage.PIPELINE__FAST_SERIALIZATION:
 				setFastSerialization((Integer)newValue);
 				return;
+			case PipelinePackage.PIPELINE__IS_SUB_PIPELINE:
+				setIsSubPipeline((Integer)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -479,6 +526,9 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 			case PipelinePackage.PIPELINE__FAST_SERIALIZATION:
 				setFastSerialization(FAST_SERIALIZATION_EDEFAULT);
 				return;
+			case PipelinePackage.PIPELINE__IS_SUB_PIPELINE:
+				setIsSubPipeline(IS_SUB_PIPELINE_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -508,6 +558,8 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 				return DEBUG_EDEFAULT == null ? debug != null : !DEBUG_EDEFAULT.equals(debug);
 			case PipelinePackage.PIPELINE__FAST_SERIALIZATION:
 				return FAST_SERIALIZATION_EDEFAULT == null ? fastSerialization != null : !FAST_SERIALIZATION_EDEFAULT.equals(fastSerialization);
+			case PipelinePackage.PIPELINE__IS_SUB_PIPELINE:
+				return IS_SUB_PIPELINE_EDEFAULT == null ? isSubPipeline != null : !IS_SUB_PIPELINE_EDEFAULT.equals(isSubPipeline);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -534,6 +586,8 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 		result.append(debug);
 		result.append(", fastSerialization: ");
 		result.append(fastSerialization);
+		result.append(", isSubPipeline: ");
+		result.append(isSubPipeline);
 		result.append(')');
 		return result.toString();
 	}

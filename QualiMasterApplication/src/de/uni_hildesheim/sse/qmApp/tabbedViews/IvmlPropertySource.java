@@ -1,5 +1,8 @@
 package de.uni_hildesheim.sse.qmApp.tabbedViews;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.ui.provider.PropertySource;
@@ -28,4 +31,25 @@ public class IvmlPropertySource extends PropertySource {
         return new IvmlPropertyDescriptor(object, itemPropertyDescriptor);
     }
 
+    @Override
+    public IPropertyDescriptor[] getPropertyDescriptors() {
+        IPropertyDescriptor[] descriptors = super.getPropertyDescriptors();
+        
+        boolean filter = descriptors != null && descriptors.length > 0
+            && descriptors[0] instanceof IvmlPropertyDescriptor
+            && ((IvmlPropertyDescriptor) descriptors[0]).isFilterable();
+        if (filter) {
+            List<IPropertyDescriptor> descriptorList = new ArrayList<IPropertyDescriptor>();
+            for (int i = 0; i < descriptors.length; i++) {
+                if (!(descriptors[i] instanceof IvmlPropertyDescriptor)
+                    || ((IvmlPropertyDescriptor) descriptors[i]).isVisible()) {
+                    
+                    descriptorList.add(descriptors[i]);
+                }
+            }
+            descriptors = descriptorList.toArray(new IPropertyDescriptor[descriptorList.size()]);
+        }
+        
+        return descriptors;
+    }
 }
