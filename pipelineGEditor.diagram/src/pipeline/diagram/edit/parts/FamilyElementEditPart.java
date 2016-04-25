@@ -306,11 +306,8 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
 		public void updateFigure(Boolean isConnector) {
 		    if (isConnector) {
 		        this.setURI("platform:/plugin/pipelineGEditor/svg/familyElementConnector.svg", true);
-		        this.setSize(new Dimension(getMapMode().DPtoLP(120),
-	                    getMapMode().DPtoLP(120)));
             } else {
                 this.setURI("platform:/plugin/pipelineGEditor/svg/familyelement.svg", true);
-                this.setSize(60, 60);
             }
 		    this.repaint();
 		}
