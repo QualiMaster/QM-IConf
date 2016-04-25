@@ -30,8 +30,10 @@ import org.eclipse.gmf.runtime.gef.ui.figures.DefaultSizeNodeFigure;
 import org.eclipse.gmf.runtime.gef.ui.figures.NodeFigure;
 import org.eclipse.gmf.runtime.lite.svg.SVGFigure;
 import org.eclipse.gmf.runtime.notation.View;
+import org.eclipse.gmf.runtime.notation.impl.ShapeImpl;
 import org.eclipse.swt.graphics.Color;
 
+import pipeline.FamilyElement;
 import pipeline.diagram.edit.policies.FamilyElementItemSemanticEditPolicy;
 import pipeline.diagram.part.PipelineVisualIDRegistry;
 
@@ -117,7 +119,9 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
 	 * @generated
 	 */
 	protected IFigure createNodeShape() {
-		return primaryShape = new FamilyElementFigure();
+	    FamilyElement model = (FamilyElement) ((ShapeImpl) getModel()).getElement();
+	    Boolean isConnector = model.getIsConnector();
+		return primaryShape = new FamilyElementFigure(isConnector);
 	}
 
 	/**
@@ -248,15 +252,12 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
 		    if (event.getFeature() instanceof EAttribute) {
 		        EAttribute eAttribute = (EAttribute) event.getFeature();
 
-		        if (eAttribute.getName().equalsIgnoreCase("isConnector") && this.contentPane instanceof SVGFigure) {
-		            SVGFigure svgFigure = (SVGFigure) contentPane;
+		        if (eAttribute.getName().equalsIgnoreCase("isConnector")
+		            && this.contentPane instanceof FamilyElementFigure) {
+		            
+		            FamilyElementFigure svgFigure = (FamilyElementFigure) contentPane;
 		            Boolean isConnector = (Boolean) event.getNewValue();
-		            if (isConnector) {
-		                svgFigure.setURI("platform:/plugin/pipelineGEditor/svg/end.svg", true);
-		            } else {
-		                svgFigure.setURI("platform:/plugin/pipelineGEditor/svg/familyelement.svg", true);
-		            }
-		            svgFigure.repaint();
+		            svgFigure.updateFigure(isConnector);
 		        }
 		      }
 		    /*
@@ -282,6 +283,36 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
 			this.setBorder(new MarginBorder(getMapMode().DPtoLP(5),
 					getMapMode().DPtoLP(5), getMapMode().DPtoLP(5),
 					getMapMode().DPtoLP(5)));
+		}
+		
+		/**
+		 * Manual added constructor
+		 * @param isConenctor <tt>true</tt> if it is a connector, default should be <tt>false</tt>
+		 */
+		public FamilyElementFigure(Boolean isConnector) {
+		    this.setPreferredSize(new Dimension(getMapMode().DPtoLP(60),
+		            getMapMode().DPtoLP(60)));
+		    this.setBorder(new MarginBorder(getMapMode().DPtoLP(5),
+		            getMapMode().DPtoLP(5), getMapMode().DPtoLP(5),
+		            getMapMode().DPtoLP(5)));
+		    
+		    updateFigure(isConnector);
+		}
+		
+		/**
+		 * Updates the shown SVG figure depending on the "isConnector" attribute.
+		 * @param isConnector isConenctor <tt>true</tt> if it is a connector, default should be <tt>false</tt>
+		 */
+		public void updateFigure(Boolean isConnector) {
+		    if (isConnector) {
+		        this.setURI("platform:/plugin/pipelineGEditor/svg/familyElementConnector.svg", true);
+		        this.setSize(new Dimension(getMapMode().DPtoLP(120),
+	                    getMapMode().DPtoLP(120)));
+            } else {
+                this.setURI("platform:/plugin/pipelineGEditor/svg/familyelement.svg", true);
+                this.setSize(60, 60);
+            }
+		    this.repaint();
 		}
 
 	}
