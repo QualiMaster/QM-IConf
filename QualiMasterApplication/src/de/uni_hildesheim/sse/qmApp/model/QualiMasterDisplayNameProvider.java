@@ -166,5 +166,4 @@ public class QualiMasterDisplayNameProvider extends DisplayNameProvider {
             MODEL_PART_NAMES.put(part.getDefinition(), displayName);
         }
     }
-
 }

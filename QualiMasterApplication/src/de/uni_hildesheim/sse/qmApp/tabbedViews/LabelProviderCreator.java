@@ -6,10 +6,10 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
-import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
+import de.uni_hildesheim.sse.qmApp.model.QualiMasterDisplayNameProvider;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.DisplayNameProvider;
-import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
 import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.datatypes.AnyType;
 import net.ssehub.easy.varModel.model.datatypes.BooleanType;
@@ -28,7 +28,6 @@ import net.ssehub.easy.varModel.model.datatypes.Sequence;
 import net.ssehub.easy.varModel.model.datatypes.Set;
 import net.ssehub.easy.varModel.model.datatypes.StringType;
 import net.ssehub.easy.varModel.model.datatypes.VersionType;
-import net.ssehub.easy.varModel.model.filter.ReferenceValuesFinder;
 
 /**
  * Implements a label provider creator based on IVML datatypes.
@@ -121,16 +120,11 @@ class LabelProviderCreator implements IDatatypeVisitor {
         if (value instanceof Integer) {
             int index = (Integer) value;
             Configuration cfg = modelPart.getConfiguration();
-            List<AbstractVariable> possible = ReferenceValuesFinder.findPossibleValues(cfg.getProject(), reference);
-            int count = possible.size();
+            List<ConstraintSyntaxTree> possibleValues = cfg.getQueryCache().getPossibleValues(reference);
+            int count = possibleValues.size();
             if (0 <= index && index < count) {
-                AbstractVariable decl = possible.get(index);
-                IDecisionVariable var = cfg.getDecision(decl);
-                if (null != var) {
-                    labelText = ModelAccess.getDisplayName(var);
-                } else {
-                    labelText = decl.getName();
-                }
+                ConstraintSyntaxTree value = possibleValues.get(index);
+                labelText = QualiMasterDisplayNameProvider.INSTANCE.getDisplayName(value, cfg.getProject());
             } else if (index >= count) {
                 labelText = getNullName(labelText);
             }

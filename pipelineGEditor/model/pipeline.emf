@@ -25,6 +25,11 @@ class Flow extends PipelineElement{
   ref PipelineElement source; // not in IVML, required by diagram editor
   ref PipelineElement destination;
   attr Integer grouping = 0; // enums become integer holding the ordinal (count+1 = nullValue if supported)
+  /*
+   * Single reference (1:1) between one tuple of source.output and destination.input
+   * References become integers holding the global index of all defined variables, -1 is unselected, count+1 = nullValue if supported
+   */
+  attr Integer tupleType = -1;
 }
 
 @gmf.node()

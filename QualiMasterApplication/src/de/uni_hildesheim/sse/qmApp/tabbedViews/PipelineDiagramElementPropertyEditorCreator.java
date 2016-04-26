@@ -253,6 +253,7 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
                 tmpDecl.setComment(compound.getComment()); // take over .text information
                 tmpModel.add(tmpDecl);
                 Configuration tmpConfig = new Configuration(tmpModel, AssignmentState.ASSIGNED);
+                cfg.shareQueryCacheWith(tmpConfig);
                 IDecisionVariable tmpVar = tmpConfig.getDecision(tmpDecl);
                 if (null != tmpVar) {
                     CompoundVariable cVar = (CompoundVariable) tmpVar;
@@ -308,7 +309,7 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
      * 
      * @author Holger Eichelberger
      */
-    private class EditorUpdater implements IUpdateListener, IChangeListener {
+    class EditorUpdater implements IUpdateListener, IChangeListener {
 
         private IUpdateProvider provider;
         

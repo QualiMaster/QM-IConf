@@ -1,5 +1,46 @@
 package de.uni_hildesheim.sse.qmApp.model;
 
+import static eu.qualimaster.easy.extension.QmConstants.ANNOTATION_BINDING_TIME;
+import static eu.qualimaster.easy.extension.QmConstants.ANNOTATION_USER_VISIBLE;
+import static eu.qualimaster.easy.extension.QmConstants.CFG_POSTFIX;
+import static eu.qualimaster.easy.extension.QmConstants.CONST_BINDING_TIME_COMPILE;
+import static eu.qualimaster.easy.extension.QmConstants.PROJECT_ADAPTIVITY;
+import static eu.qualimaster.easy.extension.QmConstants.PROJECT_ALGORITHMS;
+import static eu.qualimaster.easy.extension.QmConstants.PROJECT_BASICS;
+import static eu.qualimaster.easy.extension.QmConstants.PROJECT_DATAMGT;
+import static eu.qualimaster.easy.extension.QmConstants.PROJECT_FAMILIES;
+import static eu.qualimaster.easy.extension.QmConstants.PROJECT_HARDWARE;
+import static eu.qualimaster.easy.extension.QmConstants.PROJECT_INFRASTRUCTURE;
+import static eu.qualimaster.easy.extension.QmConstants.PROJECT_OBSERVABLES;
+import static eu.qualimaster.easy.extension.QmConstants.PROJECT_PIPELINES;
+import static eu.qualimaster.easy.extension.QmConstants.PROJECT_RECONFHW;
+import static eu.qualimaster.easy.extension.QmConstants.PROJECT_TOP_LEVEL;
+import static eu.qualimaster.easy.extension.QmConstants.SLOT_NAME;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_ADAPTIVITY_QPARAMWEIGHTING;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_ALGORITHM;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_DATASINK;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_DATASOURCE;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_FAMILY;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_FIELDTYPE;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_HWNODE;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_MACHINE;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_OBSERVABLES_CONFIGUREDQPARAM;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_PERSISTENTDATAELT;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_PIPELINE;
+import static eu.qualimaster.easy.extension.QmConstants.VAR_ADAPTIVITY_CROSSPIPELINETRADEOFFS;
+import static eu.qualimaster.easy.extension.QmConstants.VAR_ADAPTIVITY_PIPELINEIMPORTANCE;
+import static eu.qualimaster.easy.extension.QmConstants.VAR_ALGORITHMS_ALGORITHMS;
+import static eu.qualimaster.easy.extension.QmConstants.VAR_BASICS_TYPES;
+import static eu.qualimaster.easy.extension.QmConstants.VAR_DATAMGT_DATASINKS;
+import static eu.qualimaster.easy.extension.QmConstants.VAR_DATAMGT_DATASOURCES;
+import static eu.qualimaster.easy.extension.QmConstants.VAR_DATAMGT_PERSISTENTDATAELTS;
+import static eu.qualimaster.easy.extension.QmConstants.VAR_FAMILIES_FAMILIES;
+import static eu.qualimaster.easy.extension.QmConstants.VAR_HARDWARE_MACHINES;
+import static eu.qualimaster.easy.extension.QmConstants.VAR_INFRASTRUCTURE_ACTIVEPIPELINES;
+import static eu.qualimaster.easy.extension.QmConstants.VAR_OBSERVABLES_CONFIGUREDPARAMS;
+import static eu.qualimaster.easy.extension.QmConstants.VAR_PIPELINES_PIPELINES;
+import static eu.qualimaster.easy.extension.QmConstants.VAR_RECONFHW_CLUSTERS;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,12 +48,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import pipeline.impl.DataManagementElementImpl;
-import pipeline.impl.FamilyElementImpl;
-import pipeline.impl.FlowImpl;
-import pipeline.impl.PipelineImpl;
-import pipeline.impl.SinkImpl;
-import pipeline.impl.SourceImpl;
 import de.uni_hildesheim.sse.qmApp.editorInput.EmptyEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator.CloneMode;
@@ -30,14 +65,15 @@ import de.uni_hildesheim.sse.qmApp.editors.TuplesEditor;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.qmApp.images.ImageRegistry;
 import de.uni_hildesheim.sse.qmApp.model.Utils.ConfigurationProperties;
+import de.uni_hildesheim.sse.qmApp.tabbedViews.FlowPropertyEditorCreator;
 import de.uni_hildesheim.sse.qmApp.tabbedViews.PipelineDiagramElementPropertyEditorCreator;
 import de.uni_hildesheim.sse.qmApp.tabbedViews.PropertyEditorFactory;
 import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElement;
 import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElements;
+import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElements.IElementReferrer;
 import de.uni_hildesheim.sse.qmApp.treeView.DecisionVariableElementFactory;
 import de.uni_hildesheim.sse.qmApp.treeView.IConfigurableElementFactory;
 import de.uni_hildesheim.sse.qmApp.treeView.PipelineElementFactory;
-import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElements.IElementReferrer;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.ApplicationRole;
 import de.uni_hildesheim.sse.repositoryConnector.roleFetcher.model.Role;
@@ -52,8 +88,11 @@ import net.ssehub.easy.varModel.model.datatypes.StringType;
 import net.ssehub.easy.varModel.model.values.BooleanValue;
 import net.ssehub.easy.varModel.model.values.EnumValue;
 import net.ssehub.easy.varModel.model.values.Value;
-
-import static eu.qualimaster.easy.extension.QmConstants.*;
+import pipeline.impl.DataManagementElementImpl;
+import pipeline.impl.FamilyElementImpl;
+import pipeline.impl.PipelineImpl;
+import pipeline.impl.SinkImpl;
+import pipeline.impl.SourceImpl;
 
 /**
  * Defines and initializes model-specific data and functionality. 
@@ -375,7 +414,7 @@ public class VariabilityModel {
         PropertyEditorFactory.registerCreator(new PipelineDiagramElementPropertyEditorCreator(FamilyElementImpl.class));
         PropertyEditorFactory.registerCreator(new PipelineDiagramElementPropertyEditorCreator(
                 DataManagementElementImpl.class));
-        PropertyEditorFactory.registerCreator(new PipelineDiagramElementPropertyEditorCreator(FlowImpl.class));
+        PropertyEditorFactory.registerCreator(new FlowPropertyEditorCreator());
         PropertyEditorFactory.registerCreator(new PipelineDiagramElementPropertyEditorCreator(PipelineImpl.class));
     }
     

@@ -316,6 +316,15 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 
 /**
 	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getFlow_TupleType() {
+		return (EAttribute)flowEClass.getEStructuralFeatures().get(3);
+	}
+
+/**
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -483,6 +492,7 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 		createEReference(flowEClass, FLOW__SOURCE);
 		createEReference(flowEClass, FLOW__DESTINATION);
 		createEAttribute(flowEClass, FLOW__GROUPING);
+		createEAttribute(flowEClass, FLOW__TUPLE_TYPE);
 
 		pipelineNodeEClass = createEClass(PIPELINE_NODE);
 		createEAttribute(pipelineNodeEClass, PIPELINE_NODE__PARALLELISM);
@@ -561,6 +571,7 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 		initEReference(getFlow_Source(), this.getPipelineElement(), null, "source", null, 0, 1, Flow.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getFlow_Destination(), this.getPipelineElement(), null, "destination", null, 0, 1, Flow.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getFlow_Grouping(), ecorePackage.getEIntegerObject(), "grouping", "0", 0, 1, Flow.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getFlow_TupleType(), ecorePackage.getEIntegerObject(), "tupleType", "-1", 0, 1, Flow.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(pipelineNodeEClass, PipelineNode.class, "PipelineNode", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getPipelineNode_Parallelism(), ecorePackage.getEIntegerObject(), "parallelism", "1", 0, 1, PipelineNode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

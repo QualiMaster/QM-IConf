@@ -45,6 +45,8 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="destination" eType="#//PipelineElement"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="grouping" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EIntegerObject"
         defaultValueLiteral="0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tupleType" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EIntegerObject"
+        defaultValueLiteral="-1"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="PipelineNode" abstract="true" eSuperTypes="#//PipelineElement">
     <eAnnotations source="gmf.node"/>

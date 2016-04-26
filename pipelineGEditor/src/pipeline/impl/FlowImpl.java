@@ -25,6 +25,7 @@ import pipeline.PipelinePackage;
  *   <li>{@link pipeline.impl.FlowImpl#getSource <em>Source</em>}</li>
  *   <li>{@link pipeline.impl.FlowImpl#getDestination <em>Destination</em>}</li>
  *   <li>{@link pipeline.impl.FlowImpl#getGrouping <em>Grouping</em>}</li>
+ *   <li>{@link pipeline.impl.FlowImpl#getTupleType <em>Tuple Type</em>}</li>
  * </ul>
  * </p>
  *
@@ -71,6 +72,26 @@ public class FlowImpl extends PipelineElementImpl implements Flow
 	 * @ordered
 	 */
     protected Integer grouping = GROUPING_EDEFAULT;
+
+/**
+	 * The default value of the '{@link #getTupleType() <em>Tuple Type</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getTupleType()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final Integer TUPLE_TYPE_EDEFAULT = new Integer(-1);
+
+/**
+	 * The cached value of the '{@link #getTupleType() <em>Tuple Type</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getTupleType()
+	 * @generated
+	 * @ordered
+	 */
+	protected Integer tupleType = TUPLE_TYPE_EDEFAULT;
 
 /**
 	 * <!-- begin-user-doc -->
@@ -194,6 +215,27 @@ public class FlowImpl extends PipelineElementImpl implements Flow
 
 /**
 	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Integer getTupleType() {
+		return tupleType;
+	}
+
+/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setTupleType(Integer newTupleType) {
+		Integer oldTupleType = tupleType;
+		tupleType = newTupleType;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, PipelinePackage.FLOW__TUPLE_TYPE, oldTupleType, tupleType));
+	}
+
+/**
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -209,6 +251,8 @@ public class FlowImpl extends PipelineElementImpl implements Flow
 				return basicGetDestination();
 			case PipelinePackage.FLOW__GROUPING:
 				return getGrouping();
+			case PipelinePackage.FLOW__TUPLE_TYPE:
+				return getTupleType();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -230,6 +274,9 @@ public class FlowImpl extends PipelineElementImpl implements Flow
 				return;
 			case PipelinePackage.FLOW__GROUPING:
 				setGrouping((Integer)newValue);
+				return;
+			case PipelinePackage.FLOW__TUPLE_TYPE:
+				setTupleType((Integer)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -253,6 +300,9 @@ public class FlowImpl extends PipelineElementImpl implements Flow
 			case PipelinePackage.FLOW__GROUPING:
 				setGrouping(GROUPING_EDEFAULT);
 				return;
+			case PipelinePackage.FLOW__TUPLE_TYPE:
+				setTupleType(TUPLE_TYPE_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -272,6 +322,8 @@ public class FlowImpl extends PipelineElementImpl implements Flow
 				return destination != null;
 			case PipelinePackage.FLOW__GROUPING:
 				return GROUPING_EDEFAULT == null ? grouping != null : !GROUPING_EDEFAULT.equals(grouping);
+			case PipelinePackage.FLOW__TUPLE_TYPE:
+				return TUPLE_TYPE_EDEFAULT == null ? tupleType != null : !TUPLE_TYPE_EDEFAULT.equals(tupleType);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -289,6 +341,8 @@ public class FlowImpl extends PipelineElementImpl implements Flow
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (grouping: ");
 		result.append(grouping);
+		result.append(", tupleType: ");
+		result.append(tupleType);
 		result.append(')');
 		return result.toString();
 	}

@@ -60,6 +60,7 @@ public class FlowItemProvider
 			addSourcePropertyDescriptor(object);
 			addDestinationPropertyDescriptor(object);
 			addGroupingPropertyDescriptor(object);
+			addTupleTypePropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -132,6 +133,28 @@ public class FlowItemProvider
 	}
 
 /**
+	 * This adds a property descriptor for the Tuple Type feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addTupleTypePropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Flow_tupleType_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Flow_tupleType_feature", "_UI_Flow_type"),
+				 PipelinePackage.Literals.FLOW__TUPLE_TYPE,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+/**
 	 * This returns Flow.gif.
 	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -172,6 +195,7 @@ public class FlowItemProvider
 
 		switch (notification.getFeatureID(Flow.class)) {
 			case PipelinePackage.FLOW__GROUPING:
+			case PipelinePackage.FLOW__TUPLE_TYPE:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 		}

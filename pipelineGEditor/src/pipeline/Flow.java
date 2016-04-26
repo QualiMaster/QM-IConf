@@ -15,6 +15,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link pipeline.Flow#getSource <em>Source</em>}</li>
  *   <li>{@link pipeline.Flow#getDestination <em>Destination</em>}</li>
  *   <li>{@link pipeline.Flow#getGrouping <em>Grouping</em>}</li>
+ *   <li>{@link pipeline.Flow#getTupleType <em>Tuple Type</em>}</li>
  * </ul>
  * </p>
  *
@@ -102,5 +103,32 @@ public interface Flow extends PipelineElement
 	 * @generated
 	 */
     void setGrouping(Integer value);
+
+/**
+	 * Returns the value of the '<em><b>Tuple Type</b></em>' attribute.
+	 * The default value is <code>"-1"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Tuple Type</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Tuple Type</em>' attribute.
+	 * @see #setTupleType(Integer)
+	 * @see pipeline.PipelinePackage#getFlow_TupleType()
+	 * @model default="-1"
+	 * @generated
+	 */
+	Integer getTupleType();
+
+/**
+	 * Sets the value of the '{@link pipeline.Flow#getTupleType <em>Tuple Type</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Tuple Type</em>' attribute.
+	 * @see #getTupleType()
+	 * @generated
+	 */
+	void setTupleType(Integer value);
 
 } // Flow

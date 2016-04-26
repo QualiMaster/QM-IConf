@@ -249,13 +249,22 @@ public interface PipelinePackage extends EPackage
     int FLOW__GROUPING = PIPELINE_ELEMENT_FEATURE_COUNT + 2;
 
 /**
+	 * The feature id for the '<em><b>Tuple Type</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FLOW__TUPLE_TYPE = PIPELINE_ELEMENT_FEATURE_COUNT + 3;
+
+/**
 	 * The number of structural features of the '<em>Flow</em>' class.
 	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-  int FLOW_FEATURE_COUNT = PIPELINE_ELEMENT_FEATURE_COUNT + 3;
+  int FLOW_FEATURE_COUNT = PIPELINE_ELEMENT_FEATURE_COUNT + 4;
 
   /**
 	 * The meta object id for the '{@link pipeline.impl.PipelineNodeImpl <em>Node</em>}' class.
@@ -818,6 +827,17 @@ public interface PipelinePackage extends EPackage
     EAttribute getFlow_Grouping();
 
 /**
+	 * Returns the meta object for the attribute '{@link pipeline.Flow#getTupleType <em>Tuple Type</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Tuple Type</em>'.
+	 * @see pipeline.Flow#getTupleType()
+	 * @see #getFlow()
+	 * @generated
+	 */
+	EAttribute getFlow_TupleType();
+
+/**
 	 * Returns the meta object for class '{@link pipeline.PipelineNode <em>Node</em>}'.
 	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -1120,6 +1140,14 @@ public interface PipelinePackage extends EPackage
         EAttribute FLOW__GROUPING = eINSTANCE.getFlow_Grouping();
 
     /**
+		 * The meta object literal for the '<em><b>Tuple Type</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute FLOW__TUPLE_TYPE = eINSTANCE.getFlow_TupleType();
+
+				/**
 		 * The meta object literal for the '{@link pipeline.impl.PipelineNodeImpl <em>Node</em>}' class.
 		 * <!-- begin-user-doc -->
          * <!-- end-user-doc -->

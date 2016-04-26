@@ -120,8 +120,8 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
 	 */
 	protected IFigure createNodeShape() {
 	    FamilyElement model = (FamilyElement) ((ShapeImpl) getModel()).getElement();
-	    Boolean isConnector = model.getIsConnector();
-		return primaryShape = new FamilyElementFigure(isConnector);
+        Boolean isConnector = model.getIsConnector();
+        return primaryShape = new FamilyElementFigure(isConnector);
 	}
 
 	/**
@@ -244,27 +244,26 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
 						.equals(event.getFeature())) {
 			handleMajorSemanticChange();
 		} else {
-			
 		    /*
-		     * Not generated -> hand crafted code, copied from
-		     * http://www.eclipse.org/epsilon/doc/articles/eugenia-nodes-with-runtime-images/ ;-)
-		     */
-		    if (event.getFeature() instanceof EAttribute) {
-		        EAttribute eAttribute = (EAttribute) event.getFeature();
+             * Not generated -> hand crafted code, copied from
+             * http://www.eclipse.org/epsilon/doc/articles/eugenia-nodes-with-runtime-images/ ;-)
+             */
+            if (event.getFeature() instanceof EAttribute) {
+                EAttribute eAttribute = (EAttribute) event.getFeature();
 
-		        if (eAttribute.getName().equalsIgnoreCase("isConnector")
-		            && this.contentPane instanceof FamilyElementFigure) {
-		            
-		            FamilyElementFigure svgFigure = (FamilyElementFigure) contentPane;
-		            Boolean isConnector = (Boolean) event.getNewValue();
-		            svgFigure.updateFigure(isConnector);
-		        }
-		      }
-		    /*
-		     * end of manually added code
-		     */
-		    
-		    super.handleNotificationEvent(event);
+                if (eAttribute.getName().equalsIgnoreCase("isConnector")
+                    && this.contentPane instanceof FamilyElementFigure) {
+                    
+                    FamilyElementFigure svgFigure = (FamilyElementFigure) contentPane;
+                    Boolean isConnector = (Boolean) event.getNewValue();
+                    svgFigure.updateFigure(isConnector);
+                }
+              }
+            /*
+             * end of manually added code
+             */
+            
+			super.handleNotificationEvent(event);
 		}
 	}
 
@@ -284,34 +283,45 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
 					getMapMode().DPtoLP(5), getMapMode().DPtoLP(5),
 					getMapMode().DPtoLP(5)));
 		}
-		
+
+		/*
+		 * Manually added code.
+		 */
+
 		/**
 		 * Manual added constructor
 		 * @param isConenctor <tt>true</tt> if it is a connector, default should be <tt>false</tt>
 		 */
 		public FamilyElementFigure(Boolean isConnector) {
-		    this.setPreferredSize(new Dimension(getMapMode().DPtoLP(60),
-		            getMapMode().DPtoLP(60)));
-		    this.setBorder(new MarginBorder(getMapMode().DPtoLP(5),
-		            getMapMode().DPtoLP(5), getMapMode().DPtoLP(5),
-		            getMapMode().DPtoLP(5)));
-		    
-		    updateFigure(isConnector);
+			this.setPreferredSize(new Dimension(getMapMode().DPtoLP(60),
+					getMapMode().DPtoLP(60)));
+			this.setBorder(new MarginBorder(getMapMode().DPtoLP(5),
+					getMapMode().DPtoLP(5), getMapMode().DPtoLP(5),
+					getMapMode().DPtoLP(5)));
+
+			updateFigure(isConnector);
 		}
-		
+
 		/**
 		 * Updates the shown SVG figure depending on the "isConnector" attribute.
 		 * @param isConnector isConenctor <tt>true</tt> if it is a connector, default should be <tt>false</tt>
 		 */
 		public void updateFigure(Boolean isConnector) {
-		    if (isConnector) {
-		        this.setURI("platform:/plugin/pipelineGEditor/svg/familyElementConnector.svg", true);
-            } else {
-                this.setURI("platform:/plugin/pipelineGEditor/svg/familyelement.svg", true);
-            }
-		    this.repaint();
+			if (isConnector) {
+				this.setURI(
+						"platform:/plugin/pipelineGEditor/svg/familyElementConnector.svg",
+						true);
+			} else {
+				this.setURI(
+						"platform:/plugin/pipelineGEditor/svg/familyelement.svg",
+						true);
+			}
+			this.repaint();
 		}
 
+		/*
+		 * End of manually added code.
+		 */
 	}
 
 }

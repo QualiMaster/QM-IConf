@@ -24,6 +24,7 @@
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pipeline.ecore#//Flow/source"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pipeline.ecore#//Flow/destination"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Flow/grouping"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Flow/tupleType"/>
     </genClasses>
     <genClasses image="false" ecoreClass="pipeline.ecore#//PipelineNode">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//PipelineNode/parallelism"/>
