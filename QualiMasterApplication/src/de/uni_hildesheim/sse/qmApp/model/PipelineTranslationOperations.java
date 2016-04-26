@@ -37,7 +37,9 @@ import eu.qualimaster.easy.extension.QmConstants;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
+import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
 import net.ssehub.easy.varModel.management.VarModel;
 import net.ssehub.easy.varModel.model.ContainableModelElement;
 import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
@@ -47,6 +49,7 @@ import net.ssehub.easy.varModel.model.ModelQueryException;
 import net.ssehub.easy.varModel.model.Project;
 import net.ssehub.easy.varModel.model.ProjectImport;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
+import net.ssehub.easy.varModel.model.datatypes.Reference;
 import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
 import net.ssehub.easy.varModel.model.values.StringValue;
 import net.ssehub.easy.varModel.model.values.Value;
@@ -565,10 +568,6 @@ public class PipelineTranslationOperations {
         destProject.add(flowVariable);        
         flowCount++;
 
-        /*
-         * try { IDatatype dataType = ModelQuery.findType(modelProject, "Grouping", null); System.out.println(dataType);
-         * } catch (ModelQueryException e) { // TODO Auto-generated catch block e.printStackTrace(); }
-         */
         // construct the compound variables
         Map<String, Object> flowCompound = new HashMap<String, Object>();
         Grouping[] grouping = Grouping.values();
@@ -606,6 +605,20 @@ public class PipelineTranslationOperations {
         if (destination != null) {
             flowCompound.put("destination", destination);
         }
+        
+        Integer tupleTypeRef = flow.getTupleType();
+        if (null != tupleTypeRef && tupleTypeRef != -1) {
+            // TODO
+//            flowCompound.put("tupleType", destination);
+            
+            Map<String, IDatatype> nameAndTypeMap = IVMLModelOperations.getCompoundNameAndType(flowVariable);
+            System.out.println("");
+            Reference refType = (Reference) nameAndTypeMap.get("tupleType");
+            Configuration cfg = ModelAccess.getConfiguration(VariabilityModel.Configuration.PIPELINES);
+            List<ConstraintSyntaxTree> possibleValues = cfg.getQueryCache().getPossibleValues(refType);
+            flowCompound.put("tupleType", possibleValues.get(tupleTypeRef));
+        }
+        
         addPipelineElementToProject(flow, destProject, flowVariable, flowCompound);
         
         //removed the already-handled flow

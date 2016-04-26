@@ -113,7 +113,7 @@ public class IVMLModelOperations {
             IModelElement parent) {
         Constraint constraint = new Constraint(parent);
         try {
-            Value value = ValueFactory.createValue(declarationVariable.getType(), objectValue);           
+            Value value = ValueFactory.createValue(declarationVariable.getType(), objectValue);
             constraint.setConsSyntax(obtainAssignment(value, declarationVariable));
         } catch (ValueDoesNotMatchTypeException e) {
             getLogger().exception(e);
@@ -178,6 +178,9 @@ public class IVMLModelOperations {
                         compoundVariablesMap.get(name), decisionVariable);
                 }
                 sourceObject.add(variables);               
+            } else if (compound.get(name) instanceof ConstraintSyntaxTree) {
+                sourceObject.add(name);
+                sourceObject.add(compound.get(name));
             } else {
                 compoundVariable = new DecisionVariableDeclaration(compound.get(name).toString(),
                         compoundVariablesMap.get(name), decisionVariable);
