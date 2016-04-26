@@ -172,12 +172,12 @@ public class PipelineTranslationOperations {
             }
             IVMLModelOperations.addFreezeBlock(freezables, newProject, modelProject);
         }
-        ProjectImport pImport = new ProjectImport(newProject.getName(), null);
         // adds the imports in the main pipeline project
-        IVMLModelOperations.modifyImports(modelProject,
-                IVMLModelOperations.ADD, pImport);
+        ProjectImport pImport = new ProjectImport(newProject.getName(), null);
+        IVMLModelOperations.modifyImports(modelProject, IVMLModelOperations.ADD, pImport);
         // adds the pipeline to the main project
         IVMLModelOperations.addPipelineToMainProject(pipelineVariable);
+        
         // writes the new IVML project to a file
         String filePath = PipelineDiagramUtils.getFolderDirectory(fileURI) + newProject.getName() + EXTENSION;
         File file = new File(filePath);
@@ -437,6 +437,8 @@ public class PipelineTranslationOperations {
         // EASy Editor convention :|
         pipelineCompound.put("debug", pipeline.getDebug() == 0 ? Boolean.TRUE : Boolean.FALSE); 
         pipelineCompound.put("fastSerialization", pipeline.getFastSerialization() == 0 ? Boolean.TRUE : Boolean.FALSE); 
+        pipelineCompound.put("isSubPipeline", pipeline.getIsSubPipeline() == 0 ? Boolean.TRUE : Boolean.FALSE); 
+        
         // get source
         Source source = null;
         ArrayList<String> sourceList = new ArrayList<String>();
@@ -455,17 +457,20 @@ public class PipelineTranslationOperations {
             pipelineCompound.put("sources", sourceList.toArray());
         }
         
+        // Handle connectors of a sub pipeline, must be done after element are processed
+        if (pipeline.getIsSubPipeline() == 0) {
+            pipelineCompound.put("connectors", context.getConnectorNames().toArray());
+        }
+        
         // add the compound variables in the project
-        Object[] pipelineObject = IVMLModelOperations.configureCompoundValues(
-                pipelineVariable, pipelineCompound);
+        Object[] pipelineObject = IVMLModelOperations.configureCompoundValues(pipelineVariable, pipelineCompound);
        
         //add the constraints into the value array
         ArrayList<Object> objList = new ArrayList<Object>(Arrays.asList(pipelineObject));
         objList.add("constraints");
         objList.add(cstValList.toArray());
            
-        destProject.add(IVMLModelOperations.getConstraint(objList.toArray(),
-                pipelineVariable, destProject));
+        destProject.add(IVMLModelOperations.getConstraint(objList.toArray(), pipelineVariable, destProject));
         return pipelineVariable;
     }
 
@@ -656,6 +661,12 @@ public class PipelineTranslationOperations {
         addPipelineElementToProject(familyElement, destProject, decisionVariable, familyElementCompound);
         context.addFamilyMapping(familyElement, decisionVariable.getName());
         pipProcessedNodes.add(familyElement);
+        
+        // Handle connectors of a sub pipeline
+        if (familyElement.getIsConnector()) {
+            context.addConnector(decisionVariable.getName());
+        }
+        
         return decisionVariable.getName();
     }
 

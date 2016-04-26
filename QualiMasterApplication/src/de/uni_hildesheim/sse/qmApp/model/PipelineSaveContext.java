@@ -16,7 +16,9 @@
 package de.uni_hildesheim.sse.qmApp.model;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import pipeline.FamilyElement;
 import pipeline.Sink;
@@ -32,6 +34,12 @@ class PipelineSaveContext {
     
     private Map<FamilyElement, String> familyNodesAndName = new HashMap<FamilyElement, String>();
     private Map<Sink, String> sinkNodesAndName = new HashMap<Sink, String>();
+    
+    /**
+     * Only relevant for sub pipelines.
+     * Set of family elements which are in role of a connector.
+     */
+    private Set<String> connectors = new HashSet<String>();
     
     /**
      * Adds a mapping for Family elements of (ECORE Source, name in IVML).
@@ -103,4 +111,21 @@ class PipelineSaveContext {
         return sinkNodesAndName.keySet().size();
     }
     
+    /**
+     * Adds a family element, which is in role of a connector.
+     * Only needed for sub pipelines.
+     * @param feName The name of the translated family element.
+     */
+    void addConnector(String feName) {
+        connectors.add(feName);
+    }
+    
+    /**
+     * Returns the set of family elements which are in role of a connector.
+     * @return If the pipeline is a sub pipeline, this list must not be empty, otherwise it should
+     * be empty.
+     */
+    Set<String> getConnectorNames() {
+        return connectors;
+    }
 }
