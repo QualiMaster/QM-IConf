@@ -40,6 +40,7 @@ public class IconManager {
     public static final String RECONFIG_MACHINES = PRE + "reconfigMachines.png";
     public static final String ALGORITHM = PRE + "algorithm.png";
     public static final String SUBALGORITHM = PRE + "subAlgorithm.png";
+    public static final String HWALGORITHM = PRE + "hardwareAlgorithm.png";
     public static final String ALGORITHMS = PRE + "algorithms.png";
     public static final String DATA_SOURCE = PRE + "dataSource.png";
     public static final String DATA_SINK = PRE + "dataSink.png";
@@ -47,6 +48,7 @@ public class IconManager {
     public static final String DATA_MANAGEMENT = PRE + "dataManagement.png";
     public static final String FAMILY = PRE + "family.png";
     public static final String FAMILIES = PRE + "families.png";
+    public static final String SUBPIPELINE = PRE + "subPipeline.png";
     public static final String PIPELINE = PRE + "pipeline.png";
     public static final String PIPELINES = PRE + "pipelines.png";
     public static final String INFRASTRUCTURE = PRE + "infrastructure.png";
