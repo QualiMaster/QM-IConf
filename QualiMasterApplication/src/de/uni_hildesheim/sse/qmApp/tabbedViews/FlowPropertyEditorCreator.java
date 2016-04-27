@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.swt.widgets.Composite;
 
 import de.uni_hildesheim.sse.qmApp.editors.EditorUtils;
+import de.uni_hildesheim.sse.qmApp.model.QualiMasterDisplayNameProvider;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import eu.qualimaster.easy.extension.QmConstants;
 import net.ssehub.easy.producer.ui.confModel.IRangeRestriction;
@@ -18,6 +20,7 @@ import net.ssehub.easy.varModel.confModel.AssignmentState;
 import net.ssehub.easy.varModel.confModel.CompoundVariable;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
 import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
 import net.ssehub.easy.varModel.model.Project;
 import net.ssehub.easy.varModel.model.ProjectImport;
@@ -110,6 +113,42 @@ public class FlowPropertyEditorCreator extends PipelineDiagramElementPropertyEdi
         if (null == result && QmConstants.SLOT_NAME.equals(normalizeIdentifier(propertyIdentifier))) {
             result = fallback.createFallbackPropertyEditor(composite);
         }
+        return result;
+    }
+    
+    @Override
+    public ILabelProvider getLabelProvider(Object data, String propertyIdentifier, Object value, 
+        IFallbackImageProvider imageProvider) {
+        ILabelProvider result = super.getLabelProvider(data, propertyIdentifier, value, imageProvider);
+        if ("tupleType".equals(propertyIdentifier) && null != value && ((Integer) value) > -1) {
+            Configuration cfg = getConfiguration();
+            Integer index = (Integer) value;
+            DecisionVariableDeclaration slot = getVariableDeclaration(propertyIdentifier);
+            Reference refType = (Reference) slot.getType();
+            List<ConstraintSyntaxTree> possibleValues = cfg.getQueryCache().getPossibleValues(refType);
+            if (null != possibleValues) {
+                int nValuesAccepted = 0;
+                String label = null;
+                for (int i = 0, end = possibleValues.size(); i < end && (nValuesAccepted <= index
+                        || label == null); i++) {
+                    /*
+                     * Dirty: Filter it here as it is done by the Properties editor.
+                     * Unfortunately, there is no access to the embedded EASy-Editior of the properties
+                     * editor from here
+                     * The EASy-Editors save the relation between the index and the individual possible values.
+                     */
+                    ConstraintSyntaxTree cstValue = possibleValues.get(i);
+                    label = QualiMasterDisplayNameProvider.INSTANCE.getDisplayName(cstValue, cfg.getProject());
+                    if (!(FlowPropertyEditorCreator.FLOW_TUPLE_FILTER.filterValue(cstValue, label))) {
+                        nValuesAccepted++;
+                    }
+                }
+                if (nValuesAccepted >= index && label != null) {
+                    result = new StaticLabelProvider(label, result.getImage(data));
+                }
+            }
+        }
+        
         return result;
     }
 }
