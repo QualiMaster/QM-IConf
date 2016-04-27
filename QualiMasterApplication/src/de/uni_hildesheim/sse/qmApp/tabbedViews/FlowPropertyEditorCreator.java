@@ -48,12 +48,14 @@ public class FlowPropertyEditorCreator extends PipelineDiagramElementPropertyEdi
         
         @Override
         public boolean appliesTo(IDecisionVariable variable) {
-            return "tupleType".equals(variable.getDeclaration().getName());
+//            return "tupleType".equals(variable.getDeclaration().getName());
+            return false;
         }
 
         @Override
         public boolean filterValue(Object value, String label) {
-            return label != null && (label.contains("output"));
+//            return label != null && (label.contains("output"));
+            return false;
         }
         
     }
