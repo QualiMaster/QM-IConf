@@ -1,45 +1,6 @@
 package de.uni_hildesheim.sse.qmApp.model;
 
-import static eu.qualimaster.easy.extension.QmConstants.ANNOTATION_BINDING_TIME;
-import static eu.qualimaster.easy.extension.QmConstants.ANNOTATION_USER_VISIBLE;
-import static eu.qualimaster.easy.extension.QmConstants.CFG_POSTFIX;
-import static eu.qualimaster.easy.extension.QmConstants.CONST_BINDING_TIME_COMPILE;
-import static eu.qualimaster.easy.extension.QmConstants.PROJECT_ADAPTIVITY;
-import static eu.qualimaster.easy.extension.QmConstants.PROJECT_ALGORITHMS;
-import static eu.qualimaster.easy.extension.QmConstants.PROJECT_BASICS;
-import static eu.qualimaster.easy.extension.QmConstants.PROJECT_DATAMGT;
-import static eu.qualimaster.easy.extension.QmConstants.PROJECT_FAMILIES;
-import static eu.qualimaster.easy.extension.QmConstants.PROJECT_HARDWARE;
-import static eu.qualimaster.easy.extension.QmConstants.PROJECT_INFRASTRUCTURE;
-import static eu.qualimaster.easy.extension.QmConstants.PROJECT_OBSERVABLES;
-import static eu.qualimaster.easy.extension.QmConstants.PROJECT_PIPELINES;
-import static eu.qualimaster.easy.extension.QmConstants.PROJECT_RECONFHW;
-import static eu.qualimaster.easy.extension.QmConstants.PROJECT_TOP_LEVEL;
-import static eu.qualimaster.easy.extension.QmConstants.SLOT_NAME;
-import static eu.qualimaster.easy.extension.QmConstants.TYPE_ADAPTIVITY_QPARAMWEIGHTING;
-import static eu.qualimaster.easy.extension.QmConstants.TYPE_ALGORITHM;
-import static eu.qualimaster.easy.extension.QmConstants.TYPE_DATASINK;
-import static eu.qualimaster.easy.extension.QmConstants.TYPE_DATASOURCE;
-import static eu.qualimaster.easy.extension.QmConstants.TYPE_FAMILY;
-import static eu.qualimaster.easy.extension.QmConstants.TYPE_FIELDTYPE;
-import static eu.qualimaster.easy.extension.QmConstants.TYPE_HWNODE;
-import static eu.qualimaster.easy.extension.QmConstants.TYPE_MACHINE;
-import static eu.qualimaster.easy.extension.QmConstants.TYPE_OBSERVABLES_CONFIGUREDQPARAM;
-import static eu.qualimaster.easy.extension.QmConstants.TYPE_PERSISTENTDATAELT;
-import static eu.qualimaster.easy.extension.QmConstants.TYPE_PIPELINE;
-import static eu.qualimaster.easy.extension.QmConstants.VAR_ADAPTIVITY_CROSSPIPELINETRADEOFFS;
-import static eu.qualimaster.easy.extension.QmConstants.VAR_ADAPTIVITY_PIPELINEIMPORTANCE;
-import static eu.qualimaster.easy.extension.QmConstants.VAR_ALGORITHMS_ALGORITHMS;
-import static eu.qualimaster.easy.extension.QmConstants.VAR_BASICS_TYPES;
-import static eu.qualimaster.easy.extension.QmConstants.VAR_DATAMGT_DATASINKS;
-import static eu.qualimaster.easy.extension.QmConstants.VAR_DATAMGT_DATASOURCES;
-import static eu.qualimaster.easy.extension.QmConstants.VAR_DATAMGT_PERSISTENTDATAELTS;
-import static eu.qualimaster.easy.extension.QmConstants.VAR_FAMILIES_FAMILIES;
-import static eu.qualimaster.easy.extension.QmConstants.VAR_HARDWARE_MACHINES;
-import static eu.qualimaster.easy.extension.QmConstants.VAR_INFRASTRUCTURE_ACTIVEPIPELINES;
-import static eu.qualimaster.easy.extension.QmConstants.VAR_OBSERVABLES_CONFIGUREDPARAMS;
-import static eu.qualimaster.easy.extension.QmConstants.VAR_PIPELINES_PIPELINES;
-import static eu.qualimaster.easy.extension.QmConstants.VAR_RECONFHW_CLUSTERS;
+import static eu.qualimaster.easy.extension.QmConstants.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,6 +42,7 @@ import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFa
 import net.ssehub.easy.varModel.confModel.IConfiguration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.model.AbstractVariable;
+import net.ssehub.easy.varModel.model.IvmlKeyWords;
 import net.ssehub.easy.varModel.model.datatypes.ConstraintType;
 import net.ssehub.easy.varModel.model.datatypes.EnumLiteral;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
@@ -160,7 +122,8 @@ public class VariabilityModel {
             new DecisionVariableElementFactory(SourceSinkEditor.ID)), 
         ALGORITHMS(PROJECT_ALGORITHMS,
             new String[] {VAR_ALGORITHMS_ALGORITHMS}, 
-            new String[] {TYPE_ALGORITHM}, 
+            new String[] {TYPE_ALGORITHM, 
+                PROJECT_PIPELINES + IvmlKeyWords.NAMESPACE_SEPARATOR + TYPE_SUBPIPELINE_ALGORITHM},
             SourceMode.VARIABLES,
             new DecisionVariableElementFactory(AlgorithmEditor.ID)), 
         FAMILIES(PROJECT_FAMILIES, 
@@ -825,6 +788,8 @@ public class VariabilityModel {
             IconManager.retrieveImage(IconManager.ALGORITHMS));
         registry.registerImage(Configuration.ALGORITHMS, 0, 
             IconManager.retrieveImage(IconManager.ALGORITHM));
+        registry.registerImage(Configuration.ALGORITHMS, 1, 
+            IconManager.retrieveImage(IconManager.SUBALGORITHM));
         if (DISPLAY_ALGORITHMS_NESTED) {
             registry.registerImage(Configuration.ALGORITHMS, "Family", 
                 IconManager.retrieveImage(IconManager.FAMILY));

@@ -39,6 +39,7 @@ public class IconManager {
     public static final String RECONFIG_MACHINE = PRE + "reconfigMachine.png";
     public static final String RECONFIG_MACHINES = PRE + "reconfigMachines.png";
     public static final String ALGORITHM = PRE + "algorithm.png";
+    public static final String SUBALGORITHM = PRE + "subAlgorithm.png";
     public static final String ALGORITHMS = PRE + "algorithms.png";
     public static final String DATA_SOURCE = PRE + "dataSource.png";
     public static final String DATA_SINK = PRE + "dataSink.png";

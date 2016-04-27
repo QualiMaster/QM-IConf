@@ -297,7 +297,7 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
             IModelPart modelPart = selectedElement.getModelPart();
             IDatatype[] providedTypes = modelPart.getProvidedTypes();
             if (null != providedTypes) {
-                for (IDatatype providedType : modelPart.getProvidedTypes()) {
+                for (IDatatype providedType : providedTypes) {
                     final IDatatype type = providedType;
                     Action addAction = new Action() {
                         @Override

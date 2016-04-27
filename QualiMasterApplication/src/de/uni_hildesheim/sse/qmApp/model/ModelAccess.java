@@ -58,6 +58,7 @@ import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.ContainableModelElement;
 import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
 import net.ssehub.easy.varModel.model.IModelElement;
+import net.ssehub.easy.varModel.model.IvmlKeyWords;
 import net.ssehub.easy.varModel.model.ModelQuery;
 import net.ssehub.easy.varModel.model.ModelQueryException;
 import net.ssehub.easy.varModel.model.Project;
@@ -624,16 +625,27 @@ public class ModelAccess {
     static List<IDatatype> getTypesImpl(IModelPart part, String[] typeNames) {
         List<IDatatype> result = new ArrayList<IDatatype>();
         if (null != typeNames) {
-            Configuration cfg = getConfiguration(part.getModelName());
-            Project project = cfg.getProject();
             for (int t = 0; t < typeNames.length; t++) {
-                try {
-                    IDatatype type = ModelQuery.findType(project, typeNames[t], null);
-                    if (null != type) {
-                        result.add(type);
+                String modelName = part.getModelName();
+                String typeName = typeNames[t];
+                int pos = typeName.indexOf(IvmlKeyWords.NAMESPACE_SEPARATOR);
+                if (pos > 0) {
+                    modelName = typeName.substring(0, pos);
+                    typeName = typeName.substring(pos + IvmlKeyWords.NAMESPACE_SEPARATOR.length());
+                }
+                Configuration cfg = getConfiguration(modelName);
+                if (null != cfg) {
+                    Project project = cfg.getProject();
+                    try {
+                        IDatatype type = ModelQuery.findType(project, typeNames[t], null);
+                        if (null != type) {
+                            result.add(type);
+                        }
+                    } catch (ModelQueryException e) {
+                        Activator.getLogger(ModelAccess.class).exception(e);
                     }
-                } catch (ModelQueryException e) {
-                    Activator.getLogger(ModelAccess.class).exception(e);
+                } else {
+                    Activator.getLogger(ModelAccess.class).error("Cannot resolve " + typeNames[t]);
                 }
             }
         }
