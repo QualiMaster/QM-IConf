@@ -24,7 +24,6 @@ import net.ssehub.easy.varModel.model.ProjectImport;
 import net.ssehub.easy.varModel.model.datatypes.Compound;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 import net.ssehub.easy.varModel.model.datatypes.Reference;
-import pipeline.Flow;
 import pipeline.impl.FlowImpl;
 
 /**
@@ -35,24 +34,14 @@ import pipeline.impl.FlowImpl;
  */
 public class FlowPropertyEditorCreator extends PipelineDiagramElementPropertyEditorCreator {
 
-    
+    public static final IRangeRestriction FLOW_TUPLE_FILTER = new FlowValueRestriction();
     
     /**
      * Restricts the possible values for the selection of tupleType in properties editor of a Flow.
      * @author El-Sharkawy
      *
      */
-    private class FlowValueRestriction implements IRangeRestriction {
-
-        private String sourceName;
-        
-        /**
-         * Single constructor instance for this class.
-         * @param sourceName The name of the source element, which can be used for filtering.
-         */
-        private FlowValueRestriction(String sourceName) {
-            this.sourceName = sourceName;
-        }
+    private static class FlowValueRestriction implements IRangeRestriction {
         
         @Override
         public boolean appliesTo(IDecisionVariable variable) {
@@ -61,7 +50,6 @@ public class FlowPropertyEditorCreator extends PipelineDiagramElementPropertyEdi
 
         @Override
         public boolean filterValue(Object value, String label) {
-//            return label != null && (!label.contains(sourceName) || label.contains("output"));
             return label != null && (label.contains("output"));
         }
         
@@ -104,7 +92,8 @@ public class FlowPropertyEditorCreator extends PipelineDiagramElementPropertyEdi
                     CompoundVariable cVar = (CompoundVariable) tmpVar;
                     DelegatingEasyEditorPage parent = new DelegatingEasyEditorPage(composite);
                     List<IRangeRestriction> restrictors = new ArrayList<IRangeRestriction>();
-                    restrictors.add(new FlowValueRestriction(((Flow) data).getSource().getName()));
+//                    restrictors.add(new FlowValueRestriction(((Flow) data).getSource().getName()));
+                    restrictors.add(FLOW_TUPLE_FILTER);
                     UIConfiguration uiCfg = ConfigurationTableEditorFactory.createConfiguration(
                         tmpConfig, parent, null);
                     result = ConfigurationTableEditorFactory.createCellEditor(uiCfg, getSlot(cVar, propertyIdentifier),

@@ -32,6 +32,7 @@ import org.eclipse.emf.common.util.URI;
 
 import de.uni_hildesheim.sse.qmApp.editors.QMPipelineEditor;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Definition;
+import de.uni_hildesheim.sse.qmApp.tabbedViews.FlowPropertyEditorCreator;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager;
 import eu.qualimaster.easy.extension.QmConstants;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
@@ -86,6 +87,8 @@ public class PipelineTranslationOperations {
     private static IModelPart pipelineModelPart = VariabilityModel.Configuration.PIPELINES;
     
     private static Project modelProject = pipelineModelPart.getConfiguration().getProject();
+    
+    // TODO: Move all this static stuff into PipelineSaveContext
     private static List<IFreezable> freezables;
     private static List<PipelineNode> pipNodes;
     private static List<PipelineNode> pipProcessedNodes;
@@ -561,9 +564,8 @@ public class PipelineTranslationOperations {
         throws PipelineTranslationException {
 
         // define flow
-        DecisionVariableDeclaration flowVariable = IVMLModelOperations
-                .getDecisionVariable(modelProject, "Flow",
-                        Integer.toString(flowCount), destProject);
+        DecisionVariableDeclaration flowVariable = IVMLModelOperations.getDecisionVariable(modelProject, "Flow",
+                    Integer.toString(flowCount), destProject);
         freezables.add(flowVariable);
         destProject.add(flowVariable);        
         flowCount++;
@@ -607,23 +609,51 @@ public class PipelineTranslationOperations {
         }
         
         Integer tupleTypeRef = flow.getTupleType();
-        if (null != tupleTypeRef && tupleTypeRef != -1) {
-            // TODO
-//            flowCompound.put("tupleType", destination);
-            
-            Map<String, IDatatype> nameAndTypeMap = IVMLModelOperations.getCompoundNameAndType(flowVariable);
-            System.out.println("");
-            Reference refType = (Reference) nameAndTypeMap.get("tupleType");
-            Configuration cfg = ModelAccess.getConfiguration(VariabilityModel.Configuration.PIPELINES);
-            List<ConstraintSyntaxTree> possibleValues = cfg.getQueryCache().getPossibleValues(refType);
-            flowCompound.put("tupleType", possibleValues.get(tupleTypeRef));
-        }
+        convertFlowTupleReference(flowVariable, flowCompound, tupleTypeRef);
         
         addPipelineElementToProject(flow, destProject, flowVariable, flowCompound);
         
         //removed the already-handled flow
         processedflows.add(flow);
         return flowVariable.getName();
+    }
+
+    /**
+     * Part of {@link #addPipelineElement(Flow, Project, PipelineSaveContext)}: Converts the integer reference
+     * of the tuple type to the chosen constraint and saves it.
+     * @param flowVariable The currently created declaration for the flow
+     * @param flowCompoundValue Is used to store the values for the different slots of the compound
+     * @param tupleTypeRef The reference to be converted
+     */
+    private static void convertFlowTupleReference(DecisionVariableDeclaration flowVariable,
+        Map<String, Object> flowCompoundValue, Integer tupleTypeRef) {
+        
+        if (null != tupleTypeRef && tupleTypeRef != -1) {
+            Map<String, IDatatype> nameAndTypeMap = IVMLModelOperations.getCompoundNameAndType(flowVariable);
+            Reference refType = (Reference) nameAndTypeMap.get("tupleType");
+            Configuration cfg = ModelAccess.getConfiguration(VariabilityModel.Configuration.PIPELINES);
+            List<ConstraintSyntaxTree> possibleValues = cfg.getQueryCache().getPossibleValues(refType);
+            if (null != possibleValues) {
+                int nValuesAccepted = 0;
+                ConstraintSyntaxTree cstValue = null;
+                for (int i = 0, end = possibleValues.size(); i < end && (nValuesAccepted <= tupleTypeRef
+                    || cstValue == null); i++) {
+                    /*
+                     * Dirty: Filter it here as it is done by the Properties editor.
+                     * Unfortunately, there is no access to the embedded EASy-Editior of the properties editor from here
+                     * The EASy-Editors save the relation between the index and the individual possible values.
+                     */
+                    cstValue = possibleValues.get(i);
+                    String label = QualiMasterDisplayNameProvider.INSTANCE.getDisplayName(cstValue, cfg.getProject());
+                    if (!(FlowPropertyEditorCreator.FLOW_TUPLE_FILTER.filterValue(cstValue, label))) {
+                        nValuesAccepted++;
+                    }
+                }
+                if (nValuesAccepted >= tupleTypeRef && cstValue != null) {
+                    flowCompoundValue.put("tupleType", cstValue);
+                }
+            }
+        }
     }
 
     /**
