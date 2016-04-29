@@ -124,7 +124,7 @@ class LabelProviderCreator implements IDatatypeVisitor {
             int count = possibleValues.size();
             if (0 <= index && index < count) {
                 ConstraintSyntaxTree value = possibleValues.get(index);
-                labelText = QualiMasterDisplayNameProvider.INSTANCE.getDisplayName(value, cfg.getProject());
+                labelText = QualiMasterDisplayNameProvider.INSTANCE.getDisplayName(value, cfg);
             } else if (index >= count) {
                 labelText = getNullName(labelText);
             }

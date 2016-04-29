@@ -644,7 +644,7 @@ public class PipelineTranslationOperations {
                      * The EASy-Editors save the relation between the index and the individual possible values.
                      */
                     cstValue = possibleValues.get(i);
-                    String label = QualiMasterDisplayNameProvider.INSTANCE.getDisplayName(cstValue, cfg.getProject());
+                    String label = QualiMasterDisplayNameProvider.INSTANCE.getDisplayName(cstValue, cfg);
                     if (!(FlowPropertyEditorCreator.FLOW_TUPLE_FILTER.filterValue(cstValue, label))) {
                         nValuesAccepted++;
                     }
