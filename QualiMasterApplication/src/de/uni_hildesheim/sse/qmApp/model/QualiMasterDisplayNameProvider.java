@@ -3,13 +3,18 @@ package de.uni_hildesheim.sse.qmApp.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import eu.qualimaster.easy.extension.QmConstants;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.DisplayNameProvider;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.cst.OCLFeatureCall;
+import net.ssehub.easy.varModel.cstEvaluation.EvaluationVisitor;
 import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.IModelElement;
 import net.ssehub.easy.varModel.model.datatypes.Enum;
 import net.ssehub.easy.varModel.model.datatypes.EnumLiteral;
+import net.ssehub.easy.varModel.model.values.CompoundValue;
+import net.ssehub.easy.varModel.model.values.Value;
 
 /**
  * Implements a specific display name provider in order to hide details
@@ -166,4 +171,25 @@ public class QualiMasterDisplayNameProvider extends DisplayNameProvider {
             MODEL_PART_NAMES.put(part.getDefinition(), displayName);
         }
     }
+    
+    @Override
+    protected String getDisplayNameForIndexAccess(OCLFeatureCall call, Configuration configuration) {
+        String result = null;
+        EvaluationVisitor evaluator = new EvaluationVisitor(configuration, null, false, null);
+        evaluator.visit(call);
+        Value accessResult = evaluator.getResult();
+        if (accessResult instanceof CompoundValue) { // goes to a tuple or so
+            CompoundValue cValue = (CompoundValue) accessResult;
+            String name = cValue.getStringValue(QmConstants.SLOT_NAME);
+            if (null != name) {
+                result = getDisplayName(call.getOperand(), configuration) + "[" + name + "]";
+            }
+        }
+        evaluator.clear();
+        if (null == result) { // fallback
+            result = super.getDisplayNameForIndexAccess(call, configuration);
+        }
+        return result;
+    }
+    
 }
