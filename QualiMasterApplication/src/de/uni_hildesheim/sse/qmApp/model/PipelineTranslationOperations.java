@@ -678,7 +678,10 @@ public class PipelineTranslationOperations {
                 Integer.toString(context.getFamilyCount()), destProject);
         freezables.add(decisionVariable);
         destProject.add(decisionVariable);
-
+        
+        if (decisionVariable != null) { //record the family element and its name in the context map
+            context.addFamilyMapping(familyElement, decisionVariable.getName());
+        }
         Map<String, IDatatype> nameAndTypeMap = IVMLModelOperations
                 .getCompoundNameAndType(decisionVariable);
         IDecisionVariable familyVariable = ModelAccess.getFromGlobalIndex(
@@ -709,7 +712,7 @@ public class PipelineTranslationOperations {
         if (familyElement.getIsConnector()) {
             context.addConnector(decisionVariable.getName());
         }
-        
+
         return decisionVariable.getName();
     }
 
