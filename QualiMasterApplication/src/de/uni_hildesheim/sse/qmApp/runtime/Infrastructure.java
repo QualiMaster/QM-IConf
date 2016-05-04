@@ -27,6 +27,7 @@ import eu.qualimaster.adaptation.external.AlgorithmChangedMessage;
 import eu.qualimaster.adaptation.external.AuthenticateMessage;
 import eu.qualimaster.adaptation.external.ChangeParameterRequest;
 import eu.qualimaster.adaptation.external.ClientEndpoint;
+import eu.qualimaster.adaptation.external.CloudPipelineMessage;
 import eu.qualimaster.adaptation.external.ConnectedMessage;
 import eu.qualimaster.adaptation.external.DisconnectRequest;
 import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
@@ -180,8 +181,15 @@ public class Infrastructure {
         }
 
         @Override
-        public void handleUpdateCloudResourceMessage(UpdateCloudResourceMessage arg0) {
+        public void handleUpdateCloudResourceMessage(UpdateCloudResourceMessage message) {
             // do not forward
+        }
+
+        @Override
+        public void handleCloudPipelineMessage(CloudPipelineMessage message) {
+            for (int d = 0, n = dispatchers.size(); d < n; d++) {
+                dispatchers.get(d).handleCloudPipelineMessage(message);
+            }
         }
         
     }

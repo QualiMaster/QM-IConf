@@ -18,6 +18,7 @@ package de.uni_hildesheim.sse.qmApp.runtime;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure.IClientDispatcher;
 import eu.qualimaster.adaptation.external.AlgorithmChangedMessage;
 import eu.qualimaster.adaptation.external.ChangeParameterRequest;
+import eu.qualimaster.adaptation.external.CloudPipelineMessage;
 import eu.qualimaster.adaptation.external.DisconnectRequest;
 import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
 import eu.qualimaster.adaptation.external.HardwareAliveMessage;
@@ -92,6 +93,10 @@ public abstract class DispatcherAdapter implements IClientDispatcher {
 
     @Override
     public void handleUpdateCloudResourceMessage(UpdateCloudResourceMessage arg0) {
+    }
+
+    @Override
+    public void handleCloudPipelineMessage(CloudPipelineMessage arg0) {
     }
 
 }
