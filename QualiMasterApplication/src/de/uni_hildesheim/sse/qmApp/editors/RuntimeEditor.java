@@ -133,6 +133,8 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     
     private static final int PIPELINE_DISPLAY_BUFFER_SIZE = 50;
     private static final int PIPELINE_DISPLAY_DELAY = 100;
+    private static final String QUALITY_PARAMETERS = "qualityParameters";
+    
     private static Label infoLabel;
     @SuppressWarnings("unused")
     private int insertMark = 0;
@@ -865,7 +867,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         SetVariable set = (SetVariable) object;
         String name = set.getDeclaration().getName();
 
-        if (name.equals("qualityParameters")) {
+        if (name.equals(QUALITY_PARAMETERS)) {
 
             ConstantValue vaule = (ConstantValue) set.getDeclaration().getDefaultValue();
             ContainerValue container = (ContainerValue) vaule.getConstantValue();
