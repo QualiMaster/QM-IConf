@@ -103,7 +103,14 @@ class ChangeableComboCellEditor extends ComboBoxCellEditor {
             // String based selection of value
             boolean found = false;
             for (int i = 0; i < getItems().length && !found; i++) {
-                if (getItems()[i].equals(oValue) || oValue.equals(StringProvider.toIvmlString(values.get(i)))) {
+                if (getItems()[i].equals(oValue)) {
+                    super.doSetValue(i);
+                    found = true;
+                }
+            }
+            // Fallback, but much worse performance
+            for (int i = 0; i < getItems().length && !found; i++) {
+                if (oValue.equals(StringProvider.toIvmlString(values.get(i)))) {
                     super.doSetValue(i);
                     found = true;
                 }

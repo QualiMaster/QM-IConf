@@ -308,7 +308,7 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
         }
         
         // Special handling for constraint based combo boxes
-        if ("tupleType".equals(propertyIdentifier) || ("default".equals(propertyIdentifier)) 
+        if (("tupleType".equals(propertyIdentifier) || "default".equals(propertyIdentifier)) 
             && null != value && value instanceof String) {
             
             try {
