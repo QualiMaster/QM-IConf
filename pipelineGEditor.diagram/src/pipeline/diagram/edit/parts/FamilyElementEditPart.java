@@ -119,7 +119,7 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
 	 * @generated
 	 */
 	protected IFigure createNodeShape() {
-	    FamilyElement model = (FamilyElement) ((ShapeImpl) getModel()).getElement();
+		FamilyElement model = (FamilyElement) ((ShapeImpl) getModel()).getElement();
         Boolean isConnector = model.getIsConnector();
         return primaryShape = new FamilyElementFigure(isConnector);
 	}
@@ -244,7 +244,7 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
 						.equals(event.getFeature())) {
 			handleMajorSemanticChange();
 		} else {
-		    /*
+			/*
              * Not generated -> hand crafted code, copied from
              * http://www.eclipse.org/epsilon/doc/articles/eugenia-nodes-with-runtime-images/ ;-)
              */
@@ -262,7 +262,6 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
             /*
              * end of manually added code
              */
-            
 			super.handleNotificationEvent(event);
 		}
 	}

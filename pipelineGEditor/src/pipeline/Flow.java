@@ -106,7 +106,6 @@ public interface Flow extends PipelineElement
 
 /**
 	 * Returns the value of the '<em><b>Tuple Type</b></em>' attribute.
-	 * The default value is <code>"-1"</code>.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Tuple Type</em>' attribute isn't clear,
@@ -114,12 +113,12 @@ public interface Flow extends PipelineElement
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Tuple Type</em>' attribute.
-	 * @see #setTupleType(Integer)
+	 * @see #setTupleType(String)
 	 * @see pipeline.PipelinePackage#getFlow_TupleType()
-	 * @model default="-1"
+	 * @model
 	 * @generated
 	 */
-	Integer getTupleType();
+	String getTupleType();
 
 /**
 	 * Sets the value of the '{@link pipeline.Flow#getTupleType <em>Tuple Type</em>}' attribute.
@@ -129,6 +128,6 @@ public interface Flow extends PipelineElement
 	 * @see #getTupleType()
 	 * @generated
 	 */
-	void setTupleType(Integer value);
+	void setTupleType(String value);
 
 } // Flow

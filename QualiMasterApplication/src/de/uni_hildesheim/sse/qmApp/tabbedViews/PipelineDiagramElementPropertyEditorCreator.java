@@ -5,9 +5,12 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.swt.widgets.Composite;
 
+import de.uni_hildesheim.sse.ConstraintSyntaxException;
+import de.uni_hildesheim.sse.ModelUtility;
 import de.uni_hildesheim.sse.qmApp.editors.EditorUtils;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
+import de.uni_hildesheim.sse.qmApp.model.QualiMasterDisplayNameProvider;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.EventKind;
@@ -22,6 +25,8 @@ import net.ssehub.easy.varModel.confModel.AssignmentState;
 import net.ssehub.easy.varModel.confModel.CompoundVariable;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.cst.CSTSemanticException;
+import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
 import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
 import net.ssehub.easy.varModel.model.IvmlKeyWords;
 import net.ssehub.easy.varModel.model.ModelQuery;
@@ -301,6 +306,25 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
                 labelCreator.clear();
             }
         }
+        
+        // Special handling for constraint based combo boxes
+        if ("tupleType".equals(propertyIdentifier) || ("default".equals(propertyIdentifier)) 
+            && null != value && value instanceof String) {
+            
+            try {
+                ConstraintSyntaxTree cstValue = ModelUtility.INSTANCE.createExpression((String) value,
+                    ModelAccess.getModel(VariabilityModel.Definition.TOP_LEVEL));
+                String readableString = QualiMasterDisplayNameProvider.INSTANCE.getDisplayName(cstValue,
+                    getConfiguration());
+                result = new StaticLabelProvider(readableString, result.getImage(data));
+            } catch (CSTSemanticException e) {
+                result = new StaticLabelProvider((String) value, result.getImage(data));
+            } catch (ConstraintSyntaxException e) {
+                result = new StaticLabelProvider((String) value, result.getImage(data));
+            }
+            
+        }
+        
         return result;
     }
 

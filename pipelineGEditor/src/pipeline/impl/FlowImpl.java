@@ -81,7 +81,7 @@ public class FlowImpl extends PipelineElementImpl implements Flow
 	 * @generated
 	 * @ordered
 	 */
-	protected static final Integer TUPLE_TYPE_EDEFAULT = new Integer(-1);
+	protected static final String TUPLE_TYPE_EDEFAULT = null;
 
 /**
 	 * The cached value of the '{@link #getTupleType() <em>Tuple Type</em>}' attribute.
@@ -91,7 +91,7 @@ public class FlowImpl extends PipelineElementImpl implements Flow
 	 * @generated
 	 * @ordered
 	 */
-	protected Integer tupleType = TUPLE_TYPE_EDEFAULT;
+	protected String tupleType = TUPLE_TYPE_EDEFAULT;
 
 /**
 	 * <!-- begin-user-doc -->
@@ -218,7 +218,7 @@ public class FlowImpl extends PipelineElementImpl implements Flow
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Integer getTupleType() {
+	public String getTupleType() {
 		return tupleType;
 	}
 
@@ -227,8 +227,8 @@ public class FlowImpl extends PipelineElementImpl implements Flow
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setTupleType(Integer newTupleType) {
-		Integer oldTupleType = tupleType;
+	public void setTupleType(String newTupleType) {
+		String oldTupleType = tupleType;
 		tupleType = newTupleType;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, PipelinePackage.FLOW__TUPLE_TYPE, oldTupleType, tupleType));
@@ -276,7 +276,7 @@ public class FlowImpl extends PipelineElementImpl implements Flow
 				setGrouping((Integer)newValue);
 				return;
 			case PipelinePackage.FLOW__TUPLE_TYPE:
-				setTupleType((Integer)newValue);
+				setTupleType((String)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);

@@ -427,6 +427,15 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 
 /**
 	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getFamilyElement_Default() {
+		return (EAttribute)familyElementEClass.getEStructuralFeatures().get(2);
+	}
+
+/**
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -509,6 +518,7 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 		familyElementEClass = createEClass(FAMILY_ELEMENT);
 		createEAttribute(familyElementEClass, FAMILY_ELEMENT__FAMILY);
 		createEAttribute(familyElementEClass, FAMILY_ELEMENT__IS_CONNECTOR);
+		createEAttribute(familyElementEClass, FAMILY_ELEMENT__DEFAULT);
 
 		dataManagementElementEClass = createEClass(DATA_MANAGEMENT_ELEMENT);
 		createEAttribute(dataManagementElementEClass, DATA_MANAGEMENT_ELEMENT__DATA_MANAGEMENT);
@@ -571,7 +581,7 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 		initEReference(getFlow_Source(), this.getPipelineElement(), null, "source", null, 0, 1, Flow.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getFlow_Destination(), this.getPipelineElement(), null, "destination", null, 0, 1, Flow.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getFlow_Grouping(), ecorePackage.getEIntegerObject(), "grouping", "0", 0, 1, Flow.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getFlow_TupleType(), ecorePackage.getEIntegerObject(), "tupleType", "-1", 0, 1, Flow.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getFlow_TupleType(), ecorePackage.getEString(), "tupleType", null, 0, 1, Flow.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(pipelineNodeEClass, PipelineNode.class, "PipelineNode", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getPipelineNode_Parallelism(), ecorePackage.getEIntegerObject(), "parallelism", "1", 0, 1, PipelineNode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -588,6 +598,7 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 		initEClass(familyElementEClass, FamilyElement.class, "FamilyElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getFamilyElement_Family(), ecorePackage.getEIntegerObject(), "family", "-1", 0, 1, FamilyElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getFamilyElement_IsConnector(), ecorePackage.getEBooleanObject(), "isConnector", "false", 0, 1, FamilyElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getFamilyElement_Default(), ecorePackage.getEString(), "default", null, 0, 1, FamilyElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(dataManagementElementEClass, DataManagementElement.class, "DataManagementElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getDataManagementElement_DataManagement(), ecorePackage.getEIntegerObject(), "dataManagement", "-1", 0, 1, DataManagementElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

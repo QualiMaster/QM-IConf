@@ -29,7 +29,7 @@ class Flow extends PipelineElement{
    * Single reference (1:1) between one tuple of source.output and destination.input
    * References become integers holding the global index of all defined variables, -1 is unselected, count+1 = nullValue if supported
    */
-  attr Integer tupleType = -1;
+  attr String tupleType;
 }
 
 @gmf.node()
@@ -56,6 +56,7 @@ abstract class ProcessingElement extends PipelineNode {
 class FamilyElement extends ProcessingElement {
   attr Integer family = -1; // references become integer (see above)
   attr Boolean isConnector = false; // Should only be visible if Pipeline.isSubPipeline = true, can be a Boolean, since this is not modeled in IVML
+  attr String default;
 }
 
 @gmf.node(figure="svg", svg.uri="platform:/plugin/pipelineGEditor/svg/datamanagement.svg", size="60,60")

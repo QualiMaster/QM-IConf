@@ -20,6 +20,7 @@ import pipeline.PipelinePackage;
  * <ul>
  *   <li>{@link pipeline.impl.FamilyElementImpl#getFamily <em>Family</em>}</li>
  *   <li>{@link pipeline.impl.FamilyElementImpl#getIsConnector <em>Is Connector</em>}</li>
+ *   <li>{@link pipeline.impl.FamilyElementImpl#getDefault <em>Default</em>}</li>
  * </ul>
  * </p>
  *
@@ -65,6 +66,26 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 	 * @ordered
 	 */
 	protected Boolean isConnector = IS_CONNECTOR_EDEFAULT;
+
+				/**
+	 * The default value of the '{@link #getDefault() <em>Default</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getDefault()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String DEFAULT_EDEFAULT = null;
+
+				/**
+	 * The cached value of the '{@link #getDefault() <em>Default</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getDefault()
+	 * @generated
+	 * @ordered
+	 */
+	protected String default_ = DEFAULT_EDEFAULT;
 
 				/**
 	 * <!-- begin-user-doc -->
@@ -129,6 +150,27 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 
 				/**
 	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getDefault() {
+		return default_;
+	}
+
+				/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setDefault(String newDefault) {
+		String oldDefault = default_;
+		default_ = newDefault;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, PipelinePackage.FAMILY_ELEMENT__DEFAULT, oldDefault, default_));
+	}
+
+				/**
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -139,6 +181,8 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 				return getFamily();
 			case PipelinePackage.FAMILY_ELEMENT__IS_CONNECTOR:
 				return getIsConnector();
+			case PipelinePackage.FAMILY_ELEMENT__DEFAULT:
+				return getDefault();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -156,6 +200,9 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 				return;
 			case PipelinePackage.FAMILY_ELEMENT__IS_CONNECTOR:
 				setIsConnector((Boolean)newValue);
+				return;
+			case PipelinePackage.FAMILY_ELEMENT__DEFAULT:
+				setDefault((String)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -175,6 +222,9 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 			case PipelinePackage.FAMILY_ELEMENT__IS_CONNECTOR:
 				setIsConnector(IS_CONNECTOR_EDEFAULT);
 				return;
+			case PipelinePackage.FAMILY_ELEMENT__DEFAULT:
+				setDefault(DEFAULT_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -191,6 +241,8 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 				return FAMILY_EDEFAULT == null ? family != null : !FAMILY_EDEFAULT.equals(family);
 			case PipelinePackage.FAMILY_ELEMENT__IS_CONNECTOR:
 				return IS_CONNECTOR_EDEFAULT == null ? isConnector != null : !IS_CONNECTOR_EDEFAULT.equals(isConnector);
+			case PipelinePackage.FAMILY_ELEMENT__DEFAULT:
+				return DEFAULT_EDEFAULT == null ? default_ != null : !DEFAULT_EDEFAULT.equals(default_);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -209,6 +261,8 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 		result.append(family);
 		result.append(", isConnector: ");
 		result.append(isConnector);
+		result.append(", default: ");
+		result.append(default_);
 		result.append(')');
 		return result.toString();
 	}

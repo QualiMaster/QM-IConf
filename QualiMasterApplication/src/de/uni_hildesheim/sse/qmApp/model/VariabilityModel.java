@@ -18,10 +18,12 @@ import de.uni_hildesheim.sse.qmApp.editors.AlgorithmEditor;
 import de.uni_hildesheim.sse.qmApp.editors.ArtifactEditor;
 import de.uni_hildesheim.sse.qmApp.editors.ClassEditor;
 import de.uni_hildesheim.sse.qmApp.editors.ConstraintsEditor;
+import de.uni_hildesheim.sse.qmApp.editors.DefaultAlgorithmCellEditor;
 import de.uni_hildesheim.sse.qmApp.editors.FamilyEditor;
 import de.uni_hildesheim.sse.qmApp.editors.MultipleLineText;
 import de.uni_hildesheim.sse.qmApp.editors.ParameterEditor;
 import de.uni_hildesheim.sse.qmApp.editors.SourceSinkEditor;
+import de.uni_hildesheim.sse.qmApp.editors.TupleTypeEditor;
 import de.uni_hildesheim.sse.qmApp.editors.TuplesEditor;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.qmApp.images.ImageRegistry;
@@ -747,6 +749,11 @@ public class VariabilityModel {
         ConfigurationTableEditorFactory.registerEditorCreator("Basics::OptionalArtifactString", ArtifactEditor.CREATOR);
         ConfigurationTableEditorFactory.registerEditorCreator("Basics::Description", MultipleLineText.CREATOR);
 
+        // Special property editors in pipeline editor -> References, which will be saved as Strings (not as numbers)
+        ConfigurationTableEditorFactory.registerEditorCreator("refTo(Basics::Tuple)", TupleTypeEditor.CREATOR);
+        ConfigurationTableEditorFactory.registerEditorCreator("refTo(Algorithms::Algorithm)",
+            DefaultAlgorithmCellEditor.CREATOR);
+        
         if (!demoMode) {
             ConfigurationTableEditorFactory.registerEditorCreator("Basics::ClassString", ClassEditor.CREATOR);
             ConfigurationTableEditorFactory.registerEditorCreator("Basics::OptionalClassString", ClassEditor.CREATOR);

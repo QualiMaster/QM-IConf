@@ -570,13 +570,22 @@ public interface PipelinePackage extends EPackage
 	int FAMILY_ELEMENT__IS_CONNECTOR = PROCESSING_ELEMENT_FEATURE_COUNT + 1;
 
 								/**
+	 * The feature id for the '<em><b>Default</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FAMILY_ELEMENT__DEFAULT = PROCESSING_ELEMENT_FEATURE_COUNT + 2;
+
+								/**
 	 * The number of structural features of the '<em>Family Element</em>' class.
 	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-    int FAMILY_ELEMENT_FEATURE_COUNT = PROCESSING_ELEMENT_FEATURE_COUNT + 2;
+    int FAMILY_ELEMENT_FEATURE_COUNT = PROCESSING_ELEMENT_FEATURE_COUNT + 3;
 
         /**
 	 * The meta object id for the '{@link pipeline.impl.DataManagementElementImpl <em>Data Management Element</em>}' class.
@@ -954,6 +963,17 @@ public interface PipelinePackage extends EPackage
 	EAttribute getFamilyElement_IsConnector();
 
 /**
+	 * Returns the meta object for the attribute '{@link pipeline.FamilyElement#getDefault <em>Default</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Default</em>'.
+	 * @see pipeline.FamilyElement#getDefault()
+	 * @see #getFamilyElement()
+	 * @generated
+	 */
+	EAttribute getFamilyElement_Default();
+
+/**
 	 * Returns the meta object for class '{@link pipeline.DataManagementElement <em>Data Management Element</em>}'.
 	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -1244,6 +1264,14 @@ public interface PipelinePackage extends EPackage
 		 * @generated
 		 */
 		EAttribute FAMILY_ELEMENT__IS_CONNECTOR = eINSTANCE.getFamilyElement_IsConnector();
+
+				/**
+		 * The meta object literal for the '<em><b>Default</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute FAMILY_ELEMENT__DEFAULT = eINSTANCE.getFamilyElement_Default();
 
 				/**
 		 * The meta object literal for the '{@link pipeline.impl.DataManagementElementImpl <em>Data Management Element</em>}' class.

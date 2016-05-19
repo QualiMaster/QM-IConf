@@ -4,7 +4,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
 
@@ -78,7 +77,7 @@ public class Activator extends AbstractUIPlugin {
      * @return the logger
      */
     public static EASyLogger getLogger(Class<?> cls) {
-        return EASyLoggerFactory.INSTANCE.getLogger(ModelAccess.class, PLUGIN_ID);        
+        return EASyLoggerFactory.INSTANCE.getLogger(cls, PLUGIN_ID);        
     }
     
 }
