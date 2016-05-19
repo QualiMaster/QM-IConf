@@ -115,26 +115,4 @@ public class FlowPropertyEditorCreator extends PipelineDiagramElementPropertyEdi
         
         return result;
     }
-//    
-//    @Override
-//    public ILabelProvider getLabelProvider(Object data, String propertyIdentifier, Object value, 
-//        IFallbackImageProvider imageProvider) {
-//        ILabelProvider result = super.getLabelProvider(data, propertyIdentifier, value, imageProvider);
-//        if ("tupleType".equals(propertyIdentifier) && null != value && value instanceof String) {
-//            try {
-//                ConstraintSyntaxTree cstValue = ModelUtility.INSTANCE.createExpression((String) value,
-//                    ModelAccess.getModel(VariabilityModel.Definition.TOP_LEVEL));
-//                String readableString = QualiMasterDisplayNameProvider.INSTANCE.getDisplayName(cstValue,
-//                    getConfiguration());
-//                result = new StaticLabelProvider(readableString, result.getImage(data));
-//            } catch (CSTSemanticException e) {
-//                result = new StaticLabelProvider((String) value, result.getImage(data));
-//            } catch (ConstraintSyntaxException e) {
-//                result = new StaticLabelProvider((String) value, result.getImage(data));
-//            }
-//            
-//        }
-//        
-//        return result;
-//    }
 }

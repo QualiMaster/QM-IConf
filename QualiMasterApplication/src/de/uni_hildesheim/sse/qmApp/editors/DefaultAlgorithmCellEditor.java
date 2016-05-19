@@ -4,22 +4,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
-import de.uni_hildesheim.sse.qmApp.model.QualiMasterDisplayNameProvider;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.IEditorCreator;
-import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
 import net.ssehub.easy.varModel.cst.Variable;
-import net.ssehub.easy.varModel.model.datatypes.Reference;
 import net.ssehub.easy.varModel.model.values.ContainerValue;
 import net.ssehub.easy.varModel.model.values.ReferenceValue;
 
@@ -29,7 +23,7 @@ import net.ssehub.easy.varModel.model.values.ReferenceValue;
  * @author El-Sharkawy
  *
  */
-public class DefaultAlgorithmCellEditor implements IEditorCreator {
+public class DefaultAlgorithmCellEditor extends AbstractChangeableDropBoxCellEditorCreator {
 
     public static final IEditorCreator CREATOR = new DefaultAlgorithmCellEditor();
     
@@ -39,13 +33,10 @@ public class DefaultAlgorithmCellEditor implements IEditorCreator {
     private DefaultAlgorithmCellEditor() {}
     
     @Override
-    public CellEditor createCellEditor(UIConfiguration config, IDecisionVariable variable, Composite parent) {
-        // Retrieve the selected family from the original IVML model (not from the copy which is here used)
-        Configuration cfg = variable.getConfiguration();
+    protected List<ConstraintSyntaxTree> retrieveFilteredElements(Tree propertiesTree) {
         List<ConstraintSyntaxTree> cstValues = null;
         
         // Extract selected family from property editor
-        Tree propertiesTree = (Tree) parent;
         String familyName = null;
         for (int i = 0, end = propertiesTree.getItems().length; i < end && null == familyName; i++) {
             TreeItem tmpItem = propertiesTree.getItems()[i];
@@ -54,7 +45,7 @@ public class DefaultAlgorithmCellEditor implements IEditorCreator {
             }
         }
         
-        // Best solution: Filter for relevant algorithms (algorithms which are part of selected family
+        // Optimal solution: Filter for relevant algorithms (algorithms which are part of selected family
         if (null != familyName && !familyName.isEmpty()) {
             Configuration familyConfig = ModelAccess.getConfiguration(VariabilityModel.Configuration.FAMILIES);
             Iterator<IDecisionVariable> varItr = familyConfig.iterator();
@@ -88,25 +79,6 @@ public class DefaultAlgorithmCellEditor implements IEditorCreator {
                 }
             }
         }
-        
-        // Fallback: Filter for all algorithms
-        if (null == cstValues) {
-            cstValues = cfg.getQueryCache().getPossibleValues((Reference) variable.getDeclaration().getType());
-        }
-        
-        // Create user readable labels
-        String[] labels = new String[cstValues.size()];
-        for (int i = 0; i < labels.length; i++) {
-            labels[i] = QualiMasterDisplayNameProvider.INSTANCE.getDisplayName(cstValues.get(i), cfg);
-        }
-        
-        return new ChangeableComboCellEditor(variable, parent, labels, cstValues);
+        return cstValues;
     }
-
-    @Override
-    public Control createEditor(UIConfiguration config, IDecisionVariable variable, Composite parent) {
-        // This provider shall only create editors for the topological pipeline editor -> only cell editors needed
-        return null;
-    }
-
 }
