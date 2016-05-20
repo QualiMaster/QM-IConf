@@ -27,6 +27,7 @@ import net.ssehub.easy.varModel.model.values.ContainerValue;
 import net.ssehub.easy.varModel.model.values.Value;
 import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
 import net.ssehub.easy.varModel.model.values.ValueFactory;
+import qualimasterapplication.Activator;
 
 /**
  * CellEditor creator for the selection of tuple types inside the topological pipeline editor.
@@ -134,11 +135,9 @@ public class TupleTypeEditor extends AbstractChangeableDropBoxCellEditorCreator 
                     cst.inferDatatype();
                     cstValues.add(cst);
                 } catch (ValueDoesNotMatchTypeException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    Activator.getLogger(TupleTypeEditor.class).exception(e);
                 } catch (CSTSemanticException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    Activator.getLogger(TupleTypeEditor.class).exception(e);
                 }
             }
         }
