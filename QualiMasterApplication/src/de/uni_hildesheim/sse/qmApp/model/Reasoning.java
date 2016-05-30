@@ -136,7 +136,23 @@ public class Reasoning {
         errors.clear();
         CONFIGURATION.enableCustomMessages();
         Configuration cfg = modelPart.getConfiguration();
-        Project project = cfg.getProject();      
+        success = reasonOn(true, showSuccessDialog, cfg);
+        updateEditors();
+        return success;
+    }
+
+    /**
+     * Sub-part of {@link #reasonOn(IModelPart, boolean)}: Allows to check and propagate without the specification of a
+     * model part, e.g., after creation of a copy.
+     * @param runsInUI <tt>true</tt> errors will be propagated to editors (must be called from a UI thread),
+     *     <tt>false</tt> otherwise.
+     * @param showSuccessDialog  whether a dialog shall be shown in case of success.
+     * @param cfg The configuration to check (and propagate).
+     * @return <code>true</code> if successful, <code>false</code> else
+     */
+    private static boolean reasonOn(boolean runsInUI, boolean showSuccessDialog, Configuration cfg) {
+        boolean success;
+        Project project = cfg.getProject();
         ReasoningResult result = ReasonerFrontend.getInstance().check(project, cfg, CONFIGURATION, 
             ProgressObserver.NO_OBSERVER); // currently same as propagate, ... 
         if (result.hasConflict()) {
@@ -145,7 +161,9 @@ public class Reasoning {
             CoreException markerException = null;
             for (int m = 0; m < result.getMessageCount(); m++) {
                 Message msg = result.getMessage(m); //Save reasoner-results in Hashmap
-                saveErrors(msg);
+                if (runsInUI) {
+                    saveErrors(msg);
+                }
                 try {
                     List<String> labels = msg.getConflictLabels();
                     List<ModelElement> conflicts = msg.getConflicts();
@@ -175,18 +193,22 @@ public class Reasoning {
                     message.append(text);
                 }
                 try {
+                    if (runsInUI) {
                     // just to be sure that the problem view opens
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(
-                        org.eclipse.ui.IPageLayout.ID_PROBLEM_VIEW).setFocus();
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(
+                            org.eclipse.ui.IPageLayout.ID_PROBLEM_VIEW).setFocus();
+                    }
                 } catch (PartInitException e) {
                     EASyLoggerFactory.INSTANCE.getLogger(Reasoning.class, Bundle.ID).exception(e);    
                 }
             }
-            if (null != markerException) {
-                EASyLoggerFactory.INSTANCE.getLogger(Reasoning.class, Bundle.ID).exception(markerException);
-                Dialogs.showErrorDialog("Validation problems", message.toString());
-            } else {
-                Dialogs.showErrorDialog("Validation problems", "Please consult the 'Problems View'");
+            if (runsInUI) {
+                if (null != markerException) {
+                    EASyLoggerFactory.INSTANCE.getLogger(Reasoning.class, Bundle.ID).exception(markerException);
+                    Dialogs.showErrorDialog("Validation problems", message.toString());
+                } else {
+                    Dialogs.showErrorDialog("Validation problems", "Please consult the 'Problems View'");
+                }
             }
             success = false;
         } else {
@@ -195,8 +217,18 @@ public class Reasoning {
             }
             success = true;
         }
-        updateEditors();
         return success;
+    }
+    
+    /**
+     * Sub-part of {@link #reasonOn(IModelPart, boolean)}: Allows to check and propagate without the specification of a
+     * model part, e.g., after creation of a copy.
+     * @param showSuccessDialog  whether a dialog shall be shown in case of success
+     * @param cfg The configuration to check (and propagate).
+     * @return <code>true</code> if successful, <code>false</code> else
+     */
+    public static boolean reasonOn(boolean showSuccessDialog, Configuration cfg) {
+        return reasonOn(false, showSuccessDialog, cfg);
     }
 
     /**
@@ -302,9 +334,7 @@ public class Reasoning {
                                         project.getElement(k);
                                 //Get the actual variable which holds the pipelines name
                                 IDecisionVariable pipelineVariable = configuration.getDecision(pipelineDeclaration);
-                                
                                 savePipelineErrors(pipelineVariable, variable, conflictMessage);
-                                
                             }
                         }
                     }  
@@ -317,7 +347,11 @@ public class Reasoning {
                             String name = failedVariable.getNestedVariable("name").toString();
                             
                             //Extract the actual name.
-                            name = name.substring(name.indexOf("="), name.indexOf(":"));
+                            int startPos = name.indexOf("=");
+                            int endPos = name.indexOf(":");
+                            if (-1 != startPos && -1 != endPos) {
+                                name = name.substring(startPos, endPos);
+                            }
                             name = name.replaceAll("[^a-zA-Z0-9]", "");
                             name = name.trim();
                             
@@ -371,7 +405,12 @@ public class Reasoning {
                     String name = pipelineVariable.getNestedElement(k).getValue().toString();
 
                     //Prepare name
-                    pipelineName = name.substring(0, name.indexOf(":")).trim();
+                    int endPos = name.indexOf(":");
+                    if (-1 != endPos) {
+                        pipelineName = name.substring(0, endPos).trim();
+                    } else {
+                        pipelineName = name;
+                    }
                 }
             }
         }
@@ -382,7 +421,13 @@ public class Reasoning {
           
             if (variable.getNestedElement(k).toString().startsWith("name")) {
                 String name = variable.getNestedElement(k).toString();
-                name = name.substring(name.indexOf("="), name.indexOf(":"));
+                
+                //Extract the actual name.
+                int startPos = name.indexOf("=");
+                int endPos = name.indexOf(":");
+                if (-1 != startPos && -1 != endPos) {
+                    name = name.substring(startPos, endPos);
+                }
                 name = name.replaceAll("[^a-zA-Z0-9]", "");
                 name = name.trim();
                 

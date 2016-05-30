@@ -324,8 +324,11 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
         } catch (IOException e) {
             showExceptionDialog("Model could not be saved", e);
         }
+        
         // Return a configuration based on the copied, frozen and pruned project
-        return new Configuration(baseProject, true);
+        Configuration config = new Configuration(baseProject, true);
+        Reasoning.reasonOn(false, config);
+        return config;
     }
     
     /**

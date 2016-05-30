@@ -4,6 +4,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 import qualimasterapplication.Activator;
@@ -56,7 +57,9 @@ public class Dialogs {
      */
     public static Shell getDefaultShell() {
         IWorkbench workbench = PlatformUI.getWorkbench();
-        return workbench.getActiveWorkbenchWindow().getShell();
+        IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+        
+        return (null != window) ? window.getShell() : null;
     }
 
     /**
