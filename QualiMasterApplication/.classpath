@@ -8,6 +8,6 @@
 	<classpathentry kind="lib" path="lib/xygraph/org.csstudio.swt.widgets.source_2.1.0.201209121549.jar"/>
 	<classpathentry kind="lib" path="lib/xygraph/org.csstudio.swt.xygraph.source_2.1.0.201209121540.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/RepositoryConnector"/>
-	<classpathentry kind="lib" path="lib/adaptationLayer-external-0.5-20160504-150956.jar"/>
+	<classpathentry kind="lib" path="lib/adaptationLayer-external-0.5-20160531-122550.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

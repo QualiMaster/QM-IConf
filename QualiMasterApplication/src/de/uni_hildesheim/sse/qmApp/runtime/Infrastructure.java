@@ -42,6 +42,7 @@ import eu.qualimaster.adaptation.external.MonitoringDataMessage;
 import eu.qualimaster.adaptation.external.PipelineMessage;
 import eu.qualimaster.adaptation.external.PipelineStatusRequest;
 import eu.qualimaster.adaptation.external.PipelineStatusResponse;
+import eu.qualimaster.adaptation.external.ReplayMessage;
 import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
 import eu.qualimaster.adaptation.external.UpdateCloudResourceMessage;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
@@ -189,6 +190,13 @@ public class Infrastructure {
         public void handleCloudPipelineMessage(CloudPipelineMessage message) {
             for (int d = 0, n = dispatchers.size(); d < n; d++) {
                 dispatchers.get(d).handleCloudPipelineMessage(message);
+            }
+        }
+
+        @Override
+        public void handleReplayMessage(ReplayMessage message) {
+            for (int d = 0, n = dispatchers.size(); d < n; d++) {
+                dispatchers.get(d).handleReplayMessage(message);
             }
         }
         

@@ -95,6 +95,7 @@ import eu.qualimaster.adaptation.external.MonitoringDataMessage;
 import eu.qualimaster.adaptation.external.PipelineMessage;
 import eu.qualimaster.adaptation.external.PipelineStatusRequest;
 import eu.qualimaster.adaptation.external.PipelineStatusResponse;
+import eu.qualimaster.adaptation.external.ReplayMessage;
 import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
 import eu.qualimaster.adaptation.external.UpdateCloudResourceMessage;
 import eu.qualimaster.easy.extension.QmObservables;
@@ -1523,25 +1524,22 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
     @Override
     public void handlePipelineStatusRequest(PipelineStatusRequest arg0) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void handlePipelineStatusResponse(PipelineStatusResponse arg0) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void handleUpdateCloudResourceMessage(UpdateCloudResourceMessage arg0) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void handleCloudPipelineMessage(CloudPipelineMessage arg0) {
-        // TODO Auto-generated method stub
-        
     }
+
+    @Override
+    public void handleReplayMessage(ReplayMessage arg0) {
+    }
+    
 }
