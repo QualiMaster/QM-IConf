@@ -313,8 +313,9 @@ public class ModelAccess {
                 model = info.getResolved();
             }
         }
-        Project tmp = VarModel.INSTANCE.reload(model);
+        Project tmp = VarModel.INSTANCE.reload(model, true);
         if (tmp != model) {
+            VarModel.INSTANCE.events().removeModelListener(model, CONFIG_LISTENER);
             model = tmp;
             VarModel.INSTANCE.events().addModelListener(model, CONFIG_LISTENER);
         }
@@ -446,6 +447,17 @@ public class ModelAccess {
      * @param config the given configuration
      */
     public static void store(Configuration config) {
+        store(config, true, false);
+    }
+    
+    /**
+     * Stores the given configuration.
+     * 
+     * @param config the given configuration
+     * @param forceUpdate an update of the model in the respective registries
+     * @param clearCache clear the configuration cache to force re-creation upon next access
+     */
+    public static void store(Configuration config, boolean forceUpdate, boolean clearCache) {
         Project project = config.getProject();
         ModelInfo<Project> info = VarModel.INSTANCE.availableModels().getModelInfo(project);
         if (null == info) {
@@ -456,12 +468,18 @@ public class ModelAccess {
             try {
                 URI uri = info.getLocation();
                 writer = new FileWriter(new File(uri));
-                Project stored = store(config, writer, uri);
+                Project stored = store(config, writer, null); // updateModel is below
                 writer.close();
-                // replace in cache
-                CONFIG_CACHE.put(project.getName(), config);
-                // replace in VarModel
-                VarModel.INSTANCE.updateModel(stored, uri);
+                if (forceUpdate) {
+                    // replace in cache
+                    CONFIG_CACHE.put(project.getName(), config);
+                    // replace in VarModel
+                    VarModel.INSTANCE.updateModel(stored, uri);
+                } else {
+                    if (clearCache) {
+                        CONFIG_CACHE.remove(project.getName());    
+                    }
+                }
             } catch (IOException e) {
                 IOUtils.closeQuietly(writer);
                 Dialogs.showErrorDialog("Storing configuration", ModelAccess.class, e);

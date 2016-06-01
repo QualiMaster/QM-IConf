@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import net.ssehub.easy.varModel.model.Project;
 import pipeline.FamilyElement;
 import pipeline.Sink;
 
@@ -40,6 +41,25 @@ class PipelineSaveContext {
      * Set of family elements which are in role of a connector.
      */
     private Set<String> connectors = new HashSet<String>();
+    private Project pipelineProject;
+    
+    /**
+     * Creates a save context.
+     * 
+     * @param pipelineProject the actual pipeline project
+     */
+    PipelineSaveContext(Project pipelineProject) {
+        this.pipelineProject = pipelineProject;
+    }
+    
+    /**
+     * Returns the pipeline project.
+     * 
+     * @return the pieline project
+     */
+    Project getPipelineProject() {
+        return pipelineProject;
+    }
     
     /**
      * Adds a mapping for Family elements of (ECORE Source, name in IVML).

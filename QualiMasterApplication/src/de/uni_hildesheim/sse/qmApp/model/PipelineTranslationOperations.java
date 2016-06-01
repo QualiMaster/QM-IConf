@@ -86,8 +86,6 @@ public class PipelineTranslationOperations {
     private static IModelPart datamanagementModelPart = VariabilityModel.Configuration.DATA_MANAGEMENT;
     private static IModelPart pipelineModelPart = VariabilityModel.Configuration.PIPELINES;
     
-    private static Project modelProject = pipelineModelPart.getConfiguration().getProject();
-    
     // TODO: Move all this static stuff into PipelineSaveContext
     private static List<IFreezable> freezables;
     private static List<PipelineNode> pipNodes;
@@ -142,8 +140,9 @@ public class PipelineTranslationOperations {
      */
     public static String translationFromEcoregraphToIVMLfile(URI fileURI, List<Pipeline> pipelineList) 
         throws PipelineTranslationException {
-        
-        PipelineSaveContext context = new PipelineSaveContext();
+
+        Project modelProject = pipelineModelPart.getConfiguration().getProject();
+        PipelineSaveContext context = new PipelineSaveContext(modelProject);
         sourceCount = 0;
         flowCount = 0;
         dataManagementElementCount = 0;
@@ -166,8 +165,7 @@ public class PipelineTranslationOperations {
             handleDisconnectedElements(newProject, context); //handle the disconnected elements in the pipeline
             String pVariableName = pipelineVariable.getName();
             String pDisplayName = pipeline.getName();
-            Map<String, String> nameMap = QMPipelineEditor
-                            .getPipelineNameAndDisplayname();
+            Map<String, String> nameMap = QMPipelineEditor.getPipelineNameAndDisplayname();
             if (!nameMap.containsKey(pVariableName)) {
                 nameMap.put(pVariableName, pVariableName);
             } else {
@@ -199,7 +197,6 @@ public class PipelineTranslationOperations {
         } catch (IOException e) {
             getLogger().info(e.getMessage());
         }
-        Project prj = ModelAccess.reloadModel(newProject, file.toURI());
         // Reload model
         if (!exists) {
             try {
@@ -208,7 +205,8 @@ public class PipelineTranslationOperations {
                 getLogger().info(e.getMessage());
             }
         }
-        ModelAccess.store(pipelineModelPart.getConfiguration());        
+        ModelAccess.store(pipelineModelPart.getConfiguration(), false, true);        
+        Project prj = ModelAccess.reloadModel(newProject, file.toURI()); // reloads also pipelineModelPart
         return notifyUpdatePipeline(null == prj ? newProject : prj);
     }
     
@@ -412,8 +410,8 @@ public class PipelineTranslationOperations {
         PipelineSaveContext context) throws PipelineTranslationException {
 
         // define pipeline
-        DecisionVariableDeclaration pipelineVariable = IVMLModelOperations.getDecisionVariable(modelProject,
-            "Pipeline", null, destProject);
+        DecisionVariableDeclaration pipelineVariable = IVMLModelOperations.getDecisionVariable(
+            context.getPipelineProject(), "Pipeline", null, destProject);
         freezables.add(pipelineVariable);
         destProject.add(pipelineVariable);
         //get all pipeline nodes and flows
@@ -515,9 +513,8 @@ public class PipelineTranslationOperations {
         
         DecisionVariableDeclaration decisionVariable = null;
         // define source
-        decisionVariable = IVMLModelOperations.getDecisionVariable(
-                modelProject, "Source", Integer.toString(sourceCount),
-                destProject);
+        decisionVariable = IVMLModelOperations.getDecisionVariable(context.getPipelineProject(), "Source", 
+                Integer.toString(sourceCount), destProject);
         freezables.add(decisionVariable);
         destProject.add(decisionVariable);
         sourceCount++;
@@ -564,8 +561,8 @@ public class PipelineTranslationOperations {
         throws PipelineTranslationException {
 
         // define flow
-        DecisionVariableDeclaration flowVariable = IVMLModelOperations.getDecisionVariable(modelProject, "Flow",
-                    Integer.toString(flowCount), destProject);
+        DecisionVariableDeclaration flowVariable = IVMLModelOperations.getDecisionVariable(context.getPipelineProject(),
+                "Flow", Integer.toString(flowCount), destProject);
         freezables.add(flowVariable);
         destProject.add(flowVariable);        
         flowCount++;
@@ -658,7 +655,7 @@ public class PipelineTranslationOperations {
         DecisionVariableDeclaration decisionVariable = null;
         // define familyelement
         decisionVariable = IVMLModelOperations.getDecisionVariable(
-                modelProject, "FamilyElement",
+                context.getPipelineProject(), "FamilyElement",
                 Integer.toString(context.getFamilyCount()), destProject);
         freezables.add(decisionVariable);
         destProject.add(decisionVariable);
@@ -720,8 +717,8 @@ public class PipelineTranslationOperations {
         
         DecisionVariableDeclaration decisionVariable = null;
         // define dataManagementElement
-        decisionVariable = IVMLModelOperations.getDecisionVariable(
-                modelProject, "DataManagementElement", Integer.toString(dataManagementElementCount), destProject);
+        decisionVariable = IVMLModelOperations.getDecisionVariable(context.getPipelineProject(), 
+                "DataManagementElement", Integer.toString(dataManagementElementCount), destProject);
         freezables.add(decisionVariable);
         destProject.add(decisionVariable);
         dataManagementElementCount++;
@@ -771,8 +768,8 @@ public class PipelineTranslationOperations {
         
         DecisionVariableDeclaration decisionVariable = null;
         // define sink
-        decisionVariable = IVMLModelOperations.getDecisionVariable(
-                modelProject, "Sink", Integer.toString(context.getSinkCount()), destProject);
+        decisionVariable = IVMLModelOperations.getDecisionVariable(context.getPipelineProject(), "Sink", 
+                Integer.toString(context.getSinkCount()), destProject);
         freezables.add(decisionVariable);
         destProject.add(decisionVariable);
 
