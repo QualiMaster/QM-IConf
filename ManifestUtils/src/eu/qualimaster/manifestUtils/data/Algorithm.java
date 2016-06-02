@@ -18,6 +18,8 @@ public class Algorithm {
     protected String artifact;
     /**The topology class of the Algorithm.*/
     protected String algTopologyClass;
+    /**The description of this Algorithm.*/
+    protected String description;
     
     /**The predecessor of the algorithm.*/
     private Algorithm predecessor;
@@ -225,6 +227,22 @@ public class Algorithm {
         
         return result;
         
+    }
+    
+    /**
+     * Sets the description of the Algorithm.
+     * @param desc The description as String.
+     */
+    public void setDescription(String desc) {
+        this.description = desc;
+    }
+    
+    /**
+     * Returns the description of this Algorithm.
+     * @return The description as String. Can be null.
+     */
+    public String getDescription() {
+        return this.description;
     }
     
 }

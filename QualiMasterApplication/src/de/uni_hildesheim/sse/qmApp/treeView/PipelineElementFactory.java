@@ -1,15 +1,22 @@
 package de.uni_hildesheim.sse.qmApp.treeView;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.common.ui.URIEditorInput;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IElementFactory;
@@ -19,6 +26,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 
 import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
+import de.uni_hildesheim.sse.qmApp.dialogs.DialogsUtil;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.IVariableEditorInput;
 import de.uni_hildesheim.sse.qmApp.editorInput.IVariableEditorInputCreator;
@@ -29,6 +37,7 @@ import de.uni_hildesheim.sse.qmApp.model.IVMLModelOperations;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.PipelineDiagramUtils;
 import de.uni_hildesheim.sse.qmApp.model.PipelineTranslationOperations;
+import de.uni_hildesheim.sse.qmApp.model.SessionModel;
 import de.uni_hildesheim.sse.qmApp.model.Utils;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
@@ -37,7 +46,9 @@ import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import eu.qualimaster.adaptation.external.PipelineMessage;
 import eu.qualimaster.easy.extension.QmConstants;
 import eu.qualimaster.manifestUtils.ManifestConnection;
+import eu.qualimaster.manifestUtils.ManifestUtilsException;
 import net.ssehub.easy.basics.modelManagement.ModelInfo;
+import net.ssehub.easy.producer.eclipse.observer.EclipseProgressObserver;
 import net.ssehub.easy.varModel.confModel.CompoundVariable;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
@@ -357,12 +368,9 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
                         @Override
                         public void run() {
                             IDecisionVariable var = getVariable(); // take data from
-                            Dialogs.showInfoDialog("In implementation...", "Will deploy '" 
+                            Dialogs.showInfoDialog("Ivy Publish", "Will deploy '" 
                                 + ModelAccess.getDisplayName(var) + "' to " + deploymentUrl);
-                            // TODO deploy
-                            //find target folder... artifact there?... then...
-                            ManifestConnection con = new ManifestConnection();
-                            
+                            createProgressDialog(DialogsUtil.getActiveShell());
                         }
                     };
                     action.setEnabled(isInfrastructureAdmin && (null != deploymentUrl && deploymentUrl.length() > 0));
@@ -401,7 +409,95 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
      */
     private PipelineElementFactory() {
     }
+    
+    /**
+     * Create progress Dialog.
+     * 
+     * @param parent
+     *            parent composite.
+     */
+    private static void createProgressDialog(Composite parent) {
+        try {
+            ProgressMonitorDialog pmd = new ProgressMonitorDialog(parent.getShell()) {
 
+                @Override
+                protected void setShellStyle(int newShellStyle) {
+                    super.setShellStyle(SWT.CLOSE | SWT.INDETERMINATE
+                            | SWT.BORDER | SWT.TITLE);
+                    setBlockOnOpen(false);
+                }
+            };
+            pmd.run(false, true, new ProgressDialogOperation());
+            
+        } catch (final InvocationTargetException e) {
+            Throwable exc = e;
+            if (null != e.getCause()) {
+                exc = e.getCause();
+            }
+            MessageDialog.openError(parent.getShell(), "Error", "Error: " + exc.getMessage());
+            e.printStackTrace();
+        } catch (final InterruptedException e) {
+            MessageDialog.openInformation(parent.getShell(), "Cancelled",
+                    "Error: ");
+            e.printStackTrace();
+        }
+        
+    }
+    
+    /**
+     * This Operation is used to monitor the Deployment and its progress.
+     */
+    private static class ProgressDialogOperation implements IRunnableWithProgress {
+        
+        @Override
+        public void run(final IProgressMonitor monitor)
+            throws InvocationTargetException, InterruptedException {
+            
+            startDeployment(monitor);
+            
+            monitor.done();
+        }
+        
+    }
+    
+    /**
+     * Starts the deployment process and monitors it.
+     * @param monitor The used monitor.
+     */
+    private static void startDeployment(IProgressMonitor monitor) {
+        
+        int userSelection = Dialogs.showInfoConfirmDialog("Overwrite?", 
+                "Do you want to overwrite, in case of an existing artifact?");
+        boolean overwrite;
+        if (userSelection == SWT.YES) {
+            overwrite = true;
+        } else {
+            overwrite = false;
+        }
+        
+        EclipseProgressObserver obs = new EclipseProgressObserver();
+        obs.register(monitor);
+        
+        ManifestConnection con = new ManifestConnection();
+        File instFile = SessionModel.INSTANCE.getInstantationFolder();
+        if (null != instFile && instFile.exists()) {
+            String instDir = SessionModel.INSTANCE.getInstantationFolder().getAbsolutePath();
+            String pomFile = instDir + "/if-gen/pom.xml";
+            String dir = instDir + "/target";
+            final String deploymentUrl = ModelAccess.getDeploymentUrl();
+            
+            try {
+                con.publishDirWithPom(dir, pomFile, deploymentUrl, overwrite, obs);
+            } catch (ManifestUtilsException e) {
+                Dialogs.showErrorDialog("ERROR", e.getMessage());
+            }
+        } else {
+            Dialogs.showErrorDialog("ERROR", "Unable to locate instantiation folder at: '" + instFile + "'!");
+        }
+        
+        obs.unregister(monitor);
+    }
+    
     /**
      * Creates the artifacts for a diagram model.
      * 

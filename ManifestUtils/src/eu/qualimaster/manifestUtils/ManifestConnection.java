@@ -254,8 +254,9 @@ public class ManifestConnection {
      * Returns the underlying manifest (i.e the one that was provided).
      * @param artifactId the id of the artifact for which the manifest is required.
      * @return The underlying manifest, or null.
+     * @throws ManifestUtilsException If the manifest has errors.
      */
-    public Manifest getUnderlyingManifest(String artifactId) {
+    public Manifest getUnderlyingManifest(String artifactId) throws ManifestUtilsException {
         Manifest manifest = null;
         
         if (null != artifactId && extractManifest(artifactId)) {
@@ -380,6 +381,7 @@ public class ManifestConnection {
         
         deleteDir(this.out);
         setRetrievalFolder(this.out);
+        System.out.println("RETRIEVAL: " + this.out);
         
         ResolveOptions ro = new ResolveOptions();
 
@@ -492,8 +494,9 @@ public class ManifestConnection {
      * @param name The name of the original class.
      * @param artifactId The id of the artifact.
      * @return A list with all input fields. Can be empty but never null.
+     * @throws ManifestUtilsException if in/output could not be read.
      */
-    public List<Item> getInput(String name, String artifactId) {
+    public List<Item> getInput(String name, String artifactId) throws ManifestUtilsException {
         return getInOut(name, artifactId, true);
     }
     
@@ -502,8 +505,9 @@ public class ManifestConnection {
      * @param name The name of the original class.
      * @param artifactId The id of the artifact.
      * @return A list with all output fields. Can be empty but never null.
+     * @throws ManifestUtilsException if in/output could not be read.
      */
-    public List<Item> getOutput(String name, String artifactId) {
+    public List<Item> getOutput(String name, String artifactId) throws ManifestUtilsException {
         return getInOut(name, artifactId, false);
     }
     
@@ -513,8 +517,9 @@ public class ManifestConnection {
      * @param artifactId the id of the artifact.
      * @param getInput true if input should be returned, false for output.
      * @return A list of fields for in/output.
+     * @throws ManifestUtilsException if in/output could not be read.
      */
-    private List<Item> getInOut(String name, String artifactId, boolean getInput) {
+    private List<Item> getInOut(String name, String artifactId, boolean getInput) throws ManifestUtilsException {
         
         List<Item> result = new ArrayList<Item>();
         URLClassLoader loader = null;
@@ -545,6 +550,10 @@ public class ManifestConnection {
             }             
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+            throw new ManifestUtilsException("Missing dependency!", e);
+        } catch (NoClassDefFoundError e) {
+            e.printStackTrace();
+            throw new ManifestUtilsException("Missing dependency!", e);
         } catch (SecurityException e) {
             e.printStackTrace();
         } finally {
@@ -961,6 +970,132 @@ public class ManifestConnection {
             exc.printStackTrace();
         }
         
+    }
+    
+    /**
+     * Publishes an artifact.
+     * @param dir The folder to publish<br>
+     *        Example: "C:/Artifacts/test.jar"
+     * @param pomFile The pom file for publishing.
+     * @param repository The nexus repository. <br>
+     *        Example: "https://nexus.sse.uni-hildesheim.de/content/repositories/qmproject/"
+     * @param forceOverwrite forces an overwrite in the nexus.
+     * @param monitor The ProgressObserver to monitor the current progress.
+     * @throws ManifestUtilsException 
+     */
+    public void publishDirWithPom(String dir, String pomFile, String repository, 
+            boolean forceOverwrite, ProgressObserver monitor) throws ManifestUtilsException {
+        
+        boolean failed = false;
+        if (null != pomFile) {
+            File ivyFile = new File(pomFile);
+            if (null != ivyFile) {
+                ivyFile = ivyFile.getParentFile();
+                if (null != ivyFile) {
+                    ivyFile = new File(ivyFile.getAbsolutePath() + "/ivy.xml");
+                    
+                    System.out.println("Publishing with POM...");
+                    
+                    IvyConvertPom converter = new IvyConvertPom();
+                    converter.setPomFile(new File(pomFile));
+            
+                    converter.setIvyFile(ivyFile);
+                    
+                    converter.setProject(new Project());
+            //        Project project = new Project();
+            //        project.setBaseDir(new File("C:/TEST-thing/if-gen"));
+            //        converter.setProject(project);
+                    converter.doExecute();
+                    
+                    System.out.println("Converted to ivy...");
+                    
+                    publishDir(dir, ivyFile.getAbsolutePath(), repository, forceOverwrite, monitor);
+                } else {
+                    failed = true;
+                }
+            }
+        } else {
+            failed = true;
+        }
+        
+        if (failed) {
+            throw new ManifestUtilsException("Unable to convert pom: '" + pomFile + "'!");
+        }
+        
+    }
+    
+    /**
+     * Publishes an artifact.
+     * @param dir The dir to publish<br>
+     *        Example: "C:/Artifacts/target"
+     * @param ivyFile The ivy file for publishing. For pom use the wrapper method.
+     * @param repository The nexus repository. <br>
+     *        Example: "https://nexus.sse.uni-hildesheim.de/content/repositories/qmproject/"
+     * @param forceOverwrite forces an overwrite in the nexus.
+     * @param monitor The ProgressObserver to monitor the current progress.
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked", "unused" })
+    public void publishDir(String dir,  String ivyFile, String repository, 
+            boolean forceOverwrite, ProgressObserver monitor) {
+        
+        IBiblioResolver testRes = new IBiblioResolver();
+        testRes.setName("publish_" + repository);
+        testRes.setRoot(repository);
+        
+        List<File> files = getFilesFromDir(dir);
+        
+        if (null == this.ivy.getSettings().getResolver("publish_" + repository)) {
+            this.ivy.getSettings().addResolver(testRes);
+        }
+        
+        //Is undefined, because ivy needs a Collection<Pattern> with actually just Strings inside it...
+        Collection srcArtifactPattern = new ArrayList();
+        for (File file : files) {
+            String filePath = file.getAbsolutePath();
+            System.out.println(filePath.substring(0, filePath.lastIndexOf("/")) + "/[module].[ext]");
+            srcArtifactPattern.add(filePath.substring(0, filePath.lastIndexOf("/")) + "/[module].[ext]");
+        }
+        
+        ModuleRevisionId ri;
+        ri = ModuleRevisionId.newInstance("", "", "");
+ 
+        PublishOptions options = new PublishOptions();
+        options.setHaltOnMissing(true);
+        options.setOverwrite(forceOverwrite);
+        options.setSrcIvyPattern(ivyFile);
+        options.setUpdate(true);
+            
+        System.out.println("WOULD NOW PUBLISH!");
+        
+//        try {
+//            ivy.publish(ri, srcArtifactPattern, "publish_" + repository, options);
+//        } catch (IOException exc) {
+//            exc.printStackTrace();
+//        } catch (IllegalStateException exc) {
+//            exc.printStackTrace();
+//        }
+        
+    }
+    
+    /**
+     * Returns all files inside a folder and its subfolders.
+     * @param dir The root folder.
+     * @return A list of all files inside the folder and its subfolders.
+     */
+    public static List<File> getFilesFromDir(String dir) {
+        List<File> files = new ArrayList<File>();
+        File directory = new File(dir);
+
+        // get all the files from a directory
+        File[] fList = directory.listFiles();
+        for (File file : fList) {
+            if (file.isFile()) {
+                files.add(file);
+            } else if (file.isDirectory()) {
+                files.addAll(getFilesFromDir(file.getAbsolutePath()));
+            }
+        }
+        return files;
     }
     
     /**
@@ -1515,8 +1650,9 @@ public class ManifestConnection {
      * @return A list of possible implementing classes (if the manifest specifies the implementing class,
      * then the list should only contain a single element). If the manifest does not specify an implementing class,
      * or the specified class does not exist, then all classes inside the main artifact(jar) are returned.
+     * @throws ManifestUtilsException If the manifest has errors.
      */
-    public List<String> getAllValidClasses(String artifactId) {
+    public List<String> getAllValidClasses(String artifactId) throws ManifestUtilsException {
         
         String className = null;
         List<String> result = new ArrayList<String>();
@@ -1603,4 +1739,20 @@ public class ManifestConnection {
         return this.mainArtifactName;
     }
 
+    /**
+     * Main method for regular quick testing of singular functions.
+     * @param args The default arguments.
+     */
+    public static void main(String[] args) {
+        
+        ManifestConnection con = new ManifestConnection();
+        try {
+            con.publishDirWithPom("C:/TEST-thing/if-gen/target", "C:/TEST-thing/if-gen/pom.xml", 
+                    "https://nexus.sse.uni-hildesheim.de/content/repositories/qmproject/", false, null);
+        } catch (ManifestUtilsException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    
 }

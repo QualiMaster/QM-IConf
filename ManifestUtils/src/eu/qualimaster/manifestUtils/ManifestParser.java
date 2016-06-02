@@ -103,32 +103,39 @@ public class ManifestParser {
      * Parses a manifest into a representative manifest data structure.
      * @param file The file of the manifest.
      * @return Manifest The representative manifest.
+     * @throws ManifestUtilsException if the Manifest has an error.
      */
-    public Manifest parseFile(File file) {
+    public Manifest parseFile(File file) throws ManifestUtilsException {
         
         Manifest manifest = null;
         
-        if (file != null && file.length() > 0) {
+        try { 
             
-            try { 
+            if (file != null && file.length() > 0) {
                 
-                doc = builder.parse(file);
-                manifest = analyseManifest(doc);
+                try { 
+                    
+                    doc = builder.parse(file);
+                    manifest = analyseManifest(doc);
+                    
+                } catch (SAXException exc) {           
+                    exc.printStackTrace();           
+                } catch (IOException exc) {             
+                    exc.printStackTrace();       
+                } catch (IllegalArgumentException exc) {
+                    exc.printStackTrace();
+                }
                 
-            } catch (SAXException exc) {           
-                exc.printStackTrace();           
-            } catch (IOException exc) {             
-                exc.printStackTrace();       
-            } catch (IllegalArgumentException exc) {
-                exc.printStackTrace();
+            } else {
+                
+                System.out.println("Unable to parse manifest!");
+                
             }
-            
-        } else {
-            
-            System.out.println("Unable to parse manifest!");
-            
-        }
         
+        } catch (NullPointerException e) {
+            throw new ManifestUtilsException("Manifest parsing error: " + e.getMessage());
+        }
+            
         return manifest;
         
     }
@@ -359,7 +366,7 @@ public class ManifestParser {
      */
     private void readAdditionalInfo(Node node, Algorithm algorithm) {
         
-        if (null != algorithm) {
+        if (null != algorithm && null != node) {
             if (INPUT.equals(node.getNodeName())) {   
                 for (Item it : getTuples(node)) {
                     algorithm.addInput(it);
@@ -414,6 +421,8 @@ public class ManifestParser {
                             .getNamedItem(PARAM).getNodeValue(); //String bypass = 
                 } catch (NullPointerException exc) {
                 }              
+            } else if (DESCRIPTION.equals(node.getNodeName())) {
+                algorithm.setDescription(ManifestParser.normalizeText(node.getTextContent()));
             }
         }
         
@@ -484,9 +493,17 @@ public class ManifestParser {
         
         ManifestConnection con = new ManifestConnection();
         con.load(null, groupId, artifactId, version);
-        List<Item> input = con.getInput(name, artifactId);
-        List<Item> output = con.getOutput(name, artifactId);
-        List<Parameter> parameters = con.getParameters(name, artifactId);
+        List<Item> input = new ArrayList<Item>();
+        List<Parameter> parameters = new ArrayList<Parameter>();
+        List<Item> output = new ArrayList<Item>();
+        try {
+            input = con.getInput(name, artifactId);
+            output = con.getOutput(name, artifactId);
+            parameters = con.getParameters(name, artifactId);
+        } catch (ManifestUtilsException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         
         //Validate existence of the algorithm.
         Algorithm algorithm = null;
@@ -965,8 +982,15 @@ public class ManifestParser {
 //            e.printStackTrace();
 //        }
         ManifestParser mp = new ManifestParser();
-        Manifest manifest = mp.parseFile(new File("C:/Test/manifest.xml"));
-        System.out.println(manifest);
+        Manifest manifest;
+        try {
+            manifest = mp.parseFile(new File("C:/Test/manifest.xml"));
+            System.out.println(manifest);
+        } catch (ManifestUtilsException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         
         
     }

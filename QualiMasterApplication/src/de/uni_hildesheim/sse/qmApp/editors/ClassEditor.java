@@ -63,10 +63,13 @@ import de.uni_hildesheim.sse.qmApp.dialogs.DialogsUtil;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import eu.qualimaster.manifestUtils.ManifestConnection;
+import eu.qualimaster.manifestUtils.ManifestUtilsException;
+import eu.qualimaster.manifestUtils.data.Algorithm;
 import eu.qualimaster.manifestUtils.data.Field;
 import eu.qualimaster.manifestUtils.data.Item;
 import eu.qualimaster.manifestUtils.data.Manifest;
 import eu.qualimaster.manifestUtils.data.Manifest.ManifestType;
+import eu.qualimaster.manifestUtils.data.Parameter;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
 import net.ssehub.easy.basics.progress.ProgressObserver;
 import net.ssehub.easy.producer.eclipse.observer.EclipseProgressObserver;
@@ -90,14 +93,13 @@ import net.ssehub.easy.varModel.model.datatypes.Reference;
 import net.ssehub.easy.varModel.model.datatypes.StringType;
 import net.ssehub.easy.varModel.model.filter.DatatypeFinder;
 import net.ssehub.easy.varModel.model.filter.DeclarationFinder;
-import net.ssehub.easy.varModel.model.filter.FilterType;
 import net.ssehub.easy.varModel.model.filter.DeclarationFinder.VisibilityType;
+import net.ssehub.easy.varModel.model.filter.FilterType;
 import net.ssehub.easy.varModel.model.values.NullValue;
 import net.ssehub.easy.varModel.model.values.StringValue;
 import net.ssehub.easy.varModel.model.values.Value;
 import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
 import net.ssehub.easy.varModel.model.values.ValueFactory;
-import eu.qualimaster.manifestUtils.data.Parameter;
 import qualimasterapplication.Activator;
 
 /**
@@ -133,10 +135,17 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             
             createProgressDialog(DialogsUtil.getActiveShell());
             
-            List<String> list = con.getAllValidClasses(ManifestConnection.getArtifactId(artifact));
-            for (String s : list) {
-                classes.add(s);
+            List<String> list;
+            try {
+                list = con.getAllValidClasses(ManifestConnection.getArtifactId(artifact));
+                for (String s : list) {
+                    classes.add(s);
+                }
+            } catch (ManifestUtilsException e1) {
+                Dialogs.showErrorDialog("ERROR", "Manifest corrupt: " + e1.getMessage());
+                e1.printStackTrace();
             }
+
             
             ClassSelectorDialog dlg = new ClassSelectorDialog(DialogsUtil.getActiveShell(), "Select class", classes);
             dlg.setInitialPattern("?");
@@ -209,16 +218,29 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
      */
     private void updateArtifactInfo(String className, String artifactId, IDecisionVariable context) {
         
-        List<Item> input = con.getInput(className, artifactId);
-        List<Item> output = con.getOutput(className, artifactId);
-        List<Parameter> param = con.getParameters(className, artifactId);
-        Manifest uManifest = con.getUnderlyingManifest(artifactId);
+        List<Item> input = new ArrayList<Item>();
+        List<Parameter> param = new ArrayList<Parameter>();
+        List<Item> output = new ArrayList<Item>();
+        try {
+            input = con.getInput(className, artifactId);
+            output = con.getOutput(className, artifactId);
+            param = con.getParameters(className, artifactId);
+        } catch (ManifestUtilsException e) {
+            Dialogs.showErrorDialog(e.getMessage(), e.getCause().getMessage());
+        }
+        Manifest uManifest = null;
+        try {
+            uManifest = con.getUnderlyingManifest(artifactId);
+        } catch (ManifestUtilsException e) {
+            Dialogs.showErrorDialog("ERROR", "Manifest corrupt: " + e.getMessage());
+            e.printStackTrace();
+        }
         ManifestType type = ManifestType.UNKNOWN;
         
         IDecisionVariable var = (IDecisionVariable) context.getParent();
         
         if (null == uManifest) {
-            Dialogs.showErrorDialog("No manifest", "No manifest could be found!");
+            Dialogs.showInfoDialog("No manifest", "No manifest could be found!");
         } else {
             type = uManifest.getType();
         }
@@ -241,7 +263,6 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             
             ensureParent(outputVars);
             ensureParent(parameterVars);
-    
             clearInput(inputVars);
             clearInput(outputVars);
             clearInput(parameterVars);
@@ -252,10 +273,13 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             
             addInOut(input, inputVars, true);
             addInOut(output, outputVars, false);
-            addParameter(param, parameterVars);
+            addParameter(param, parameterVars, uManifest, artifactId);
             setTopoClass(var, type, className);
             if (null != uManifest) {
-                setDescription(var, uManifest.getDescription());
+                Algorithm alg = uManifest.getMember(artifactId);
+                if (null != alg) {
+                    setDescription(var, alg.getDescription());
+                }
             }
             ModelAccess.freezeAgain(var);
         }
@@ -375,8 +399,11 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
      * Adds parameters into the editor.
      * @param param A list of parameters to add.
      * @param list The actual list-object of the editor.
+     * @param manifest The underlying manifest, used to for default values for parameters.
+     * @param algorithmName The name of the processed algorithm.
      */
-    public void addParameter(List<Parameter> param, List<IDecisionVariable> list) {
+    public void addParameter(List<Parameter> param, List<IDecisionVariable> list, 
+            Manifest manifest, String algorithmName) {
         
         if (!list.isEmpty()) {
          
@@ -388,15 +415,14 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             found = getIDecisionVariable(base, "parameters");
             IDecisionVariable var = found.get(0); 
             container = (ContainerVariable) var;
+            addManifestParameters(param, manifest, algorithmName);
             
             for (Parameter p : param) {
                 
                 try {
-                    
-                    //if (container.getNestedElementsCount() == 0) {
+
                     container.addNestedElement(); 
-                    //}
-                    
+
                     IDatatype containerType = container.getDeclaration().getType();
                     // The container could be a deriveddatatype -> resolve to basis to be sure that we have a container
                     containerType = DerivedDatatype.resolveToBasis(containerType);
@@ -424,10 +450,12 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
                         }
                         if (null != refinedType) {
                             
+                            String defaultValue = getDefaultParamValue(manifest, p, algorithmName);
+                            
                             //"name", "class" and "defaultValue" must not be changed, they are the names of the columns!
                             Value val = ValueFactory.createValue(refinedType, 
                                     new Object[] {"name", new String(p.getName()), 
-                                        "class", refValue, "defaultValue", p.getValue()});
+                                        "class", refValue, "defaultValue", defaultValue});
                         
                             container.getNestedElement(container.getNestedElementsCount() - 1)
                                 .setValue(val, AssignmentState.ASSIGNED);        
@@ -442,6 +470,68 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
                 }     
             }     
         }    
+    }
+    
+    /**
+     * Checks for an existing default value inside the manifest, 
+     * since default values can (usually) not be extracted from the classes.
+     * @param manifest The underlying manifest.
+     * @param param The actual parameter.
+     * @param algorithmName The name of the processed algorithm.
+     * @return The default value for that parameter or null if none exists.
+     */
+    private String getDefaultParamValue(Manifest manifest, Parameter param, String algorithmName) {
+        String defaultValue = null;
+        if ((null == param || null == param.getValue() || param.getValue().isEmpty()) && null != manifest) {
+            Algorithm alg = manifest.getMember(algorithmName);
+            if (null != alg) {
+                for (Parameter mParam : alg.getParameters()) {
+                    if (param.getName().equalsIgnoreCase(mParam.getName())) {
+                        defaultValue = mParam.getValue();
+                    }
+                        
+                }
+            } else {
+                defaultValue = param.getValue();
+            }
+        } else {
+            defaultValue = param.getValue();
+        }
+        return defaultValue;
+    }
+    
+    /**
+     * Adds all parameters from the manifest into the given parameter list, while avoiding duplicates.
+     * @param params The existing list of parameters.
+     * @param manifest The manifest to take parameters from.
+     * @param algorithmName The name of the processed algorithm.
+     */
+    private void addManifestParameters(List<Parameter> params, Manifest manifest, String algorithmName) {
+        
+        if (null != manifest && null != params) {
+            Algorithm alg = manifest.getMember(algorithmName);
+            if (null != alg) {
+                for (Parameter mParam : alg.getParameters()) {
+                    
+                    boolean exists = false;
+                    for (Parameter param : params) {
+                        
+                        if (param.getName().equalsIgnoreCase(mParam.getName())) {
+                            
+                            exists = true;
+                            break;
+                            
+                        }
+                        
+                    }
+                    if (!exists) {
+                        params.add(mParam);
+                    }
+                    
+                }
+            }
+        }
+        
     }
     
     /**
