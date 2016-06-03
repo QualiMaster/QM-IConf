@@ -107,6 +107,7 @@ import net.ssehub.easy.varModel.model.Constraint;
 import net.ssehub.easy.varModel.model.ContainableModelElement;
 import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
 import net.ssehub.easy.varModel.model.Project;
+import net.ssehub.easy.varModel.model.datatypes.Compound;
 import net.ssehub.easy.varModel.model.values.CompoundValue;
 import net.ssehub.easy.varModel.model.values.ContainerValue;
 import net.ssehub.easy.varModel.model.values.EnumValue;
@@ -872,35 +873,39 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
             ConstantValue vaule = (ConstantValue) set.getDeclaration().getDefaultValue();
             ContainerValue container = (ContainerValue) vaule.getConstantValue();
+            
+            Collection<Value> observalbeSet = new ArrayList<Value>();
+            
             for (int i = 0; i < container.getElementSize(); i++) {
 
                 CompoundValue value = (CompoundValue) container.getElement(i);
-
-                Collection<Value> observalbeSet = new ArrayList<Value>();
-                for (int k = 0; k < value.getNestedElementsSize(); k++) {
-                    Value val = value.getNestedElement(k);
-                    if (val != null) {
-                        observalbeSet.add(val);
-                    }
-                }
-
-                Object[] valueArray = observalbeSet.toArray();
-
-                for (int j = 0; j < valueArray.length; j++) {
-                    Object obj = valueArray[j];
-
-                    if (obj != null && obj instanceof StringValue) {
-                        StringValue stringValue = (StringValue) obj;
-
-                        String observalbeName = stringValue.getValue();
-
-                        TableItem treeItem = new TableItem(observablesTable, 0);
-                        treeItem.setText(observalbeName);
-
-                        PipelinesRuntimeUtils.INSTANCE.getBackupObservableItem().add(observalbeName);
-                    }
+                Compound cType = (Compound) value.getType();
+                
+                for (int j = 0; j < cType.getInheritedElementCount(); j++) {
+                    DecisionVariableDeclaration slotDecl = cType.getInheritedElement(j);
+                    Value nestedValue = value.getNestedValue(slotDecl.getName());
+                    
+                    observalbeSet.add(nestedValue);
                 }
             }
+            
+            Object[] valueArray = observalbeSet.toArray();
+
+            for (int k = 0; k < valueArray.length; k++) {
+                Object obj = valueArray[k];
+
+                if (obj != null && obj instanceof StringValue) {
+                    StringValue stringValue = (StringValue) obj;
+
+                    String observalbeName = stringValue.getValue();
+
+                    TableItem treeItem = new TableItem(observablesTable, 0);
+                    treeItem.setText(observalbeName);
+
+                    PipelinesRuntimeUtils.INSTANCE.getBackupObservableItem().add(observalbeName);
+                }
+            }
+            
         }
     }
 

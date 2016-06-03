@@ -444,12 +444,11 @@ public class PipelineTranslationOperations {
         pipelineCompound.put("isSubPipeline", pipeline.getIsSubPipeline() == 0 ? Boolean.TRUE : Boolean.FALSE); 
         
         // get source
-        Source source = null;
         ArrayList<String> sourceList = new ArrayList<String>();
         EList<PipelineNode> pipelineNodes = pipeline.getNodes();
         for (PipelineNode pipelineNode : pipelineNodes) {
             if (pipelineNode instanceof Source) {
-                source = (Source) pipelineNode;
+                Source source = (Source) pipelineNode;
                 String sourceName = addPipelineElement(source, destProject, context);
                 if (sourceName != null) {
                     sourceList.add(sourceName);                    
@@ -462,9 +461,7 @@ public class PipelineTranslationOperations {
         }
         
         // Handle connectors of a sub pipeline, must be done after element are processed
-        if (pipeline.getIsSubPipeline() == 0) {
-            pipelineCompound.put("connectors", context.getConnectorNames().toArray());
-        }
+        handleConnectorsOfSubPipeline(pipeline, destProject, context, pipelineCompound);
         
         // add the compound variables in the project
         Object[] pipelineObject = IVMLModelOperations.configureCompoundValues(pipelineVariable, pipelineCompound);
@@ -476,6 +473,38 @@ public class PipelineTranslationOperations {
            
         destProject.add(IVMLModelOperations.getConstraint(objList.toArray(), pipelineVariable, destProject));
         return pipelineVariable;
+    }
+
+    /**
+     * Part of the {@link #addPipelineElement(Pipeline, Project, PipelineSaveContext)} method to add all
+     * connectors to a sub pipeline.<br/>
+     * <font color="red">Attention:</font> A sub pipeline do not need a source. Further, connectors (family elements)
+     * may also serve as a starting point. This must be considered, otherwise some elements may be skipped.
+     * @param pipeline The pipeline to be added
+     * @param destProject The project to add pipeline element to
+     * @param context Context, which stores information about already translated elements of the translation of a
+     * complete pipeline from ECORE to IVML.
+     * @param pipelineCompound The values to be saved, will be changed as a side effect.
+     * @throws PipelineTranslationException In case of illegal pipeline structures
+     */
+    private static void handleConnectorsOfSubPipeline(Pipeline pipeline, Project destProject,
+        PipelineSaveContext context, Map<String, Object> pipelineCompound)
+        throws PipelineTranslationException {
+        
+        if (pipeline.getIsSubPipeline() == 0) {
+            EList<PipelineNode> pipelineNodes = pipeline.getNodes();
+            // In a sub pipeline connectors (family elements) may also serve as starting point
+            for (PipelineNode pipelineNode : pipelineNodes) {
+                if (pipelineNode instanceof FamilyElement && ((FamilyElement) pipelineNode).getIsConnector()) {
+                    FamilyElement connector = (FamilyElement) pipelineNode;
+                    if (!context.hasFamilyMapping(connector)) {
+                        addPipelineElement(connector, destProject, context);
+                    }
+                }
+            }
+            
+            pipelineCompound.put("connectors", context.getConnectorNames().toArray());
+        }
     }
 
     /**
