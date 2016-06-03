@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -20,6 +19,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
+import de.uni_hildesheim.sse.qmApp.dialogs.UiTracerFactory;
 import de.uni_hildesheim.sse.qmApp.model.Location;
 import de.uni_hildesheim.sse.qmApp.model.ProjectDescriptor;
 import de.uni_hildesheim.sse.qmApp.model.Reasoning;
@@ -32,12 +32,13 @@ import net.ssehub.easy.basics.modelManagement.Version;
 import net.ssehub.easy.basics.progress.ProgressObserver;
 import net.ssehub.easy.instantiation.core.model.buildlangModel.BuildModel;
 import net.ssehub.easy.instantiation.core.model.buildlangModel.Script;
+import net.ssehub.easy.instantiation.core.model.common.VilException;
 import net.ssehub.easy.instantiation.core.model.execution.Executor;
+import net.ssehub.easy.instantiation.core.model.execution.TracerFactory;
 import net.ssehub.easy.producer.core.persistence.Configuration.PathKind;
 import net.ssehub.easy.producer.core.persistence.IVMLFileWriter;
 import net.ssehub.easy.producer.core.persistence.PersistenceUtils;
 import net.ssehub.easy.producer.ui.productline_editor.EclipseConsole;
-import net.ssehub.easy.varModel.confModel.AssignmentState;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.cst.AttributeVariable;
 import net.ssehub.easy.varModel.cst.CSTSemanticException;
@@ -59,6 +60,7 @@ import net.ssehub.easy.varModel.model.filter.DeclarationFinder;
 import net.ssehub.easy.varModel.model.filter.DeclarationFinder.VisibilityType;
 import net.ssehub.easy.varModel.model.filter.FilterType;
 import net.ssehub.easy.varModel.model.rewrite.ProjectCopyVisitor;
+import net.ssehub.easy.varModel.model.rewrite.ProjectRewriteVisitor;
 import net.ssehub.easy.varModel.model.rewrite.RewriteContext;
 import net.ssehub.easy.varModel.model.rewrite.modifier.IProjectModifier;
 import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
@@ -77,7 +79,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
      * Experimental: <tt>true</tt> use copied and cleaned up configuration for instantiation, 
      * <tt>false</tt> use underlying model and configuration.
      */
-    private static final boolean PRUNE_CONFIG = true;
+    private static final boolean PRUNE_CONFIG = false;
     
     private static final String COPIED_IVML_LOCATION = "QM-Model";
     private static final String COPIED_VIL_LOCATION = "Instantiation";
@@ -193,18 +195,18 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                             executor = new Executor(source.getMainVilScript())
                                 .addConfiguration(source.getConfiguration());
                         }
-//                        executor.addSource(source).addTarget(target);
-//                        String startRuleName = getStartRuleName();
-//                        if (null != startRuleName) {
-//                            executor.addStartRuleName(startRuleName);
-//                        }
-//                        TracerFactory.setDefaultInstance(UiTracerFactory.INSTANCE);
-//                        executor.execute();
-//                        notifyInstantiationCompleted(shell);
+                        executor.addSource(source).addTarget(target);
+                        String startRuleName = getStartRuleName();
+                        if (null != startRuleName) {
+                            executor.addStartRuleName(startRuleName);
+                        }
+                        TracerFactory.setDefaultInstance(UiTracerFactory.INSTANCE);
+                        executor.execute();
+                        notifyInstantiationCompleted(shell);
                     } catch (ModelManagementException e) {
                         showExceptionDialog("Model resolution problem", e);
-//                    } catch (VilException e) {
-//                        showExceptionDialog("Instantiation problem", e);
+                    } catch (VilException e) {
+                        showExceptionDialog("Instantiation problem", e);
                     }
                     return org.eclipse.core.runtime.Status.OK_STATUS;
                 }
@@ -286,9 +288,6 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
     protected Configuration freezeAndPruneConfig(File targetLocation) {
         // Copy base project
         Project baseProject = VariabilityModel.Definition.TOP_LEVEL.getConfiguration().getProject();
-    
-        
-        
         ProjectCopyVisitor copier = new ProjectCopyVisitor(baseProject, FilterType.ALL);
         baseProject.accept(copier);
         baseProject = copier.getCopiedProject();
@@ -306,11 +305,11 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                 allDeclarations.add((DecisionVariableDeclaration) declaration);
             }
         }
-//        ProjectRewriteVisitor rewriter = new ProjectRewriteVisitor(baseProject, FilterType.ALL);
-//        ProjectFreezeModifier freezer = new ProjectFreezeModifier();
-//        freezer.declarations = allDeclarations;
-//        //rewriter.addProjectModifier(freezer);
-//        baseProject.accept(rewriter);
+        ProjectRewriteVisitor rewriter = new ProjectRewriteVisitor(baseProject, FilterType.ALL);
+        ProjectFreezeModifier freezer = new ProjectFreezeModifier();
+        freezer.declarations = allDeclarations;
+        //rewriter.addProjectModifier(freezer);
+        baseProject.accept(rewriter);
         
         // Saved copied projects
         try {
@@ -327,7 +326,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
         }
         
         // Return a configuration based on the copied, frozen and pruned project
-        Configuration config = new Configuration(baseProject, AssignmentState.ASSIGNED);
+        Configuration config = new Configuration(baseProject, true);
         Reasoning.reasonOn(false, config);
         return config;
     }
