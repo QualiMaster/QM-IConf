@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -61,6 +63,9 @@ import net.ssehub.easy.basics.progress.ProgressObserver.ITask;
  */
 public class ManifestConnection {
 
+    private static final String ANNOTATION_CLASS = "eu.qualimaster.base.algorithm.DefaultValue"; 
+    private static final String DEFAULT_VALUE_METHOD_NAME = "value";
+    
     private static File ivyOut = null;
     
     private static List<String> repositories = new ArrayList<String>();
@@ -450,10 +455,8 @@ public class ManifestConnection {
         try {
             
             URL[] urls = new URL[1];
-            URLClassLoader loader = new URLClassLoader(loadJars(out.getAbsolutePath()).toArray(urls));        
-            
-            Class<?> base = loader.loadClass(name);   
-            
+            URLClassLoader loader = new URLClassLoader(loadJars(out.getAbsolutePath()).toArray(urls));         
+            Class<?> base = loader.loadClass(name);    
             Method[] methods = base.getMethods();
             
             for (Method m : methods) {
@@ -461,16 +464,42 @@ public class ManifestConnection {
                 if (m.getName().startsWith("setParameter")) {
                     
                     String pName = m.getName().substring("setParameter".length(), m.getName().length());
-                    pName = lowerFirstLetter(pName);
-                    
+                    pName = lowerFirstLetter(pName); 
                     Parameter param = new Parameter(pName, ParameterType.valueOf(m.getParameterTypes()[0]));
                     if (null != m.getDefaultValue()) {
                         param.setValue(m.getDefaultValue().toString());
                     }
-                    result.add(param);
-                    
-                }
-                
+                    try {
+                        
+                        Class<?> defaultValueClass = loader.loadClass(ANNOTATION_CLASS);
+                        @SuppressWarnings("unchecked")
+                        Class<Annotation> defaultValueAnnotationClass = (Class) defaultValueClass.getClass();
+                        Annotation annotation = m.getAnnotation(defaultValueAnnotationClass);
+                        if (null != annotation) {
+                            Method method = annotation.getClass().getMethod(DEFAULT_VALUE_METHOD_NAME);
+                            Object[] args = null;
+                            Object invokeResult = method.invoke(annotation, args);
+                            String defaultValue = (String) invokeResult;
+                            param.setValue(defaultValue);
+                        }
+                        
+                    } catch (ClassNotFoundException e) {
+                        System.out.println("ERROR: Unable to load Annotation Class: '" + ANNOTATION_CLASS + "'");
+                        System.out.println("Please update your StormCommons!");
+                    } catch (ClassCastException e) {
+                        e.printStackTrace();
+                        System.out.println("ERROR: Unable to cast: '" + ANNOTATION_CLASS + "' to Annotation.");
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                    result.add(param); 
+                }      
             }
             
             loader.close();
@@ -799,6 +828,8 @@ public class ManifestConnection {
         File dir = new File(folder);
         
         for (File file : dir.listFiles()) {
+            
+            System.out.println("FOUND: " + file.getAbsolutePath());
             
             if (!file.isDirectory()) {
                 String outPath = out.getAbsolutePath();
