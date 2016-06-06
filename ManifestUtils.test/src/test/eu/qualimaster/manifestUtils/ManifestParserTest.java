@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.qualimaster.manifestUtils.ManifestParser;
+import eu.qualimaster.manifestUtils.ManifestUtilsException;
 import eu.qualimaster.manifestUtils.data.Algorithm;
 import eu.qualimaster.manifestUtils.data.FieldType;
 import eu.qualimaster.manifestUtils.data.Manifest;
@@ -37,44 +38,48 @@ public class ManifestParserTest {
         System.out.println();
         
         ManifestParser mp = new ManifestParser();
-        Manifest family = mp.parseFile(new File(MHA_FILE));
-        
-        Assert.assertTrue(family.getMembers().size() == 2);
-        Algorithm first = family.getMembers().iterator().next();
-        
-        Assert.assertTrue(first.getName().equals("adaptiveFilter"));
-        Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next().getName().equals("symbol"));
-        Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next()
-                .getFieldType() == FieldType.STRING);
-        
-        Assert.assertTrue(first.getOutput().iterator().next().getFields().iterator().next().getName().equals("symbol"));
-        Assert.assertTrue(first.getOutput().iterator().next().getFields().iterator().next()
-                .getFieldType() == FieldType.STRING);
-        
-        Assert.assertTrue(first.getParameters().iterator().next().getName().equals("window"));
-        Assert.assertTrue(first.getParameters().iterator().next().getType() == Parameter.ParameterType.INTEGER);
-        
-        Iterator<Algorithm> it = family.getMembers().iterator();
-        it.next();
-        first = it.next();
-        
-        Assert.assertTrue(first.getName().equals("correlationMatrix"));
-        
-        Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next().getName().equals("symbol"));
-        Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next()
-                .getFieldType() == FieldType.STRING);
-        
-        Assert.assertTrue(first.getOutput().iterator().next().getFields().iterator().next().getName()
-                .equals("identifier"));
-        Assert.assertTrue(first.getOutput().iterator().next().getFields().iterator().next()
-                .getFieldType() == FieldType.STRING);
-        
-        Assert.assertTrue(first.getParameters().iterator().next().getName().equals("window"));
-        Assert.assertTrue(first.getParameters().iterator().next().getType() == Parameter.ParameterType.INTEGER);
-        
-        System.out.println(family.toString());
-        
-        System.out.println();
+        Manifest family;
+        try {
+            family = mp.parseFile(new File(MHA_FILE));
+            Assert.assertTrue(family.getMembers().size() == 2);
+            Algorithm first = family.getMembers().iterator().next();
+            
+            Assert.assertTrue(first.getName().equals("adaptiveFilter"));
+            Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next().getName().equals("symbol"));
+            Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next()
+                    .getFieldType() == FieldType.STRING);
+            
+            Assert.assertTrue(first.getOutput().iterator().next().getFields().iterator().next().getName().equals("symbol"));
+            Assert.assertTrue(first.getOutput().iterator().next().getFields().iterator().next()
+                    .getFieldType() == FieldType.STRING);
+            
+            Assert.assertTrue(first.getParameters().iterator().next().getName().equals("window"));
+            Assert.assertTrue(first.getParameters().iterator().next().getType() == Parameter.ParameterType.INTEGER);
+            
+            Iterator<Algorithm> it = family.getMembers().iterator();
+            it.next();
+            first = it.next();
+            
+            Assert.assertTrue(first.getName().equals("correlationMatrix"));
+            
+            Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next().getName().equals("symbol"));
+            Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next()
+                    .getFieldType() == FieldType.STRING);
+            
+            Assert.assertTrue(first.getOutput().iterator().next().getFields().iterator().next().getName()
+                    .equals("identifier"));
+            Assert.assertTrue(first.getOutput().iterator().next().getFields().iterator().next()
+                    .getFieldType() == FieldType.STRING);
+            
+            Assert.assertTrue(first.getParameters().iterator().next().getName().equals("window"));
+            Assert.assertTrue(first.getParameters().iterator().next().getType() == Parameter.ParameterType.INTEGER);
+            
+            System.out.println(family.toString());
+            
+            System.out.println();
+        } catch (ManifestUtilsException e) {
+            e.printStackTrace();
+        }
         
     }
 
@@ -88,11 +93,17 @@ public class ManifestParserTest {
         System.out.println();
         
         ManifestParser mp = new ManifestParser();
-        Manifest family = mp.parseFile(new File(PSPA_FILE));
-        
-        System.out.println(family.toString());
-        
-        System.out.println();
+        Manifest family;
+        try {
+            family = mp.parseFile(new File(PSPA_FILE));
+            
+            System.out.println(family.toString());
+            
+            System.out.println();
+        } catch (ManifestUtilsException e) {
+            e.printStackTrace();
+        }
+
     }
     
     /**
@@ -105,16 +116,22 @@ public class ManifestParserTest {
         System.out.println();
         
         ManifestParser mp = new ManifestParser();
-        Manifest family = mp.parseFile(new File(SDA_FILE));
-        
-        Assert.assertTrue(family.getMembers().size() == 1);
-        Algorithm first = family.getMembers().iterator().next();
-        
-        Assert.assertTrue(first.getName().equals("correlationMatrix"));
-        
-        System.out.println(family.toString());
-        
-        System.out.println();
+        Manifest family;
+        try {
+            family = mp.parseFile(new File(SDA_FILE));
+            
+            Assert.assertTrue(family.getMembers().size() == 1);
+            Algorithm first = family.getMembers().iterator().next();
+            
+            Assert.assertTrue(first.getName().equals("correlationMatrix"));
+            
+            System.out.println(family.toString());
+            
+            System.out.println();
+        } catch (ManifestUtilsException e) {
+            e.printStackTrace();
+        }
+
         
     }
     
@@ -128,28 +145,34 @@ public class ManifestParserTest {
         System.out.println();
         
         ManifestParser mp = new ManifestParser();
-        Manifest family = mp.parseFile(new File(SHA_FILE));
-        
-        Assert.assertTrue(family.getMembers().size() == 1);
-        Algorithm first = family.getMembers().iterator().next();
-        
-        Assert.assertTrue(first.getName().equals("correlationMatrix"));
-        
-        Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next().getName().equals("symbol"));
-        Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next()
-                .getFieldType() == FieldType.STRING);
-        
-        Assert.assertTrue(first.getOutput().iterator().next().getFields().iterator().next().getName()
-                .equals("identifier"));
-        Assert.assertTrue(first.getOutput().iterator().next().getFields().iterator().next()
-                .getFieldType() == FieldType.STRING);
-        
-        Assert.assertTrue(first.getParameters().iterator().next().getName().equals("window"));
-        Assert.assertTrue(first.getParameters().iterator().next().getType() == Parameter.ParameterType.INTEGER);
-        
-        System.out.println(family.toString());
-        
-        System.out.println();
+        Manifest family;
+        try {
+            family = mp.parseFile(new File(SHA_FILE));
+            
+            Assert.assertTrue(family.getMembers().size() == 1);
+            Algorithm first = family.getMembers().iterator().next();
+            
+            Assert.assertTrue(first.getName().equals("correlationMatrix"));
+            
+            Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next().getName().equals("symbol"));
+            Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next()
+                    .getFieldType() == FieldType.STRING);
+            
+            Assert.assertTrue(first.getOutput().iterator().next().getFields().iterator().next().getName()
+                    .equals("identifier"));
+            Assert.assertTrue(first.getOutput().iterator().next().getFields().iterator().next()
+                    .getFieldType() == FieldType.STRING);
+            
+            Assert.assertTrue(first.getParameters().iterator().next().getName().equals("window"));
+            Assert.assertTrue(first.getParameters().iterator().next().getType() == Parameter.ParameterType.INTEGER);
+            
+            System.out.println(family.toString());
+            
+            System.out.println();
+        } catch (ManifestUtilsException e) {
+            e.printStackTrace();
+        }  
+
     }
     
     /**
@@ -162,16 +185,21 @@ public class ManifestParserTest {
         System.out.println();
         
         ManifestParser mp = new ManifestParser();
-        Manifest family = mp.parseFile(new File(SSA_FILE));
-        
-        Assert.assertTrue(family.getMembers().size() == 1);
-        Algorithm first = family.getMembers().iterator().next();
-        
-        Assert.assertTrue(first.getName().equals("correlationMatrix"));
-        
-        System.out.println(family.toString());
-        
-        System.out.println();
+        Manifest family;
+        try {
+            family = mp.parseFile(new File(SSA_FILE));
+
+            Assert.assertTrue(family.getMembers().size() == 1);
+            Algorithm first = family.getMembers().iterator().next();
+            
+            Assert.assertTrue(first.getName().equals("correlationMatrix"));
+            
+            System.out.println(family.toString());
+            
+            System.out.println();
+        } catch (ManifestUtilsException e) {
+            e.printStackTrace();
+        }
 
     }
     

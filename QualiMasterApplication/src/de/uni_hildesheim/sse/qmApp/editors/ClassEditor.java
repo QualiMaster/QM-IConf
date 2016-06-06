@@ -217,7 +217,7 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
      * @param context The current context.
      */
     private void updateArtifactInfo(String className, String artifactId, IDecisionVariable context) {
-        
+
         List<Item> input = new ArrayList<Item>();
         List<Parameter> param = new ArrayList<Parameter>();
         List<Item> output = new ArrayList<Item>();
@@ -249,8 +249,6 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             createMap(var);
             
             var.unfreeze(AssignmentState.ASSIGNED);
-           
-            // just use the
             List<IDecisionVariable> inputVars = getIDecisionVariable(var, SLOT_INPUT);
             List<IDecisionVariable> outputVars = getIDecisionVariable(var, SLOT_OUTPUT);
             List<IDecisionVariable> parameterVars = getIDecisionVariable(var, SLOT_PARAMETERS);
@@ -277,6 +275,9 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             setTopoClass(var, type, className);
             if (null != uManifest) {
                 Algorithm alg = uManifest.getMember(artifactId);
+                if (!uManifest.getMembers().isEmpty() && null == alg) {
+                    alg = uManifest.getMembers().iterator().next();
+                }
                 if (null != alg) {
                     setDescription(var, alg.getDescription());
                 }
@@ -451,7 +452,6 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
                         if (null != refinedType) {
                             
                             String defaultValue = getDefaultParamValue(manifest, p, algorithmName);
-                            
                             //"name", "class" and "defaultValue" must not be changed, they are the names of the columns!
                             Value val = ValueFactory.createValue(refinedType, 
                                     new Object[] {"name", new String(p.getName()), 
@@ -484,6 +484,9 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
         String defaultValue = null;
         if ((null == param || null == param.getValue() || param.getValue().isEmpty()) && null != manifest) {
             Algorithm alg = manifest.getMember(algorithmName);
+            if (!manifest.getMembers().isEmpty() && null == alg) {
+                alg = manifest.getMembers().iterator().next();
+            }
             if (null != alg) {
                 for (Parameter mParam : alg.getParameters()) {
                     if (param.getName().equalsIgnoreCase(mParam.getName())) {
@@ -510,6 +513,9 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
         
         if (null != manifest && null != params) {
             Algorithm alg = manifest.getMember(algorithmName);
+            if (!manifest.getMembers().isEmpty() && null == alg) {
+                alg = manifest.getMembers().iterator().next();
+            }
             if (null != alg) {
                 for (Parameter mParam : alg.getParameters()) {
                     
