@@ -1,7 +1,9 @@
 package de.uni_hildesheim.sse.qmApp.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,6 +13,7 @@ import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
 import net.ssehub.easy.basics.modelManagement.IVersionRestriction;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.basics.modelManagement.RestrictionEvaluationException;
+import net.ssehub.easy.varModel.confModel.AssignmentState;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.ConfigurationException;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
@@ -33,6 +36,8 @@ import net.ssehub.easy.varModel.model.datatypes.IntegerType;
 import net.ssehub.easy.varModel.model.datatypes.OclKeyWords;
 import net.ssehub.easy.varModel.model.datatypes.Reference;
 import net.ssehub.easy.varModel.model.datatypes.Sequence;
+import net.ssehub.easy.varModel.model.filter.FilterType;
+import net.ssehub.easy.varModel.model.filter.FrozenElementsFinder;
 import net.ssehub.easy.varModel.model.values.ContainerValue;
 import net.ssehub.easy.varModel.model.values.Value;
 import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
@@ -281,4 +286,35 @@ public class QualiMasterConfigurationSaver extends net.ssehub.easy.varModel.conf
         return block;
     }
     
+    @Override
+    protected void saveFreezeStates(Project confProject) {
+        // Find (all) frozen elements
+        List<IFreezable> frozenElements = new ArrayList<IFreezable>();
+        for (IDecisionVariable decisionVariable : getConfiguration()) {
+            if (decisionVariable.getState() == AssignmentState.FROZEN
+                && decisionVariable.getDeclaration() instanceof IFreezable) {
+                
+                frozenElements.add((IFreezable) decisionVariable.getDeclaration());
+            }
+        }
+        
+        // Filter elements: Only elements which are frozen in this project
+        /* 
+         * QualiMaster has cycling imports and saves into a new srcProject, but will also overwrite this.
+         * For this reason, the original (srcConfig.getProject()) not the destProject must be used for the
+         * FrozenElementsFinder. Thats the only change in this method.
+         */
+        FrozenElementsFinder finder = new FrozenElementsFinder(getConfiguration().getProject(),
+            FilterType.ONLY_IMPORTS);
+        List<IFreezable> alreadyFrozenElements = finder.getFrozenElements();
+        frozenElements.removeAll(alreadyFrozenElements);
+        
+        // Freeze elements, which are frozen in this Configuration/Project.
+        if (frozenElements.size() > 0) {
+            IFreezable[] freezables = new IFreezable[frozenElements.size()];
+            frozenElements.toArray(freezables);
+            FreezeBlock freeze = createFreezeBlock(freezables, confProject);
+            confProject.add(freeze);
+        }
+    }
 }
