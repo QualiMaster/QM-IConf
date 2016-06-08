@@ -44,7 +44,6 @@ import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFa
 import net.ssehub.easy.varModel.confModel.IConfiguration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.model.AbstractVariable;
-import net.ssehub.easy.varModel.model.IvmlKeyWords;
 import net.ssehub.easy.varModel.model.datatypes.ConstraintType;
 import net.ssehub.easy.varModel.model.datatypes.EnumLiteral;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
@@ -125,7 +124,8 @@ public class VariabilityModel {
         ALGORITHMS(PROJECT_ALGORITHMS,
             new String[] {VAR_ALGORITHMS_ALGORITHMS}, 
             new String[] {TYPE_ALGORITHM, 
-                PROJECT_PIPELINES + IvmlKeyWords.NAMESPACE_SEPARATOR + TYPE_SUBPIPELINE_ALGORITHM},
+//                PROJECT_PIPELINES + IvmlKeyWords.NAMESPACE_SEPARATOR + 
+                TYPE_SUBPIPELINE_ALGORITHM},
             SourceMode.VARIABLES,
             new DecisionVariableElementFactory(AlgorithmEditor.ID)), 
         FAMILIES(PROJECT_FAMILIES, 

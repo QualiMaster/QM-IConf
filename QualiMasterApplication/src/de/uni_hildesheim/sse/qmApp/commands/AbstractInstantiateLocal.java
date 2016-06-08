@@ -79,7 +79,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
      * Experimental: <tt>true</tt> use copied and cleaned up configuration for instantiation, 
      * <tt>false</tt> use underlying model and configuration.
      */
-    private static final boolean PRUNE_CONFIG = false;
+    private static final boolean PRUNE_CONFIG = true;
     
     private static final String COPIED_IVML_LOCATION = "QM-Model";
     private static final String COPIED_VIL_LOCATION = "Instantiation";
@@ -195,18 +195,18 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                             executor = new Executor(source.getMainVilScript())
                                 .addConfiguration(source.getConfiguration());
                         }
-                        executor.addSource(source).addTarget(target);
-                        String startRuleName = getStartRuleName();
-                        if (null != startRuleName) {
-                            executor.addStartRuleName(startRuleName);
-                        }
-                        TracerFactory.setDefaultInstance(UiTracerFactory.INSTANCE);
-                        executor.execute();
-                        notifyInstantiationCompleted(shell);
+    //                    executor.addSource(source).addTarget(target);
+    //                    String startRuleName = getStartRuleName();
+    //                    if (null != startRuleName) {
+    //                        executor.addStartRuleName(startRuleName);
+    //                    }
+    //                    TracerFactory.setDefaultInstance(UiTracerFactory.INSTANCE);
+    //                    executor.execute();
+    //                    notifyInstantiationCompleted(shell);
                     } catch (ModelManagementException e) {
                         showExceptionDialog("Model resolution problem", e);
-                    } catch (VilException e) {
-                        showExceptionDialog("Instantiation problem", e);
+    //                    } catch (VilException e) {
+    //                        showExceptionDialog("Instantiation problem", e);
                     }
                     return org.eclipse.core.runtime.Status.OK_STATUS;
                 }
