@@ -79,7 +79,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
      * Experimental: <tt>true</tt> use copied and cleaned up configuration for instantiation, 
      * <tt>false</tt> use underlying model and configuration.
      */
-    private static final boolean PRUNE_CONFIG = true;
+    private static final boolean PRUNE_CONFIG = false;
     
     private static final String COPIED_IVML_LOCATION = "QM-Model";
     private static final String COPIED_VIL_LOCATION = "Instantiation";
