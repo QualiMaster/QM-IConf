@@ -195,18 +195,18 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                             executor = new Executor(source.getMainVilScript())
                                 .addConfiguration(source.getConfiguration());
                         }
-    //                    executor.addSource(source).addTarget(target);
-    //                    String startRuleName = getStartRuleName();
-    //                    if (null != startRuleName) {
-    //                        executor.addStartRuleName(startRuleName);
-    //                    }
-    //                    TracerFactory.setDefaultInstance(UiTracerFactory.INSTANCE);
-    //                    executor.execute();
-    //                    notifyInstantiationCompleted(shell);
+                        executor.addSource(source).addTarget(target);
+                        String startRuleName = getStartRuleName();
+                        if (null != startRuleName) {
+                            executor.addStartRuleName(startRuleName);
+                        }
+                        TracerFactory.setDefaultInstance(UiTracerFactory.INSTANCE);
+                        executor.execute();
+                        notifyInstantiationCompleted(shell);
                     } catch (ModelManagementException e) {
                         showExceptionDialog("Model resolution problem", e);
-    //                    } catch (VilException e) {
-    //                        showExceptionDialog("Instantiation problem", e);
+                        } catch (VilException e) {
+                            showExceptionDialog("Instantiation problem", e);
                     }
                     return org.eclipse.core.runtime.Status.OK_STATUS;
                 }
