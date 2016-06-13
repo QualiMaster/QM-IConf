@@ -21,6 +21,7 @@
       startupMessageRect="7,252,445,20"
       startupForegroundColor="0080FF" />
    <launcher name="QualiMasterApplication">
+      <linux icon="/icons/icon.xpm"/>
       <solaris/>
       <win useIco="false">
          <bmp/>
