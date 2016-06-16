@@ -45,11 +45,13 @@ public class ManifestParserTest {
             Algorithm first = family.getMembers().iterator().next();
             
             Assert.assertTrue(first.getName().equals("adaptiveFilter"));
-            Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next().getName().equals("symbol"));
+            Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next().getName()
+                .equals("symbol"));
             Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next()
                     .getFieldType() == FieldType.STRING);
             
-            Assert.assertTrue(first.getOutput().iterator().next().getFields().iterator().next().getName().equals("symbol"));
+            Assert.assertTrue(first.getOutput().iterator().next().getFields().iterator().next().getName()
+                .equals("symbol"));
             Assert.assertTrue(first.getOutput().iterator().next().getFields().iterator().next()
                     .getFieldType() == FieldType.STRING);
             
@@ -62,7 +64,8 @@ public class ManifestParserTest {
             
             Assert.assertTrue(first.getName().equals("correlationMatrix"));
             
-            Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next().getName().equals("symbol"));
+            Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next().getName()
+                .equals("symbol"));
             Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next()
                     .getFieldType() == FieldType.STRING);
             
@@ -154,7 +157,8 @@ public class ManifestParserTest {
             
             Assert.assertTrue(first.getName().equals("correlationMatrix"));
             
-            Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next().getName().equals("symbol"));
+            Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next().getName()
+                 .equals("symbol"));
             Assert.assertTrue(first.getInput().iterator().next().getFields().iterator().next()
                     .getFieldType() == FieldType.STRING);
             

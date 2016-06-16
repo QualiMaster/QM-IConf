@@ -25,6 +25,7 @@ import de.uni_hildesheim.sse.qmApp.model.ProjectDescriptor;
 import de.uni_hildesheim.sse.qmApp.model.Reasoning;
 import de.uni_hildesheim.sse.qmApp.model.SessionModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
+import eu.qualimaster.easy.extension.ProjectFreezeModifier;
 import eu.qualimaster.easy.extension.QmConstants;
 import net.ssehub.easy.basics.modelManagement.ModelInfo;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
@@ -40,31 +41,15 @@ import net.ssehub.easy.producer.core.persistence.IVMLFileWriter;
 import net.ssehub.easy.producer.core.persistence.PersistenceUtils;
 import net.ssehub.easy.producer.ui.productline_editor.EclipseConsole;
 import net.ssehub.easy.varModel.confModel.Configuration;
-import net.ssehub.easy.varModel.cst.AttributeVariable;
-import net.ssehub.easy.varModel.cst.CSTSemanticException;
-import net.ssehub.easy.varModel.cst.ConstantValue;
-import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
-import net.ssehub.easy.varModel.cst.OCLFeatureCall;
-import net.ssehub.easy.varModel.cst.Variable;
 import net.ssehub.easy.varModel.management.VarModel;
 import net.ssehub.easy.varModel.model.AbstractVariable;
-import net.ssehub.easy.varModel.model.Attribute;
 import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
-import net.ssehub.easy.varModel.model.FreezeBlock;
-import net.ssehub.easy.varModel.model.IFreezable;
 import net.ssehub.easy.varModel.model.Project;
-import net.ssehub.easy.varModel.model.datatypes.EnumLiteral;
-import net.ssehub.easy.varModel.model.datatypes.OclKeyWords;
-import net.ssehub.easy.varModel.model.datatypes.OrderedEnum;
 import net.ssehub.easy.varModel.model.filter.DeclarationFinder;
 import net.ssehub.easy.varModel.model.filter.DeclarationFinder.VisibilityType;
 import net.ssehub.easy.varModel.model.filter.FilterType;
 import net.ssehub.easy.varModel.model.rewrite.ProjectCopyVisitor;
 import net.ssehub.easy.varModel.model.rewrite.ProjectRewriteVisitor;
-import net.ssehub.easy.varModel.model.rewrite.RewriteContext;
-import net.ssehub.easy.varModel.model.rewrite.modifier.IProjectModifier;
-import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
-import net.ssehub.easy.varModel.model.values.ValueFactory;
 
 /**
  * An abstract handler for local instantiation commands. This class supports the explicit selection
@@ -83,77 +68,6 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
     
     private static final String COPIED_IVML_LOCATION = "QM-Model";
     private static final String COPIED_VIL_LOCATION = "Instantiation";
-    
-    /**
-     * This modifier is used to freeze all relevant declarations inside the CFG projects of Qualimaster.
-     * @author El-Sharkawy
-     *
-     */
-    private static class ProjectFreezeModifier implements IProjectModifier {
-
-        private List<DecisionVariableDeclaration> declarations;
-        
-        @Override
-        public void modifyProject(Project project, RewriteContext context) {
-            // Freeze only in configuration projects
-            String pName = project.getName();
-            if (pName.endsWith(QmConstants.CFG_POSTFIX) && !pName.equals(QmConstants.PROJECT_ADAPTIVITYCFG)) {
-                String projectNS = pName.substring(0, pName.length() - QmConstants.CFG_POSTFIX.length());
-                
-                // Filter for relevant declarations
-                List<IFreezable> toFreeze = new ArrayList<IFreezable>();
-                for (int i = 0, end = declarations.size(); i < end; i++) {
-                    DecisionVariableDeclaration decl = declarations.get(i);
-                    if (decl.getNameSpace().equals(projectNS) || decl.getNameSpace().equals(pName)) {
-                        toFreeze.add((IFreezable) decl);
-                    }
-                }
-                IFreezable[] freezes = toFreeze.toArray(new IFreezable[0]);
-                
-                // Create selector
-                DecisionVariableDeclaration itr = null;
-                ConstraintSyntaxTree selector = null;
-                Attribute annotation = null;
-                for (int i = 0, end = project.getAttributesCount(); i < end && annotation == null; i++) {
-                    Attribute tmpAnnotation = project.getAttribute(i);
-                    if (tmpAnnotation.getName().equals(QmConstants.ANNOTATION_BINDING_TIME)) {
-                        annotation = tmpAnnotation;
-                    }
-                }
-                if (null != annotation && annotation.getType() instanceof OrderedEnum) {
-                    OrderedEnum btType = (OrderedEnum) annotation.getType();
-                    EnumLiteral lit = null;
-                    ConstantValue cVal = null;
-                    for (int i = 0, end = btType.getLiteralCount(); i < end && null == lit; i++) {
-                        if (btType.getLiteral(i).getName().equals(QmConstants.CONST_BINDING_TIME_RUNTIME_MON)) {
-                            lit = btType.getLiteral(i);
-                            try {
-                                cVal = new ConstantValue(ValueFactory.createValue(btType, lit));
-                            } catch (ValueDoesNotMatchTypeException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                    if (null != cVal) {
-                        itr = new DecisionVariableDeclaration("var", null, null);
-                        AttributeVariable attrExpr = new AttributeVariable(new Variable(itr), annotation);
-                        selector = new OCLFeatureCall(attrExpr, OclKeyWords.GREATER_EQUALS, cVal);
-                        try {
-                            selector.inferDatatype();
-                        } catch (CSTSemanticException e) {
-                            itr = null;
-                            selector = null;
-                        }
-                    }
-                }
-                
-                FreezeBlock block = new FreezeBlock(freezes, itr, selector, project);
-                project.add(block);
-            }
-        }
-        
-    }
     
     private static String lastTargetLocation = Location.getModelLocation();
     
@@ -205,8 +119,8 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                         notifyInstantiationCompleted(shell);
                     } catch (ModelManagementException e) {
                         showExceptionDialog("Model resolution problem", e);
-                    } catch (VilException e) {
-                        showExceptionDialog("Instantiation problem", e);
+                        } catch (VilException e) {
+                            showExceptionDialog("Instantiation problem", e);
                     }
                     return org.eclipse.core.runtime.Status.OK_STATUS;
                 }
@@ -306,9 +220,8 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
             }
         }
         ProjectRewriteVisitor rewriter = new ProjectRewriteVisitor(baseProject, FilterType.ALL);
-        ProjectFreezeModifier freezer = new ProjectFreezeModifier();
-        freezer.declarations = allDeclarations;
-        //rewriter.addProjectModifier(freezer);
+        ProjectFreezeModifier freezer = new ProjectFreezeModifier(baseProject, allDeclarations);
+        rewriter.addProjectModifier(freezer);
         baseProject.accept(rewriter);
         
         // Saved copied projects
