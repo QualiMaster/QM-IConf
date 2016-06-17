@@ -63,7 +63,28 @@ public class QualiMasterConfigurationSaver extends net.ssehub.easy.varModel.conf
      * @throws ConfigurationException in case of any configuration errors
      */
     QualiMasterConfigurationSaver(Configuration srcConfiguration) throws ConfigurationException {
-        super(srcConfiguration, true, true);
+        this(srcConfiguration, true, true);
+    }
+
+    /**
+     * Creates a configuration saver instance.
+     * 
+     * @param srcConfiguration The configuration which should be saved.
+     * @param ownProject return an own project (<code>true</code>) or add the 
+     *   configuration to {@link Configuration#getProject()} (<code>false</code>)
+     * @param onlyUserInput Specifies whether only user Input should be stored:
+     * <ul>
+     *     <li><tt>true:</tt> Assignments in state {@link AssignmentState#ASSIGNED} and {@link AssignmentState#FROZEN}
+     *         will be saved.</li>
+     *     <li><tt>false: Assignments in state {@link AssignmentState#ASSIGNED}, {@link AssignmentState#FROZEN}, and
+     *         {@link AssignmentState#DERIVED} will be saved (i.e. also computed values).</tt></li>
+     * </ul>
+     * @throws ConfigurationException in case of any configuration errors
+     */
+    protected QualiMasterConfigurationSaver(Configuration srcConfiguration, boolean ownProject, boolean onlyUserInput)
+        throws ConfigurationException {
+        
+        super(srcConfiguration, ownProject, onlyUserInput);
     }
     
     /**
@@ -210,7 +231,7 @@ public class QualiMasterConfigurationSaver extends net.ssehub.easy.varModel.conf
     protected ConstraintSyntaxTree createAssignmentConstraint(Project dstProject, AbstractVariable decl, 
         IDecisionVariable var, Value value) {
         Configuration config = var.getConfiguration();
-        AbstractVariable dstDecl = varMapping.get(decl);
+        AbstractVariable dstDecl = null != varMapping ? varMapping.get(decl) : decl;
         if (null == dstDecl) {
             dstDecl = decl;
         }

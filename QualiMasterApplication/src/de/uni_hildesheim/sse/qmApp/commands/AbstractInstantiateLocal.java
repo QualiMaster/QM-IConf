@@ -1,11 +1,7 @@
 package de.uni_hildesheim.sse.qmApp.commands;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -21,35 +17,16 @@ import org.eclipse.swt.widgets.Shell;
 import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.dialogs.UiTracerFactory;
 import de.uni_hildesheim.sse.qmApp.model.Location;
+import de.uni_hildesheim.sse.qmApp.model.ModelPruner;
 import de.uni_hildesheim.sse.qmApp.model.ProjectDescriptor;
 import de.uni_hildesheim.sse.qmApp.model.Reasoning;
 import de.uni_hildesheim.sse.qmApp.model.SessionModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
-import eu.qualimaster.easy.extension.ProjectFreezeModifier;
-import eu.qualimaster.easy.extension.QmConstants;
-import net.ssehub.easy.basics.modelManagement.ModelInfo;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
-import net.ssehub.easy.basics.modelManagement.Version;
-import net.ssehub.easy.basics.progress.ProgressObserver;
-import net.ssehub.easy.instantiation.core.model.buildlangModel.BuildModel;
-import net.ssehub.easy.instantiation.core.model.buildlangModel.Script;
 import net.ssehub.easy.instantiation.core.model.common.VilException;
 import net.ssehub.easy.instantiation.core.model.execution.Executor;
 import net.ssehub.easy.instantiation.core.model.execution.TracerFactory;
-import net.ssehub.easy.producer.core.persistence.Configuration.PathKind;
-import net.ssehub.easy.producer.core.persistence.IVMLFileWriter;
-import net.ssehub.easy.producer.core.persistence.PersistenceUtils;
 import net.ssehub.easy.producer.ui.productline_editor.EclipseConsole;
-import net.ssehub.easy.varModel.confModel.Configuration;
-import net.ssehub.easy.varModel.management.VarModel;
-import net.ssehub.easy.varModel.model.AbstractVariable;
-import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
-import net.ssehub.easy.varModel.model.Project;
-import net.ssehub.easy.varModel.model.filter.DeclarationFinder;
-import net.ssehub.easy.varModel.model.filter.DeclarationFinder.VisibilityType;
-import net.ssehub.easy.varModel.model.filter.FilterType;
-import net.ssehub.easy.varModel.model.rewrite.ProjectCopyVisitor;
-import net.ssehub.easy.varModel.model.rewrite.ProjectRewriteVisitor;
 
 /**
  * An abstract handler for local instantiation commands. This class supports the explicit selection
@@ -65,12 +42,8 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
      * <tt>false</tt> use underlying model and configuration.
      */
     private static final boolean PRUNE_CONFIG = false;
-    
-    private static final String COPIED_IVML_LOCATION = "QM-Model";
-    private static final String COPIED_VIL_LOCATION = "Instantiation";
-    
+
     private static String lastTargetLocation = Location.getModelLocation();
-    
     
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -103,7 +76,8 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                         Executor executor = null;
                         if (PRUNE_CONFIG) {
                             // Maybe null in case of any error
-                            executor = prepareModels(trgFolder);
+                            ModelPruner pruner = new ModelPruner(trgFolder);
+                            executor = pruner.prepareModels();
                         }
                         if (!PRUNE_CONFIG || null == executor) {
                             executor = new Executor(source.getMainVilScript())
@@ -119,129 +93,14 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                         notifyInstantiationCompleted(shell);
                     } catch (ModelManagementException e) {
                         showExceptionDialog("Model resolution problem", e);
-                        } catch (VilException e) {
-                            showExceptionDialog("Instantiation problem", e);
+                    } catch (VilException e) {
+                        showExceptionDialog("Instantiation problem", e);
                     }
                     return org.eclipse.core.runtime.Status.OK_STATUS;
                 }
             };
             job.schedule();
         }
-    }
-    
-    /**
-     * Prepares the underlying IVML {@link Project} and VIL, VTL {@link Script} models
-     * for instantiation and generates a pruned and frozen {@link Configuration},
-     * which should be used for the instantiation of the QM model.
-     * @param targetLocation The destination folder where to instantiate all artifacts
-     * @return {@link Configuration}, which should be used for the instantiation of the QM model
-     */
-    protected Executor prepareModels(File targetLocation) {
-        // Create frozen and pruned config
-        Executor executor = null;
-        Configuration config = freezeAndPruneConfig(targetLocation);
-        
-        // Register copied model
-        VarModel.INSTANCE.updateModel(config.getProject(), new File(targetLocation, COPIED_IVML_LOCATION).toURI());
-        
-        // Copy build model and load this temporarily
-        File srcFolder = new File(Location.getModelLocationFile(), "EASy");
-        File vilFolder = new File(targetLocation, COPIED_VIL_LOCATION);
-        vilFolder.mkdirs();
-        try {
-            FileUtils.copyDirectory(srcFolder, vilFolder, new FileFilter() {
-                
-                @Override
-                public boolean accept(File pathname) {
-                    String fileName = pathname.getName();
-                    return pathname.isDirectory() || fileName.endsWith("vil") || fileName.endsWith("vtl")
-                        || fileName.endsWith("rtvtl");
-                }
-            });
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        try {
-            net.ssehub.easy.producer.core.persistence.Configuration pathConfig
-                = PersistenceUtils.getConfiguration(targetLocation);
-            try {
-                pathConfig.setPath(PathKind.IVML, COPIED_IVML_LOCATION);
-                pathConfig.setPath(PathKind.VIL, COPIED_VIL_LOCATION);
-                pathConfig.setPath(PathKind.VTL, COPIED_VIL_LOCATION);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            PersistenceUtils.addLocation(pathConfig, ProgressObserver.NO_OBSERVER);
-        } catch (ModelManagementException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
-        URI vilURI = new File(vilFolder, QmConstants.PROJECT_TOP_LEVEL + "_0.vil").toURI();
-        ModelInfo<Script> info = BuildModel.INSTANCE.availableModels().getModelInfo(QmConstants.PROJECT_TOP_LEVEL,
-            new Version(0), vilURI);
-        if (null != info) {
-            try {
-                executor = new Executor(BuildModel.INSTANCE.load(info));
-            } catch (ModelManagementException e) {
-                e.printStackTrace();
-            }
-            executor.addConfiguration(config);
-        }
-        return executor;
-    }
-    
-    /**
-     * Prepares the underlying IVML {@link Project} for instantiation and generates a pruned 
-     * {@link Configuration}, which should be used for the instantiation of the QM model.
-     * @param targetLocation The destination folder where to instantiate all artifacts
-     * @return {@link Configuration}, which should be used for the instantiation of the QM model
-     */
-    protected Configuration freezeAndPruneConfig(File targetLocation) {
-        // Copy base project
-        Project baseProject = VariabilityModel.Definition.TOP_LEVEL.getConfiguration().getProject();
-        ProjectCopyVisitor copier = new ProjectCopyVisitor(baseProject, FilterType.ALL);
-        baseProject.accept(copier);
-        baseProject = copier.getCopiedProject();
-        
-        // Freeze the copy, except for the runtime elements.
-        DeclarationFinder finder = new DeclarationFinder(baseProject, FilterType.ALL, null);
-        List<DecisionVariableDeclaration> allDeclarations = new ArrayList<DecisionVariableDeclaration>();
-        List<AbstractVariable> tmpList = finder.getVariableDeclarations(VisibilityType.ALL);
-        for (int i = 0, end = tmpList.size(); i < end; i++) {
-            AbstractVariable declaration = tmpList.get(i);
-            if (declaration instanceof DecisionVariableDeclaration
-                && !(declaration.getNameSpace().equals(QmConstants.PROJECT_OBSERVABLESCFG)
-                && declaration.getName().equals("qualityParameters"))) {
-                
-                allDeclarations.add((DecisionVariableDeclaration) declaration);
-            }
-        }
-        ProjectRewriteVisitor rewriter = new ProjectRewriteVisitor(baseProject, FilterType.ALL);
-        ProjectFreezeModifier freezer = new ProjectFreezeModifier(baseProject, allDeclarations);
-        rewriter.addProjectModifier(freezer);
-        baseProject.accept(rewriter);
-        
-        // Saved copied projects
-        try {
-            File modelFolder = new File(targetLocation, COPIED_IVML_LOCATION);
-            if (!modelFolder.exists()) {
-                modelFolder.mkdirs();
-            }
-            IVMLFileWriter writer = new IVMLFileWriter(modelFolder);
-            writer.forceComponundTypes(true);
-            writer.setFormatInitializer(true);
-            writer.save(baseProject);
-        } catch (IOException e) {
-            showExceptionDialog("Model could not be saved", e);
-        }
-        
-        // Return a configuration based on the copied, frozen and pruned project
-        Configuration config = new Configuration(baseProject, true);
-        Reasoning.reasonOn(false, config);
-        return config;
     }
     
     /**
