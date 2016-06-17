@@ -450,6 +450,70 @@ public interface PipelinePackage extends EPackage
   int SINK_FEATURE_COUNT = PIPELINE_NODE_FEATURE_COUNT + 1;
 
   /**
+	 * The meta object id for the '{@link pipeline.impl.ReplaySinkImpl <em>Replay Sink</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see pipeline.impl.ReplaySinkImpl
+	 * @see pipeline.impl.PipelinePackageImpl#getReplaySink()
+	 * @generated
+	 */
+	int REPLAY_SINK = 6;
+
+/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int REPLAY_SINK__NAME = SINK__NAME;
+
+/**
+	 * The feature id for the '<em><b>Constraints</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int REPLAY_SINK__CONSTRAINTS = SINK__CONSTRAINTS;
+
+/**
+	 * The feature id for the '<em><b>Parallelism</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int REPLAY_SINK__PARALLELISM = SINK__PARALLELISM;
+
+/**
+	 * The feature id for the '<em><b>Numtasks</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int REPLAY_SINK__NUMTASKS = SINK__NUMTASKS;
+
+/**
+	 * The feature id for the '<em><b>Sink</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int REPLAY_SINK__SINK = SINK__SINK;
+
+/**
+	 * The number of structural features of the '<em>Replay Sink</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int REPLAY_SINK_FEATURE_COUNT = SINK_FEATURE_COUNT + 0;
+
+		/**
 	 * The meta object id for the '{@link pipeline.impl.ProcessingElementImpl <em>Processing Element</em>}' class.
 	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -457,7 +521,7 @@ public interface PipelinePackage extends EPackage
 	 * @see pipeline.impl.PipelinePackageImpl#getProcessingElement()
 	 * @generated
 	 */
-  int PROCESSING_ELEMENT = 6;
+  int PROCESSING_ELEMENT = 7;
 
   /**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -513,7 +577,7 @@ public interface PipelinePackage extends EPackage
 	 * @see pipeline.impl.PipelinePackageImpl#getFamilyElement()
 	 * @generated
 	 */
-    int FAMILY_ELEMENT = 7;
+    int FAMILY_ELEMENT = 8;
 
         /**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -595,7 +659,7 @@ public interface PipelinePackage extends EPackage
 	 * @see pipeline.impl.PipelinePackageImpl#getDataManagementElement()
 	 * @generated
 	 */
-    int DATA_MANAGEMENT_ELEMENT = 8;
+    int DATA_MANAGEMENT_ELEMENT = 9;
 
         /**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -921,6 +985,16 @@ public interface PipelinePackage extends EPackage
     EAttribute getSink_Sink();
 
 /**
+	 * Returns the meta object for class '{@link pipeline.ReplaySink <em>Replay Sink</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Replay Sink</em>'.
+	 * @see pipeline.ReplaySink
+	 * @generated
+	 */
+	EClass getReplaySink();
+
+/**
 	 * Returns the meta object for class '{@link pipeline.ProcessingElement <em>Processing Element</em>}'.
 	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -1230,6 +1304,16 @@ public interface PipelinePackage extends EPackage
         EAttribute SINK__SINK = eINSTANCE.getSink_Sink();
 
     /**
+		 * The meta object literal for the '{@link pipeline.impl.ReplaySinkImpl <em>Replay Sink</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see pipeline.impl.ReplaySinkImpl
+		 * @see pipeline.impl.PipelinePackageImpl#getReplaySink()
+		 * @generated
+		 */
+		EClass REPLAY_SINK = eINSTANCE.getReplaySink();
+
+				/**
 		 * The meta object literal for the '{@link pipeline.impl.ProcessingElementImpl <em>Processing Element</em>}' class.
 		 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->

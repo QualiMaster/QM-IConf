@@ -32,6 +32,7 @@ import pipeline.diagram.edit.parts.DataManagementElementEditPart;
 import pipeline.diagram.edit.parts.FamilyElementEditPart;
 import pipeline.diagram.edit.parts.FlowEditPart;
 import pipeline.diagram.edit.parts.PipelineEditPart;
+import pipeline.diagram.edit.parts.ReplaySinkEditPart;
 import pipeline.diagram.edit.parts.SinkEditPart;
 import pipeline.diagram.edit.parts.SourceEditPart;
 import pipeline.diagram.part.PipelineDiagramUpdater;
@@ -96,6 +97,7 @@ public class PipelineCanonicalEditPolicy extends CanonicalEditPolicy {
 	private boolean isMyDiagramElement(View view) {
 		int visualID = PipelineVisualIDRegistry.getVisualID(view);
 		switch (visualID) {
+		case ReplaySinkEditPart.VISUAL_ID:
 		case FamilyElementEditPart.VISUAL_ID:
 		case DataManagementElementEditPart.VISUAL_ID:
 		case SourceEditPart.VISUAL_ID:
@@ -267,6 +269,14 @@ public class PipelineCanonicalEditPolicy extends CanonicalEditPolicy {
 			if (!domain2NotationMap.containsKey(view.getElement())) {
 				result.addAll(PipelineDiagramUpdater
 						.getPipeline_1000ContainedLinks(view));
+			}
+			domain2NotationMap.putView(view.getElement(), view);
+			break;
+		}
+		case ReplaySinkEditPart.VISUAL_ID: {
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result.addAll(PipelineDiagramUpdater
+						.getReplaySink_2007ContainedLinks(view));
 			}
 			domain2NotationMap.putView(view.getElement(), view);
 			break;

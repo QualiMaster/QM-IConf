@@ -17,6 +17,7 @@ import pipeline.diagram.edit.parts.DataManagementElementEditPart;
 import pipeline.diagram.edit.parts.FamilyElementEditPart;
 import pipeline.diagram.edit.parts.FlowEditPart;
 import pipeline.diagram.edit.parts.PipelineEditPart;
+import pipeline.diagram.edit.parts.ReplaySinkEditPart;
 import pipeline.diagram.edit.parts.SinkEditPart;
 import pipeline.diagram.edit.parts.SourceEditPart;
 import pipeline.diagram.part.PipelineDiagramEditorPlugin;
@@ -53,6 +54,11 @@ public class PipelineElementTypes {
 	 * @generated
 	 */
 	public static final IElementType Pipeline_1000 = getElementType("pipelineGEditor.diagram.Pipeline_1000"); //$NON-NLS-1$
+	/**
+	 * @generated
+	 */
+	public static final IElementType ReplaySink_2007 = getElementType("pipelineGEditor.diagram.ReplaySink_2007"); //$NON-NLS-1$
+
 	/**
 	 * @generated
 	 */
@@ -114,6 +120,9 @@ public class PipelineElementTypes {
 
 			elements.put(Pipeline_1000, PipelinePackage.eINSTANCE.getPipeline());
 
+			elements.put(ReplaySink_2007,
+					PipelinePackage.eINSTANCE.getReplaySink());
+
 			elements.put(FamilyElement_2005,
 					PipelinePackage.eINSTANCE.getFamilyElement());
 
@@ -143,6 +152,7 @@ public class PipelineElementTypes {
 		if (KNOWN_ELEMENT_TYPES == null) {
 			KNOWN_ELEMENT_TYPES = new HashSet<IElementType>();
 			KNOWN_ELEMENT_TYPES.add(Pipeline_1000);
+			KNOWN_ELEMENT_TYPES.add(ReplaySink_2007);
 			KNOWN_ELEMENT_TYPES.add(FamilyElement_2005);
 			KNOWN_ELEMENT_TYPES.add(DataManagementElement_2006);
 			KNOWN_ELEMENT_TYPES.add(Source_2001);
@@ -159,6 +169,8 @@ public class PipelineElementTypes {
 		switch (visualID) {
 		case PipelineEditPart.VISUAL_ID:
 			return Pipeline_1000;
+		case ReplaySinkEditPart.VISUAL_ID:
+			return ReplaySink_2007;
 		case FamilyElementEditPart.VISUAL_ID:
 			return FamilyElement_2005;
 		case DataManagementElementEditPart.VISUAL_ID:

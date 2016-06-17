@@ -95,6 +95,10 @@ public class PipelineAdapterFactory extends AdapterFactoryImpl
 				return createSinkAdapter();
 			}
 			@Override
+			public Adapter caseReplaySink(ReplaySink object) {
+				return createReplaySinkAdapter();
+			}
+			@Override
 			public Adapter caseProcessingElement(ProcessingElement object) {
 				return createProcessingElementAdapter();
 			}
@@ -216,6 +220,20 @@ public class PipelineAdapterFactory extends AdapterFactoryImpl
 	}
 
   /**
+	 * Creates a new adapter for an object of class '{@link pipeline.ReplaySink <em>Replay Sink</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see pipeline.ReplaySink
+	 * @generated
+	 */
+	public Adapter createReplaySinkAdapter() {
+		return null;
+	}
+
+		/**
 	 * Creates a new adapter for an object of class '{@link pipeline.ProcessingElement <em>Processing Element</em>}'.
 	 * <!-- begin-user-doc -->
    * This default implementation returns null so that we can easily ignore cases;

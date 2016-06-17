@@ -346,6 +346,11 @@ public class PipelineItemProvider
 		newChildDescriptors.add
 			(createChildParameter
 				(PipelinePackage.Literals.PIPELINE__NODES,
+				 PipelineFactory.eINSTANCE.createReplaySink()));
+
+		newChildDescriptors.add
+			(createChildParameter
+				(PipelinePackage.Literals.PIPELINE__NODES,
 				 PipelineFactory.eINSTANCE.createFamilyElement()));
 
 		newChildDescriptors.add

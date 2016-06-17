@@ -24,6 +24,17 @@
     <descriptors name="SinkLabelFigure">
       <actualFigure xsi:type="gmfgraph:Label" name="SinkLabelFigure" text="Sink"/>
     </descriptors>
+    <descriptors name="ReplaySinkFigure">
+      <actualFigure xsi:type="gmfgraph:SVGFigure" name="ReplaySinkFigure" documentURI="platform:/plugin/pipelineGEditor/svg/ReplaySink.svg">
+        <preferredSize dx="55" dy="55"/>
+        <border xsi:type="gmfgraph:MarginBorder">
+          <insets top="5" left="5" bottom="5" right="5"/>
+        </border>
+      </actualFigure>
+    </descriptors>
+    <descriptors name="ReplaySinkLabelFigure">
+      <actualFigure xsi:type="gmfgraph:Label" name="ReplaySinkLabelFigure" text="ReplaySink"/>
+    </descriptors>
     <descriptors name="FamilyElementFigure">
       <actualFigure xsi:type="gmfgraph:SVGFigure" name="FamilyElementFigure" documentURI="platform:/plugin/pipelineGEditor/svg/familyelement.svg">
         <preferredSize dx="60" dy="60"/>
@@ -63,6 +74,11 @@
       <defaultSize dx="55" dy="55"/>
     </facets>
   </nodes>
+  <nodes name="ReplaySink" figure="ReplaySinkFigure">
+    <facets xsi:type="gmfgraph:DefaultSizeFacet">
+      <defaultSize dx="55" dy="55"/>
+    </facets>
+  </nodes>
   <nodes name="FamilyElement" figure="FamilyElementFigure">
     <facets xsi:type="gmfgraph:DefaultSizeFacet">
       <defaultSize dx="60" dy="60"/>
@@ -76,6 +92,7 @@
   <connections name="Flow" figure="FlowFigure"/>
   <labels name="SourceLabel" figure="SourceLabelFigure" elementIcon="false"/>
   <labels name="SinkLabel" figure="SinkLabelFigure" elementIcon="false"/>
+  <labels name="ReplaySinkLabel" figure="ReplaySinkLabelFigure" elementIcon="false"/>
   <labels name="FamilyElementLabel" figure="FamilyElementLabelFigure" elementIcon="false"/>
   <labels name="DataManagementElementLabel" figure="DataManagementElementLabelFigure" elementIcon="false"/>
   <labels name="FlowLabel" figure="FlowLabelFigure" elementIcon="false"/>

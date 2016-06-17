@@ -238,7 +238,7 @@
          </object>
          <context viewClass="org.eclipse.gmf.runtime.notation.Node" containerViews="referencing-diagrams"/>
          <context viewClass="org.eclipse.gmf.runtime.notation.Diagram" semanticHints="Pipeline"/>
-         <context viewClass="org.eclipse.gmf.runtime.notation.Node" semanticHints="2005,2006,2001,2002"/>
+         <context viewClass="org.eclipse.gmf.runtime.notation.Node" semanticHints="2007,2005,2006,2001,2002"/>
          <context viewClass="org.eclipse.gmf.runtime.notation.Edge" semanticHints="4001"/>
       </viewProvider>
    </extension>
@@ -251,13 +251,13 @@
             <method name="getType()" value="Pipeline"/>
          </object>
          <object class="org.eclipse.gmf.runtime.notation.Node" id="generated-nodes">
-            <method name="getType()" value="2005,2006,2001,2002"/>
+            <method name="getType()" value="2007,2005,2006,2001,2002"/>
          </object>
          <object class="org.eclipse.gmf.runtime.notation.Edge" id="generated-links">
             <method name="getType()" value="4001"/>
          </object>
          <object class="org.eclipse.gmf.runtime.notation.Node" id="generated-labels">
-            <method name="getType()" value="5005,5006,5001,5002"/>
+            <method name="getType()" value="5007,5005,5006,5001,5002"/>
          </object>
          <object class="org.eclipse.gmf.runtime.notation.Node" id="generated-compartments">
             <method name="getType()" value=""/>
@@ -273,6 +273,11 @@
          <Priority name="Lowest"/>
          <object class="pipeline.diagram.edit.parts.PipelineEditPart" id="Pipeline_1000"/>
          <context elements="Pipeline_1000"/>
+      </modelingAssistantProvider>
+            <modelingAssistantProvider class="pipeline.diagram.providers.assistants.PipelineModelingAssistantProviderOfReplaySinkEditPart">
+         <Priority name="Lowest"/>
+         <object class="pipeline.diagram.edit.parts.ReplaySinkEditPart" id="ReplaySink_2007"/>
+         <context elements="ReplaySink_2007"/>
       </modelingAssistantProvider>
             <modelingAssistantProvider class="pipeline.diagram.providers.assistants.PipelineModelingAssistantProviderOfFamilyElementEditPart">
          <Priority name="Lowest"/>
@@ -323,6 +328,16 @@
                eclass="Pipeline"
                edithelper="pipeline.diagram.edit.helpers.PipelineEditHelper">
             <param name="semanticHint" value="1000"/>
+         </metamodelType>
+      </metamodel>
+      <metamodel nsURI="pipeline">
+         <metamodelType
+               id="pipelineGEditor.diagram.ReplaySink_2007"
+               name="%metatype.name.ReplaySink_2007"
+               kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
+               eclass="ReplaySink"
+               edithelper="pipeline.diagram.edit.helpers.ReplaySinkEditHelper">
+            <param name="semanticHint" value="2007"/>
          </metamodelType>
       </metamodel>
       <metamodel nsURI="pipeline">
@@ -388,6 +403,7 @@
       </clientContext> 
       <binding context="pipelineGEditor.diagram.TypeContext">
          <elementType ref="pipelineGEditor.diagram.Pipeline_1000"/>
+         <elementType ref="pipelineGEditor.diagram.ReplaySink_2007"/>
          <elementType ref="pipelineGEditor.diagram.FamilyElement_2005"/>
          <elementType ref="pipelineGEditor.diagram.DataManagementElement_2006"/>
          <elementType ref="pipelineGEditor.diagram.Source_2001"/>
@@ -597,7 +613,7 @@
       <decoratorProvider class="pipeline.diagram.providers.PipelineShortcutsDecoratorProvider">
          <Priority name="Lowest"/>
          <object class="org.eclipse.gmf.runtime.notation.Node(org.eclipse.gmf.runtime.notation)" id="generated-top-nodes">
-            <method name="getType()" value="2005,2006,2001,2002"/>
+            <method name="getType()" value="2007,2005,2006,2001,2002"/>
          </object>
          <context decoratorTargets="generated-top-nodes"/>
       </decoratorProvider>

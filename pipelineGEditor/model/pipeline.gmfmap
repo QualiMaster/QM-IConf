@@ -11,6 +11,26 @@
         href="pipeline.ecore#//Pipeline/nodes"/>
     <ownedChild>
       <domainMetaElement
+          href="pipeline.ecore#//ReplaySink"/>
+      <labelMappings
+          xsi:type="gmfmap:FeatureLabelMapping">
+        <diagramLabel
+            href="pipeline.gmfgraph#ReplaySinkLabel"/>
+        <features
+            href="pipeline.ecore#//PipelineElement/name"/>
+      </labelMappings>
+      <tool
+          xsi:type="gmftool:CreationTool"
+          href="pipeline.gmftool#//@palette/@tools.0/@tools.2"/>
+      <diagramNode
+          href="pipeline.gmfgraph#ReplaySink"/>
+    </ownedChild>
+  </nodes>
+  <nodes>
+    <containmentFeature
+        href="pipeline.ecore#//Pipeline/nodes"/>
+    <ownedChild>
+      <domainMetaElement
           href="pipeline.ecore#//FamilyElement"/>
       <labelMappings
           xsi:type="gmfmap:FeatureLabelMapping">
@@ -61,7 +81,7 @@
       </labelMappings>
       <tool
           xsi:type="gmftool:CreationTool"
-          href="pipeline.gmftool#//@palette/@tools.0/@tools.3"/>
+          href="pipeline.gmftool#//@palette/@tools.0/@tools.4"/>
       <diagramNode
           href="pipeline.gmfgraph#Source"/>
     </ownedChild>
@@ -81,7 +101,7 @@
       </labelMappings>
       <tool
           xsi:type="gmftool:CreationTool"
-          href="pipeline.gmftool#//@palette/@tools.0/@tools.2"/>
+          href="pipeline.gmftool#//@palette/@tools.0/@tools.3"/>
       <diagramNode
           href="pipeline.gmfgraph#Sink"/>
     </ownedChild>

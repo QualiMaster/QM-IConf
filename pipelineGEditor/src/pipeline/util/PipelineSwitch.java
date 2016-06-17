@@ -112,6 +112,15 @@ public class PipelineSwitch<T> extends Switch<T>
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case PipelinePackage.REPLAY_SINK: {
+				ReplaySink replaySink = (ReplaySink)theEObject;
+				T result = caseReplaySink(replaySink);
+				if (result == null) result = caseSink(replaySink);
+				if (result == null) result = casePipelineNode(replaySink);
+				if (result == null) result = casePipelineElement(replaySink);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			case PipelinePackage.PROCESSING_ELEMENT: {
 				ProcessingElement processingElement = (ProcessingElement)theEObject;
 				T result = caseProcessingElement(processingElement);
@@ -237,6 +246,21 @@ public class PipelineSwitch<T> extends Switch<T>
 	}
 
   /**
+	 * Returns the result of interpreting the object as an instance of '<em>Replay Sink</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Replay Sink</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseReplaySink(ReplaySink object) {
+		return null;
+	}
+
+		/**
 	 * Returns the result of interpreting the object as an instance of '<em>Processing Element</em>'.
 	 * <!-- begin-user-doc -->
    * This implementation returns null;

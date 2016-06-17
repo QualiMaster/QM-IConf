@@ -8,6 +8,7 @@ import org.eclipse.gmf.runtime.emf.type.core.requests.CreateElementRequest;
 import org.eclipse.gmf.runtime.emf.type.core.requests.DuplicateElementsRequest;
 import pipeline.diagram.edit.commands.DataManagementElementCreateCommand;
 import pipeline.diagram.edit.commands.FamilyElementCreateCommand;
+import pipeline.diagram.edit.commands.ReplaySinkCreateCommand;
 import pipeline.diagram.edit.commands.SinkCreateCommand;
 import pipeline.diagram.edit.commands.SourceCreateCommand;
 import pipeline.diagram.providers.PipelineElementTypes;
@@ -29,6 +30,9 @@ public class PipelineItemSemanticEditPolicy extends
 	 * @generated
 	 */
 	protected Command getCreateCommand(CreateElementRequest req) {
+		if (PipelineElementTypes.ReplaySink_2007 == req.getElementType()) {
+			return getGEFWrapper(new ReplaySinkCreateCommand(req));
+		}
 		if (PipelineElementTypes.FamilyElement_2005 == req.getElementType()) {
 			return getGEFWrapper(new FamilyElementCreateCommand(req));
 		}

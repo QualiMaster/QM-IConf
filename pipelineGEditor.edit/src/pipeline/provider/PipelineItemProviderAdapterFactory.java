@@ -170,6 +170,29 @@ public class PipelineItemProviderAdapterFactory extends PipelineAdapterFactory i
 	}
 
   /**
+	 * This keeps track of the one adapter used for all {@link pipeline.ReplaySink} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ReplaySinkItemProvider replaySinkItemProvider;
+
+		/**
+	 * This creates an adapter for a {@link pipeline.ReplaySink}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Adapter createReplaySinkAdapter() {
+		if (replaySinkItemProvider == null) {
+			replaySinkItemProvider = new ReplaySinkItemProvider(this);
+		}
+
+		return replaySinkItemProvider;
+	}
+
+		/**
 	 * This keeps track of the one adapter used for all {@link pipeline.FamilyElement} instances.
 	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -327,6 +350,7 @@ public class PipelineItemProviderAdapterFactory extends PipelineAdapterFactory i
 		if (flowItemProvider != null) flowItemProvider.dispose();
 		if (sourceItemProvider != null) sourceItemProvider.dispose();
 		if (sinkItemProvider != null) sinkItemProvider.dispose();
+		if (replaySinkItemProvider != null) replaySinkItemProvider.dispose();
 		if (familyElementItemProvider != null) familyElementItemProvider.dispose();
 		if (dataManagementElementItemProvider != null) dataManagementElementItemProvider.dispose();
 	}

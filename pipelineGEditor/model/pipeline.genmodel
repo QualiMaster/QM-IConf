@@ -36,6 +36,7 @@
     <genClasses ecoreClass="pipeline.ecore#//Sink">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Sink/sink"/>
     </genClasses>
+    <genClasses ecoreClass="pipeline.ecore#//ReplaySink"/>
     <genClasses image="false" ecoreClass="pipeline.ecore#//ProcessingElement"/>
     <genClasses ecoreClass="pipeline.ecore#//FamilyElement">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//FamilyElement/family"/>

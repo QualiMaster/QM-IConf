@@ -59,6 +59,15 @@ public interface PipelineFactory extends EFactory
   Sink createSink();
 
   /**
+	 * Returns a new object of class '<em>Replay Sink</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Replay Sink</em>'.
+	 * @generated
+	 */
+	ReplaySink createReplaySink();
+
+		/**
 	 * Returns a new object of class '<em>Family Element</em>'.
 	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->

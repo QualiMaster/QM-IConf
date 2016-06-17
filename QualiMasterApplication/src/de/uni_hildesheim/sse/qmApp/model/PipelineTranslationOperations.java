@@ -61,6 +61,7 @@ import pipeline.Flow;
 import pipeline.Pipeline;
 import pipeline.PipelineElement;
 import pipeline.PipelineNode;
+import pipeline.ReplaySink;
 import pipeline.Sink;
 import pipeline.Source;
 import qualimasterapplication.Activator;
@@ -781,10 +782,9 @@ public class PipelineTranslationOperations {
     }    
     
     /**
-     * Adds <code>Sink</code> to the project.
+     * Adds <code>Sink</code> or <tt>ReplaySink</tt> to the project.
      * 
-     * @param sink
-     *            the sink to be added
+     * @param sink The sink or ReplaySink to be added
      * @param destProject
      *            the project to add to
      * @param context Context, which stores information about already translated elements of the translation of a
@@ -797,7 +797,8 @@ public class PipelineTranslationOperations {
         
         DecisionVariableDeclaration decisionVariable = null;
         // define sink
-        decisionVariable = IVMLModelOperations.getDecisionVariable(context.getPipelineProject(), "Sink", 
+        String typeName = (sink instanceof ReplaySink) ? "ReplaySink" : "Sink";
+        decisionVariable = IVMLModelOperations.getDecisionVariable(context.getPipelineProject(), typeName, 
                 Integer.toString(context.getSinkCount()), destProject);
         freezables.add(decisionVariable);
         destProject.add(decisionVariable);

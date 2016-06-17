@@ -72,6 +72,13 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="sink" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EIntegerObject"
         defaultValueLiteral="-1"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ReplaySink" eSuperTypes="#//Sink">
+    <eAnnotations source="gmf.node">
+      <details key="figure" value="svg"/>
+      <details key="svg.uri" value="platform:/plugin/pipelineGEditor/svg/ReplaySink.svg"/>
+      <details key="size" value="55,55"/>
+    </eAnnotations>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ProcessingElement" abstract="true" eSuperTypes="#//PipelineNode">
     <eAnnotations source="gmf.node"/>
   </eClassifiers>

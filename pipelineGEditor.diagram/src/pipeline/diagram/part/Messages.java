@@ -273,22 +273,32 @@ public class Messages extends NLS {
 	/**
 	 * @generated
 	 */
-	public static String Sink3CreationTool_title;
+	public static String ReplaySink3CreationTool_title;
 
 	/**
 	 * @generated
 	 */
-	public static String Sink3CreationTool_desc;
+	public static String ReplaySink3CreationTool_desc;
 
 	/**
 	 * @generated
 	 */
-	public static String Source4CreationTool_title;
+	public static String Sink4CreationTool_title;
 
 	/**
 	 * @generated
 	 */
-	public static String Source4CreationTool_desc;
+	public static String Sink4CreationTool_desc;
+
+	/**
+	 * @generated
+	 */
+	public static String Source5CreationTool_title;
+
+	/**
+	 * @generated
+	 */
+	public static String Source5CreationTool_desc;
 
 	/**
 	 * @generated
@@ -349,6 +359,16 @@ public class Messages extends NLS {
 	 * @generated
 	 */
 	public static String NavigatorGroupName_DataManagementElement_2006_outgoinglinks;
+
+	/**
+	 * @generated
+	 */
+	public static String NavigatorGroupName_ReplaySink_2007_incominglinks;
+
+	/**
+	 * @generated
+	 */
+	public static String NavigatorGroupName_ReplaySink_2007_outgoinglinks;
 
 	/**
 	 * @generated
