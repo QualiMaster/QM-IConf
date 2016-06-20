@@ -3,7 +3,6 @@ package de.uni_hildesheim.sse.qmApp.dialogs;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
@@ -26,9 +25,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.osgi.framework.Bundle;
 
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
+import qualimasterapplication.Activator;
 
 /**
  * Dialog which presents information about the qualimaster - application.
@@ -43,7 +42,7 @@ public class AboutDialog extends Dialog {
             + "\n\n" + "Developed by"
             + "\n" + "Stiftung University Hildesheim"
             + "\n" + "Software Systems Engineering"
-            + "\n" + "Marienburger Platz 22"
+            + "\n" + "Universitätsplatz 1"
             + "\n" + "30411 Hildesheim"
             + "\n" + "Germany"
             + "\n\n" + "in the QualiMaster project <a href=\"http://qualimaster.eu\">qualimaster.eu</a>"
@@ -141,9 +140,8 @@ public class AboutDialog extends Dialog {
         team = new Label(innerRight, SWT.FILL);
         team.setText(teamText);
         
-        Bundle bundle = Platform.getBundle(qualimasterapplication.Activator.PLUGIN_ID);
         versionNumber = new Label(innerRight, SWT.FILL);
-        versionNumber.setText("Version number: " + bundle.getVersion().toString());
+        versionNumber.setText("Version number: " + Activator.getProductVersion());
         
         //Capture ESC-Key.
         composite.addListener(SWT.Traverse, new Listener() {
