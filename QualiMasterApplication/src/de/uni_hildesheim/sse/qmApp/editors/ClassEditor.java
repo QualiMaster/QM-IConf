@@ -374,7 +374,7 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
                 topo.setValue(value, AssignmentState.ASSIGNED);
             }
         } catch (ConfigurationException | ValueDoesNotMatchTypeException e) {
-            Dialogs.showErrorDialog(ERROR_PREFIX, "Cannot set topology name: " + e.getMessage());
+            Dialogs.showErrorDialog(ERROR_PREFIX, "Unable to set topology name: " + e.getMessage());
         }
     }
     
@@ -391,7 +391,7 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
                 Value value = ValueFactory.createValue(StringType.TYPE, description);
                 descVar.setValue(value, AssignmentState.ASSIGNED);
             } catch (ConfigurationException | ValueDoesNotMatchTypeException e) {
-                Dialogs.showErrorDialog(ERROR_PREFIX, "Cannot set description: " + e.getMessage());
+                Dialogs.showErrorDialog(ERROR_PREFIX, "Unable to set description: " + e.getMessage());
             }
         }
     }
