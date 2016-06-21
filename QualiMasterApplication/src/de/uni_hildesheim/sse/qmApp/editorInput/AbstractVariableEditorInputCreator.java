@@ -158,5 +158,13 @@ public abstract class AbstractVariableEditorInputCreator implements IVariableEdi
     public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
         return null;
     }
+    
+    /**
+     * Returns the variable name of the handled variable.
+     * @return The name of the variable, which is used as reference to handle the variable itself.
+     */
+    protected String getVariableName() {
+        return variableName;
+    }
 
 }

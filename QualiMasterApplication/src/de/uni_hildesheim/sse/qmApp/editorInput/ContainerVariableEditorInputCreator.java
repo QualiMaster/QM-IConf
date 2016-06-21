@@ -17,6 +17,8 @@ package de.uni_hildesheim.sse.qmApp.editorInput;
 
 import org.eclipse.ui.IMemento;
 
+import de.uni_hildesheim.sse.qmApp.editorInput.ContainerVariableEditorInputChangeListener
+    .IContainerVariableEditorInputChangeListener;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
@@ -26,7 +28,8 @@ import net.ssehub.easy.varModel.confModel.IDecisionVariable;
  * 
  * @author Holger Eichelberger
  */
-public class ContainerVariableEditorInputCreator extends AbstractVariableEditorInputCreator {
+public class ContainerVariableEditorInputCreator extends AbstractVariableEditorInputCreator
+    implements IContainerVariableEditorInputChangeListener {
 
     private static final String INDEX = "index";
     private int index;
@@ -42,6 +45,7 @@ public class ContainerVariableEditorInputCreator extends AbstractVariableEditorI
     public ContainerVariableEditorInputCreator(IModelPart modelPart, String variableName, int index) {
         super(modelPart, variableName);
         this.index = index;
+        ContainerVariableEditorInputChangeListener.INSTANCE.add(variableName, this);
     }
     
     /**
@@ -76,6 +80,15 @@ public class ContainerVariableEditorInputCreator extends AbstractVariableEditorI
     @Override
     public String getFactoryId() {
         return ContainerVariableEditorInputCreatorElementFactory.ID;
+    }
+
+    @Override
+    public void notifyDeletetion(String parentName, int index) {
+        String thisParentName = super.getVariable().getDeclaration().getName().toLowerCase();
+        if (parentName.toLowerCase().equals(thisParentName) && index <= this.index) {
+            this.index--;
+        }
+        
     }
 
 }
