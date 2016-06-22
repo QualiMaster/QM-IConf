@@ -443,7 +443,6 @@ public class PipelineTranslationOperations {
         // EASy Editor convention :|
         pipelineCompound.put("debug", pipeline.getDebug() == 0 ? Boolean.TRUE : Boolean.FALSE); 
         pipelineCompound.put("fastSerialization", pipeline.getFastSerialization() == 0 ? Boolean.TRUE : Boolean.FALSE); 
-        pipelineCompound.put("isSubPipeline", pipeline.getIsSubPipeline()); 
         
         // get source
         ArrayList<String> sourceList = new ArrayList<String>();
