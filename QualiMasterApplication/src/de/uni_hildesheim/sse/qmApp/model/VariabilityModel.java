@@ -27,6 +27,7 @@ import static eu.qualimaster.easy.extension.QmConstants.TYPE_MACHINE;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_OBSERVABLES_CONFIGUREDQPARAM;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_PERSISTENTDATAELT;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_PIPELINE;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_SUBPIPELINE;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_SUBPIPELINE_ALGORITHM;
 import static eu.qualimaster.easy.extension.QmConstants.VAR_ADAPTIVITY_CROSSPIPELINETRADEOFFS;
 import static eu.qualimaster.easy.extension.QmConstants.VAR_ADAPTIVITY_PIPELINEIMPORTANCE;
@@ -184,7 +185,7 @@ public class VariabilityModel {
             SourceMode.VARIABLES), // add provided types
         PIPELINES(PROJECT_PIPELINES, 
             new String[] {VAR_PIPELINES_PIPELINES}, 
-            new String[] {TYPE_PIPELINE}, 
+            new String[] {TYPE_PIPELINE, TYPE_SUBPIPELINE}, 
             SourceMode.VARIABLES,
             PipelineElementFactory.INSTANCE), 
         INFRASTRUCTURE(PROJECT_INFRASTRUCTURE, 
@@ -853,6 +854,8 @@ public class VariabilityModel {
             IconManager.retrieveImage(IconManager.PIPELINES));
         registry.registerImage(Configuration.PIPELINES, 0, 
             IconManager.retrieveImage(IconManager.PIPELINE));
+        registry.registerImage(Configuration.PIPELINES, 1, 
+                IconManager.retrieveImage(IconManager.SUBPIPELINE));
         
         registry.registerImage(Configuration.INFRASTRUCTURE, 
             IconManager.retrieveImage(IconManager.INFRASTRUCTURE));
