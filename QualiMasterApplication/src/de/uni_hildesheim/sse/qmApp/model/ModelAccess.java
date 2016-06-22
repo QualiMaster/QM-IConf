@@ -699,7 +699,10 @@ public class ModelAccess {
                         IDatatype decl = declaredTypes.get(d);
                         if (decl instanceof Compound && ((Compound) decl).getRefines() == cmp) {
                             declaredTypes.remove(d);
-                            tmp.add(decl);
+                            // Avoid duplicates
+                            if (!tmp.contains(decl)) {
+                                tmp.add(decl);
+                            }
                         }
                     }
                     if (cmp.isAbstract()) {

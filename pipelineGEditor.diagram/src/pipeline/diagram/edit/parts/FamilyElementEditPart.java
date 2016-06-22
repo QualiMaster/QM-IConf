@@ -234,15 +234,15 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
 	}
 
 	/**
-	 * @generated
-	 */
-	protected void handleNotificationEvent(Notification event) {
-		if (event.getNotifier() == getModel()
-				&& EcorePackage.eINSTANCE.getEModelElement_EAnnotations()
-						.equals(event.getFeature())) {
-			handleMajorSemanticChange();
-		} else {
-			/*
+     * @generated
+     */
+    protected void handleNotificationEvent(Notification event) {
+        if (event.getNotifier() == getModel()
+                && EcorePackage.eINSTANCE.getEModelElement_EAnnotations()
+                        .equals(event.getFeature())) {
+            handleMajorSemanticChange();
+        } else {
+            /*
              * Not generated -> hand crafted code, copied from
              * http://www.eclipse.org/epsilon/doc/articles/eugenia-nodes-with-runtime-images/ ;-)
              */
@@ -260,9 +260,9 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
             /*
              * end of manually added code
              */
-			super.handleNotificationEvent(event);
-		}
-	}
+            super.handleNotificationEvent(event);
+        }
+    }
 
 	/**
 	 * @generated

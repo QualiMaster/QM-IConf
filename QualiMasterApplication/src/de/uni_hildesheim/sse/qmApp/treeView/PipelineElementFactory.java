@@ -74,7 +74,7 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
      * @author Holger Eichelberger
      * @author Cui Qin
      */
-    private static class DeferredURIEditorInput extends URIEditorInput implements IVariableEditorInput {
+    public static class DeferredURIEditorInput extends URIEditorInput implements IVariableEditorInput {
 
         protected static final String URI_TAG = "deferred.URI";
         protected static final String NAME_TAG = "deferred.name";
@@ -186,6 +186,13 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
             return name;
         }
 
+        /**
+         * Returns whether a pipeline or a subpipeline shall be edited.
+         * @return <tt>true</tt> if a subpipeline shall be edited, <tt>false</tt> if a normal pipeline is handled.
+         */
+        public boolean isSubpipeline() {
+            return QmConstants.TYPE_SUBPIPELINE.equals(variable.getDeclaration().getType().getName());
+        }
     }
 
     /**

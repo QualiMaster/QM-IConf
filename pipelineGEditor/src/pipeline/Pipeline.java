@@ -228,7 +228,7 @@ public interface Pipeline extends EObject
 
 /**
 	 * Returns the value of the '<em><b>Is Sub Pipeline</b></em>' attribute.
-	 * The default value is <code>"1"</code>.
+	 * The default value is <code>"false"</code>.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Is Sub Pipeline</em>' attribute isn't clear,
@@ -236,12 +236,12 @@ public interface Pipeline extends EObject
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Is Sub Pipeline</em>' attribute.
-	 * @see #setIsSubPipeline(Integer)
+	 * @see #setIsSubPipeline(Boolean)
 	 * @see pipeline.PipelinePackage#getPipeline_IsSubPipeline()
-	 * @model default="1"
+	 * @model default="false"
 	 * @generated
 	 */
-	Integer getIsSubPipeline();
+	Boolean getIsSubPipeline();
 
 /**
 	 * Sets the value of the '{@link pipeline.Pipeline#getIsSubPipeline <em>Is Sub Pipeline</em>}' attribute.
@@ -251,6 +251,6 @@ public interface Pipeline extends EObject
 	 * @see #getIsSubPipeline()
 	 * @generated
 	 */
-	void setIsSubPipeline(Integer value);
+	void setIsSubPipeline(Boolean value);
 
 } // Pipeline
