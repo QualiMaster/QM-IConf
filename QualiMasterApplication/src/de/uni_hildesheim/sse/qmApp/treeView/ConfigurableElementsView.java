@@ -76,7 +76,7 @@ import pipeline.diagram.part.PipelineDiagramEditor;
 public class ConfigurableElementsView extends ViewPart implements IChangeListener {
     public static final String ID = "QualiMasterApplication.view";
     private static final boolean DIAGRAM_STATUS_LISTENER = true;
-    private static HashMap<Image, Image> originalErrorIconReminder = new HashMap<Image, Image>();
+    private static HashMap<String, Image> originalErrorIconReminder = new HashMap<String, Image>();
     private static HashMap<Image, Image> originalIndicatorIconReminder = new HashMap<Image, Image>();
     
     private static ConfigurableElements elements = new ConfigurableElements();
@@ -564,13 +564,16 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                 }
                 
                 Image newImage = IconManager.addErrorToImage(image);
-                originalErrorIconReminder.put(newImage, image);
+                System.out.println(elem.getDisplayName());
+                originalErrorIconReminder.put(elem.getDisplayName(), image);
                 image = newImage;
                 
             } else if (!elem.getFlawedIndicator()) {
 
-                if (originalErrorIconReminder.containsKey(image)) {
-                    image = originalErrorIconReminder.get(image);
+                elem.setFlawedIndicator(false);
+                
+                if (originalErrorIconReminder.containsKey(elem.getDisplayName())) {
+                    image = originalErrorIconReminder.get(elem.getDisplayName());
                 }
                 
                 //In order to set the icon for elements indicator.
@@ -1010,6 +1013,12 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                 
                 ConfigurableElement innerTreeElement = treeElement.getChild(k);
                 innerTreeElement.setFlawedIndicator(false);
+                
+                for (int l = 0; l < innerTreeElement.getChildCount(); l++) {
+                    ConfigurableElement innerTreeElement2 = innerTreeElement.getChild(l);
+                    innerTreeElement2.setFlawedIndicator(false);
+                }
+                
                 viewer.refresh();
             }
         }

@@ -935,7 +935,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
             @Override
             public void widgetSelected(SelectionEvent evt) {
-                //Draw the graph with the collectd info so far.
+                //Draw the graph with the collected info so far.
                 drawGraphsInNewTab();
             }
             @Override
