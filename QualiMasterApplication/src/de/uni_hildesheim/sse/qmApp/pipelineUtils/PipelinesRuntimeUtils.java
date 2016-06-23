@@ -17,6 +17,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
+import eu.qualimaster.easy.extension.QmConstants;
 import net.ssehub.easy.dslCore.TranslationResult;
 import net.ssehub.easy.varModel.confModel.CompoundVariable;
 import net.ssehub.easy.varModel.confModel.Configuration;
@@ -44,6 +45,12 @@ public class PipelinesRuntimeUtils {
 
     public static final PipelinesRuntimeUtils INSTANCE = new PipelinesRuntimeUtils();
     
+    
+    private static final String EASY_STRING = "EASy";
+    private static final String IVML_STRING = ".ivml";
+    private static final String META_STRING = "meta";
+    private static final String PIPELINE_IVML_FILE = "Pipelines.ivml";
+    private static final String NAME_STRING = "name";
     
     private RuntimeEditorContentProvider contentProvider = new RuntimeEditorContentProvider();
     private RuntimeEditorLabelProvider labelProvider = new RuntimeEditorLabelProvider();
@@ -110,7 +117,7 @@ public class PipelinesRuntimeUtils {
     
     /**
      * Wrapper which wraps up info about a pipelines element, its type, variable,
-     * declaration, color and observable which shoul dbe drawn.
+     * declaration, color and observable which should be drawn.
      * 
      * @author Niko Nowatzki
      */
@@ -311,29 +318,30 @@ public class PipelinesRuntimeUtils {
                 
                 for (final File fileEntry2 : fileEntry.listFiles()) {
                     
-                    if (fileEntry2.getName().equals("EASy")) {
+                    if (fileEntry2.getName().equals(EASY_STRING)) {
                         File file = new File(fileEntry2.getPath());
 
                         for (final File fileEntry3 : file.listFiles()) {
 
-                            if (fileEntry3.isDirectory() && fileEntry3.getName().endsWith("pipelines")) { 
+                            if (fileEntry3.isDirectory() && fileEntry3.getName().endsWith(
+                                    QmConstants.VAR_PIPELINES_PIPELINES)) { 
                                 File file2 = new File(fileEntry3.getPath());
 
                                 for (final File fileEntry4 : file2.listFiles()) {
 
-                                    if (fileEntry4.isFile() && fileEntry4.toString().endsWith(".ivml")) {
+                                    if (fileEntry4.isFile() && fileEntry4.toString().endsWith(IVML_STRING)) {
 
                                         savePipelineStructures(fileEntry4);
                                     }
                                 }
                             }
-                            if (fileEntry3.isDirectory() && fileEntry3.getName().endsWith("meta")) {
+                            if (fileEntry3.isDirectory() && fileEntry3.getName().endsWith(META_STRING)) {
 
                                 File file2 = new File(fileEntry3.getPath());
 
                                 for (final File fileEntry4 : file2.listFiles()) {
 
-                                    if (fileEntry4.isFile() && fileEntry4.toString().endsWith("Pipelines.ivml")) {
+                                    if (fileEntry4.isFile() && fileEntry4.toString().endsWith(PIPELINE_IVML_FILE)) {
 
                                         saveObservableStructures(fileEntry4);
                                     }
@@ -358,7 +366,7 @@ public class PipelinesRuntimeUtils {
             result = de.uni_hildesheim.sse.ModelUtility.INSTANCE.parse(fileEntry);
             Project project123 = result.getResult(0);
             
-            Compound modelElement = (Compound) project123.getElement("PipelineNode");
+            Compound modelElement = (Compound) project123.getElement(QmConstants.TYPE_PIPELINE_NODE);
             
             for (int i = 0; i < modelElement.getAssignmentCount(); i++) {
                 AttributeAssignment assignment = modelElement.getAssignment(i);
@@ -369,7 +377,7 @@ public class PipelinesRuntimeUtils {
                 }
             }
             //------------------
-            Compound modelElement2 = (Compound) project123.getElement("Source");
+            Compound modelElement2 = (Compound) project123.getElement(QmConstants.TYPE_SOURCE);
             
             for (int i = 0; i < modelElement2.getAssignmentCount(); i++) {            
                 AttributeAssignment assignment = modelElement2.getAssignment(i);
@@ -400,7 +408,7 @@ public class PipelinesRuntimeUtils {
      */
     private void saveMoreObservableStructures(Project project123) {
 
-        Compound modelElement3 = (Compound) project123.getElement("Sink");
+        Compound modelElement3 = (Compound) project123.getElement(QmConstants.TYPE_SINK);
         
         for (int i = 0; i < modelElement3.getAssignmentCount(); i++) { 
             AttributeAssignment assignment = modelElement3.getAssignment(i);
@@ -416,7 +424,7 @@ public class PipelinesRuntimeUtils {
         newList2.addAll(observableSink);
         observalesPipMapping.put(PipelineNodeType.Sink.name(), newList2);
         //------------------
-        Compound modelElement4 = (Compound) project123.getElement("FamilyElement");
+        Compound modelElement4 = (Compound) project123.getElement(QmConstants.TYPE_FAMILYELEMENT);
         
         for (int i = 0; i < modelElement4.getAssignmentCount(); i++) {  
             AttributeAssignment assignment = modelElement4.getAssignment(i);
@@ -432,7 +440,7 @@ public class PipelinesRuntimeUtils {
         newList3.addAll(observableFamily);
         observalesPipMapping.put(PipelineNodeType.FamilyElement.name(), newList3);
         //------------------
-        Compound modelElement5 = (Compound) project123.getElement("DataManagementElement");
+        Compound modelElement5 = (Compound) project123.getElement(QmConstants.TYPE_DATAMANAGEMENTELEMENT);
         
         for (int i = 0; i < modelElement5.getAssignmentCount(); i++) {             
             AttributeAssignment assignment = modelElement5.getAssignment(i);
@@ -448,7 +456,7 @@ public class PipelinesRuntimeUtils {
         newList4.addAll(observableDatamanagement);
         observalesPipMapping.put(PipelineNodeType.DataManagementElement.name(), newList4);
         //------------------
-        Compound modelElement6 = (Compound) project123.getElement("Pipeline");
+        Compound modelElement6 = (Compound) project123.getElement(QmConstants.TYPE_PIPELINE);
         
         for (int i = 0; i < modelElement6.getAssignmentCount(); i++) {  
             AttributeAssignment assignment = modelElement6.getAssignment(i);
@@ -536,7 +544,7 @@ public class PipelinesRuntimeUtils {
  
         //add all children to this element and then store it in a list.
         
-        ContainerValue sourceValue = (ContainerValue) cmp.getNestedValue("sources");
+        ContainerValue sourceValue = (ContainerValue) cmp.getNestedValue(QmConstants.SLOT_PIPELINE_SOURCES);
 
         if (sourceValue.getElementSize() > 0) { 
             
@@ -659,13 +667,13 @@ public class PipelinesRuntimeUtils {
     private void iterateOverNode(IDecisionVariable actualPipelinesVar, PipelineGraphColoringWrapper treeElem,
             Configuration cfg, String value) {
         
-        if (actualPipelinesVar.getNestedElement("output") != null) {
-            if (actualPipelinesVar.getNestedElement("output").getNestedElementsCount() > 0
-                    && actualPipelinesVar.getNestedElement("output").getNestedElement(0).hasValue()) { 
+        if (actualPipelinesVar.getNestedElement(QmConstants.SLOT_OUTPUT) != null) {
+            if (actualPipelinesVar.getNestedElement(QmConstants.SLOT_OUTPUT).getNestedElementsCount() > 0
+                    && actualPipelinesVar.getNestedElement(QmConstants.SLOT_OUTPUT).getNestedElement(0).hasValue()) { 
                 
                     
                 PipelineNodeType type = checknodeType(actualPipelinesVar);
-                IDecisionVariable decNameVar = actualPipelinesVar.getNestedElement("name");
+                IDecisionVariable decNameVar = actualPipelinesVar.getNestedElement(NAME_STRING);
                 String name = decNameVar.toString();
                 
                 if (name.contains("=") && name.contains(":")) {
@@ -679,7 +687,7 @@ public class PipelinesRuntimeUtils {
                         treeElem.addTreeElement(newElem);
                     }
                     
-                    IDecisionVariable reference = actualPipelinesVar.getNestedElement("output");
+                    IDecisionVariable reference = actualPipelinesVar.getNestedElement(QmConstants.SLOT_OUTPUT);
                     for (int i = 0; i < reference.getNestedElementsCount(); i++) {
                         
                         ReferenceValue nodeSet = (ReferenceValue) reference.getNestedElement(i).getValue();
@@ -710,13 +718,13 @@ public class PipelinesRuntimeUtils {
         
         CompoundVariable node = (CompoundVariable) cfg.getDecision(modelElement);
         //PipelineNodeType type = checknodeType(node);
-        ReferenceValue reference = (ReferenceValue) node.getNestedElement("destination").getValue();
+        ReferenceValue reference = (ReferenceValue) node.getNestedElement(QmConstants.SLOT_FLOW_DESTINATION).getValue();
         
         DecisionVariableDeclaration object = (DecisionVariableDeclaration) reference.getValue();
         IDecisionVariable variable = (IDecisionVariable) cfg.getDecision(object);
         PipelineNodeType type = checknodeType(variable);
         
-        Value value = variable.getNestedElement("name").getValue();
+        Value value = variable.getNestedElement(NAME_STRING).getValue();
         PipelineGraphColoringWrapper newElem = new PipelineGraphColoringWrapper(value.getValue().toString(), 
                type, treeElem.getElemName(), variable, object);
 
@@ -730,7 +738,7 @@ public class PipelinesRuntimeUtils {
 
     /**
     * Check whether pipeline is already present in the color chooser table.
-    * @param treeViewerColorChooser colro chooser table.
+    * @param treeViewerColorChooser color chooser table.
     * @param name name of the new pipeline-element.
     * @return true if already contained/ false if not,.
     */
@@ -793,7 +801,12 @@ public class PipelinesRuntimeUtils {
          
             if (existingItemText.contains(pipParent) && existingItemText.contains(name)
                    && existingItemText.contains(observableName)) {
-                toReturn = true;
+                
+                if (existingItemText.length() > pipParent.length() + name.length()
+                        + observableName.length()) {
+                    
+                    toReturn = true;
+                }
             }
         }
         return toReturn;

@@ -6,12 +6,6 @@ import static eu.qualimaster.easy.extension.QmObservables.RESOURCEUSAGE_USED_DFE
 import static eu.qualimaster.easy.extension.QmObservables.RESOURCEUSAGE_USED_MACHINES;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -43,6 +37,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -81,8 +77,6 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
-import de.uni_hildesheim.sse.qmApp.WorkspaceUtils;
-import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
@@ -109,6 +103,7 @@ import eu.qualimaster.adaptation.external.PipelineStatusResponse;
 import eu.qualimaster.adaptation.external.ReplayMessage;
 import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
 import eu.qualimaster.adaptation.external.UpdateCloudResourceMessage;
+import eu.qualimaster.easy.extension.QmConstants;
 import eu.qualimaster.easy.extension.QmObservables;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.confModel.SetVariable;
@@ -144,11 +139,17 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     private static int counter = 0;
     private static CTabFolder tabFolder;
     
+    private static Label infoLabel;
     private static final int PIPELINE_DISPLAY_BUFFER_SIZE = 50;
     private static final int PIPELINE_DISPLAY_DELAY = 100;
-    private static final String QUALITY_PARAMETERS = "qualityParameters";
     
-    private static Label infoLabel;
+    //private static final String QUALITY_PARAMETERS = "qualityParameters";
+    
+    private String executionTimeString = "execution time (s)";
+    private String pipelineActivityString = "pipeline activity (";
+    private String observablesString = "observables (";
+    private String saveSelectionsText = "Save Selections";
+    
     @SuppressWarnings("unused")
     private int insertMark = 0;
 
@@ -403,16 +404,24 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         fData.bottom = new FormAttachment(100);
         innerLeftBottomRight.setLayoutData(fData);
         innerLeftBottomRight.setLayout(new GridLayout());
+  
+        parent.addDisposeListener(new DisposeListener() {
 
+            @Override
+            public void widgetDisposed(DisposeEvent exc) {
+                //saveTreeLocally();
+            }
+        });
+        
         // Create all the controls needed for the customizing of graphs.
         createOptionsPanel(bottom, innerLeftBottom);
 
-        // Create the controls which will be needed fpr displaying graphs.
+        // Create the controls which will be needed for displaying graphs.
         createMonitoringPanel(innerRight);
 
         addTabFolder(innerLeftTop, topButtons, parent);
         
-        loadItemsLocally();
+        //loadItemsLocally();
     }
 
     /**
@@ -530,25 +539,23 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
         // create a new XY Graph.
         XYGraph xyGraph = new XYGraph();
-
         xyGraph.primaryXAxis.setShowMajorGrid(true);
-        xyGraph.primaryXAxis.setTitle("execution time (s)");
+        xyGraph.primaryXAxis.setTitle(executionTimeString);
         xyGraph.primaryXAxis.setAutoScale(true);
         xyGraph.primaryXAxis.setDateEnabled(true);
-
         xyGraph.primaryYAxis.setShowMajorGrid(true);
-        xyGraph.primaryYAxis.setFormatPattern("00000");
+        //xyGraph.primaryYAxis.setFormatPattern("00000");
         xyGraph.primaryYAxis.setAutoScale(true);
-        xyGraph.primaryYAxis.setRange(0, 10000);
+        xyGraph.primaryYAxis.setRange(0, 3);
         
         xyGraph.primaryYAxis
                 .setForegroundColor(XYGraphMediaFactory.getInstance().getColor(XYGraphMediaFactory.COLOR_BLUE));
-        
-        String pipelineString = "pipeline activity (";
+        String pipelineString = pipelineActivityString;
         StringBuilder pipelineTitle = new StringBuilder(pipelineString);
-        String observablesString = "observables (";
-        StringBuilder observableTitle = new StringBuilder(observablesString);
+        String observables = observablesString;
+        StringBuilder observableTitle = new StringBuilder(observables);
         
+        //Go through all saved info and create the corresponding traces.
         for (int i = 0; i < pipelinesToDisplayInTableWithObservable.size(); i++) {
             
             PipelineGraphColoringWrapper wrapper = pipelinesToDisplayInTableWithObservable.get(i);
@@ -561,29 +568,21 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             if (parent != null && !"".equals(parent) && !varName.equals(parent)
                     && !pipelineTitle.toString().contains(parent)) {
                 createObservableTraces(varName, parent, xyGraph, color, obs);
-                pipelineTitle.append(parent + ",");
-                if (observableTitle.length() < 30) {
-                    observableTitle.append(obs + ",");
-                }
             } else {
-                if (!pipelineTitle.toString().contains(parent)) {
-                    pipelineTitle.append(varName + ",");
-                }
                 createObservableTraces(varName, xyGraph, color, obs);
-                if (observableTitle.length() < 30) {
-                    observableTitle.append(obs + ",");
-                }
-            }
-            
+            }          
         }
-
+        
+        //set some contant titels, such as the achses captions.
+        PipelineGraphColoringWrapper wrapper = pipelinesToDisplayInTableWithObservable.get(0);
+        pipelineTitle.append(wrapper.getPipelineParent());
+        observableTitle.append(wrapper.getObs() + "...");
         pipelineTitle.setLength(pipelineTitle.length() - 1);
         pipelineTitle.append(")"); 
         observableTitle.setLength(observableTitle.length() - 1);
         observableTitle.append(")");
         Font titleFont = new Font(Display.getCurrent(), "Arial", 11, SWT.BOLD);
-        Font achseFont = new Font(Display.getCurrent(), "Arial", 8, SWT.BOLD);
-        
+        Font achseFont = new Font(Display.getCurrent(), "Arial", 8, SWT.BOLD);      
         xyGraph.setTitleFont(titleFont);
         xyGraph.setTitle(pipelineTitle.toString());
         xyGraph.primaryYAxis.setFont(achseFont);
@@ -615,7 +614,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             //Check if pipeline already exists
             if (!checkIfPipelineIsExisting(pipelineTraces, pipElementName, observalbeForTrace)) {
             
-                String name = pipelineName + ":" + pipElementName + " (" + observalbeForTrace + ")";
+                String name = pipelineName + ":" + pipElementName;
                 PipelineTrace pTrace = new PipelineTrace(name,
                                 xyGraph.primaryXAxis, xyGraph.primaryYAxis, getPointStyleMod(pipelineTraces.size()),
                                     observalbeForTrace);
@@ -755,15 +754,14 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                 for (int j = 0; j < object.getParameterCount(); j++) {
                     if (object.getParameter(j) instanceof ConstantValue) {
                         if (object.getParameter(j) instanceof ConstantValue) {
-                            ConstantValue test = (ConstantValue) object.getParameter(j);
+                            ConstantValue constValue = (ConstantValue) object.getParameter(j);
 
-                            if (test.getConstantValue() instanceof ContainerValue) {
-                                ContainerValue container = (ContainerValue) test.getConstantValue();
+                            if (constValue.getConstantValue() instanceof ContainerValue) {
+                                ContainerValue container = (ContainerValue) constValue.getConstantValue();
 
                                 for (int k = 0; k < container.getElementSize(); k++) {
                                     ReferenceValue reference = (ReferenceValue) container.getElement(k);
                                     instance.addPipeline(reference.getValue().getName());
-
                                 }
                             }
                         }
@@ -828,6 +826,8 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             }
         }
 
+        //Add listener for user action. When the user selects pipeline-elements and/or observalbes,
+        //we have to react.
         treeViewerPipelineChooser.addCheckStateListener(new ICheckStateListener() {
             @Override
             public void checkStateChanged(CheckStateChangedEvent event) {
@@ -867,7 +867,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     }
 
     /**
-     * Create the observalbes-table which shows the found observables from the config and makes them selectable.
+     * Create the observables-table which shows the found observables from the config and makes them selectable.
      * 
      * @param innerLeftTop
      *            part of the view.
@@ -877,14 +877,15 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     private void createObservableTable2(Composite innerLeftTop, Composite innerLeftBottomRight) {
 
         Button button4 = new Button(innerLeftTop, SWT.NONE);
-        button4.setText("Save Selections");
+        button4.setText(saveSelectionsText);
         button4.addSelectionListener(new SelectionListener() {
 
             @Override
             public void widgetSelected(SelectionEvent evt) {
+                //When the "SAve"-Button is selected, save the selected pipeline-elements and observalbes
+                //by creating objects, which wrap up all info.
                 saveSelections();
             }
-
             @Override
             public void widgetDefaultSelected(SelectionEvent evt) {
             }
@@ -934,9 +935,9 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
             @Override
             public void widgetSelected(SelectionEvent evt) {
+                //Draw the graph with the collectd info so far.
                 drawGraphsInNewTab();
             }
-
             @Override
             public void widgetDefaultSelected(SelectionEvent evt) {
             }
@@ -948,11 +949,9 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
      */
     protected void performDeletion() {
 
+        //Delete a certain pipelineTrace.
         TableItem tableItem = savedObservablesTable.getSelection()[0];
 
-        savedObservablesTable.remove(savedObservablesTable.getSelectionIndices()); 
-        pipelinesToDisplayInTableWithObservable.remove(savedObservablesTable.getSelectionIndices());
-     
         Collection<ArrayList<PipelineTrace>> allTraces = pipelineTraces.values();
      
         for (int i = 0; i < allTraces.size(); i++) {
@@ -965,15 +964,25 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                     PipelineTrace trace = traces.get(j);
                   
                     String name = trace.getTrace().getName();
-                    String obs = trace.observable;
+                    name = name.substring(0, name.indexOf("("));
+                    String obs = trace.observable.toLowerCase();
                  
-                    if (tableItem.getText().contains(name) && tableItem.getText().contains(obs)) {
-                        trace.clearTrace();
+                    String item = tableItem.getText();
+                    if (item.contains(name)) {
+                        if (item.toLowerCase().contains(obs)) {
+                            //trace.clearTrace();
+                            traces.remove(trace);
+                        }
                     }
                 }
             }
         }
-        savedObservablesTable.remove(savedObservablesTable.getSelectionIndices());   
+
+        pipelinesToDisplayInTableWithObservable.remove(savedObservablesTable.getSelectionIndices());
+        savedObservablesTable.remove(savedObservablesTable.getSelectionIndices());
+             
+//        pipelineTraces.remove(pipelineTraces.keySet().remove(pipelineTraces.keySet().toArray()[
+//                savedObservablesTable.getSelectionIndex()]));
     }
 
     /**
@@ -987,7 +996,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         SetVariable set = (SetVariable) object;
         String name = set.getDeclaration().getName();
 
-        if (name.equals(QUALITY_PARAMETERS)) {
+        if (name.equals(QmConstants.VAR_OBSERVABLES_QUALITYPARAMS)) {
 
             ConstantValue vaule = (ConstantValue) set.getDeclaration().getDefaultValue();
             ContainerValue container = (ContainerValue) vaule.getConstantValue();
@@ -1028,7 +1037,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     }
 
     /**
-     * Save the users selectios concerning the observables.
+     * Save the users selections concerning the observables.
      */
     private void saveSelections() {
 
@@ -1057,10 +1066,8 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                         pipParent, name, observableName)) {
                     performSelection(pipParent, name, observableName);
                 }
-
             }
         }
-
     }
 
     /**
@@ -1222,121 +1229,146 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     public void dispose() {
         Infrastructure.unregisterDispatcher(this);
         Infrastructure.unregisterListener(this);
-        
-        saveTreeLocally();    
+    
     }
 
     /**
      * Save the List of {@link TreeItem}. If the user is offline, the tree can
      * be loaded from the saved file.
      */
-    private void saveTreeLocally() {
-        try {
-            
-            List<TableItem> selectionsToSave =
-                    new ArrayList<TableItem>();
-            List<PipelineGraphColoringWrapper> wrapperList = 
-                    new ArrayList<PipelineGraphColoringWrapper>();
-            
-            //save selected elements
-            for (int i = 0; i < savedObservablesTable.getItemCount(); i++) {
-                TableItem item = savedObservablesTable.getItem(i);    
-                
-                selectionsToSave.add(item);
-            }
-            
-            for (int j = 0; j < pipelinesToDisplayInTableWithObservable.size(); j++) {
-                
-                PipelineGraphColoringWrapper wrapper = 
-                        pipelinesToDisplayInTableWithObservable.get(j);
-                
-                wrapperList.add(wrapper);
-            }
-            
-            
-            FileOutputStream fileoutputstream = new FileOutputStream(getItemsFile());
-            ObjectOutputStream outputstream = new ObjectOutputStream(fileoutputstream);
-            outputstream.writeObject(selectionsToSave);
-            
-            fileoutputstream = new FileOutputStream(getWrapperFile());
-            outputstream = new ObjectOutputStream(fileoutputstream);
-            outputstream.writeObject(wrapperList);
-            
-            outputstream.close();
-        } catch (FileNotFoundException e) {
-            Dialogs.showErrorDialog("Error storing the Maven artifacts tree cache", e.getMessage());
-        } catch (IOException e) {
-            Dialogs.showErrorDialog("Error storing the Maven artifacts tree cache", e.getMessage());
-        }
-    }
+//    private void saveTreeLocally() {
+//        CSVWriter writer = null;
+//        try {
+//            
+//            writer = new CSVWriter(getItemsFile(), true, ", ", "\n");
+//            //save selected elements
+//            
+//            String toWrite = "";
+//            for (int i = 0; i < pipelinesToDisplayInTableWithObservable.size(); i++) {
+//                PipelineGraphColoringWrapper wrapper = pipelinesToDisplayInTableWithObservable.get(i);    
+//
+//                toWrite += wrapper.getElemName() + ",";
+//                toWrite += wrapper.getType() + ",";
+//                toWrite += wrapper.getPipelineParent() + ",";
+//                toWrite += wrapper.getVar() + ",";
+//                toWrite += wrapper.getDecl() + ",";
+//                toWrite += wrapper.getObs() + ",";
+//                
+//                
+//                //writer.writeLine(item.getText());
+//                
+//            }
+//
+//            writer.writeLine(toWrite);
+//            
+//        } finally {
+//            if (null != writer) {
+//                writer.close();
+//            }
+//        }
+//    }
 
     /**
-     * Load the serialized tree. Use the extracted list to set the treeviewers
+     * Load the serialized tree. Use the extracted list to set the treeviewer
      * input.
      */
-    @SuppressWarnings("unchecked")
-    private void loadItemsLocally() {
-    
-        
-        try {
-            FileInputStream fileIn;
-            fileIn = new FileInputStream(getItemsFile());
-            
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            
-            List<TableItem> saved =
-                    new ArrayList<TableItem>();
-            saved = (ArrayList<TableItem>) in.readObject();
-            
-            for (int i = 0; i < saved.size(); i++) {
-                TableItem item = new TableItem(savedObservablesTable, SWT.NONE);
-                item.setText(item.getText());
-            }
-            
-            //-------------------------------------------------------------------------
-            
-            fileIn = new FileInputStream(getWrapperFile());
-            in = new ObjectInputStream(fileIn);
-            
-            List<PipelineGraphColoringWrapper> wrapperList =
-                    new ArrayList<PipelineGraphColoringWrapper>();
-            wrapperList = (ArrayList<PipelineGraphColoringWrapper>) in.readObject();
-            
-            pipelinesToDisplayInTableWithObservable = wrapperList;
-            
-            in.close();
-            fileIn.close();
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
-       
-    }
+//    private void loadItemsLocally() {
+//    
+//        try (BufferedReader br = new BufferedReader(new FileReader(getItemsFile()))) {
+//            StringBuilder sb = new StringBuilder();
+//            String line = br.readLine();
+//
+//            while (line != null) {
+//                
+//                String[] all = line.split(",");
+//
+//                for (int i = 0; i < all.length; i++) {
+//                    String elemName = all[0];
+//                    String type = all[1];
+//                    String pipelineParent = all[2];
+//                    String variable = all[3];
+//                    String declaration = all[4];
+//                    String observable = all[5];
+//                    PipelineNodeType typeToSet;
+//                    
+//                    PipelineNodeType types = PipelineNodeType.Source;
+//
+//                    switch (type) { 
+//                    case "Source": 
+//                        typeToSet = PipelineNodeType.Source;
+//                        break;
+//                    case "Sink": 
+//                        typeToSet = PipelineNodeType.Sink;
+//                        break;
+//                    case "FamilyElement":
+//                        typeToSet = PipelineNodeType.FamilyElement;
+//                        break;
+//                    case "DataManagementElement": 
+//                        typeToSet = PipelineNodeType.DataManagementElement;
+//                        break;
+//                    case "Pipeline": 
+//                        typeToSet = PipelineNodeType.Pipeline;
+//                        break;
+//                    case "Flow": 
+//                        typeToSet = PipelineNodeType.Flow;
+//                        break;
+//                    case "ProcessingElement": 
+//                        typeToSet = PipelineNodeType.ProcessingElement;
+//                        break;
+//                    default: 
+//                        typeToSet = PipelineNodeType.Source;
+//                        break;
+//                    }
+//
+//                    PipelineGraphColoringWrapper newWrapper = new PipelineGraphColoringWrapper(elemName,
+//                            typeToSet, pipelineParent, declaration);
+//                    newWrapper.setObservable(observable);
+//                }
+//                
+//                pipelinesToDisplayInTableWithObservable.add(newWrapper);
+//                 
+//                TableItem item = new TableItem(savedObservablesTable, SWT.NONE);
+//                item.setText(line);     
+//            }
+//            
+//        }
+//        
+//        CSVWriter writer = null;
+//        try {
+//            
+//            writer = new CSVWriter(getItemsFile(), true, ", ", "\n");
+//            //save selected elements
+//            for (int i = 0; i < savedObservablesTable.getItemCount(); i++) {
+//                TableItem item = savedObservablesTable.getItem(i);    
+//
+//                writer.writeLine(item.getText());
+//                
+//            }
+//
+//        } finally {
+//            if (null != writer) {
+//                writer.close();
+//            }
+//        }
+//    }
 
     /**
      * Returns the file for storing the Maven tree persistently (offline use).
      * 
      * @return the file
      */
-    private File getItemsFile() {
-        return new File(WorkspaceUtils.getMetadataFolder(), "runtimeSavedItems.ser");
-    }
+//    private File getItemsFile() {
+//        return new File(WorkspaceUtils.getMetadataFolder(), "runtimeSavedItems.csv");
+//    }
     
     /**
      * Returns the file for storing the Maven tree persistently (offline use).
      * 
      * @return the file
      */
-    private File getWrapperFile() {
-        return new File(WorkspaceUtils.getMetadataFolder(), "runtimeSavedWrappers.ser");
-    }
+//    private File getWrapperFile() {
+//        return new File(WorkspaceUtils.getMetadataFolder(), "runtimeSavedWrappers.ser");
+//    }
     
     /**
      * Enables or disables the buttons on this editor.
