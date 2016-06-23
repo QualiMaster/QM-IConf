@@ -17,6 +17,7 @@ import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import net.ssehub.easy.dslCore.EclipseResourceInitializer;
+import qualimasterapplication.Activator;
 
 /**
  * Public class for configuring the window of the Qualimaster-App.
@@ -56,8 +57,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         configurer.setShowCoolBar(false);
         configurer.setShowStatusLine(true);
         configurer.setTitle("QualiMaster Infastructure Configuration Tool (QM-IConf) "
-                + UserContext.INSTANCE.getRoles().toString());
-        
+            + UserContext.INSTANCE.getRoles().toString() + " v" + Activator.getFullVersion());
         try {
             WorkspaceUtils.enableAutoBuild(false); // disable Java builds
         } catch (CoreException e) {

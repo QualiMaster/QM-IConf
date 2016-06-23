@@ -30,6 +30,15 @@
       </tools>
       <tools
           xsi:type="gmftool:CreationTool"
+          title="ReplaySink"
+          description="Create new ReplaySink">
+        <smallIcon
+            xsi:type="gmftool:DefaultImage"/>
+        <largeIcon
+            xsi:type="gmftool:DefaultImage"/>
+      </tools>
+      <tools
+          xsi:type="gmftool:CreationTool"
           title="Sink"
           description="Create new Sink">
         <smallIcon

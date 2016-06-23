@@ -1,7 +1,9 @@
 package qualimasterapplication;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
@@ -78,6 +80,51 @@ public class Activator extends AbstractUIPlugin {
      */
     public static EASyLogger getLogger(Class<?> cls) {
         return EASyLoggerFactory.INSTANCE.getLogger(cls, PLUGIN_ID);        
+    }
+    
+    /**
+     * Returns the version of the plug-in as specified in its manifest.
+     * @return The version in the following format: <tt>&lt;number&gt;.&lt;number&gt;.&lt;number&gt;</tt>
+     */
+    public static String getPluginVersion() {
+        return getVersion(PLUGIN_ID);
+    }
+    
+    /**
+     * Returns the version of the product (RCP standalone application) as specified in its manifest.
+     * @return The version in the following format: <tt>&lt;number&gt;.&lt;number&gt;.&lt;number&gt;</tt>
+     */
+    public static String getProductVersion() {
+        return getVersion("de.uni-hildesheim.sse.qualiMasterApplication");
+    }
+    
+    /**
+     * Returns the version of the product and its main plugin as specified in their manifests.
+     * @return The version in the following format:
+     * <tt>&lt;number&gt;.&lt;number&gt;.&lt;number&gt; [&lt;number&gt;.&lt;number&gt;.&lt;number&gt;]</tt>
+     */
+    public static String getFullVersion() {
+        String productVersion = getProductVersion();
+        String pluginVersion = getPluginVersion();
+        
+        String version;
+        if (!"<unknown version>".equals(productVersion)) {
+            version = (productVersion != pluginVersion) ? productVersion + "[" + pluginVersion + "]" : productVersion;
+        } else {
+            version = pluginVersion;
+        }
+        
+        return version;
+    }
+    
+    /**
+     * Returns the version of the specified bundle as specified in its manifest.
+     * @param bundleID the ID of the bundle for which the version should be retrieved.
+     * @return The version in the following format: <tt>&lt;number&gt;.&lt;number&gt;.&lt;number&gt;</tt>
+     */
+    private static String getVersion(String bundleID) {
+        Bundle bundle = Platform.getBundle(bundleID);
+        return (null != bundle) ? bundle.getVersion().toString() : "<unknown version>"; 
     }
     
 }

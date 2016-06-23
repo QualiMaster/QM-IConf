@@ -15,6 +15,8 @@ import pipeline.diagram.edit.parts.FamilyElementNameEditPart;
 import pipeline.diagram.edit.parts.FlowEditPart;
 import pipeline.diagram.edit.parts.FlowNameEditPart;
 import pipeline.diagram.edit.parts.PipelineEditPart;
+import pipeline.diagram.edit.parts.ReplaySinkEditPart;
+import pipeline.diagram.edit.parts.ReplaySinkNameEditPart;
 import pipeline.diagram.edit.parts.SinkEditPart;
 import pipeline.diagram.edit.parts.SinkNameEditPart;
 import pipeline.diagram.edit.parts.SourceEditPart;
@@ -129,6 +131,10 @@ public class PipelineVisualIDRegistry {
 		}
 		switch (containerVisualID) {
 		case PipelineEditPart.VISUAL_ID:
+			if (PipelinePackage.eINSTANCE.getReplaySink().isSuperTypeOf(
+					domainElement.eClass())) {
+				return ReplaySinkEditPart.VISUAL_ID;
+			}
 			if (PipelinePackage.eINSTANCE.getFamilyElement().isSuperTypeOf(
 					domainElement.eClass())) {
 				return FamilyElementEditPart.VISUAL_ID;
@@ -173,6 +179,9 @@ public class PipelineVisualIDRegistry {
 		}
 		switch (containerVisualID) {
 		case PipelineEditPart.VISUAL_ID:
+			if (ReplaySinkEditPart.VISUAL_ID == nodeVisualID) {
+				return true;
+			}
 			if (FamilyElementEditPart.VISUAL_ID == nodeVisualID) {
 				return true;
 			}
@@ -183,6 +192,11 @@ public class PipelineVisualIDRegistry {
 				return true;
 			}
 			if (SinkEditPart.VISUAL_ID == nodeVisualID) {
+				return true;
+			}
+			break;
+		case ReplaySinkEditPart.VISUAL_ID:
+			if (ReplaySinkNameEditPart.VISUAL_ID == nodeVisualID) {
 				return true;
 			}
 			break;
@@ -270,6 +284,7 @@ public class PipelineVisualIDRegistry {
 		case SinkEditPart.VISUAL_ID:
 		case FamilyElementEditPart.VISUAL_ID:
 		case DataManagementElementEditPart.VISUAL_ID:
+		case ReplaySinkEditPart.VISUAL_ID:
 			return true;
 		default:
 			break;

@@ -35,8 +35,9 @@ public class PipelinePaletteFactory {
 		paletteContainer.setId("createObjects1Group"); //$NON-NLS-1$
 		paletteContainer.add(createDataManagementElement1CreationTool());
 		paletteContainer.add(createFamilyElement2CreationTool());
-		paletteContainer.add(createSink3CreationTool());
-		paletteContainer.add(createSource4CreationTool());
+		paletteContainer.add(createReplaySink3CreationTool());
+		paletteContainer.add(createSink4CreationTool());
+		paletteContainer.add(createSource5CreationTool());
 		return paletteContainer;
 	}
 
@@ -87,12 +88,27 @@ public class PipelinePaletteFactory {
 	/**
 	 * @generated
 	 */
-	private ToolEntry createSink3CreationTool() {
+	private ToolEntry createReplaySink3CreationTool() {
 		NodeToolEntry entry = new NodeToolEntry(
-				Messages.Sink3CreationTool_title,
-				Messages.Sink3CreationTool_desc,
+				Messages.ReplaySink3CreationTool_title,
+				Messages.ReplaySink3CreationTool_desc,
+				Collections.singletonList(PipelineElementTypes.ReplaySink_2007));
+		entry.setId("createReplaySink3CreationTool"); //$NON-NLS-1$
+		entry.setSmallIcon(PipelineElementTypes
+				.getImageDescriptor(PipelineElementTypes.ReplaySink_2007));
+		entry.setLargeIcon(entry.getSmallIcon());
+		return entry;
+	}
+
+	/**
+	 * @generated
+	 */
+	private ToolEntry createSink4CreationTool() {
+		NodeToolEntry entry = new NodeToolEntry(
+				Messages.Sink4CreationTool_title,
+				Messages.Sink4CreationTool_desc,
 				Collections.singletonList(PipelineElementTypes.Sink_2002));
-		entry.setId("createSink3CreationTool"); //$NON-NLS-1$
+		entry.setId("createSink4CreationTool"); //$NON-NLS-1$
 		entry.setSmallIcon(PipelineElementTypes
 				.getImageDescriptor(PipelineElementTypes.Sink_2002));
 		entry.setLargeIcon(entry.getSmallIcon());
@@ -102,12 +118,12 @@ public class PipelinePaletteFactory {
 	/**
 	 * @generated
 	 */
-	private ToolEntry createSource4CreationTool() {
+	private ToolEntry createSource5CreationTool() {
 		NodeToolEntry entry = new NodeToolEntry(
-				Messages.Source4CreationTool_title,
-				Messages.Source4CreationTool_desc,
+				Messages.Source5CreationTool_title,
+				Messages.Source5CreationTool_desc,
 				Collections.singletonList(PipelineElementTypes.Source_2001));
-		entry.setId("createSource4CreationTool"); //$NON-NLS-1$
+		entry.setId("createSource5CreationTool"); //$NON-NLS-1$
 		entry.setSmallIcon(PipelineElementTypes
 				.getImageDescriptor(PipelineElementTypes.Source_2001));
 		entry.setLargeIcon(entry.getSmallIcon());

@@ -61,6 +61,7 @@ import pipeline.Flow;
 import pipeline.Pipeline;
 import pipeline.PipelineElement;
 import pipeline.PipelineNode;
+import pipeline.ReplaySink;
 import pipeline.Sink;
 import pipeline.Source;
 import qualimasterapplication.Activator;
@@ -410,8 +411,9 @@ public class PipelineTranslationOperations {
         PipelineSaveContext context) throws PipelineTranslationException {
 
         // define pipeline
+        String typeName = pipeline.getIsSubPipeline() ? QmConstants.TYPE_SUBPIPELINE : QmConstants.TYPE_PIPELINE;
         DecisionVariableDeclaration pipelineVariable = IVMLModelOperations.getDecisionVariable(
-            context.getPipelineProject(), "Pipeline", null, destProject);
+            context.getPipelineProject(), typeName, null, destProject);
         freezables.add(pipelineVariable);
         destProject.add(pipelineVariable);
         //get all pipeline nodes and flows
@@ -441,7 +443,6 @@ public class PipelineTranslationOperations {
         // EASy Editor convention :|
         pipelineCompound.put("debug", pipeline.getDebug() == 0 ? Boolean.TRUE : Boolean.FALSE); 
         pipelineCompound.put("fastSerialization", pipeline.getFastSerialization() == 0 ? Boolean.TRUE : Boolean.FALSE); 
-        pipelineCompound.put("isSubPipeline", pipeline.getIsSubPipeline() == 0 ? Boolean.TRUE : Boolean.FALSE); 
         
         // get source
         ArrayList<String> sourceList = new ArrayList<String>();
@@ -491,7 +492,7 @@ public class PipelineTranslationOperations {
         PipelineSaveContext context, Map<String, Object> pipelineCompound)
         throws PipelineTranslationException {
         
-        if (pipeline.getIsSubPipeline() == 0) {
+        if (pipeline.getIsSubPipeline()) {
             EList<PipelineNode> pipelineNodes = pipeline.getNodes();
             // In a sub pipeline connectors (family elements) may also serve as starting point
             for (PipelineNode pipelineNode : pipelineNodes) {
@@ -781,10 +782,9 @@ public class PipelineTranslationOperations {
     }    
     
     /**
-     * Adds <code>Sink</code> to the project.
+     * Adds <code>Sink</code> or <tt>ReplaySink</tt> to the project.
      * 
-     * @param sink
-     *            the sink to be added
+     * @param sink The sink or ReplaySink to be added
      * @param destProject
      *            the project to add to
      * @param context Context, which stores information about already translated elements of the translation of a
@@ -797,7 +797,8 @@ public class PipelineTranslationOperations {
         
         DecisionVariableDeclaration decisionVariable = null;
         // define sink
-        decisionVariable = IVMLModelOperations.getDecisionVariable(context.getPipelineProject(), "Sink", 
+        String typeName = (sink instanceof ReplaySink) ? "ReplaySink" : "Sink";
+        decisionVariable = IVMLModelOperations.getDecisionVariable(context.getPipelineProject(), typeName, 
                 Integer.toString(context.getSinkCount()), destProject);
         freezables.add(decisionVariable);
         destProject.add(decisionVariable);

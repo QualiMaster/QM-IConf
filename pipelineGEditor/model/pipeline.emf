@@ -11,7 +11,7 @@ class Pipeline {
   attr String constraints = ""; // constraints as text separated by ";"
   attr Integer debug = 1; // 1 = false in EASy editors :|
   attr Integer fastSerialization = 1;// 1 = false in EASy editors :|
-  attr Integer isSubPipeline = 1; // 1 = false, Booleans won't work with generated property editors
+  attr Boolean isSubPipeline = false;
 }
 
 @gmf.node(label="name", label.icon="false", figure="svg", label.placement="external")
@@ -35,7 +35,7 @@ class Flow extends PipelineElement{
 @gmf.node()
 abstract class PipelineNode extends PipelineElement {
   attr Integer parallelism = 1;
-  attr Integer numtasks = 0; // OptionalPsotiveNumber, but null forces EASy-Editors to crash -> Use 0 as default
+  attr Integer numtasks = 0; // OptionalPositiveNumber, but null forces EASy-Editors to crash -> Use 0 as default
 }
 
 @gmf.node(figure="svg", svg.uri="platform:/plugin/pipelineGEditor/svg/source.svg", size="60,60")
@@ -46,6 +46,10 @@ class Source extends PipelineNode {
 @gmf.node(figure="svg", svg.uri="platform:/plugin/pipelineGEditor/svg/sink.svg", size="55,55")
 class Sink extends PipelineNode {
   attr Integer sink = -1; // references become integer (see above)
+}
+
+@gmf.node(figure="svg", svg.uri="platform:/plugin/pipelineGEditor/svg/ReplaySink.svg", size="55,55")
+class ReplaySink extends Sink {
 }
 
 @gmf.node()

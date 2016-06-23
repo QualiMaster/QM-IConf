@@ -8,6 +8,7 @@ import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.gmf.runtime.emf.type.core.IElementType;
 import pipeline.diagram.edit.parts.DataManagementElementEditPart;
 import pipeline.diagram.edit.parts.FamilyElementEditPart;
+import pipeline.diagram.edit.parts.ReplaySinkEditPart;
 import pipeline.diagram.edit.parts.SinkEditPart;
 import pipeline.diagram.edit.parts.SourceEditPart;
 import pipeline.diagram.providers.PipelineElementTypes;
@@ -60,6 +61,9 @@ public class PipelineModelingAssistantProviderOfDataManagementElementEditPart
 			DataManagementElementEditPart source,
 			IGraphicalEditPart targetEditPart) {
 		List<IElementType> types = new LinkedList<IElementType>();
+		if (targetEditPart instanceof ReplaySinkEditPart) {
+			types.add(PipelineElementTypes.Flow_4001);
+		}
 		if (targetEditPart instanceof FamilyElementEditPart) {
 			types.add(PipelineElementTypes.Flow_4001);
 		}
@@ -95,6 +99,7 @@ public class PipelineModelingAssistantProviderOfDataManagementElementEditPart
 			DataManagementElementEditPart source, IElementType relationshipType) {
 		List<IElementType> types = new ArrayList<IElementType>();
 		if (relationshipType == PipelineElementTypes.Flow_4001) {
+			types.add(PipelineElementTypes.ReplaySink_2007);
 			types.add(PipelineElementTypes.FamilyElement_2005);
 			types.add(PipelineElementTypes.DataManagementElement_2006);
 			types.add(PipelineElementTypes.Source_2001);
@@ -143,6 +148,7 @@ public class PipelineModelingAssistantProviderOfDataManagementElementEditPart
 			DataManagementElementEditPart target, IElementType relationshipType) {
 		List<IElementType> types = new ArrayList<IElementType>();
 		if (relationshipType == PipelineElementTypes.Flow_4001) {
+			types.add(PipelineElementTypes.ReplaySink_2007);
 			types.add(PipelineElementTypes.FamilyElement_2005);
 			types.add(PipelineElementTypes.DataManagementElement_2006);
 			types.add(PipelineElementTypes.Source_2001);

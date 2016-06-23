@@ -18,12 +18,14 @@ import pipeline.Pipeline;
 import pipeline.PipelineElement;
 import pipeline.PipelineNode;
 import pipeline.PipelinePackage;
+import pipeline.ReplaySink;
 import pipeline.Sink;
 import pipeline.Source;
 import pipeline.diagram.edit.parts.DataManagementElementEditPart;
 import pipeline.diagram.edit.parts.FamilyElementEditPart;
 import pipeline.diagram.edit.parts.FlowEditPart;
 import pipeline.diagram.edit.parts.PipelineEditPart;
+import pipeline.diagram.edit.parts.ReplaySinkEditPart;
 import pipeline.diagram.edit.parts.SinkEditPart;
 import pipeline.diagram.edit.parts.SourceEditPart;
 import pipeline.diagram.providers.PipelineElementTypes;
@@ -66,6 +68,10 @@ public class PipelineDiagramUpdater {
 			PipelineNode childElement = (PipelineNode) it.next();
 			int visualID = PipelineVisualIDRegistry.getNodeVisualID(view,
 					childElement);
+			if (visualID == ReplaySinkEditPart.VISUAL_ID) {
+				result.add(new PipelineNodeDescriptor(childElement, visualID));
+				continue;
+			}
 			if (visualID == FamilyElementEditPart.VISUAL_ID) {
 				result.add(new PipelineNodeDescriptor(childElement, visualID));
 				continue;
@@ -93,6 +99,8 @@ public class PipelineDiagramUpdater {
 		switch (PipelineVisualIDRegistry.getVisualID(view)) {
 		case PipelineEditPart.VISUAL_ID:
 			return getPipeline_1000ContainedLinks(view);
+		case ReplaySinkEditPart.VISUAL_ID:
+			return getReplaySink_2007ContainedLinks(view);
 		case FamilyElementEditPart.VISUAL_ID:
 			return getFamilyElement_2005ContainedLinks(view);
 		case DataManagementElementEditPart.VISUAL_ID:
@@ -112,6 +120,8 @@ public class PipelineDiagramUpdater {
 	 */
 	public static List<PipelineLinkDescriptor> getIncomingLinks(View view) {
 		switch (PipelineVisualIDRegistry.getVisualID(view)) {
+		case ReplaySinkEditPart.VISUAL_ID:
+			return getReplaySink_2007IncomingLinks(view);
 		case FamilyElementEditPart.VISUAL_ID:
 			return getFamilyElement_2005IncomingLinks(view);
 		case DataManagementElementEditPart.VISUAL_ID:
@@ -131,6 +141,8 @@ public class PipelineDiagramUpdater {
 	 */
 	public static List<PipelineLinkDescriptor> getOutgoingLinks(View view) {
 		switch (PipelineVisualIDRegistry.getVisualID(view)) {
+		case ReplaySinkEditPart.VISUAL_ID:
+			return getReplaySink_2007OutgoingLinks(view);
 		case FamilyElementEditPart.VISUAL_ID:
 			return getFamilyElement_2005OutgoingLinks(view);
 		case DataManagementElementEditPart.VISUAL_ID:
@@ -154,6 +166,14 @@ public class PipelineDiagramUpdater {
 		LinkedList<PipelineLinkDescriptor> result = new LinkedList<PipelineLinkDescriptor>();
 		result.addAll(getContainedTypeModelFacetLinks_Flow_4001(modelElement));
 		return result;
+	}
+
+	/**
+	 * @generated
+	 */
+	public static List<PipelineLinkDescriptor> getReplaySink_2007ContainedLinks(
+			View view) {
+		return Collections.emptyList();
 	}
 
 	/**
@@ -194,6 +214,20 @@ public class PipelineDiagramUpdater {
 	public static List<PipelineLinkDescriptor> getFlow_4001ContainedLinks(
 			View view) {
 		return Collections.emptyList();
+	}
+
+	/**
+	 * @generated
+	 */
+	public static List<PipelineLinkDescriptor> getReplaySink_2007IncomingLinks(
+			View view) {
+		ReplaySink modelElement = (ReplaySink) view.getElement();
+		Map<EObject, Collection<EStructuralFeature.Setting>> crossReferences = EcoreUtil.CrossReferencer
+				.find(view.eResource().getResourceSet().getResources());
+		LinkedList<PipelineLinkDescriptor> result = new LinkedList<PipelineLinkDescriptor>();
+		result.addAll(getIncomingTypeModelFacetLinks_Flow_4001(modelElement,
+				crossReferences));
+		return result;
 	}
 
 	/**
@@ -264,6 +298,17 @@ public class PipelineDiagramUpdater {
 		LinkedList<PipelineLinkDescriptor> result = new LinkedList<PipelineLinkDescriptor>();
 		result.addAll(getIncomingTypeModelFacetLinks_Flow_4001(modelElement,
 				crossReferences));
+		return result;
+	}
+
+	/**
+	 * @generated
+	 */
+	public static List<PipelineLinkDescriptor> getReplaySink_2007OutgoingLinks(
+			View view) {
+		ReplaySink modelElement = (ReplaySink) view.getElement();
+		LinkedList<PipelineLinkDescriptor> result = new LinkedList<PipelineLinkDescriptor>();
+		result.addAll(getOutgoingTypeModelFacetLinks_Flow_4001(modelElement));
 		return result;
 	}
 

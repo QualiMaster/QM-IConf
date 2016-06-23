@@ -24,6 +24,8 @@ import pipeline.diagram.edit.parts.FamilyElementNameEditPart;
 import pipeline.diagram.edit.parts.FlowEditPart;
 import pipeline.diagram.edit.parts.FlowNameEditPart;
 import pipeline.diagram.edit.parts.PipelineEditPart;
+import pipeline.diagram.edit.parts.ReplaySinkEditPart;
+import pipeline.diagram.edit.parts.ReplaySinkNameEditPart;
 import pipeline.diagram.edit.parts.SinkEditPart;
 import pipeline.diagram.edit.parts.SinkNameEditPart;
 import pipeline.diagram.edit.parts.SourceEditPart;
@@ -115,6 +117,9 @@ public class PipelineNavigatorLabelProvider extends LabelProvider implements
 		case DataManagementElementEditPart.VISUAL_ID:
 			return getImage(
 					"Navigator?TopLevelNode?pipeline?DataManagementElement", PipelineElementTypes.DataManagementElement_2006); //$NON-NLS-1$
+		case ReplaySinkEditPart.VISUAL_ID:
+			return getImage(
+					"Navigator?TopLevelNode?pipeline?ReplaySink", PipelineElementTypes.ReplaySink_2007); //$NON-NLS-1$
 		case FlowEditPart.VISUAL_ID:
 			return getImage(
 					"Navigator?Link?pipeline?Flow", PipelineElementTypes.Flow_4001); //$NON-NLS-1$
@@ -188,6 +193,8 @@ public class PipelineNavigatorLabelProvider extends LabelProvider implements
 			return getFamilyElement_2005Text(view);
 		case DataManagementElementEditPart.VISUAL_ID:
 			return getDataManagementElement_2006Text(view);
+		case ReplaySinkEditPart.VISUAL_ID:
+			return getReplaySink_2007Text(view);
 		case FlowEditPart.VISUAL_ID:
 			return getFlow_4001Text(view);
 		}
@@ -282,6 +289,26 @@ public class PipelineNavigatorLabelProvider extends LabelProvider implements
 		} else {
 			PipelineDiagramEditorPlugin.getInstance().logError(
 					"Parser was not found for label " + 5006); //$NON-NLS-1$
+			return ""; //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * @generated
+	 */
+	private String getReplaySink_2007Text(View view) {
+		IParser parser = PipelineParserProvider.getParser(
+				PipelineElementTypes.ReplaySink_2007,
+				view.getElement() != null ? view.getElement() : view,
+				PipelineVisualIDRegistry
+						.getType(ReplaySinkNameEditPart.VISUAL_ID));
+		if (parser != null) {
+			return parser.getPrintString(new EObjectAdapter(
+					view.getElement() != null ? view.getElement() : view),
+					ParserOptions.NONE.intValue());
+		} else {
+			PipelineDiagramEditorPlugin.getInstance().logError(
+					"Parser was not found for label " + 5007); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
 	}

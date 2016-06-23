@@ -53,6 +53,8 @@ import eu.qualimaster.manifestUtils.data.JarInfo;
 import eu.qualimaster.manifestUtils.data.Manifest;
 import eu.qualimaster.manifestUtils.data.Parameter;
 import eu.qualimaster.manifestUtils.data.Parameter.ParameterType;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
 import net.ssehub.easy.basics.progress.ProgressObserver;
 import net.ssehub.easy.basics.progress.ProgressObserver.ITask;
 
@@ -70,6 +72,8 @@ public class ManifestConnection {
     
     private static List<String> repositories = new ArrayList<String>();
     
+    private EASyLogger logger = EASyLoggerFactory.INSTANCE.getLogger(ManifestConnection.class, 
+            "eu.qualimaster.ManifestUtils");
     private Ivy ivy = null;
     private File out = null;
     private String output = "";
@@ -249,6 +253,7 @@ public class ManifestConnection {
             chainResolver.add(resolver);
         }
         
+        chainResolver.setCheckmodified(true);
         ivySettings.addResolver(chainResolver);
         ivySettings.setDefaultResolver(chainResolver.getName());
         this.ivy = Ivy.newInstance(ivySettings);
@@ -451,7 +456,6 @@ public class ManifestConnection {
     public List<Parameter> getParameters(String name, String artifactId) {
         
         List<Parameter> result = new ArrayList<Parameter>();
-        
         try {
             
             URL[] urls = new URL[1];
@@ -485,7 +489,9 @@ public class ManifestConnection {
                         
                     } catch (ClassNotFoundException e) {
                         System.out.println("ERROR: Unable to load Annotation Class: '" + ANNOTATION_CLASS + "'");
-                        System.out.println("Please update your StormCommons!");
+                        logger.info("ERROR: Unable to load Annotation Class: '" + ANNOTATION_CLASS + "'");
+                        System.out.println("The used version of StormCommons does not support Annotations!");
+                        logger.info("The used version of StormCommons does not support Annotations!");
                     } catch (ClassCastException e) {
                         e.printStackTrace();
                         System.out.println("ERROR: Unable to cast: '" + ANNOTATION_CLASS + "' to Annotation.");

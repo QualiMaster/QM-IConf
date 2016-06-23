@@ -64,6 +64,7 @@ public class PipelineFactoryImpl extends EFactoryImpl implements PipelineFactory
 			case PipelinePackage.FLOW: return createFlow();
 			case PipelinePackage.SOURCE: return createSource();
 			case PipelinePackage.SINK: return createSink();
+			case PipelinePackage.REPLAY_SINK: return createReplaySink();
 			case PipelinePackage.FAMILY_ELEMENT: return createFamilyElement();
 			case PipelinePackage.DATA_MANAGEMENT_ELEMENT: return createDataManagementElement();
 			default:
@@ -116,6 +117,16 @@ public class PipelineFactoryImpl extends EFactoryImpl implements PipelineFactory
 	}
 
   /**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ReplaySink createReplaySink() {
+		ReplaySinkImpl replaySink = new ReplaySinkImpl();
+		return replaySink;
+	}
+
+		/**
 	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
 	 * @generated

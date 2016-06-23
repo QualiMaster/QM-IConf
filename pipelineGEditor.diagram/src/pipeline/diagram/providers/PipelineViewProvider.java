@@ -47,6 +47,8 @@ import pipeline.diagram.edit.parts.FamilyElementNameEditPart;
 import pipeline.diagram.edit.parts.FlowEditPart;
 import pipeline.diagram.edit.parts.FlowNameEditPart;
 import pipeline.diagram.edit.parts.PipelineEditPart;
+import pipeline.diagram.edit.parts.ReplaySinkEditPart;
+import pipeline.diagram.edit.parts.ReplaySinkNameEditPart;
 import pipeline.diagram.edit.parts.SinkEditPart;
 import pipeline.diagram.edit.parts.SinkNameEditPart;
 import pipeline.diagram.edit.parts.SourceEditPart;
@@ -145,6 +147,7 @@ public class PipelineViewProvider extends AbstractProvider implements
 					return false; // foreign diagram
 				}
 				switch (visualID) {
+				case ReplaySinkEditPart.VISUAL_ID:
 				case FamilyElementEditPart.VISUAL_ID:
 				case DataManagementElementEditPart.VISUAL_ID:
 				case SourceEditPart.VISUAL_ID:
@@ -161,7 +164,8 @@ public class PipelineViewProvider extends AbstractProvider implements
 				}
 			}
 		}
-		return FamilyElementEditPart.VISUAL_ID == visualID
+		return ReplaySinkEditPart.VISUAL_ID == visualID
+				|| FamilyElementEditPart.VISUAL_ID == visualID
 				|| DataManagementElementEditPart.VISUAL_ID == visualID
 				|| SourceEditPart.VISUAL_ID == visualID
 				|| SinkEditPart.VISUAL_ID == visualID;
@@ -221,6 +225,9 @@ public class PipelineViewProvider extends AbstractProvider implements
 			visualID = PipelineVisualIDRegistry.getVisualID(semanticHint);
 		}
 		switch (visualID) {
+		case ReplaySinkEditPart.VISUAL_ID:
+			return createReplaySink_2007(domainElement, containerView, index,
+					persisted, preferencesHint);
 		case FamilyElementEditPart.VISUAL_ID:
 			return createFamilyElement_2005(domainElement, containerView,
 					index, persisted, preferencesHint);
@@ -253,6 +260,58 @@ public class PipelineViewProvider extends AbstractProvider implements
 		}
 		// can never happen, provided #provides(CreateEdgeViewOperation) is correct
 		return null;
+	}
+
+	/**
+	 * @generated
+	 */
+	public Node createReplaySink_2007(EObject domainElement,
+			View containerView, int index, boolean persisted,
+			PreferencesHint preferencesHint) {
+		Shape node = NotationFactory.eINSTANCE.createShape();
+		node.setLayoutConstraint(NotationFactory.eINSTANCE.createBounds());
+		node.setType(PipelineVisualIDRegistry
+				.getType(ReplaySinkEditPart.VISUAL_ID));
+		ViewUtil.insertChildView(containerView, node, index, persisted);
+		node.setElement(domainElement);
+		stampShortcut(containerView, node);
+		// initializeFromPreferences 
+		final IPreferenceStore prefStore = (IPreferenceStore) preferencesHint
+				.getPreferenceStore();
+
+		org.eclipse.swt.graphics.RGB lineRGB = PreferenceConverter.getColor(
+				prefStore, IPreferenceConstants.PREF_LINE_COLOR);
+		ViewUtil.setStructuralFeatureValue(node,
+				NotationPackage.eINSTANCE.getLineStyle_LineColor(),
+				FigureUtilities.RGBToInteger(lineRGB));
+		FontStyle nodeFontStyle = (FontStyle) node
+				.getStyle(NotationPackage.Literals.FONT_STYLE);
+		if (nodeFontStyle != null) {
+			FontData fontData = PreferenceConverter.getFontData(prefStore,
+					IPreferenceConstants.PREF_DEFAULT_FONT);
+			nodeFontStyle.setFontName(fontData.getName());
+			nodeFontStyle.setFontHeight(fontData.getHeight());
+			nodeFontStyle.setBold((fontData.getStyle() & SWT.BOLD) != 0);
+			nodeFontStyle.setItalic((fontData.getStyle() & SWT.ITALIC) != 0);
+			org.eclipse.swt.graphics.RGB fontRGB = PreferenceConverter
+					.getColor(prefStore, IPreferenceConstants.PREF_FONT_COLOR);
+			nodeFontStyle.setFontColor(FigureUtilities.RGBToInteger(fontRGB)
+					.intValue());
+		}
+		org.eclipse.swt.graphics.RGB fillRGB = PreferenceConverter.getColor(
+				prefStore, IPreferenceConstants.PREF_FILL_COLOR);
+		ViewUtil.setStructuralFeatureValue(node,
+				NotationPackage.eINSTANCE.getFillStyle_FillColor(),
+				FigureUtilities.RGBToInteger(fillRGB));
+		Node label5007 = createLabel(node,
+				PipelineVisualIDRegistry
+						.getType(ReplaySinkNameEditPart.VISUAL_ID));
+		label5007.setLayoutConstraint(NotationFactory.eINSTANCE
+				.createLocation());
+		Location location5007 = (Location) label5007.getLayoutConstraint();
+		location5007.setX(0);
+		location5007.setY(5);
+		return node;
 	}
 
 	/**

@@ -16,6 +16,7 @@ import pipeline.PipelinePackage;
 import pipeline.diagram.edit.parts.DataManagementElementNameEditPart;
 import pipeline.diagram.edit.parts.FamilyElementNameEditPart;
 import pipeline.diagram.edit.parts.FlowNameEditPart;
+import pipeline.diagram.edit.parts.ReplaySinkNameEditPart;
 import pipeline.diagram.edit.parts.SinkNameEditPart;
 import pipeline.diagram.edit.parts.SourceNameEditPart;
 import pipeline.diagram.parsers.MessageFormatParser;
@@ -26,6 +27,24 @@ import pipeline.diagram.part.PipelineVisualIDRegistry;
  */
 public class PipelineParserProvider extends AbstractProvider implements
 		IParserProvider {
+
+	/**
+	 * @generated
+	 */
+	private IParser replaySinkName_5007Parser;
+
+	/**
+	 * @generated
+	 */
+	private IParser getReplaySinkName_5007Parser() {
+		if (replaySinkName_5007Parser == null) {
+			EAttribute[] features = new EAttribute[] { PipelinePackage.eINSTANCE
+					.getPipelineElement_Name() };
+			MessageFormatParser parser = new MessageFormatParser(features);
+			replaySinkName_5007Parser = parser;
+		}
+		return replaySinkName_5007Parser;
+	}
 
 	/**
 	 * @generated
@@ -122,6 +141,8 @@ public class PipelineParserProvider extends AbstractProvider implements
 	 */
 	protected IParser getParser(int visualID) {
 		switch (visualID) {
+		case ReplaySinkNameEditPart.VISUAL_ID:
+			return getReplaySinkName_5007Parser();
 		case FamilyElementNameEditPart.VISUAL_ID:
 			return getFamilyElementName_5005Parser();
 		case DataManagementElementNameEditPart.VISUAL_ID:

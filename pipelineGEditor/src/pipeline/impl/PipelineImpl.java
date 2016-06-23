@@ -196,7 +196,7 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 	 * @generated
 	 * @ordered
 	 */
-	protected static final Integer IS_SUB_PIPELINE_EDEFAULT = new Integer(1);
+	protected static final Boolean IS_SUB_PIPELINE_EDEFAULT = Boolean.FALSE;
 
 /**
 	 * The cached value of the '{@link #getIsSubPipeline() <em>Is Sub Pipeline</em>}' attribute.
@@ -206,7 +206,7 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 	 * @generated
 	 * @ordered
 	 */
-	protected Integer isSubPipeline = IS_SUB_PIPELINE_EDEFAULT;
+	protected Boolean isSubPipeline = IS_SUB_PIPELINE_EDEFAULT;
 
 /**
 	 * <!-- begin-user-doc -->
@@ -386,7 +386,7 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Integer getIsSubPipeline() {
+	public Boolean getIsSubPipeline() {
 		return isSubPipeline;
 	}
 
@@ -395,8 +395,8 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setIsSubPipeline(Integer newIsSubPipeline) {
-		Integer oldIsSubPipeline = isSubPipeline;
+	public void setIsSubPipeline(Boolean newIsSubPipeline) {
+		Boolean oldIsSubPipeline = isSubPipeline;
 		isSubPipeline = newIsSubPipeline;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, PipelinePackage.PIPELINE__IS_SUB_PIPELINE, oldIsSubPipeline, isSubPipeline));
@@ -487,7 +487,7 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 				setFastSerialization((Integer)newValue);
 				return;
 			case PipelinePackage.PIPELINE__IS_SUB_PIPELINE:
-				setIsSubPipeline((Integer)newValue);
+				setIsSubPipeline((Boolean)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);

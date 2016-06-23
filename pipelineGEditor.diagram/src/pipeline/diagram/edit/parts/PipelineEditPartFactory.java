@@ -24,6 +24,12 @@ public class PipelineEditPartFactory implements EditPartFactory {
 			case PipelineEditPart.VISUAL_ID:
 				return new PipelineEditPart(view);
 
+			case ReplaySinkEditPart.VISUAL_ID:
+				return new ReplaySinkEditPart(view);
+
+			case ReplaySinkNameEditPart.VISUAL_ID:
+				return new ReplaySinkNameEditPart(view);
+
 			case FamilyElementEditPart.VISUAL_ID:
 				return new FamilyElementEditPart(view);
 

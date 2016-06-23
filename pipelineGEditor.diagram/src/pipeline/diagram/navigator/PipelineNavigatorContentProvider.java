@@ -27,6 +27,7 @@ import pipeline.diagram.edit.parts.DataManagementElementEditPart;
 import pipeline.diagram.edit.parts.FamilyElementEditPart;
 import pipeline.diagram.edit.parts.FlowEditPart;
 import pipeline.diagram.edit.parts.PipelineEditPart;
+import pipeline.diagram.edit.parts.ReplaySinkEditPart;
 import pipeline.diagram.edit.parts.SinkEditPart;
 import pipeline.diagram.edit.parts.SourceEditPart;
 import pipeline.diagram.part.Messages;
@@ -244,6 +245,11 @@ public class PipelineNavigatorContentProvider implements ICommonContentProvider 
 			Collection<View> connectedViews;
 			connectedViews = getChildrenByType(Collections.singleton(sv),
 					PipelineVisualIDRegistry
+							.getType(ReplaySinkEditPart.VISUAL_ID));
+			result.addAll(createNavigatorItems(connectedViews, parentElement,
+					false));
+			connectedViews = getChildrenByType(Collections.singleton(sv),
+					PipelineVisualIDRegistry
 							.getType(FamilyElementEditPart.VISUAL_ID));
 			result.addAll(createNavigatorItems(connectedViews, parentElement,
 					false));
@@ -377,6 +383,33 @@ public class PipelineNavigatorContentProvider implements ICommonContentProvider 
 			return result.toArray();
 		}
 
+		case ReplaySinkEditPart.VISUAL_ID: {
+			LinkedList<PipelineAbstractNavigatorItem> result = new LinkedList<PipelineAbstractNavigatorItem>();
+			Node sv = (Node) view;
+			PipelineNavigatorGroup incominglinks = new PipelineNavigatorGroup(
+					Messages.NavigatorGroupName_ReplaySink_2007_incominglinks,
+					"icons/incomingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+			PipelineNavigatorGroup outgoinglinks = new PipelineNavigatorGroup(
+					Messages.NavigatorGroupName_ReplaySink_2007_outgoinglinks,
+					"icons/outgoingLinksNavigatorGroup.gif", parentElement); //$NON-NLS-1$
+			Collection<View> connectedViews;
+			connectedViews = getIncomingLinksByType(Collections.singleton(sv),
+					PipelineVisualIDRegistry.getType(FlowEditPart.VISUAL_ID));
+			incominglinks.addChildren(createNavigatorItems(connectedViews,
+					incominglinks, true));
+			connectedViews = getOutgoingLinksByType(Collections.singleton(sv),
+					PipelineVisualIDRegistry.getType(FlowEditPart.VISUAL_ID));
+			outgoinglinks.addChildren(createNavigatorItems(connectedViews,
+					outgoinglinks, true));
+			if (!incominglinks.isEmpty()) {
+				result.add(incominglinks);
+			}
+			if (!outgoinglinks.isEmpty()) {
+				result.add(outgoinglinks);
+			}
+			return result.toArray();
+		}
+
 		case FlowEditPart.VISUAL_ID: {
 			LinkedList<PipelineAbstractNavigatorItem> result = new LinkedList<PipelineAbstractNavigatorItem>();
 			Edge sv = (Edge) view;
@@ -395,6 +428,11 @@ public class PipelineNavigatorContentProvider implements ICommonContentProvider 
 			Collection<View> connectedViews;
 			connectedViews = getLinksTargetByType(Collections.singleton(sv),
 					PipelineVisualIDRegistry
+							.getType(ReplaySinkEditPart.VISUAL_ID));
+			target.addChildren(createNavigatorItems(connectedViews, target,
+					true));
+			connectedViews = getLinksTargetByType(Collections.singleton(sv),
+					PipelineVisualIDRegistry
 							.getType(FamilyElementEditPart.VISUAL_ID));
 			target.addChildren(createNavigatorItems(connectedViews, target,
 					true));
@@ -410,6 +448,11 @@ public class PipelineNavigatorContentProvider implements ICommonContentProvider 
 			connectedViews = getLinksTargetByType(Collections.singleton(sv),
 					PipelineVisualIDRegistry.getType(SinkEditPart.VISUAL_ID));
 			target.addChildren(createNavigatorItems(connectedViews, target,
+					true));
+			connectedViews = getLinksSourceByType(Collections.singleton(sv),
+					PipelineVisualIDRegistry
+							.getType(ReplaySinkEditPart.VISUAL_ID));
+			source.addChildren(createNavigatorItems(connectedViews, source,
 					true));
 			connectedViews = getLinksSourceByType(Collections.singleton(sv),
 					PipelineVisualIDRegistry

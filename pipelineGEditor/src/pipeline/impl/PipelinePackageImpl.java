@@ -19,6 +19,7 @@ import pipeline.PipelineFactory;
 import pipeline.PipelineNode;
 import pipeline.PipelinePackage;
 import pipeline.ProcessingElement;
+import pipeline.ReplaySink;
 import pipeline.Sink;
 import pipeline.Source;
 
@@ -73,6 +74,13 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
   private EClass sinkEClass = null;
 
   /**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass replaySinkEClass = null;
+
+		/**
 	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
 	 * @generated
@@ -390,6 +398,15 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 
 /**
 	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getReplaySink() {
+		return replaySinkEClass;
+	}
+
+/**
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -513,6 +530,8 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 		sinkEClass = createEClass(SINK);
 		createEAttribute(sinkEClass, SINK__SINK);
 
+		replaySinkEClass = createEClass(REPLAY_SINK);
+
 		processingElementEClass = createEClass(PROCESSING_ELEMENT);
 
 		familyElementEClass = createEClass(FAMILY_ELEMENT);
@@ -557,6 +576,7 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 		pipelineNodeEClass.getESuperTypes().add(this.getPipelineElement());
 		sourceEClass.getESuperTypes().add(this.getPipelineNode());
 		sinkEClass.getESuperTypes().add(this.getPipelineNode());
+		replaySinkEClass.getESuperTypes().add(this.getSink());
 		processingElementEClass.getESuperTypes().add(this.getPipelineNode());
 		familyElementEClass.getESuperTypes().add(this.getProcessingElement());
 		dataManagementElementEClass.getESuperTypes().add(this.getProcessingElement());
@@ -571,7 +591,7 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 		initEAttribute(getPipeline_Constraints(), ecorePackage.getEString(), "constraints", "", 0, 1, Pipeline.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPipeline_Debug(), ecorePackage.getEIntegerObject(), "debug", "1", 0, 1, Pipeline.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPipeline_FastSerialization(), ecorePackage.getEIntegerObject(), "fastSerialization", "1", 0, 1, Pipeline.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPipeline_IsSubPipeline(), ecorePackage.getEIntegerObject(), "isSubPipeline", "1", 0, 1, Pipeline.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPipeline_IsSubPipeline(), ecorePackage.getEBooleanObject(), "isSubPipeline", "false", 0, 1, Pipeline.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(pipelineElementEClass, PipelineElement.class, "PipelineElement", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getPipelineElement_Name(), ecorePackage.getEString(), "name", "", 0, 1, PipelineElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -592,6 +612,8 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 
 		initEClass(sinkEClass, Sink.class, "Sink", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getSink_Sink(), ecorePackage.getEIntegerObject(), "sink", "-1", 0, 1, Sink.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(replaySinkEClass, ReplaySink.class, "ReplaySink", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(processingElementEClass, ProcessingElement.class, "ProcessingElement", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
@@ -668,6 +690,14 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 		   new String[] {
 			 "figure", "svg",
 			 "svg.uri", "platform:/plugin/pipelineGEditor/svg/sink.svg",
+			 "size", "55,55"
+		   });	
+		addAnnotation
+		  (replaySinkEClass, 
+		   source, 
+		   new String[] {
+			 "figure", "svg",
+			 "svg.uri", "platform:/plugin/pipelineGEditor/svg/ReplaySink.svg",
 			 "size", "55,55"
 		   });	
 		addAnnotation
