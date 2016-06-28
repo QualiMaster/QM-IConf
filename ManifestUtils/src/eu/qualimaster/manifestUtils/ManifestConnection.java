@@ -30,8 +30,11 @@ import javax.tools.ToolProvider;
 
 import org.apache.ivy.Ivy;
 import org.apache.ivy.ant.IvyConvertPom;
+import org.apache.ivy.core.module.descriptor.Configuration;
+import org.apache.ivy.core.module.descriptor.ConfigurationGroup;
 import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
+import org.apache.ivy.core.module.descriptor.DependencyDescriptorMediator;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleId;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
@@ -40,8 +43,13 @@ import org.apache.ivy.core.report.ResolveReport;
 import org.apache.ivy.core.resolve.ResolveOptions;
 import org.apache.ivy.core.retrieve.RetrieveOptions;
 import org.apache.ivy.core.settings.IvySettings;
+import org.apache.ivy.plugins.conflict.ConflictManager;
+import org.apache.ivy.plugins.matcher.PatternMatcher;
+import org.apache.ivy.plugins.parser.m2.PomWriterOptions.ConfigurationScopeMapping;
 import org.apache.ivy.plugins.resolver.ChainResolver;
 import org.apache.ivy.plugins.resolver.IBiblioResolver;
+import org.apache.ivy.util.ConfigurationUtils;
+import org.apache.ivy.util.Configurator;
 import org.apache.tools.ant.Project;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -218,7 +226,6 @@ public class ManifestConnection {
         String mavenPath = MavenUtils.mavenRepository();
         
         if (null == ivyOut) {
-            //setRetrievalFolder(new File("C:/Test/out"));
             setRetrievalFolder(new File(mavenPath + "/ivy"));
 
         }
@@ -242,8 +249,10 @@ public class ManifestConnection {
         }
         
         ivySettings.setDefaultCache(new File(mavenPath));
-        ivySettings.setDefaultCacheArtifactPattern("[organisation]/[module]/[revision]/[module]-[revision].[ext]");
-        ivySettings.setDefaultCacheIvyPattern("[organisation]/[module]/[revision]/[module]-[revision].[ext]");
+        ivySettings.setDefaultCacheArtifactPattern(
+                "[organisation]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]");
+        ivySettings.setDefaultCacheIvyPattern(
+                "[organisation]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]");
         
         ChainResolver chainResolver = new ChainResolver();
         chainResolver.setName("chainResolver");
@@ -383,7 +392,6 @@ public class ManifestConnection {
     public void load(ProgressObserver monitor, String groupId, String artifactId, String version) {
         
         ITask mainTask = monitor.registerTask("Loading Dependencies");
-        
         sysOut.setMonitor(monitor);
         
         System.setProperty("jsse.enableSNIExtension", "false");
@@ -397,7 +405,7 @@ public class ManifestConnection {
 
         ro.setResolveMode(ResolveOptions.RESOLVEMODE_DYNAMIC);
         ro.setTransitive(true);
-        ro.setDownload(true);    
+        ro.setDownload(true);  
         DefaultModuleDescriptor md = DefaultModuleDescriptor.newDefaultInstance(
             ModuleRevisionId.newInstance(groupId, artifactId + "-envelope", version)
         );
@@ -408,7 +416,12 @@ public class ManifestConnection {
         dd.addDependencyConfiguration("default", "master");
         dd.addDependencyConfiguration("default", "runtime");
         dd.addDependencyConfiguration("default", "provided");
-        md.addDependency(dd); 
+//        dd.addDependencyConfiguration("*", "*");
+        md.addDependency(dd);
+//        ModuleId modId = new ModuleId("eu.qualimaster", "QualiMaster.Events");
+//        PatternMatcher pattMatch = null;
+//        DependencyDescriptorMediator ddm = null;
+//        md.addDependencyDescriptorMediator(modId, pattMatch, ddm);
         ModuleDescriptor m = null; 
         try {
             monitor.notifyStart(mainTask, 200);
@@ -1732,13 +1745,15 @@ public class ManifestConnection {
      
         List<File> fileList = new ArrayList<File>();
      
-        String s = report.getArtifacts().get(0).toString();
-     
-        String wip = s.substring(s.lastIndexOf('!') + 1);
-     
-        fileList.add(new File(this.out.getAbsolutePath() + "/"
-             + wip.substring(0, wip.lastIndexOf(".jar") + 4)));
-     
+        if (!report.getArtifacts().isEmpty()) {
+            String s = report.getArtifacts().get(0).toString();
+         
+            String wip = s.substring(s.lastIndexOf('!') + 1);
+         
+            fileList.add(new File(this.out.getAbsolutePath() + "/"
+                 + wip.substring(0, wip.lastIndexOf(".jar") + 4)));
+        }
+        
         return fileList;
      
     }
