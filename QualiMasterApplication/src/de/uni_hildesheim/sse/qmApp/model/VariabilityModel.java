@@ -18,6 +18,8 @@ import static eu.qualimaster.easy.extension.QmConstants.PROJECT_TOP_LEVEL;
 import static eu.qualimaster.easy.extension.QmConstants.SLOT_NAME;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_ADAPTIVITY_QPARAMWEIGHTING;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_ALGORITHM;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_SOFTWARE_ALGORITHM;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_HARDWARE_ALGORITHM;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_DATASINK;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_DATASOURCE;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_FAMILY;
@@ -166,6 +168,7 @@ public class VariabilityModel {
         ALGORITHMS(PROJECT_ALGORITHMS,
             new String[] {VAR_ALGORITHMS_ALGORITHMS}, 
             new String[] {TYPE_ALGORITHM, 
+                TYPE_SOFTWARE_ALGORITHM, TYPE_HARDWARE_ALGORITHM, 
 //                PROJECT_PIPELINES + IvmlKeyWords.NAMESPACE_SEPARATOR + 
                 TYPE_SUBPIPELINE_ALGORITHM},
             SourceMode.VARIABLES,
@@ -839,7 +842,11 @@ public class VariabilityModel {
         registry.registerImage(Configuration.ALGORITHMS, 0, 
             IconManager.retrieveImage(IconManager.ALGORITHM));
         registry.registerImage(Configuration.ALGORITHMS, 1, 
-            IconManager.retrieveImage(IconManager.SUBALGORITHM));
+            IconManager.retrieveImage(IconManager.ALGORITHM));
+        registry.registerImage(Configuration.ALGORITHMS, 2, 
+                IconManager.retrieveImage(IconManager.HWALGORITHM));
+        registry.registerImage(Configuration.ALGORITHMS, 3, 
+                IconManager.retrieveImage(IconManager.SUBALGORITHM));
         if (DISPLAY_ALGORITHMS_NESTED) {
             registry.registerImage(Configuration.ALGORITHMS, "Family", 
                 IconManager.retrieveImage(IconManager.FAMILY));

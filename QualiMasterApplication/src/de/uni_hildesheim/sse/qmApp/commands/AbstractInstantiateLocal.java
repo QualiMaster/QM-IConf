@@ -91,7 +91,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                             executor.addStartRuleName(startRuleName);
                         }
                         TracerFactory.setDefaultInstance(UiTracerFactory.INSTANCE);
-                        executor.execute();
+                        //executor.execute();
                         
                         if (PRUNE_CONFIG && null != modifier) {
                             modifier.clear();
@@ -100,8 +100,8 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                         notifyInstantiationCompleted(shell);
                     } catch (ModelManagementException e) {
                         showExceptionDialog("Model resolution problem", e);
-                    } catch (VilException e) {
-                        showExceptionDialog("Instantiation problem", e);
+//                    } catch (VilException e) {
+//                        showExceptionDialog("Instantiation problem", e);
                     }
                     return org.eclipse.core.runtime.Status.OK_STATUS;
                 }

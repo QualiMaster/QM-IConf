@@ -82,7 +82,7 @@ public class ModelModifier {
     /**
      * Adds freeze blocks to the configuration projects.
      */
-    private static final boolean FREEZE = true;
+    private static final boolean FREEZE = false;
     
     /**
      * Saves the configured values (stores the into the models), before pruning. <br/>
