@@ -18,6 +18,8 @@ import static eu.qualimaster.easy.extension.QmConstants.PROJECT_TOP_LEVEL;
 import static eu.qualimaster.easy.extension.QmConstants.SLOT_NAME;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_ADAPTIVITY_QPARAMWEIGHTING;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_ALGORITHM;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_SOFTWARE_ALGORITHM;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_HARDWARE_ALGORITHM;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_DATASINK;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_DATASOURCE;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_FAMILY;
@@ -27,6 +29,7 @@ import static eu.qualimaster.easy.extension.QmConstants.TYPE_MACHINE;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_OBSERVABLES_CONFIGUREDQPARAM;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_PERSISTENTDATAELT;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_PIPELINE;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_SUBPIPELINE;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_SUBPIPELINE_ALGORITHM;
 import static eu.qualimaster.easy.extension.QmConstants.VAR_ADAPTIVITY_CROSSPIPELINETRADEOFFS;
 import static eu.qualimaster.easy.extension.QmConstants.VAR_ADAPTIVITY_PIPELINEIMPORTANCE;
@@ -165,6 +168,7 @@ public class VariabilityModel {
         ALGORITHMS(PROJECT_ALGORITHMS,
             new String[] {VAR_ALGORITHMS_ALGORITHMS}, 
             new String[] {TYPE_ALGORITHM, 
+                TYPE_SOFTWARE_ALGORITHM, TYPE_HARDWARE_ALGORITHM, 
 //                PROJECT_PIPELINES + IvmlKeyWords.NAMESPACE_SEPARATOR + 
                 TYPE_SUBPIPELINE_ALGORITHM},
             SourceMode.VARIABLES,
@@ -184,7 +188,7 @@ public class VariabilityModel {
             SourceMode.VARIABLES), // add provided types
         PIPELINES(PROJECT_PIPELINES, 
             new String[] {VAR_PIPELINES_PIPELINES}, 
-            new String[] {TYPE_PIPELINE}, 
+            new String[] {TYPE_PIPELINE, TYPE_SUBPIPELINE}, 
             SourceMode.VARIABLES,
             PipelineElementFactory.INSTANCE), 
         INFRASTRUCTURE(PROJECT_INFRASTRUCTURE, 
@@ -838,7 +842,11 @@ public class VariabilityModel {
         registry.registerImage(Configuration.ALGORITHMS, 0, 
             IconManager.retrieveImage(IconManager.ALGORITHM));
         registry.registerImage(Configuration.ALGORITHMS, 1, 
-            IconManager.retrieveImage(IconManager.SUBALGORITHM));
+            IconManager.retrieveImage(IconManager.ALGORITHM));
+        registry.registerImage(Configuration.ALGORITHMS, 2, 
+                IconManager.retrieveImage(IconManager.HWALGORITHM));
+        registry.registerImage(Configuration.ALGORITHMS, 3, 
+                IconManager.retrieveImage(IconManager.SUBALGORITHM));
         if (DISPLAY_ALGORITHMS_NESTED) {
             registry.registerImage(Configuration.ALGORITHMS, "Family", 
                 IconManager.retrieveImage(IconManager.FAMILY));
@@ -853,6 +861,8 @@ public class VariabilityModel {
             IconManager.retrieveImage(IconManager.PIPELINES));
         registry.registerImage(Configuration.PIPELINES, 0, 
             IconManager.retrieveImage(IconManager.PIPELINE));
+        registry.registerImage(Configuration.PIPELINES, 1, 
+                IconManager.retrieveImage(IconManager.SUBPIPELINE));
         
         registry.registerImage(Configuration.INFRASTRUCTURE, 
             IconManager.retrieveImage(IconManager.INFRASTRUCTURE));

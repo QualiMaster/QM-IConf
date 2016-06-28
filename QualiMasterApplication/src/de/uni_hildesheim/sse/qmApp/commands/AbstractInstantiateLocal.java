@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Shell;
 import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.dialogs.UiTracerFactory;
 import de.uni_hildesheim.sse.qmApp.model.Location;
-import de.uni_hildesheim.sse.qmApp.model.ModelPruner;
+import de.uni_hildesheim.sse.qmApp.model.ModelModifier;
 import de.uni_hildesheim.sse.qmApp.model.ProjectDescriptor;
 import de.uni_hildesheim.sse.qmApp.model.Reasoning;
 import de.uni_hildesheim.sse.qmApp.model.SessionModel;
@@ -67,6 +67,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
         if (null != targetLocation) {
             Job job = new Job("QualiMaster Infrastructure Instantiation Process") {
                 
+                @SuppressWarnings("unused")
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
                     try {
@@ -74,10 +75,11 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                         ProjectDescriptor source = new ProjectDescriptor();
                         ProjectDescriptor target = new ProjectDescriptor(source, trgFolder);
                         Executor executor = null;
+                        ModelModifier modifier = null;
                         if (PRUNE_CONFIG) {
                             // Maybe null in case of any error
-                            ModelPruner pruner = new ModelPruner(trgFolder);
-                            executor = pruner.prepareModels();
+                            modifier = new ModelModifier(trgFolder);
+                            executor = modifier.createExecutor();
                         }
                         if (!PRUNE_CONFIG || null == executor) {
                             executor = new Executor(source.getMainVilScript())
@@ -89,12 +91,17 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                             executor.addStartRuleName(startRuleName);
                         }
                         TracerFactory.setDefaultInstance(UiTracerFactory.INSTANCE);
-                        executor.execute();
+                        //executor.execute();
+                        
+                        if (PRUNE_CONFIG && null != modifier) {
+                            modifier.clear();
+                        }
+                        
                         notifyInstantiationCompleted(shell);
                     } catch (ModelManagementException e) {
                         showExceptionDialog("Model resolution problem", e);
-                    } catch (VilException e) {
-                        showExceptionDialog("Instantiation problem", e);
+//                    } catch (VilException e) {
+//                        showExceptionDialog("Instantiation problem", e);
                     }
                     return org.eclipse.core.runtime.Status.OK_STATUS;
                 }

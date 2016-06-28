@@ -411,8 +411,9 @@ public class PipelineTranslationOperations {
         PipelineSaveContext context) throws PipelineTranslationException {
 
         // define pipeline
+        String typeName = pipeline.getIsSubPipeline() ? QmConstants.TYPE_SUBPIPELINE : QmConstants.TYPE_PIPELINE;
         DecisionVariableDeclaration pipelineVariable = IVMLModelOperations.getDecisionVariable(
-            context.getPipelineProject(), "Pipeline", null, destProject);
+            context.getPipelineProject(), typeName, null, destProject);
         freezables.add(pipelineVariable);
         destProject.add(pipelineVariable);
         //get all pipeline nodes and flows
@@ -442,7 +443,6 @@ public class PipelineTranslationOperations {
         // EASy Editor convention :|
         pipelineCompound.put("debug", pipeline.getDebug() == 0 ? Boolean.TRUE : Boolean.FALSE); 
         pipelineCompound.put("fastSerialization", pipeline.getFastSerialization() == 0 ? Boolean.TRUE : Boolean.FALSE); 
-        pipelineCompound.put("isSubPipeline", pipeline.getIsSubPipeline() == 0 ? Boolean.TRUE : Boolean.FALSE); 
         
         // get source
         ArrayList<String> sourceList = new ArrayList<String>();
@@ -492,7 +492,7 @@ public class PipelineTranslationOperations {
         PipelineSaveContext context, Map<String, Object> pipelineCompound)
         throws PipelineTranslationException {
         
-        if (pipeline.getIsSubPipeline() == 0) {
+        if (pipeline.getIsSubPipeline()) {
             EList<PipelineNode> pipelineNodes = pipeline.getNodes();
             // In a sub pipeline connectors (family elements) may also serve as starting point
             for (PipelineNode pipelineNode : pipelineNodes) {

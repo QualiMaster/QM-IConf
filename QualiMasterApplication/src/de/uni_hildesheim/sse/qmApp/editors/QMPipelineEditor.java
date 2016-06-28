@@ -10,12 +10,14 @@ import org.eclipse.emf.common.ui.URIEditorInput;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gmf.runtime.notation.impl.DiagramImpl;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IPersistableElement;
 
 import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.model.PipelineTranslationException;
 import de.uni_hildesheim.sse.qmApp.model.PipelineTranslationOperations;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
+import de.uni_hildesheim.sse.qmApp.treeView.PipelineElementFactory.DeferredURIEditorInput;
 import pipeline.Pipeline;
 import pipeline.diagram.part.PipelineDiagramEditor;
 
@@ -37,6 +39,22 @@ public class QMPipelineEditor extends PipelineDiagramEditor {
         return pipelineNameAndDisplayname;
     }
 
+    @Override
+    public void init(IEditorSite site, IEditorInput input) throws org.eclipse.ui.PartInitException {
+        super.init(site, input);
+        // Set the parameter that the pipeline is a sub pipeline, without a transaction
+        Object content = getDiagramDocument().getContent();
+        if (input instanceof DeferredURIEditorInput && content instanceof DiagramImpl) {
+            EObject element = ((DiagramImpl) content).getElement();
+            DeferredURIEditorInput pipInput = (DeferredURIEditorInput) input;
+            if (element instanceof Pipeline && pipInput.isSubpipeline()) {
+                element.eSetDeliver(false);
+                ((Pipeline) element).setIsSubPipeline(true);
+                element.eSetDeliver(true);
+            }
+        }
+    }
+    
     @Override
     public void doSave(IProgressMonitor progressMonitor) {
         IEditorInput editorURI = getEditorInput();

@@ -690,6 +690,22 @@ public class ModelAccess {
                     declaredTypes.add((IDatatype) elt);
                 }
             }
+            String[] additionalTypeNames = part.getProvidedTypeNames();
+            if (null != additionalTypeNames) {
+                for (int i = 0; i < additionalTypeNames.length; i++) {
+                    IDatatype type = null;
+                    try {
+                        type = ModelQuery.findElementByTypeName(
+                            ModelAccess.getModel(VariabilityModel.Definition.TOP_LEVEL), additionalTypeNames[i], null);
+                    } catch (ModelQueryException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    if (null != type && !declaredTypes.contains(type)) {
+                        declaredTypes.add(type);
+                    }
+                }
+            }
             int i = 0; 
             while (i < tmp.size()) {
                 IDatatype type = tmp.get(i);
@@ -698,8 +714,11 @@ public class ModelAccess {
                     for (int d = 0; d < declaredTypes.size(); d++) {
                         IDatatype decl = declaredTypes.get(d);
                         if (decl instanceof Compound && ((Compound) decl).getRefines() == cmp) {
-                            declaredTypes.remove(d);
-                            tmp.add(decl);
+                            //declaredTypes.remove(d);
+                            // Avoid duplicates
+                            if (!tmp.contains(decl)) {
+                                tmp.add(decl);
+                            }
                         }
                     }
                     if (cmp.isAbstract()) {

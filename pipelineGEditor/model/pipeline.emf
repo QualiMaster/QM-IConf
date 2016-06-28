@@ -11,7 +11,7 @@ class Pipeline {
   attr String constraints = ""; // constraints as text separated by ";"
   attr Integer debug = 1; // 1 = false in EASy editors :|
   attr Integer fastSerialization = 1;// 1 = false in EASy editors :|
-  attr Integer isSubPipeline = 1; // 1 = false, Booleans won't work with generated property editors
+  attr Boolean isSubPipeline = false;
 }
 
 @gmf.node(label="name", label.icon="false", figure="svg", label.placement="external")

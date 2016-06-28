@@ -7,6 +7,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.swt.graphics.Image;
 
 import de.uni_hildesheim.sse.qmApp.editorInput.CompoundVariableEditorInputCreator;
+import de.uni_hildesheim.sse.qmApp.editorInput.ContainerVariableEditorInputChangeListener;
 import de.uni_hildesheim.sse.qmApp.editorInput.ContainerVariableEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator.CloneMode;
@@ -298,6 +299,14 @@ public class ConfigurableElement { // unsure whether this shall be a resource
     public boolean deleteFromChildren(ConfigurableElement child) {
         boolean done = false;
         if (null != children) {
+            if (!child.isTopLevel()) {
+                int index = children.indexOf(child);
+                if (index >= 0) {
+                    ConfigurableElement parent = child.getParent();
+                    String name = parent.getDisplayName();
+                    ContainerVariableEditorInputChangeListener.INSTANCE.notifyDeletetion(name, index);
+                }
+            }
             done = children.remove(child);
         }
         return done;

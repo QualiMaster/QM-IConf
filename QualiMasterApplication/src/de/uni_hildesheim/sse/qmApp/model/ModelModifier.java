@@ -44,6 +44,7 @@ import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.ConfigurationException;
 import net.ssehub.easy.varModel.management.VarModel;
 import net.ssehub.easy.varModel.model.AbstractVariable;
+import net.ssehub.easy.varModel.model.Comment;
 import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
 import net.ssehub.easy.varModel.model.Project;
 import net.ssehub.easy.varModel.model.filter.DeclarationFinder;
@@ -51,61 +52,77 @@ import net.ssehub.easy.varModel.model.filter.DeclarationFinder.VisibilityType;
 import net.ssehub.easy.varModel.model.filter.FilterType;
 import net.ssehub.easy.varModel.model.rewrite.ProjectCopyVisitor;
 import net.ssehub.easy.varModel.model.rewrite.ProjectRewriteVisitor;
+import net.ssehub.easy.varModel.model.rewrite.modifier.FrozenCompoundConstraintsOmitter;
+import net.ssehub.easy.varModel.model.rewrite.modifier.FrozenConstraintVarFilter;
+import net.ssehub.easy.varModel.model.rewrite.modifier.FrozenConstraintsFilter;
+import net.ssehub.easy.varModel.model.rewrite.modifier.FrozenTypeDefResolver;
+import net.ssehub.easy.varModel.model.rewrite.modifier.ModelElementFilter;
 import qualimasterapplication.Activator;
 
 /**
  * This class should modify and prune the model and it's configuration before instantiation.
+ * Specifically, this modifier does the following:
+ * <ul>
+ *   <li>Dynamically freeze values ({@value #FREEZE})</li>
+ *   <li>Stores propagated values inside the configuration ({@value #SAVE_VALUES})</li>
+ *   <li>Optimizes the model for runtime (prune config) ({@value #PRUNE_CONFIG})</li>
+ *   <li>Saves the modified configuration to {@value #COPIED_IVML_LOCATION} ({@value #WRITE_MODIFIED_CONFIG})</li>
+ *   <li>Saves the VIL model to {@value #COPIED_VIL_LOCATION}</li>
+ * </ul>
  * @author El-Sharkawy
  *
  */
-public class ModelPruner {
+public class ModelModifier {
     
-    /**
+    /*
      * Settings, which treatments shall be applied to the model during pruning.
      * These may be enabled/disabled for testing purposes.
-     * @author El-Sharkawy
-     *
      */
-    private static class Settings {
-        /**
-         * Adds freeze blocks to the configuration projects.
-         */
-        private static final boolean FREEZE = true;
-        
-        /**
-         * Saves the configured values (stores the into the models), before pruning. <br/>
-         * This is necessary as some values are set by constraints (which shall be removed).
-         * 
-         */
-        private static final boolean SAVE_VALUES = true;
-        
-        /**
-         * Saves the pruned configuration (writes it to disk).
-         */
-        private static final boolean WRITE_PRUNED_CONFIG = true;
-        
-        /**
-         * Destination of the pruned configuration / projects.
-         * @see #WRITE_PRUNED_CONFIG
-         */
-        private static final String COPIED_IVML_LOCATION = "QM-Model";
-        
-        /**
-         * Destination of the pruned configuration / projects.
-         */
-        private static final String COPIED_VIL_LOCATION = "Instantiation";
-    }
     
+    /**
+     * Adds freeze blocks to the configuration projects.
+     */
+    private static final boolean FREEZE = false;
     
+    /**
+     * Saves the configured values (stores the into the models), before pruning. <br/>
+     * This is necessary as some values are set by constraints (which shall be removed).
+     * 
+     */
+    private static final boolean SAVE_VALUES = true;
+    
+    /**
+     * Saves the pruned configuration (writes it to disk).
+     */
+    private static final boolean WRITE_MODIFIED_CONFIG = true;
+    
+    /**
+     * Specifies whether elements shall be deleted, which are not necessary for runtime:
+     * <tt>true</tt> delete frozen and unused elements, <tt>false</tt> do not delete anything.
+     */
+    private static final boolean PRUNE_CONFIG = true;
+    
+    /**
+     * Destination of the pruned configuration / projects.
+     * @see #WRITE_MODIFIED_CONFIG
+     */
+    private static final String COPIED_IVML_LOCATION = "QM-Model";
+    
+    /**
+     * Destination of the pruned configuration / projects.
+     */
+    private static final String COPIED_VIL_LOCATION = "Instantiation";
     
     private File targetFolder;
+    private ModelInfo<Project> oldProjectInfo;
     
     /**
      * Single constructor for this class.
      * @param targetFolder The destination folder where to instantiate all artifacts
      */
-    public ModelPruner(File targetFolder) {
+    public ModelModifier(File targetFolder) {
         this.targetFolder = targetFolder;
+        oldProjectInfo = null;
     }
     
     /**
@@ -114,40 +131,26 @@ public class ModelPruner {
      * which should be used for the instantiation of the QM model.
      * @return {@link Configuration}, which should be used for the instantiation of the QM model
      */
-    public Executor prepareModels() {
+    public Executor createExecutor() {
         // Create frozen and pruned config
         Executor executor = null;
-        Configuration config = freezeAndPruneConfig(targetFolder);
+        Configuration config = prepareConfig(targetFolder);
         
         // Register copied model
-        File destFolder = new File(targetFolder, Settings.COPIED_IVML_LOCATION);
+        File destFolder = new File(targetFolder, COPIED_IVML_LOCATION);
+        oldProjectInfo = VarModel.INSTANCE.availableModels().getModelInfo(config.getProject());
         VarModel.INSTANCE.updateModel(config.getProject(), destFolder.toURI());
         
         // Copy build model and load this temporarily
-        File srcFolder = new File(Location.getModelLocationFile(), "EASy");
-        File vilFolder = new File(targetFolder, Settings.COPIED_VIL_LOCATION);
-        vilFolder.mkdirs();
-        try {
-            FileUtils.copyDirectory(srcFolder, vilFolder, new FileFilter() {
-                
-                @Override
-                public boolean accept(File pathname) {
-                    String fileName = pathname.getName();
-                    return pathname.isDirectory() || fileName.endsWith("vil") || fileName.endsWith("vtl")
-                        || fileName.endsWith("rtvtl");
-                }
-            });
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        File vilFolder = copyBuildModel();
+        
         try {
             net.ssehub.easy.producer.core.persistence.Configuration pathConfig
                 = PersistenceUtils.getConfiguration(targetFolder);
             try {
-                pathConfig.setPath(PathKind.IVML, Settings.COPIED_IVML_LOCATION);
-                pathConfig.setPath(PathKind.VIL, Settings.COPIED_VIL_LOCATION);
-                pathConfig.setPath(PathKind.VTL, Settings.COPIED_VIL_LOCATION);
+                pathConfig.setPath(PathKind.IVML, COPIED_IVML_LOCATION);
+                pathConfig.setPath(PathKind.VIL, COPIED_VIL_LOCATION);
+                pathConfig.setPath(PathKind.VTL, COPIED_VIL_LOCATION);
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -173,32 +176,81 @@ public class ModelPruner {
     }
     
     /**
+     * Restores the old state inside the tooling after instantiation (should be called after {@link #createExecutor()}
+     * was used for instantiation). 
+     */
+    public void clear() {
+        // Restore variability model
+        if (null != oldProjectInfo && null != oldProjectInfo.getResolved() && null != oldProjectInfo.getLocation()) {
+            VarModel.INSTANCE.updateModel(oldProjectInfo.getResolved(), oldProjectInfo.getLocation());
+        }
+        
+        // TODO SE: Restore VIL 
+    }
+
+    /**
+     * Creates a copy of the build model and place the files parallel to the copied variability model files.
+     * @return The root folder of the copied model files.
+     */
+    private File copyBuildModel() {
+        File srcFolder = new File(Location.getModelLocationFile(), "EASy");
+        File vilFolder = new File(targetFolder, COPIED_VIL_LOCATION);
+        vilFolder.mkdirs();
+        try {
+            FileUtils.copyDirectory(srcFolder, vilFolder, new FileFilter() {
+                
+                @Override
+                public boolean accept(File pathname) {
+                    String fileName = pathname.getName();
+                    return pathname.isDirectory() || fileName.endsWith("vil") || fileName.endsWith("vtl")
+                        || fileName.endsWith("rtvtl");
+                }
+            });
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return vilFolder;
+    }
+    
+    /**
      * Prepares the underlying IVML {@link Project} for instantiation and generates a pruned 
      * {@link Configuration}, which should be used for the instantiation of the QM model.
      * @param targetLocation The destination folder where to instantiate all artifacts
      * @return {@link Configuration}, which should be used for the instantiation of the QM model
      */
-    private Configuration freezeAndPruneConfig(File targetLocation) {
+    private Configuration prepareConfig(File targetLocation) {
         // Copy base project
-        Configuration cfg = VariabilityModel.Definition.TOP_LEVEL.getConfiguration();
         Project baseProject = VariabilityModel.Definition.TOP_LEVEL.getConfiguration().getProject();
         ProjectCopyVisitor copier = new ProjectCopyVisitor(baseProject, FilterType.ALL);
         baseProject.accept(copier);
         baseProject = copier.getCopiedProject();
 
-        if (Settings.SAVE_VALUES) {
+        if (SAVE_VALUES) {
             saveValues(baseProject, new HashSet<Project>());
         }
         
         // Freeze the copy, except for the runtime elements.
-        if (Settings.FREEZE) {
+        if (FREEZE) {
             freezeProject(baseProject);
         }
         
+        // Prune Config to optimize runtime behaviour
+        if (PRUNE_CONFIG) {
+            ProjectRewriteVisitor rewriter = new ProjectRewriteVisitor(baseProject, FilterType.ALL);
+            Configuration config = new Configuration(baseProject, true);
+            rewriter.addModelCopyModifier(new ModelElementFilter(Comment.class));
+            rewriter.addModelCopyModifier(new FrozenConstraintsFilter(config));
+            rewriter.addModelCopyModifier(new FrozenTypeDefResolver(config));
+            rewriter.addModelCopyModifier(new FrozenConstraintVarFilter(config));
+            rewriter.addModelCopyModifier(new FrozenCompoundConstraintsOmitter(config));
+            baseProject.accept(rewriter);
+        }
+        
         // Saved copied projects
-        if (Settings.WRITE_PRUNED_CONFIG) {
+        if (WRITE_MODIFIED_CONFIG) {
             try {
-                File modelFolder = new File(targetLocation, Settings.COPIED_IVML_LOCATION);
+                File modelFolder = new File(targetLocation, COPIED_IVML_LOCATION);
                 if (!modelFolder.exists()) {
                     modelFolder.mkdirs();
                 }
@@ -227,13 +279,13 @@ public class ModelPruner {
             done.add(project);
             
             if (project.getName().endsWith(QmConstants.CFG_POSTFIX)) {
-                Activator.getLogger(ModelPruner.class).debug("Saving ", project.getName());
+                Activator.getLogger(ModelModifier.class).debug("Saving ", project.getName());
                 try {
                     Configuration tmpConfig = new Configuration(project, true);
                     // Will change the underlying Project as a side effect
                     new QmPrunedConfigSaver(tmpConfig);
                 } catch (ConfigurationException e1) {
-                    Activator.getLogger(ModelPruner.class).exception(e1);
+                    Activator.getLogger(ModelModifier.class).exception(e1);
                 }
             }
             
