@@ -17,6 +17,7 @@ package de.uni_hildesheim.sse.qmApp.model;
 
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.ConfigurationException;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.model.Project;
 
 /**
@@ -38,5 +39,12 @@ class QmPrunedConfigSaver extends QualiMasterConfigurationSaver {
     @Override
     protected void saveFreezeStates(Project confProject) {
         // Freeze States are added by the next step
+        super.saveFreezeStates(confProject);
+    }
+    
+    @Override
+    protected boolean isSavingEnabled(Project destProject, IDecisionVariable var) {
+        // QMI-Conf app does not modify predefined annotation values -> do not save them 
+        return super.isSavingEnabled(destProject, var) && !var.getDeclaration().isAttribute();
     }
 }
