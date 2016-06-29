@@ -23,6 +23,7 @@ import de.uni_hildesheim.sse.qmApp.model.Reasoning;
 import de.uni_hildesheim.sse.qmApp.model.SessionModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
+import net.ssehub.easy.instantiation.core.model.common.VilException;
 import net.ssehub.easy.instantiation.core.model.execution.Executor;
 import net.ssehub.easy.instantiation.core.model.execution.TracerFactory;
 import net.ssehub.easy.producer.ui.productline_editor.EclipseConsole;
@@ -90,7 +91,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                             executor.addStartRuleName(startRuleName);
                         }
                         TracerFactory.setDefaultInstance(UiTracerFactory.INSTANCE);
-                        //executor.execute();
+                        executor.execute();
                         
                         if (PRUNE_CONFIG && null != modifier) {
                             modifier.clear();
@@ -99,8 +100,8 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                         notifyInstantiationCompleted(shell);
                     } catch (ModelManagementException e) {
                         showExceptionDialog("Model resolution problem", e);
-//                    } catch (VilException e) {
-//                        showExceptionDialog("Instantiation problem", e);
+                    } catch (VilException e) {
+                        showExceptionDialog("Instantiation problem", e);
                     }
                     return org.eclipse.core.runtime.Status.OK_STATUS;
                 }
