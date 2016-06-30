@@ -23,6 +23,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link pipeline.Pipeline#getDebug <em>Debug</em>}</li>
  *   <li>{@link pipeline.Pipeline#getFastSerialization <em>Fast Serialization</em>}</li>
  *   <li>{@link pipeline.Pipeline#getIsSubPipeline <em>Is Sub Pipeline</em>}</li>
+ *   <li>{@link pipeline.Pipeline#getSubPipelineFamily <em>Sub Pipeline Family</em>}</li>
  * </ul>
  * </p>
  *
@@ -252,5 +253,31 @@ public interface Pipeline extends EObject
 	 * @generated
 	 */
 	void setIsSubPipeline(Boolean value);
+
+/**
+	 * Returns the value of the '<em><b>Sub Pipeline Family</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Sub Pipeline Family</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Sub Pipeline Family</em>' attribute.
+	 * @see #setSubPipelineFamily(String)
+	 * @see pipeline.PipelinePackage#getPipeline_SubPipelineFamily()
+	 * @model
+	 * @generated
+	 */
+	String getSubPipelineFamily();
+
+/**
+	 * Sets the value of the '{@link pipeline.Pipeline#getSubPipelineFamily <em>Sub Pipeline Family</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Sub Pipeline Family</em>' attribute.
+	 * @see #getSubPipelineFamily()
+	 * @generated
+	 */
+	void setSubPipelineFamily(String value);
 
 } // Pipeline

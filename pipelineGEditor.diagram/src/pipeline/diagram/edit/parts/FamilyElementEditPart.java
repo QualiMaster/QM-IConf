@@ -234,10 +234,10 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
 	}
 
 	/**
-     * @generated
-     */
-    protected void handleNotificationEvent(Notification event) {
-        if (event.getNotifier() == getModel()
+	 * @generated
+	 */
+	protected void handleNotificationEvent(Notification event) {
+		if (event.getNotifier() == getModel()
                 && EcorePackage.eINSTANCE.getEModelElement_EAnnotations()
                         .equals(event.getFeature())) {
             handleMajorSemanticChange();
@@ -262,7 +262,7 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
              */
             super.handleNotificationEvent(event);
         }
-    }
+	}
 
 	/**
 	 * @generated

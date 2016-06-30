@@ -148,13 +148,22 @@ public interface PipelinePackage extends EPackage
 	int PIPELINE__IS_SUB_PIPELINE = 8;
 
 /**
+	 * The feature id for the '<em><b>Sub Pipeline Family</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PIPELINE__SUB_PIPELINE_FAMILY = 9;
+
+/**
 	 * The number of structural features of the '<em>Pipeline</em>' class.
 	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-  int PIPELINE_FEATURE_COUNT = 9;
+  int PIPELINE_FEATURE_COUNT = 10;
 
   /**
 	 * The meta object id for the '{@link pipeline.impl.PipelineElementImpl <em>Element</em>}' class.
@@ -825,6 +834,17 @@ public interface PipelinePackage extends EPackage
 	EAttribute getPipeline_IsSubPipeline();
 
 /**
+	 * Returns the meta object for the attribute '{@link pipeline.Pipeline#getSubPipelineFamily <em>Sub Pipeline Family</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Sub Pipeline Family</em>'.
+	 * @see pipeline.Pipeline#getSubPipelineFamily()
+	 * @see #getPipeline()
+	 * @generated
+	 */
+	EAttribute getPipeline_SubPipelineFamily();
+
+/**
 	 * Returns the meta object for class '{@link pipeline.PipelineElement <em>Element</em>}'.
 	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -1172,6 +1192,14 @@ public interface PipelinePackage extends EPackage
 		 * @generated
 		 */
 		EAttribute PIPELINE__IS_SUB_PIPELINE = eINSTANCE.getPipeline_IsSubPipeline();
+
+																/**
+		 * The meta object literal for the '<em><b>Sub Pipeline Family</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute PIPELINE__SUB_PIPELINE_FAMILY = eINSTANCE.getPipeline_SubPipelineFamily();
 
 																/**
 		 * The meta object literal for the '{@link pipeline.impl.PipelineElementImpl <em>Element</em>}' class.

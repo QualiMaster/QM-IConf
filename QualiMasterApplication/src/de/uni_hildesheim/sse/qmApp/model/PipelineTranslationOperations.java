@@ -505,6 +505,12 @@ public class PipelineTranslationOperations {
             }
             
             pipelineCompound.put("connectors", context.getConnectorNames().toArray());
+            
+            // Family to which this sub pipeline belongs to
+            String family = pipeline.getSubPipelineFamily();
+            if (null != family) {
+                pipelineCompound.put("subPipelineFamily", family);
+            }
         }
     }
 

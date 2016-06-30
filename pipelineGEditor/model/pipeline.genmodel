@@ -15,6 +15,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Pipeline/debug"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Pipeline/fastSerialization"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Pipeline/isSubPipeline"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Pipeline/subPipelineFamily"/>
     </genClasses>
     <genClasses image="false" ecoreClass="pipeline.ecore#//PipelineElement">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//PipelineElement/name"/>

@@ -18,17 +18,17 @@ import static eu.qualimaster.easy.extension.QmConstants.PROJECT_TOP_LEVEL;
 import static eu.qualimaster.easy.extension.QmConstants.SLOT_NAME;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_ADAPTIVITY_QPARAMWEIGHTING;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_ALGORITHM;
-import static eu.qualimaster.easy.extension.QmConstants.TYPE_SOFTWARE_ALGORITHM;
-import static eu.qualimaster.easy.extension.QmConstants.TYPE_HARDWARE_ALGORITHM;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_DATASINK;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_DATASOURCE;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_FAMILY;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_FIELDTYPE;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_HARDWARE_ALGORITHM;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_HWNODE;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_MACHINE;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_OBSERVABLES_CONFIGUREDQPARAM;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_PERSISTENTDATAELT;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_PIPELINE;
+import static eu.qualimaster.easy.extension.QmConstants.TYPE_SOFTWARE_ALGORITHM;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_SUBPIPELINE;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_SUBPIPELINE_ALGORITHM;
 import static eu.qualimaster.easy.extension.QmConstants.VAR_ADAPTIVITY_CROSSPIPELINETRADEOFFS;
@@ -63,6 +63,7 @@ import de.uni_hildesheim.sse.qmApp.editors.ClassEditor;
 import de.uni_hildesheim.sse.qmApp.editors.ConstraintsEditor;
 import de.uni_hildesheim.sse.qmApp.editors.DefaultAlgorithmCellEditor;
 import de.uni_hildesheim.sse.qmApp.editors.FamilyEditor;
+import de.uni_hildesheim.sse.qmApp.editors.FamilySelectionCellEditor;
 import de.uni_hildesheim.sse.qmApp.editors.MultipleLineText;
 import de.uni_hildesheim.sse.qmApp.editors.ParameterEditor;
 import de.uni_hildesheim.sse.qmApp.editors.SourceSinkEditor;
@@ -799,6 +800,10 @@ public class VariabilityModel {
         ConfigurationTableEditorFactory.registerEditorCreator("refTo(Basics::Tuple)", TupleTypeEditor.CREATOR);
         ConfigurationTableEditorFactory.registerEditorCreator("refTo(Algorithms::Algorithm)",
             DefaultAlgorithmCellEditor.CREATOR);
+        
+        // TODO: change to refTo(Families::Family), but this will affect older configurations
+        ConfigurationTableEditorFactory.registerEditorCreator("Pipelines::SubPipeline::subPipelineFamily",
+            FamilySelectionCellEditor.CREATOR);
         
         if (!demoMode) {
             ConfigurationTableEditorFactory.registerEditorCreator("Basics::ClassString", ClassEditor.CREATOR);

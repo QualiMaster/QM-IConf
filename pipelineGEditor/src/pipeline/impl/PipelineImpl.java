@@ -41,6 +41,7 @@ import pipeline.PipelinePackage;
  *   <li>{@link pipeline.impl.PipelineImpl#getDebug <em>Debug</em>}</li>
  *   <li>{@link pipeline.impl.PipelineImpl#getFastSerialization <em>Fast Serialization</em>}</li>
  *   <li>{@link pipeline.impl.PipelineImpl#getIsSubPipeline <em>Is Sub Pipeline</em>}</li>
+ *   <li>{@link pipeline.impl.PipelineImpl#getSubPipelineFamily <em>Sub Pipeline Family</em>}</li>
  * </ul>
  * </p>
  *
@@ -207,6 +208,26 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 	 * @ordered
 	 */
 	protected Boolean isSubPipeline = IS_SUB_PIPELINE_EDEFAULT;
+
+/**
+	 * The default value of the '{@link #getSubPipelineFamily() <em>Sub Pipeline Family</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getSubPipelineFamily()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String SUB_PIPELINE_FAMILY_EDEFAULT = null;
+
+/**
+	 * The cached value of the '{@link #getSubPipelineFamily() <em>Sub Pipeline Family</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getSubPipelineFamily()
+	 * @generated
+	 * @ordered
+	 */
+	protected String subPipelineFamily = SUB_PIPELINE_FAMILY_EDEFAULT;
 
 /**
 	 * <!-- begin-user-doc -->
@@ -404,6 +425,27 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 
 /**
 	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getSubPipelineFamily() {
+		return subPipelineFamily;
+	}
+
+/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setSubPipelineFamily(String newSubPipelineFamily) {
+		String oldSubPipelineFamily = subPipelineFamily;
+		subPipelineFamily = newSubPipelineFamily;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, PipelinePackage.PIPELINE__SUB_PIPELINE_FAMILY, oldSubPipelineFamily, subPipelineFamily));
+	}
+
+/**
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -446,6 +488,8 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 				return getFastSerialization();
 			case PipelinePackage.PIPELINE__IS_SUB_PIPELINE:
 				return getIsSubPipeline();
+			case PipelinePackage.PIPELINE__SUB_PIPELINE_FAMILY:
+				return getSubPipelineFamily();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -489,6 +533,9 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 			case PipelinePackage.PIPELINE__IS_SUB_PIPELINE:
 				setIsSubPipeline((Boolean)newValue);
 				return;
+			case PipelinePackage.PIPELINE__SUB_PIPELINE_FAMILY:
+				setSubPipelineFamily((String)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -529,6 +576,9 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 			case PipelinePackage.PIPELINE__IS_SUB_PIPELINE:
 				setIsSubPipeline(IS_SUB_PIPELINE_EDEFAULT);
 				return;
+			case PipelinePackage.PIPELINE__SUB_PIPELINE_FAMILY:
+				setSubPipelineFamily(SUB_PIPELINE_FAMILY_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -560,6 +610,8 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 				return FAST_SERIALIZATION_EDEFAULT == null ? fastSerialization != null : !FAST_SERIALIZATION_EDEFAULT.equals(fastSerialization);
 			case PipelinePackage.PIPELINE__IS_SUB_PIPELINE:
 				return IS_SUB_PIPELINE_EDEFAULT == null ? isSubPipeline != null : !IS_SUB_PIPELINE_EDEFAULT.equals(isSubPipeline);
+			case PipelinePackage.PIPELINE__SUB_PIPELINE_FAMILY:
+				return SUB_PIPELINE_FAMILY_EDEFAULT == null ? subPipelineFamily != null : !SUB_PIPELINE_FAMILY_EDEFAULT.equals(subPipelineFamily);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -588,6 +640,8 @@ public class PipelineImpl extends EObjectImpl implements Pipeline
 		result.append(fastSerialization);
 		result.append(", isSubPipeline: ");
 		result.append(isSubPipeline);
+		result.append(", subPipelineFamily: ");
+		result.append(subPipelineFamily);
 		result.append(')');
 		return result.toString();
 	}
