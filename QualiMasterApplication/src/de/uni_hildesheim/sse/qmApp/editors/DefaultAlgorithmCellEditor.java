@@ -45,7 +45,7 @@ public class DefaultAlgorithmCellEditor extends AbstractChangeableDropBoxCellEdi
             }
         }
         
-        // Optimal solution: Filter for relevant algorithms (algorithms which are part of selected family
+        // Optimal solution: Filter for relevant algorithms (algorithms which are part of selected family)
         if (null != familyName && !familyName.isEmpty()) {
             Configuration familyConfig = ModelAccess.getConfiguration(VariabilityModel.Configuration.FAMILIES);
             Iterator<IDecisionVariable> varItr = familyConfig.iterator();

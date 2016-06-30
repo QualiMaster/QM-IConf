@@ -42,6 +42,7 @@ import net.ssehub.easy.varModel.model.filter.mandatoryVars.VariableContainer;
 import pipeline.FamilyElement;
 import pipeline.Pipeline;
 import pipeline.impl.FamilyElementImpl;
+import pipeline.impl.PipelineImpl;
 
 /**
  * Implements a generic property editor creator for pipeline diagram elements.
@@ -161,7 +162,7 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
     protected Compound getCompound() {
         Compound result = null;
         try {
-            result = (Compound) ModelQuery.findElementByName(getVarModel(), getCompoundName(), Compound.class);
+            result = (Compound) ModelQuery.findElementByName(getVarModel(), getCompoundName(), Compound.class);       
         } catch (ModelQueryException e) {
             // not there
         }
@@ -179,6 +180,28 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
         if (propertyIdentifier.length() > 0) {
             // try first with Java convention
             Compound compound = getCompound();
+            if (null != compound) {
+                String name = normalizeIdentifier(propertyIdentifier);
+                result = compound.getElement(name);
+                if (null == result && !name.equals(propertyIdentifier)) {
+                    // just as fallback
+                    result = compound.getElement(propertyIdentifier);
+                }
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Alternative {@link #getVariableName(String)} method if the compound <b>cannot</b> retrieved by the classical
+     * way as it is done inside the {@link #getCompound()} method.
+     * @param compound The concrete (sub) compound to which the slot belongs to.
+     * @param propertyIdentifier the property/slot identifier
+     * @return the variable declaration (may be <b>null</b> if not found)
+     */
+    private DecisionVariableDeclaration getVariableDeclaration(Compound compound, String propertyIdentifier) {
+        DecisionVariableDeclaration result = null;
+        if (propertyIdentifier.length() > 0) {
             if (null != compound) {
                 String name = normalizeIdentifier(propertyIdentifier);
                 result = compound.getElement(name);
@@ -238,8 +261,21 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
     public CellEditor createPropertyEditor(Composite composite, Object data, String propertyIdentifier, 
         IFallbackEditorCreator fallback) {
         CellEditor result = null;
-        Compound compound = getCompound();
-        DecisionVariableDeclaration slot = getVariableDeclaration(propertyIdentifier);
+        Compound compound = null;
+        DecisionVariableDeclaration slot = null;
+        if (data instanceof Pipeline && ((Pipeline) data).getIsSubPipeline()) {
+            try {
+                compound = (Compound) ModelQuery.findElementByName(getVarModel(), QmConstants.TYPE_SUBPIPELINE,
+                    Compound.class);
+                slot = getVariableDeclaration(compound, propertyIdentifier);
+            } catch (ModelQueryException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } 
+        } else {
+            compound = getCompound();
+            slot = getVariableDeclaration(propertyIdentifier);
+        }
         if (null != compound && null != slot) {
             // find top-level type to exclude references
             Compound topCompoundType = compound.getRefinementBasis();
@@ -294,8 +330,21 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
     public ILabelProvider getLabelProvider(Object data, String propertyIdentifier, Object value, 
         IFallbackImageProvider imageProvider) {
         ILabelProvider result = null;
-        Compound compound = getCompound();
-        DecisionVariableDeclaration slot = getVariableDeclaration(propertyIdentifier);
+        Compound compound = null;
+        DecisionVariableDeclaration slot = null;
+        if (data instanceof Pipeline && ((Pipeline) data).getIsSubPipeline()) {
+            try {
+                compound = (Compound) ModelQuery.findElementByName(getVarModel(), QmConstants.TYPE_SUBPIPELINE,
+                    Compound.class);
+                slot = getVariableDeclaration(compound, propertyIdentifier);
+            } catch (ModelQueryException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } 
+        } else {
+            compound = getCompound();
+            slot = getVariableDeclaration(propertyIdentifier);
+        }
         if (null != compound && null != slot) {
             Compound topCompoundType = compound.getRefinementBasis();
             IDatatype slotType = slot.getType();
@@ -308,8 +357,9 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
         }
         
         // Special handling for constraint based combo boxes
-        if (("tupleType".equals(propertyIdentifier) || "default".equals(propertyIdentifier)) 
-            && null != value && value instanceof String) {
+        boolean specialProperty = "tupleType".equals(propertyIdentifier) || "default".equals(propertyIdentifier)
+            || "subPipelineFamily".equals(propertyIdentifier);
+        if (specialProperty && null != value && value instanceof String) {
             
             try {
                 ConstraintSyntaxTree cstValue = ModelUtility.INSTANCE.createExpression((String) value,
@@ -384,13 +434,19 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
                 isVisible = pipeline.getIsSubPipeline() || ((FamilyElement) data).getIsConnector();
             }
         }
+        
+        if (data instanceof Pipeline && "subPipelineFamily".equals(propertyIdentifier)) {
+            isVisible = false;
+            Pipeline pipeline = (Pipeline) data;
+            isVisible = pipeline.getIsSubPipeline();
+        }
         return isVisible;
     }
 
     @Override
     public boolean isFilterable() {
         // Currently, only elements of the family can be filtered.
-        return reactsOn == FamilyElementImpl.class;
+        return reactsOn == FamilyElementImpl.class || reactsOn == PipelineImpl.class;
     }
 
 }

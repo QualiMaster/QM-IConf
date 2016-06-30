@@ -73,6 +73,7 @@ public class PipelineItemProvider
 			addDebugPropertyDescriptor(object);
 			addFastSerializationPropertyDescriptor(object);
 			addIsSubPipelinePropertyDescriptor(object);
+			addSubPipelineFamilyPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -232,6 +233,28 @@ public class PipelineItemProvider
 	}
 
 /**
+	 * This adds a property descriptor for the Sub Pipeline Family feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addSubPipelineFamilyPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Pipeline_subPipelineFamily_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Pipeline_subPipelineFamily_feature", "_UI_Pipeline_type"),
+				 PipelinePackage.Literals.PIPELINE__SUB_PIPELINE_FAMILY,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+/**
 	 * This specifies how to implement {@link #getChildren} and is used to deduce an appropriate feature for an
 	 * {@link org.eclipse.emf.edit.command.AddCommand}, {@link org.eclipse.emf.edit.command.RemoveCommand} or
 	 * {@link org.eclipse.emf.edit.command.MoveCommand} in {@link #createCommand}.
@@ -311,6 +334,7 @@ public class PipelineItemProvider
 			case PipelinePackage.PIPELINE__DEBUG:
 			case PipelinePackage.PIPELINE__FAST_SERIALIZATION:
 			case PipelinePackage.PIPELINE__IS_SUB_PIPELINE:
+			case PipelinePackage.PIPELINE__SUB_PIPELINE_FAMILY:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 			case PipelinePackage.PIPELINE__NODES:

@@ -11,7 +11,13 @@ class Pipeline {
   attr String constraints = ""; // constraints as text separated by ";"
   attr Integer debug = 1; // 1 = false in EASy editors :|
   attr Integer fastSerialization = 1;// 1 = false in EASy editors :|
+  
+  /*
+   * Differentation between Pipeline and Subpipeline, wihtout having
+   * two distict editors.
+   */
   attr Boolean isSubPipeline = false;
+  attr String subPipelineFamily; // Only relevant for sub pipelines 
 }
 
 @gmf.node(label="name", label.icon="false", figure="svg", label.placement="external")
@@ -25,10 +31,6 @@ class Flow extends PipelineElement{
   ref PipelineElement source; // not in IVML, required by diagram editor
   ref PipelineElement destination;
   attr Integer grouping = 0; // enums become integer holding the ordinal (count+1 = nullValue if supported)
-  /*
-   * Single reference (1:1) between one tuple of source.output and destination.input
-   * References become integers holding the global index of all defined variables, -1 is unselected, count+1 = nullValue if supported
-   */
   attr String tupleType;
 }
 
