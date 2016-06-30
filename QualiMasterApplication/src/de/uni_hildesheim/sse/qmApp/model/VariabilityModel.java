@@ -597,8 +597,7 @@ public class VariabilityModel {
             QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.ADAPTIVITY, 
                 "Adaptation");
             ConfigurableElement elt = elements.addElement("Adaptation", "de.uni_hildesheim.sse.qmApp.AdaptationEditor", 
-                new VarModelEditorInputCreator(Configuration.ADAPTIVITY, "Adaptation"),
-                Configuration.ADAPTIVITY);
+                new VarModelEditorInputCreator(Configuration.ADAPTIVITY, "Adaptation"), Configuration.ADAPTIVITY);
             elt.setImage(IconManager.retrieveImage(IconManager.ADAPTATION));
             IEditorInputCreator editorInput = new RtVilEditorInputCreator();
             if (editorInput.isEnabled()) {
