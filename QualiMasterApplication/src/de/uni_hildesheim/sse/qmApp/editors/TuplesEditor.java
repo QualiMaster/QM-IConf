@@ -169,7 +169,7 @@ public class TuplesEditor extends AbstractContainerOfCompoundsTableEditor {
      * 
      * @author Niko Nowatzki
      */
-    public class TupleObject extends TableObject {
+    public class TupleObject extends TypedTableObject {
 
         private String tupleName;
         private Boolean keyPart;

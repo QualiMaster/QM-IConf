@@ -127,7 +127,7 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
      * 
      * @author Niko Nowatzki
      */
-    public class ParameterObject extends TableObject {
+    public class ParameterObject extends TypedTableObject {
         
         private String paraValue;
         
@@ -198,7 +198,6 @@ public class ParameterEditor extends AbstractContainerOfCompoundsTableEditor {
             setValue(getCompoundValue(), QmConstants.SLOT_PARAMETER_DEFAULTVALUE, paraValue);
         }
     }
-   
 
     /**
      * Creates an editor instance.

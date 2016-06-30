@@ -379,7 +379,7 @@
             id="de.uni_hildesheim.sse.qmApp.ObservablesEditor"
             name="Observables">
       </editor>
-      <editor class="de.uni_hildesheim.sse.qmApp.editors.ConfigurationEditor"
+      <editor class="de.uni_hildesheim.sse.qmApp.editors.AdaptationEditor"
             icon="icons/adaptation.png"
             id="de.uni_hildesheim.sse.qmApp.AdaptationEditor"
             name="Adaptation">

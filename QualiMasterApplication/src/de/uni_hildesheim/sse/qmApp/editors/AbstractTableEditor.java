@@ -58,6 +58,7 @@ import qualimasterapplication.Activator;
 public abstract class AbstractTableEditor extends Composite implements IQMEditor, IDirtyableEditor, 
     IModelListener<Project>, IRefreshableEditor {
 
+    protected static final String SLOT_NAME = QmConstants.SLOT_FIELD_NAME;
     protected static final String SLOT_TYPE = QmConstants.SLOT_FIELD_TYPE;
     
     private TableViewer tableViewer;
@@ -291,7 +292,7 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
         String name = null;
         if (null != compound) {
             try {
-                name = compound.getStringValue("name");
+                name = compound.getStringValue(SLOT_NAME);
                 DecisionVariableDeclaration element = ((Compound) compound.getType()).getElement(field);
                 if (null != element) {
                     IDatatype type = element.getType();
@@ -353,26 +354,23 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
     }
 
     /**
-     * A basic table object representing a compound with name and type.
+     * A basic table object representing a compound a name.
      * 
      * @author Holger Eichelberger
      */
     protected class TableObject {
         
         private String name;
-        private String type;
         private IValueAccessor accessor;
 
         /**
          * Creates a table object.
          * 
          * @param name the name
-         * @param type the type
          * @param accessor the value accessor
          */
-        protected TableObject(String name, String type, IValueAccessor accessor) {
+        protected TableObject(String name, IValueAccessor accessor) {
             this.name = name;
-            this.type = type;
             this.accessor = accessor;
         }
         
@@ -392,7 +390,39 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
          */
         public void setName(String name) {
             this.name = name;
-            setValue(getCompoundValue(), "name", name);
+            setValue(getCompoundValue(), SLOT_NAME, name);
+        }
+        
+        /**
+         * Returns the compound value.
+         * 
+         * @return the compound value
+         */
+        protected CompoundValue getCompoundValue() {
+            return accessor.getValue(this);
+        }
+        
+    }
+    
+    /**
+     * A basic table object representing a compound with name and type.
+     * 
+     * @author Holger Eichelberger
+     */
+    protected class TypedTableObject extends TableObject {
+        
+        private String type;
+
+        /**
+         * Creates a table object.
+         * 
+         * @param name the name
+         * @param type the type
+         * @param accessor the value accessor
+         */
+        protected TypedTableObject(String name, String type, IValueAccessor accessor) {
+            super(name, accessor);
+            this.type = type;
         }
         
         /**
@@ -413,16 +443,8 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
             setValue(getCompoundValue(), SLOT_TYPE, type);
         }
         
-        /**
-         * Returns the compound value.
-         * 
-         * @return the compound value
-         */
-        protected CompoundValue getCompoundValue() {
-            return accessor.getValue(this);
-        }
-        
     }
+
     
     /**
      * EditingSUpport for name row assuming that table elements are of type {@link TableObject}.
@@ -440,7 +462,7 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
          * @param viewer the parent table viewer
          */
         public NameEditingSupport(TableViewer viewer) {
-            this(viewer, getTemporaryDecisionVariable("name"));
+            this(viewer, getTemporaryDecisionVariable(SLOT_NAME));
         }
 
         /**
@@ -498,7 +520,7 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
     }
     
     /**
-     * Editing Support for enum-based types.
+     * Editing Support for enum-based types. Requires {@link TypedTableObject}.
      * 
      * @author Niko
      */
@@ -543,11 +565,13 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
         @Override
         protected Object getValue(Object element) {
             Object result = -1;
-            TableObject object = (TableObject) element;
-            if (null != type && null != object.type) {
-                EnumLiteral lit = type.get(object.type);
-                if (null != lit) {
-                    result = type.getLiteralIndex(lit);
+            if (element instanceof TypedTableObject) {
+                TypedTableObject object = (TypedTableObject) element;
+                if (null != type && null != object.type) {
+                    EnumLiteral lit = type.get(object.type);
+                    if (null != lit) {
+                        result = type.getLiteralIndex(lit);
+                    }
                 }
             }
             return result;
@@ -555,25 +579,28 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
 
         @Override
         protected void setValue(Object element, Object value) {
-            TableObject object = (TableObject) element;
-            if (value != null) {
-                if (value instanceof Integer && null != type) {
-                    EnumLiteral lit = type.getLiteral(((Integer) value).intValue());
-                    if (null != lit) {
-                        object.setType(lit.getName());
+            if (element instanceof TypedTableObject) {
+                TypedTableObject object = (TypedTableObject) element;
+                if (value != null) {
+                    if (value instanceof Integer && null != type) {
+                        EnumLiteral lit = type.getLiteral(((Integer) value).intValue());
+                        if (null != lit) {
+                            object.setType(lit.getName());
+                            viewer.update(element, null);
+                        }
+                    } else {
+                        object.setType(value.toString());
                         viewer.update(element, null);
                     }
-                } else {
-                    object.setType(value.toString());
-                    viewer.update(element, null);
                 }
-            }    
+            }
         }
     }
 
 
     /**
-     * Editing Support for ref-based types. This class requires proper resolution of the available types.
+     * Editing Support for ref-based types. This class requires proper resolution of the available types. 
+     * Requires {@link TypedTableObject}.
      * 
      * @author Niko
      */
@@ -616,11 +643,13 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
         @Override
         protected Object getValue(Object element) {
             int result = -1;
-            TableObject object = (TableObject) element;
-            if (null != items && null != object.type) {
-                for (int i = 0; -1 == result && i < items.length; i++) {
-                    if (items[i].equals(object.type)) {
-                        result = i;
+            if (element instanceof TypedTableObject) {
+                TypedTableObject object = (TypedTableObject) element;
+                if (null != items && null != object.type) {
+                    for (int i = 0; -1 == result && i < items.length; i++) {
+                        if (items[i].equals(object.type)) {
+                            result = i;
+                        }
                     }
                 }
             }
@@ -629,14 +658,16 @@ public abstract class AbstractTableEditor extends Composite implements IQMEditor
 
         @Override
         protected void setValue(Object element, Object value) {
-            TableObject object = (TableObject) element;
-            if (null != items && value instanceof Integer) {
-                int pos = ((Integer) value).intValue();
-                if (pos >= 0 && pos < items.length) {
-                    object.setType(items[pos]);
-                    viewer.update(element, null);
+            if (element instanceof TypedTableObject) {
+                TypedTableObject object = (TypedTableObject) element;
+                if (null != items && value instanceof Integer) {
+                    int pos = ((Integer) value).intValue();
+                    if (pos >= 0 && pos < items.length) {
+                        object.setType(items[pos]);
+                        viewer.update(element, null);
+                    }
                 }
-            }    
+            }
         }
     }
 

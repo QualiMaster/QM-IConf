@@ -65,6 +65,7 @@ import de.uni_hildesheim.sse.qmApp.editors.DefaultAlgorithmCellEditor;
 import de.uni_hildesheim.sse.qmApp.editors.FamilyEditor;
 import de.uni_hildesheim.sse.qmApp.editors.MultipleLineText;
 import de.uni_hildesheim.sse.qmApp.editors.ParameterEditor;
+import de.uni_hildesheim.sse.qmApp.editors.QualityParameterWeightingEditor;
 import de.uni_hildesheim.sse.qmApp.editors.SourceSinkEditor;
 import de.uni_hildesheim.sse.qmApp.editors.TupleTypeEditor;
 import de.uni_hildesheim.sse.qmApp.editors.TuplesEditor;
@@ -804,6 +805,8 @@ public class VariabilityModel {
             ConfigurationTableEditorFactory.registerEditorCreator("Basics::ClassString", ClassEditor.CREATOR);
             ConfigurationTableEditorFactory.registerEditorCreator("Basics::OptionalClassString", ClassEditor.CREATOR);
         }
+        ConfigurationTableEditorFactory.registerEditorCreator("sequenceOf(Adaptivity::QualityParameterWeighting)", 
+            QualityParameterWeightingEditor.CREATOR);
     }
 
     /**
