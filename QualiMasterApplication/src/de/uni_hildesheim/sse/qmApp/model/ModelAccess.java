@@ -509,9 +509,40 @@ public class ModelAccess {
                     }
                 }
             }
+            if (null == displayName) {
+                displayName = getObservableFallbackDisplayName(var);
+            }
         }
         if (null == displayName && null != var) {
             displayName = getDisplayName(var.getDeclaration());
+        }
+        return displayName;
+    }
+    
+    /**
+     * Returns the type as fallback display name for a decision variable of type observable.
+     * 
+     * @param var the variable to return the display name for
+     * @return the display name, may be <b>null</b> if the fallback does not work
+     */
+    private static String getObservableFallbackDisplayName(IDecisionVariable var) {
+        String displayName = null;
+        try {
+            IDatatype obs = ModelQuery.findType(var.getConfiguration().getProject(), 
+                QmConstants.TYPE_OBSERVABLES_OBSERVABLE, null);
+            if (null != obs && obs.isAssignableFrom(var.getDeclaration().getType())) {
+                for (int n = 0; null == displayName && n < var.getNestedElementsCount(); n++) {
+                    IDecisionVariable nVar = var.getNestedElement(n);
+                    AbstractVariable nDecl = nVar.getDeclaration();
+                    if (nDecl.getName().equals(QmConstants.SLOT_OBSERVABLE_TYPE)) {
+                        Value value = nVar.getValue();
+                        if (null != value) {
+                            displayName = ((StringValue) value).getValue();
+                        }
+                    }
+                }
+            }
+        } catch (ModelQueryException e) {
         }
         return displayName;
     }

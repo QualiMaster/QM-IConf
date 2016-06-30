@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
+import eu.qualimaster.easy.extension.QmConstants;
 import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.UIChangeListener;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.datatypes.Container;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
+import net.ssehub.easy.varModel.model.datatypes.StringType;
 
 /**
  * Implements a central change manager in order to keep UI elements up to date.
@@ -62,13 +64,24 @@ public class ChangeManager {
             AbstractVariable decl = variable.getDeclaration();
             IDatatype type = decl.getType();
             // filter out irrelevant events
-            if (VariabilityModel.isNameSlot(decl)) {
+            if (VariabilityModel.isNameSlot(decl) || isTypeSlot(decl)) {
                 if (variable.getParent() instanceof IDecisionVariable) {
                     variableChanged(null, (IDecisionVariable) variable.getParent());
                 }
             } else if (Container.TYPE.isAssignableFrom(type)) {
                 variableChanged(null, variable);
             }
+        }
+        
+        /**
+         * Returns whether <code>decl</code> is an observable's type slot.
+         * 
+         * @param decl the declaration
+         * @return <code>true</code> if type slot, <code>false</code> else
+         */
+        private boolean isTypeSlot(AbstractVariable decl) {
+            return QmConstants.SLOT_OBSERVABLE_TYPE.equals(decl.getName()) 
+                && StringType.TYPE.isAssignableFrom(decl.getType());
         }
         
     };

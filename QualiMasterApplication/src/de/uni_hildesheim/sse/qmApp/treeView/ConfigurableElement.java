@@ -153,7 +153,14 @@ public class ConfigurableElement { // unsure whether this shall be a resource
         IVariableEditorInputCreator creator = null;
         IDatatype varType = variable.getDeclaration().getType();
         if (Compound.TYPE.isAssignableFrom(varType)) {
-            creator = new CompoundVariableEditorInputCreator(modelPart, variable.getDeclaration().getName());
+            if (variable.getParent() instanceof ContainerVariable) {
+                ContainerVariable cVar = (ContainerVariable) variable.getParent();
+                creator = new ContainerVariableEditorInputCreator(modelPart, cVar.getDeclaration().getName(), 
+                    cVar.indexOf(variable));
+            } else {
+                creator = new CompoundVariableEditorInputCreator(modelPart, 
+                    variable.getDeclaration().getName());                
+            }
         } else if (variable.getParent() instanceof ContainerVariable) {
             ContainerVariable cont = (ContainerVariable) variable.getParent();
             int index = cont.indexOf(variable);
