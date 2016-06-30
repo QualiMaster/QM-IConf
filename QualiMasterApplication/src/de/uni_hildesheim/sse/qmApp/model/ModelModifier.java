@@ -100,7 +100,7 @@ public class ModelModifier {
      * Specifies whether elements shall be deleted, which are not necessary for runtime:
      * <tt>true</tt> delete frozen and unused elements, <tt>false</tt> do not delete anything.
      */
-    private static final boolean PRUNE_CONFIG = false;
+    private static final boolean PRUNE_CONFIG = true;
     
     /**
      * Destination of the pruned configuration / projects.
