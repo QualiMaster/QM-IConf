@@ -119,7 +119,9 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
 	 * @generated
 	 */
 	protected IFigure createNodeShape() {
-		return primaryShape = new FamilyElementFigure();
+	    FamilyElement model = (FamilyElement) ((ShapeImpl) getModel()).getElement();
+	    Boolean isConnector = model.getIsConnector();
+	    return primaryShape = new FamilyElementFigure(isConnector);
 	}
 
 	/**
