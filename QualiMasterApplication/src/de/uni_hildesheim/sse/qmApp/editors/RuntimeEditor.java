@@ -218,6 +218,14 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         }
 
         /**
+         * Set the color of this trace.
+         * @param color Color to set.
+         */
+        private void setColor(Color color) {
+            trace.setTraceColor(color);
+        }
+        
+        /**
          * Returns the trace.
          * 
          * @return the trace
@@ -577,10 +585,14 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         PipelineGraphColoringWrapper wrapper = pipelinesToDisplayInTableWithObservable.get(0);
         pipelineTitle.append(wrapper.getPipelineParent());
         observableTitle.append(wrapper.getObs() + "...");
-        pipelineTitle.setLength(pipelineTitle.length() - 1);
+ 
+//        if (pipelineTitle.charAt(pipelineTitle.length()) == ',') {
+//            pipelineTitle.setLength(pipelineTitle.length() - 1);
+//        }
+        
         pipelineTitle.append(")"); 
-        observableTitle.setLength(observableTitle.length() - 1);
         observableTitle.append(")");
+        
         Font titleFont = new Font(Display.getCurrent(), "Arial", 11, SWT.BOLD);
         Font achseFont = new Font(Display.getCurrent(), "Arial", 8, SWT.BOLD);      
         xyGraph.setTitleFont(titleFont);
@@ -619,8 +631,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                                 xyGraph.primaryXAxis, xyGraph.primaryYAxis, getPointStyleMod(pipelineTraces.size()),
                                     observalbeForTrace);
                 
-                pTrace.getTrace().setBackgroundColor(color);        
-                pTrace.trace.setForegroundColor(color);              
+                pTrace.setColor(color);             
                 pipCollection.add(pTrace);
                 
                 xyGraph.addTrace(pTrace.getTrace());
@@ -656,10 +667,8 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                         xyGraph.primaryXAxis, xyGraph.primaryYAxis,
                                 getPointStyleMod(pipelineTraces.size()), observalbeForTrace);
                 
-                pTrace.getTrace().setBackgroundColor(color);        
-                pTrace.trace.setForegroundColor(color);
-                pipCollection.add(pTrace);
-                
+                pTrace.setColor(color);        
+                pipCollection.add(pTrace);    
                 
                 xyGraph.addTrace(pTrace.getTrace());
             }
@@ -882,7 +891,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
             @Override
             public void widgetSelected(SelectionEvent evt) {
-                //When the "SAve"-Button is selected, save the selected pipeline-elements and observalbes
+                //When the "Save"-Button is selected, save the selected pipeline-elements and observalbes
                 //by creating objects, which wrap up all info.
                 saveSelections();
             }
