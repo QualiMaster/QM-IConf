@@ -18,9 +18,9 @@ package de.uni_hildesheim.sse.qmApp.editors;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.swt.widgets.Composite;
 
+import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
 import net.ssehub.easy.producer.ui.productline_editor.IUpdateListener;
 import net.ssehub.easy.producer.ui.productline_editor.IUpdateProvider;
-import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 
 /**
@@ -106,6 +106,7 @@ public abstract class UpdatingCellEditor extends CellEditor implements IUpdatePr
      * Called to notify about a value change.
      */
     protected void notifyValueChanged() {
+        fireApplyEditorValue();
         if (null != listener) {
             listener.valueChanged(this);
         }
