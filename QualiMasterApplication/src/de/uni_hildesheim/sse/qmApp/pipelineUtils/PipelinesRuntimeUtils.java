@@ -2,6 +2,7 @@ package de.uni_hildesheim.sse.qmApp.pipelineUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -121,8 +122,9 @@ public class PipelinesRuntimeUtils {
      * 
      * @author Niko Nowatzki
      */
-    public static class PipelineGraphColoringWrapper {
+    public static class PipelineGraphColoringWrapper implements Serializable {
         
+        private static final long serialVersionUID = 998164785967639136L;
         private String elemName;
         private PipelineNodeType type;
         private IDecisionVariable var;
