@@ -14,7 +14,9 @@ public class TestMediator implements DependencyDescriptorMediator {
     @SuppressWarnings("unchecked")
     @Override
     public DependencyDescriptor mediate(DependencyDescriptor dd) {
+        System.out.println("Mediating...");
         if (null != dd) {
+            System.out.println("..." + dd.getDependencyId());
             if (dd.getDependencyId().toString().equals("Qualimaster.Events")) {
                 dd.getAttributes().put("m:classifier", "tests");
             }
