@@ -49,11 +49,14 @@ class ConstraintsCellEditor extends DialogCellEditor implements IUpdateProvider 
 
     @Override
     protected Object openDialogBox(Control cellEditorWindow) {
+        // null means that dialog was canceled or no selectionw as made in dialog
+        Object returnValue = null;
         ConstraintsEditorDialog dlg = new ConstraintsEditorDialog(cellEditorWindow.getShell(), context, valueToStr());
         if (Window.OK == dlg.open()) {
             setValue(dlg.getConstraintsText());
+            returnValue = getValue();
         }
-        return null;
+        return returnValue;
     }
     
     /**

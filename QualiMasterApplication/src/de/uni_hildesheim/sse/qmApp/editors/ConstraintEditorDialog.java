@@ -303,7 +303,7 @@ class ConstraintEditorDialog extends Dialog implements IValidationStateListener 
     protected void okPressed() {
         try {
             String tmp = editor.getConstraint();
-            ModelUtility.INSTANCE.createExpression(tmp, context.getDeclaration());
+            ModelUtility.INSTANCE.createExpression(tmp, context.getDeclaration().getParent());
             constraint = tmp; // if ok, no exception
             super.okPressed();
         } catch (CSTSemanticException e) {

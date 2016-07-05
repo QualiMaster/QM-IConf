@@ -878,7 +878,7 @@ public class PipelineTranslationOperations {
         Object[] postObjectList = new Object[preObjectList.length + 2];
         System.arraycopy(preObjectList, 0, postObjectList, 0, preObjectList.length);
         postObjectList[preObjectList.length] = "constraints";
-        postObjectList[preObjectList.length] = cstValList.toArray();
+        postObjectList[preObjectList.length + 1] = cstValList.toArray();
         
 //        ArrayList<Object> objList = new ArrayList<Object>(Arrays.asList(preObjectList));
 //        objList.add("constraints");
