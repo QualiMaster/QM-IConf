@@ -66,7 +66,7 @@ public class Reasoning {
     static {
         CONFIGURATION = new ReasonerConfiguration();
         CONFIGURATION.enableCustomMessages();
-        CONFIGURATION.createFreshConfiguration();
+        CONFIGURATION.setFreshConfiguration(false);
     }
     
     /**
