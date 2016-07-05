@@ -30,8 +30,6 @@ import javax.tools.ToolProvider;
 
 import org.apache.ivy.Ivy;
 import org.apache.ivy.ant.IvyConvertPom;
-import org.apache.ivy.core.module.descriptor.Configuration;
-import org.apache.ivy.core.module.descriptor.ConfigurationGroup;
 import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.DependencyDescriptorMediator;
@@ -43,13 +41,9 @@ import org.apache.ivy.core.report.ResolveReport;
 import org.apache.ivy.core.resolve.ResolveOptions;
 import org.apache.ivy.core.retrieve.RetrieveOptions;
 import org.apache.ivy.core.settings.IvySettings;
-import org.apache.ivy.plugins.conflict.ConflictManager;
 import org.apache.ivy.plugins.matcher.PatternMatcher;
-import org.apache.ivy.plugins.parser.m2.PomWriterOptions.ConfigurationScopeMapping;
 import org.apache.ivy.plugins.resolver.ChainResolver;
 import org.apache.ivy.plugins.resolver.IBiblioResolver;
-import org.apache.ivy.util.ConfigurationUtils;
-import org.apache.ivy.util.Configurator;
 import org.apache.tools.ant.Project;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -248,7 +242,7 @@ public class ManifestConnection {
             }
         }
         
-        ivySettings.setDefaultCache(new File(mavenPath));
+        ivySettings.setDefaultCache(new File(mavenPath + "/ivy_cache"));
         ivySettings.setDefaultCacheArtifactPattern(
                 "[organisation]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]");
         ivySettings.setDefaultCacheIvyPattern(
@@ -399,8 +393,7 @@ public class ManifestConnection {
         
         deleteDir(this.out);
         setRetrievalFolder(this.out);
-        System.out.println("RETRIEVAL: " + this.out);
-        
+        System.out.println("RETRIEVAL: " + this.out);  
         ResolveOptions ro = new ResolveOptions();
 
         ro.setResolveMode(ResolveOptions.RESOLVEMODE_DYNAMIC);
@@ -418,10 +411,10 @@ public class ManifestConnection {
         dd.addDependencyConfiguration("default", "provided");
 //        dd.addDependencyConfiguration("*", "*");
         md.addDependency(dd);
-//        ModuleId modId = new ModuleId("eu.qualimaster", "QualiMaster.Events");
-//        PatternMatcher pattMatch = null;
-//        DependencyDescriptorMediator ddm = null;
-//        md.addDependencyDescriptorMediator(modId, pattMatch, ddm);
+        ModuleId modId = new ModuleId("eu.qualimaster", "QualiMaster.Events");
+        PatternMatcher pattMatch = new org.apache.ivy.plugins.matcher.ExactPatternMatcher();
+        DependencyDescriptorMediator ddm = new TestMediator();
+        md.addDependencyDescriptorMediator(modId, pattMatch, ddm);
         ModuleDescriptor m = null; 
         try {
             monitor.notifyStart(mainTask, 200);
