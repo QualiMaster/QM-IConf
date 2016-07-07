@@ -43,18 +43,18 @@ public class UiTracerFactory extends TracerFactory {
     }
     
     @Override
-    protected ITracer createTemplateLanguageTracerImpl() {
+    public ITracer createTemplateLanguageTracerImpl() {
         return TRACER;
     }
 
     @Override
-    protected net.ssehub.easy.instantiation.core.model.buildlangModel.ITracer
+    public net.ssehub.easy.instantiation.core.model.buildlangModel.ITracer
         createBuildLanguageTracerImpl() {
         return TRACER;
     }
     
     @Override
-    protected IInstantiatorTracer createInstantiatorTracerImpl() {
+    public IInstantiatorTracer createInstantiatorTracerImpl() {
         return TRACER;
     }
     
