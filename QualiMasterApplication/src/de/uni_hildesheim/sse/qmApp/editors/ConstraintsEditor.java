@@ -169,7 +169,7 @@ public class ConstraintsEditor extends AbstractTableEditor {
         Value result = null;
         ConstraintSyntaxTree cst;
         try {
-            cst = ModelUtility.INSTANCE.createExpression(constraint, getVariable().getDeclaration());
+            cst = ModelUtility.INSTANCE.createExpression(constraint, getVariable().getDeclaration().getParent());
             result = ValueFactory.createValue(ConstraintType.TYPE, cst);
         } catch (CSTSemanticException e) {
             exceptionDialog(e);

@@ -5,13 +5,16 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -107,12 +110,12 @@ public class BootstrappingDialog {
     private Button defaultRepo = null;
 
     private Button ownRepo = null;
-    
+
     private Text urlField = null;
 
     private boolean sourceLocationConfigured = false;
     private boolean modelLocationConfigured = false;
-    
+
     /**
      * A private Constructor prevents any other class from instantiating.
      */
@@ -126,10 +129,10 @@ public class BootstrappingDialog {
      *            Display
      */
     public void init(final Display display) {
-        boolean configured = Boolean.valueOf(EclipsePrefUtils.INSTANCE.getPreference(
-            EclipsePrefUtils.APP_CONFIGURED_PREF_KEY));
-        boolean manually = Boolean.valueOf(EclipsePrefUtils.INSTANCE.getPreference(
-            EclipsePrefUtils.MANUAL_CONFIGURED_PREF_KEY));
+        boolean configured = Boolean
+                .valueOf(EclipsePrefUtils.INSTANCE.getPreference(EclipsePrefUtils.APP_CONFIGURED_PREF_KEY));
+        boolean manually = Boolean
+                .valueOf(EclipsePrefUtils.INSTANCE.getPreference(EclipsePrefUtils.MANUAL_CONFIGURED_PREF_KEY));
         if (configured) {
             if (manually) {
                 ConfigurationProperties.DISABLE_LOGIN.store(String.valueOf(true));
@@ -188,8 +191,7 @@ public class BootstrappingDialog {
     }
 
     /**
-     * Creates the navigation buttons and handles the navigation between the
-     * pages.
+     * Creates the navigation buttons and handles the navigation between the pages.
      * 
      * @param shell
      *            Shell
@@ -224,6 +226,8 @@ public class BootstrappingDialog {
                         layout.topControl = compositeArray[indexNextButton[0]];
                         highlightLeftNavigation(shell.getDisplay(), root, indexNextButton);
                         parent.layout();
+                    } else if (manual.getSelection() && modelLocationConfigured) {
+                        validateSettings(shell, root, parent, layout, compositeArray, indexNextButton);
                     } else {
                         layout.topControl = compositeArray[indexNextButton[0]];
                         highlightLeftNavigation(shell.getDisplay(), root, indexNextButton);
@@ -260,7 +264,7 @@ public class BootstrappingDialog {
                     manual.setSelection(false);
                     next.setEnabled(true);
                 } else {
-                    next.setEnabled(false);                
+                    next.setEnabled(false);
                 }
             }
         });
@@ -286,16 +290,22 @@ public class BootstrappingDialog {
             }
         });
     }
-    
+
     /**
      * Validates the settings made by the user.
      * 
-     * @param shell Shell
-     * @param root root Composite
-     * @param parent parent Composite
-     * @param layout StockLayout
-     * @param compositeArray array containing the stocks for the stock layout
-     * @param indexNextButton index of the page
+     * @param shell
+     *            Shell
+     * @param root
+     *            root Composite
+     * @param parent
+     *            parent Composite
+     * @param layout
+     *            StockLayout
+     * @param compositeArray
+     *            array containing the stocks for the stock layout
+     * @param indexNextButton
+     *            index of the page
      */
     // checkstyle: stop parameter number check
     private void validateSettings(final Shell shell, final Composite root, final Composite parent,
@@ -321,7 +331,7 @@ public class BootstrappingDialog {
         }
     }
     // checkstyle: resume parameter number check
-    
+
     /**
      * Creates a button.
      * 
@@ -392,8 +402,7 @@ public class BootstrappingDialog {
     }
 
     /**
-     * Highlights the left side navigation. The background of the labels and the
-     * text color will change.
+     * Highlights the left side navigation. The background of the labels and the text color will change.
      * 
      * @param display
      *            Display
@@ -419,7 +428,7 @@ public class BootstrappingDialog {
             }
         }
     }
-    
+
     /**
      * Creates the content for inserting the repository url.
      * 
@@ -502,12 +511,20 @@ public class BootstrappingDialog {
                 if (result != null) {
                     next.setEnabled(true);
                     File source = new File(result);
-                    ConfigurationProperties.SOURCE_LOCATION.store(source.getAbsolutePath());
-                    ConfigurationProperties.DISABLE_LOGIN.store(String.valueOf(true));
-                    ConfigurationProperties.MODEL_LOCATION.store(Utils.getDestinationFileForModel().getAbsolutePath());
-                    sourceLocationConfigured = true;
-                    modelLocationConfigured = true;
-                    Location.setSourceLocation(source.getAbsolutePath());
+                    // Validate source. Note: Only checks if ivml files are provided in the folder.
+                    String[] extensions = {"ivml"};
+                    List<File> wanted = (List<File>) FileUtils.listFiles(source, extensions, true);
+                    if (wanted.size() > 0) {
+                        ConfigurationProperties.SOURCE_LOCATION.store(source.getAbsolutePath());
+                        ConfigurationProperties.DISABLE_LOGIN.store(String.valueOf(true));
+                        ConfigurationProperties.MODEL_LOCATION
+                                .store(Utils.getDestinationFileForModel().getAbsolutePath());
+                        sourceLocationConfigured = true;
+                        modelLocationConfigured = true;
+                        Location.setSourceLocation(source.getAbsolutePath());
+                    } else {
+                        createMessage(shell);
+                    }
                 }
             }
         });
