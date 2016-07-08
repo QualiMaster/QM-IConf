@@ -1,5 +1,8 @@
 package de.uni_hildesheim.sse.qmApp.tabbedViews;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -18,6 +21,7 @@ import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.IChangeListener;
 import eu.qualimaster.easy.extension.QmConstants;
 import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory;
 import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
+import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.UIParameter;
 import net.ssehub.easy.producer.ui.productline_editor.DelegatingEasyEditorPage;
 import net.ssehub.easy.producer.ui.productline_editor.IUpdateListener;
 import net.ssehub.easy.producer.ui.productline_editor.IUpdateProvider;
@@ -52,6 +56,8 @@ import pipeline.impl.PipelineImpl;
  */
 public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEditorCreator {
 
+    public static final String ROOT_PARAMETER_NAME = "PipelineRoot";
+    
     private static final String IMPL_SUFFIX = "Impl";
     
     private Class<?> reactsOn;
@@ -300,7 +306,7 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
                     CompoundVariable cVar = (CompoundVariable) tmpVar;
                     DelegatingEasyEditorPage parent = new DelegatingEasyEditorPage(composite);
                     UIConfiguration uiCfg = ConfigurationTableEditorFactory.createConfiguration(
-                        tmpConfig, parent, null);
+                        tmpConfig, parent, createParameters(data));
                     result = ConfigurationTableEditorFactory.createCellEditor(uiCfg, getSlot(cVar, propertyIdentifier));
                     if (result instanceof IUpdateProvider && (Reference.TYPE.isAssignableFrom(tmpDecl.getType()) 
                         || VariabilityModel.isNameSlot(slot))) {
@@ -447,6 +453,13 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
     public boolean isFilterable() {
         // Currently, only elements of the family can be filtered.
         return reactsOn == FamilyElementImpl.class || reactsOn == PipelineImpl.class;
+    }
+
+    protected Map<UIParameter, Object> createParameters(final Object data) {
+        UIParameter parameter = new UIParameter(ROOT_PARAMETER_NAME, ((EObject) data).eContainer());
+        Map<UIParameter, Object> parameters = new HashMap<UIParameter, Object>();
+        parameters.put(parameter, parameter.getDefaultValue());
+        return parameters;
     }
 
 }
