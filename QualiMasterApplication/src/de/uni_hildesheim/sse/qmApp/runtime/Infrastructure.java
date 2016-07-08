@@ -32,6 +32,7 @@ import eu.qualimaster.adaptation.external.ConnectedMessage;
 import eu.qualimaster.adaptation.external.DisconnectRequest;
 import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
 import eu.qualimaster.adaptation.external.HardwareAliveMessage;
+import eu.qualimaster.adaptation.external.HilariousAuthenticationHelper;
 import eu.qualimaster.adaptation.external.IDispatcher;
 import eu.qualimaster.adaptation.external.IInformationDispatcher;
 import eu.qualimaster.adaptation.external.InformationMessage;
@@ -218,7 +219,7 @@ public class Infrastructure {
             boolean simpleConnect = true;
             if (isInfrastructureAdmin) {
                 if (null != user) {
-                    byte[] passphrase = obtainPassphrase(user);
+                    byte[] passphrase = HilariousAuthenticationHelper.obtainPassphrase(user);
                     if (null != passphrase) {
                         endpoint.schedule(new AuthenticateMessage(user, passphrase));
                         simpleConnect = false;
@@ -365,23 +366,6 @@ public class Infrastructure {
      */
     public static String getUserName() {
         return EclipsePrefUtils.INSTANCE.getPreference(EclipsePrefUtils.USERNAME_PREF_KEY);
-    }
-    
-    /**
-     * Obtains the passphrase for <code>userName</code>.
-     * 
-     * @param userName the user name to obtain the passphrase for
-     * @return the passphrase (may be <b>null</b>)
-     */
-    private static byte[] obtainPassphrase(String userName) {
-        // this follows the actual hilarious authentication of the infrastructure ;)
-        int hash = 0;
-        String user = getUserName();
-        if (null != user) {
-            hash = user.hashCode();
-        }
-        String tmp = String.valueOf(hash);
-        return tmp.getBytes();
     }
     
     /**
