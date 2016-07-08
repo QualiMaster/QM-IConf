@@ -64,6 +64,11 @@ public class TupleTypeEditor extends AbstractChangeableDropBoxCellEditorCreator 
         CONTAINERS.put("Family", QmConstants.VAR_FAMILIES_FAMILIES);
     }
     
+    /**
+     * Returns the {@link PipelineElement} with the given name from the currently edited pipeline (diagram).
+     * @param name The name of the element to return (name given in editor (not var model)).
+     * @return The selected name of the editor or <tt>null</tt> if it does not exist.
+     */
     private PipelineElement getSource(String name) {
         PipelineElement source = null;
         Pipeline pipeline = getPipeline();
@@ -84,8 +89,7 @@ public class TupleTypeEditor extends AbstractChangeableDropBoxCellEditorCreator 
     @Override
     protected List<ConstraintSyntaxTree> retrieveFilteredElements(Tree propertiesTree) {
         List<ConstraintSyntaxTree> cstValues = null;
-        Configuration config = ModelAccess.getConfiguration(VariabilityModel.Configuration.PIPELINES);
-
+        
         // Extract selected source from property editor
         String sourceType = null;
         String sourceName = null;
@@ -100,33 +104,9 @@ public class TupleTypeEditor extends AbstractChangeableDropBoxCellEditorCreator 
                 }
             }
         }
-
-//        AbstractVariable declaration = retrieveSourceDeclaration(config, sourceType, sourceName);
-        
-//        System.out.println(declaration);
         
         // Try to get declaration for the source element
-        AbstractVariable sourceDecl = retrieveSourceDeclaration(config, sourceType, sourceName);
-//        if (null != sourceName && !sourceName.isEmpty() && null != sourceType && !sourceType.isEmpty()) {
-//            Iterator<IDecisionVariable> varItr = config.iterator();
-//            boolean found = false;
-//            while (varItr.hasNext() && !found) {
-//                IDecisionVariable tmpVar = varItr.next();
-//                String declName = tmpVar.getDeclaration().getName();
-//                IDecisionVariable nameSlot = tmpVar.getNestedElement("name");
-//                
-//                
-//                if (null != nameSlot && sourceName.equals(nameSlot.getValue().getValue())) {
-//                    
-//                    // Convert all member references to cst values
-//                    IDecisionVariable members = tmpVar.getNestedElement(SLOTNAMES.get(sourceType));
-//                    if (null != members && null != members.getValue()) {
-//                        found = true;
-//                        sourceDecl = (AbstractVariable) members.getValue().getValue();
-//                    }
-//                }
-//            }
-//        }
+        AbstractVariable sourceDecl = retrieveSourceDeclaration(sourceType, sourceName);
         
         // Read tuple input/output types from source
         if (null != sourceDecl) {
@@ -136,8 +116,17 @@ public class TupleTypeEditor extends AbstractChangeableDropBoxCellEditorCreator 
         return cstValues;
     }
 
-    private AbstractVariable retrieveSourceDeclaration(Configuration config, String sourceType, String sourceName) {
+    /**
+     * Returns the referenced {@link AbstractVariable} of the given {@link Source} or {@link FamilyElement}.
+     * @param sourceType Specifies the type of the source of the flow (Source, Family, or Data).
+     * @param sourceName The name of the element as given in the editor.
+     * @return The declaration of the IVML element or <tt>null</tt> if it could not be found. 
+     */
+    private AbstractVariable retrieveSourceDeclaration(String sourceType, String sourceName) {
         AbstractVariable declaration = null;
+        Configuration config = ModelAccess.getConfiguration(VariabilityModel.Configuration.PIPELINES);
+        
+        // Get refernce ID (index) 
         PipelineElement source = getSource(sourceName);
         Integer referrenceID = -1;
         if (source != null) {
@@ -147,9 +136,13 @@ public class TupleTypeEditor extends AbstractChangeableDropBoxCellEditorCreator 
                 referrenceID = ((FamilyElement) source).getFamily();
             }
         }
+        
+        // Retrieve declaration from VarModel, which is referenced though the given ID
         if (referrenceID >= 0) {
             Iterator<IDecisionVariable> varItr = config.iterator();
             IDecisionVariable sourceVar = null;
+            
+            // Select container (all families or all sources)
             String nameOfContainerVar = CONTAINERS.get(sourceType);
             while (varItr.hasNext() && null == sourceVar) {
                 IDecisionVariable tmpVar = varItr.next();
@@ -158,6 +151,7 @@ public class TupleTypeEditor extends AbstractChangeableDropBoxCellEditorCreator 
                 }
             }
             
+            // If container was found, select referened declaration (referenced by the ID)
             if (null != sourceVar) {
                 IDecisionVariable selectedVar = sourceVar.getNestedElement(referrenceID);
                 if (null != selectedVar) {
