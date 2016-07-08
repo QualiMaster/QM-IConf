@@ -35,11 +35,20 @@ public abstract class AbstractChangeableDropBoxCellEditorCreator implements IEdi
      */
     protected AbstractChangeableDropBoxCellEditorCreator() {}
     
+    /**
+     * Returns (a copy) of the configuration parameters.
+     * 
+     * @return the parameters (may be <b>null</b>)
+     */
     protected Iterator<Map.Entry<UIParameter, Object>> parameterIterator() {
         Map<UIParameter, Object> map = config.getParameters();
         return null != map ? map.entrySet().iterator() : null;
     }
     
+    /**
+     * Extracts the {@link Pipeline} from the parameters, if passed to the {@link UIConfiguration}.
+     * @return The {@link Pipeline} or <tt>null</tt>.
+     */
     protected Pipeline getPipeline() {
         Pipeline pipeline = null;
         Iterator<Map.Entry<UIParameter, Object>> itr = parameterIterator();

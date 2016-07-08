@@ -279,7 +279,8 @@ public class IVMLModelOperations {
                         freezeBlock = (FreezeBlock) e;
                     }
                 }
-                if (project.removeElement(eToChange) && project.removeElement(freezeBlock)) {
+                boolean freezeOk = null != freezeBlock ? project.removeElement(freezeBlock) : true;
+                if (project.removeElement(eToChange) && freezeOk) {
                     Constraint constraint = IVMLModelOperations.getConstraint(values.toArray(), var.getDeclaration(),
                             project);
                     result = project.add(constraint) && project.add(freezeBlock);
@@ -303,7 +304,7 @@ public class IVMLModelOperations {
         ConstraintSyntaxTree cst = cstr.getConsSyntax();
         if (cst instanceof OCLFeatureCall) {
             OCLFeatureCall fc = (OCLFeatureCall) cst;
-            if (fc.getOperation().equals("=")) {
+            if (fc.getOperation().equals(OclKeyWords.ASSIGNMENT)) {
                 ConstraintSyntaxTree operand = fc.getOperand();
                 if (operand instanceof Variable) {
                     Variable opVar = (Variable) operand;
