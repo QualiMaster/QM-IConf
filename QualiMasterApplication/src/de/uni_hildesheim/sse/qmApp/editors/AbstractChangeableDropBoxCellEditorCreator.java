@@ -1,6 +1,8 @@
 package de.uni_hildesheim.sse.qmApp.editors;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.swt.widgets.Composite;
@@ -8,12 +10,15 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Tree;
 
 import de.uni_hildesheim.sse.qmApp.model.QualiMasterDisplayNameProvider;
+import de.uni_hildesheim.sse.qmApp.tabbedViews.PipelineDiagramElementPropertyEditorCreator;
 import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.IEditorCreator;
 import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
+import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.UIParameter;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
 import net.ssehub.easy.varModel.model.datatypes.Reference;
+import pipeline.Pipeline;
 
 /**
  * CellEditor creator for creating {@link ChangeableComboCellEditor}s. This will not create any {@link Control}s
@@ -22,14 +27,50 @@ import net.ssehub.easy.varModel.model.datatypes.Reference;
  *
  */
 public abstract class AbstractChangeableDropBoxCellEditorCreator implements IEditorCreator {
-
+    
+    private UIConfiguration config;
+    
     /**
      * Constructor should only be visible for sub classes.
      */
     protected AbstractChangeableDropBoxCellEditorCreator() {}
     
+    /**
+     * Returns (a copy) of the configuration parameters.
+     * 
+     * @return the parameters (may be <b>null</b>)
+     */
+    protected Iterator<Map.Entry<UIParameter, Object>> parameterIterator() {
+        Map<UIParameter, Object> map = config.getParameters();
+        return null != map ? map.entrySet().iterator() : null;
+    }
+    
+    /**
+     * Extracts the {@link Pipeline} from the parameters, if passed to the {@link UIConfiguration}.
+     * @return The {@link Pipeline} or <tt>null</tt>.
+     */
+    protected Pipeline getPipeline() {
+        Pipeline pipeline = null;
+        Iterator<Map.Entry<UIParameter, Object>> itr = parameterIterator();
+        if (null != itr) {
+            while (pipeline == null && itr.hasNext()) {
+                Map.Entry<UIParameter, Object> entry = itr.next();
+                UIParameter parameter = entry.getKey();
+                if (PipelineDiagramElementPropertyEditorCreator.ROOT_PARAMETER_NAME.equals(parameter.getName())
+                    && parameter.getDefaultValue() != null && parameter.getDefaultValue() instanceof Pipeline) {
+                    
+                    pipeline = (Pipeline) parameter.getDefaultValue();
+                }
+            }
+        }
+        
+        return pipeline;
+    }
+    
     @Override
     public CellEditor createCellEditor(UIConfiguration config, IDecisionVariable variable, Composite parent) {
+        this.config = config;
+        
         Configuration cfg = variable.getConfiguration();
 
         // Try to retrieve only relevant elements based on other selections of the property editor.

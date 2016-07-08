@@ -5,13 +5,28 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 
+import de.uni_hildesheim.sse.ConstraintSyntaxException;
+import de.uni_hildesheim.sse.ModelUtility;
+import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
 import net.ssehub.easy.producer.ui.productline_editor.IUpdateListener;
 import net.ssehub.easy.producer.ui.productline_editor.IUpdateProvider;
-import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
+import net.ssehub.easy.varModel.confModel.AssignmentState;
+import net.ssehub.easy.varModel.confModel.ConfigurationException;
+import net.ssehub.easy.varModel.confModel.ContainerVariable;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.cst.CSTSemanticException;
+import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
+import net.ssehub.easy.varModel.model.datatypes.Compound;
+import net.ssehub.easy.varModel.model.datatypes.ConstraintType;
 import net.ssehub.easy.varModel.model.values.ContainerValue;
 import net.ssehub.easy.varModel.model.values.Value;
+import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
+import net.ssehub.easy.varModel.model.values.ValueFactory;
+import net.ssehub.easy.varModel.persistency.StringProvider;
+import qualimasterapplication.Activator;
 
 /**
  * Implements a cell editor for constraints.
@@ -36,6 +51,42 @@ class ConstraintsCellEditor extends DialogCellEditor implements IUpdateProvider 
      */
     ConstraintsCellEditor(UIConfiguration config, IDecisionVariable variable, Composite parent) {
         super(parent);
+        
+        if (null != parent && parent instanceof Tree && variable instanceof ContainerVariable
+            && ((ContainerValue) variable.getValue()).getElementSize() == 0) {
+            
+            Tree propertiesTree = (Tree) parent;
+            ContainerVariable conVar = (ContainerVariable) variable;
+            
+            String constraintValues = null;
+            for (int i = 0, end = propertiesTree.getItems().length; i < end && null == constraintValues; i++) {
+                TreeItem tmpItem = propertiesTree.getItems()[i];
+                if (tmpItem.getText().contains("constraints")) {
+                    constraintValues = tmpItem.getText(1);
+                    if (constraintValues != null && !constraintValues.isEmpty()) {
+                        String[] tmpArray = constraintValues.split(ConstraintsEditorDialog.SEPARATOR);
+                        for (int j = 0; j < tmpArray.length; j++) {
+                            try {
+                                ConstraintSyntaxTree cst = ModelUtility.INSTANCE.createExpression(tmpArray[j],
+                                    variable.getDeclaration().getParent());
+                                Value constraintValue = ValueFactory.createValue(ConstraintType.TYPE, cst);
+                                conVar.addNestedElement().setValue(constraintValue, AssignmentState.ASSIGNED);
+                            } catch (ValueDoesNotMatchTypeException e) {
+                                Activator.getLogger(ConstraintsCellEditor.class).exception(e);
+                            } catch (ConfigurationException e) {
+                                Activator.getLogger(ConstraintsCellEditor.class).exception(e);
+                            } catch (CSTSemanticException e) {
+                                Activator.getLogger(ConstraintsCellEditor.class).exception(e);
+                            } catch (ConstraintSyntaxException e) {
+                                Activator.getLogger(ConstraintsCellEditor.class).exception(e);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        
         this.context = variable;
     }
    
@@ -71,11 +122,13 @@ class ConstraintsCellEditor extends DialogCellEditor implements IUpdateProvider 
             ContainerValue conValue = (ContainerValue) value;
             int nConstraints = conValue.getElementSize();
             if (nConstraints > 0) {
-                sb.append(conValue.getElement(0).getValue().toString());
+                ConstraintSyntaxTree cst = (ConstraintSyntaxTree) conValue.getElement(0).getValue();
+                sb.append(StringProvider.toIvmlString(cst, (Compound) context.getDeclaration().getParent()));
             }
             for (int i = 1; i < nConstraints; i++) {
                 sb.append(ConstraintsEditorDialog.SEPARATOR);
-                sb.append(conValue.getElement(1).getValue().toString());
+                ConstraintSyntaxTree cst = (ConstraintSyntaxTree) conValue.getElement(i).getValue();
+                sb.append(StringProvider.toIvmlString(cst, (Compound) context.getDeclaration().getParent()));
             }
         }
         return sb.toString();

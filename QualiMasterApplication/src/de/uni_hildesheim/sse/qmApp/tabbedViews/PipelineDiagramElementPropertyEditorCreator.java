@@ -1,5 +1,8 @@
 package de.uni_hildesheim.sse.qmApp.tabbedViews;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -18,6 +21,7 @@ import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.IChangeListener;
 import eu.qualimaster.easy.extension.QmConstants;
 import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory;
 import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.UIConfiguration;
+import net.ssehub.easy.producer.ui.productline_editor.ConfigurationTableEditorFactory.UIParameter;
 import net.ssehub.easy.producer.ui.productline_editor.DelegatingEasyEditorPage;
 import net.ssehub.easy.producer.ui.productline_editor.IUpdateListener;
 import net.ssehub.easy.producer.ui.productline_editor.IUpdateProvider;
@@ -41,6 +45,7 @@ import net.ssehub.easy.varModel.model.filter.mandatoryVars.MandatoryDeclarationC
 import net.ssehub.easy.varModel.model.filter.mandatoryVars.VariableContainer;
 import pipeline.FamilyElement;
 import pipeline.Pipeline;
+import pipeline.PipelineElement;
 import pipeline.impl.FamilyElementImpl;
 import pipeline.impl.PipelineImpl;
 
@@ -52,6 +57,8 @@ import pipeline.impl.PipelineImpl;
  */
 public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEditorCreator {
 
+    public static final String ROOT_PARAMETER_NAME = "PipelineRoot";
+    
     private static final String IMPL_SUFFIX = "Impl";
     
     private Class<?> reactsOn;
@@ -300,7 +307,7 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
                     CompoundVariable cVar = (CompoundVariable) tmpVar;
                     DelegatingEasyEditorPage parent = new DelegatingEasyEditorPage(composite);
                     UIConfiguration uiCfg = ConfigurationTableEditorFactory.createConfiguration(
-                        tmpConfig, parent, null);
+                        tmpConfig, parent, createParameters(data));
                     result = ConfigurationTableEditorFactory.createCellEditor(uiCfg, getSlot(cVar, propertyIdentifier));
                     if (result instanceof IUpdateProvider && (Reference.TYPE.isAssignableFrom(tmpDecl.getType()) 
                         || VariabilityModel.isNameSlot(slot))) {
@@ -447,6 +454,19 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
     public boolean isFilterable() {
         // Currently, only elements of the family can be filtered.
         return reactsOn == FamilyElementImpl.class || reactsOn == PipelineImpl.class;
+    }
+
+    /**
+     * Creates an {@link UIParameter} for the complete {@link Pipeline}
+     * out of the given {@link PipelineElement} (the data object).
+     * @param data The currently edited {@link PipelineElement}.
+     * @return The {@link Pipeline} (the parent of <tt>data</tt>) as it can be processed by EASy editors.
+     */
+    protected Map<UIParameter, Object> createParameters(final Object data) {
+        UIParameter parameter = new UIParameter(ROOT_PARAMETER_NAME, ((EObject) data).eContainer());
+        Map<UIParameter, Object> parameters = new HashMap<UIParameter, Object>();
+        parameters.put(parameter, parameter.getDefaultValue());
+        return parameters;
     }
 
 }

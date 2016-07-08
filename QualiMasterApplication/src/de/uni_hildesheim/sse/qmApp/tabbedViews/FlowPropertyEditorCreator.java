@@ -97,7 +97,7 @@ public class FlowPropertyEditorCreator extends PipelineDiagramElementPropertyEdi
 //                    restrictors.add(new FlowValueRestriction(((Flow) data).getSource().getName()));
                     restrictors.add(FLOW_TUPLE_FILTER);
                     UIConfiguration uiCfg = ConfigurationTableEditorFactory.createConfiguration(
-                        tmpConfig, parent, null);
+                        tmpConfig, parent, createParameters(data));
                     result = ConfigurationTableEditorFactory.createCellEditor(uiCfg, getSlot(cVar, propertyIdentifier),
                         restrictors);
                     if (result instanceof IUpdateProvider && (Reference.TYPE.isAssignableFrom(tmpDecl.getType()) 
