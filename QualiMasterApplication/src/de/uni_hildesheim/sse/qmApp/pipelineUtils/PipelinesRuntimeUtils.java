@@ -46,7 +46,6 @@ public class PipelinesRuntimeUtils {
 
     public static final PipelinesRuntimeUtils INSTANCE = new PipelinesRuntimeUtils();
     
-    
     private static final String EASY_STRING = "EASy";
     private static final String IVML_STRING = ".ivml";
     private static final String META_STRING = "meta";
@@ -705,11 +704,11 @@ public class PipelinesRuntimeUtils {
     }
 
     /**
-     * Follow the pipline structures by:
+     * Follow the pipeline structures by:
      * Follow the flows destination.
      * 
      * @param nextFlow current flow.
-     * @param treeElem current top-level-treelement.
+     * @param treeElem current top-level-treeelement.
      * @param cfg Pipelines Configuration.
      * @param nameValue value which will be later needed in order to name a pipelinewrapper.
      */
@@ -739,26 +738,6 @@ public class PipelinesRuntimeUtils {
     }
 
     /**
-    * Check whether pipeline is already present in the color chooser table.
-    * @param treeViewerColorChooser color chooser table.
-    * @param name name of the new pipeline-element.
-    * @return true if already contained/ false if not,.
-    */
-    public boolean pipNotExisting(Table treeViewerColorChooser, String name) {
-        boolean toReturn = false;
-     
-        for (int i = 0; i < treeViewerColorChooser.getItemCount(); i++) {
-            TableItem item = treeViewerColorChooser.getItem(i);
-            String existingPipName = item.getText(0);
-          
-            if (name.equals(existingPipName)) {
-                toReturn  = true;
-            }
-        }
-        return toReturn;
-    }
-    
-    /**
      * Add a pipeline to the list.
      * @param name name of the pipeline to add.
      */
@@ -784,31 +763,26 @@ public class PipelinesRuntimeUtils {
 
     /**
     * Check whether the combination of pipeline and observable is already exiting in the table.
-    * @param savedObservablesTable table which holds the items.
+    * @param treeViewerColorChooser table which holds the items and colors.
     * @param pipParent parent of the new item.
     * @param name name of the new item.
     * @param observableName observable of the new item.
-    * @return true if no existing/ false if alement is already present.
+    * @return toReturn true if no existing/ false if alement is already present.
     */
-    public boolean pipelineObservableCombinationIsNotExisting(Table savedObservablesTable, String pipParent,
+    public boolean pipelineObservableCombinationIsNotExisting(Table treeViewerColorChooser, String pipParent,
          String name, String observableName) {
      
         boolean toReturn = false;
      
-        for (int i = 0; i < savedObservablesTable.getItemCount(); i++) {
+        for (int i = 0; i < treeViewerColorChooser.getItemCount(); i++) {
          
-            TableItem item = savedObservablesTable.getItem(i);
+            TableItem item = treeViewerColorChooser.getItem(i);
          
             String existingItemText = item.getText(0);
          
             if (existingItemText.contains(pipParent) && existingItemText.contains(name)
-                   && existingItemText.contains(observableName)) {
-                
-                if (existingItemText.length() > pipParent.length() + name.length()
-                        + observableName.length()) {
-                    
-                    toReturn = true;
-                }
+                   && existingItemText.contains(observableName)) {   
+                toReturn = true;
             }
         }
         return toReturn;
@@ -1035,5 +1009,13 @@ public class PipelinesRuntimeUtils {
      */
     public void setBackupObservableItem(ArrayList<String> backupObservableItem) {
         this.backupObservableItem = backupObservableItem;
+    }
+
+    /**
+     * Clear the list of pipelines.
+     */
+    public void clearPipelines() {   
+        pipelines.clear();
+        pipelinesToDisplayInTable.clear();
     }
 }
