@@ -10,6 +10,7 @@ commit: https://www.iconfinder.com/icons/6005/arrow_commit_database_up_upload_ic
 dataManagement: https://www.iconfinder.com/designmodo - creative commons
 exit: https://www.iconfinder.com/icons/3226/exit_power_quit_icon#size=128 - GNU Lesser General Public License
 family: https://www.iconfinder.com/icons/126784/browser_diagram_hierarchy_map_marketing_menu_navigation_optimization_plan_relations_seo_site_sitemap_structure_tree_web_icon#size=24
+weight: https://www.iconfinder.com/icons/64988/weight_icon Creative Commons (3.0)
 Link to creators website: http://www.aha-soft.com/ - creative commons
 
 gpMachine: https://www.iconfinder.com/icons/84536/desktop_icon#size=32

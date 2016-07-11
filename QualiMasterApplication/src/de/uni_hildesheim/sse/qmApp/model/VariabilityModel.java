@@ -877,6 +877,8 @@ public class VariabilityModel {
         
         registry.registerImage(Configuration.ADAPTIVITY, 
             IconManager.retrieveImage(IconManager.ADAPTATION));
+        registry.registerImage(Configuration.ADAPTIVITY, 0,
+                IconManager.retrieveImage(IconManager.ADAPTATION_WEIGHT));
         registry.registerImage(Configuration.OBSERVABLES, 
             IconManager.retrieveImage(IconManager.OBSERVABLES));
         registry.registerImage(Configuration.OBSERVABLES, 0, 
