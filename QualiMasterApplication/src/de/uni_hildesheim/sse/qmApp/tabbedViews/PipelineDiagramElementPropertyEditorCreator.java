@@ -45,7 +45,6 @@ import net.ssehub.easy.varModel.model.filter.mandatoryVars.MandatoryDeclarationC
 import net.ssehub.easy.varModel.model.filter.mandatoryVars.VariableContainer;
 import pipeline.FamilyElement;
 import pipeline.Pipeline;
-import pipeline.PipelineElement;
 import pipeline.impl.FamilyElementImpl;
 import pipeline.impl.PipelineImpl;
 
@@ -458,8 +457,8 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
 
     /**
      * Creates an {@link UIParameter} for the complete {@link Pipeline}
-     * out of the given {@link PipelineElement} (the data object).
-     * @param data The currently edited {@link PipelineElement}.
+     * out of the given {@link pipeline.PipelineElement} (the data object).
+     * @param data The currently edited {@link pipeline.PipelineElement}.
      * @return The {@link Pipeline} (the parent of <tt>data</tt>) as it can be processed by EASy editors.
      */
     protected Map<UIParameter, Object> createParameters(final Object data) {

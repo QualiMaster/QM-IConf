@@ -60,6 +60,7 @@ public class IconManager {
     public static final String RUNTIME = PRE + "runtime.png";
     public static final String RTVIL = PRE + "rtvil_file_icon.gif";
     public static final String ADAPTATION = PRE + "adaptation.png";
+    public static final String OBSERVABLE = PRE + "observables.png";
     public static final String OBSERVABLES = PRE + "observables.png";
     public static final String ERROR = PRE + "error.png";
     public static final String WARNING = PRE + "warning.png";
