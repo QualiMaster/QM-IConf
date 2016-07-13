@@ -1210,6 +1210,10 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         Infrastructure.registerListener(newTabItem);
 
         newTabItem.setControl(control);
+        
+        //Let the new tabItem be shown
+        tabFolder.setSelection(newTabItem);
+        tabFolder.showItem(newTabItem);
 
         newTabItem.addListener(SWT.Dispose, new Listener() {
             public void handleEvent(Event event) {
