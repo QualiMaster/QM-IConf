@@ -56,6 +56,7 @@ import qualimasterapplication.Activator;
  * 
  * @author Holger Eichelberger
  * @author Cui Qin
+ * @author Niko Nowatzki
  */
 public class PipelineDiagramUtils {
 
@@ -656,7 +657,7 @@ public class PipelineDiagramUtils {
         // Get diagram.
         DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-        
+
         String pipelineName = diagram.getTitle().toLowerCase();
         
         List<de.uni_hildesheim.sse.qmApp.pipelineUtils.StatusHighlighter.PipelineDataflowInformationWrapper>
@@ -665,13 +666,12 @@ public class PipelineDiagramUtils {
         EObject element = diagram.getDiagram().getElement();
         EList<EObject> eContents = element.eContents();
         
-        boolean pipFound = false;
-        for (int i = 0; i < wrapperList.size() && !pipFound; i++) {
+        for (int i = 0; i < wrapperList.size(); i++) {
             
             PipelineDataflowInformationWrapper wrapper = wrapperList.get(i);
 
             if (wrapper.getPipelineName().toLowerCase().equals(pipelineName)) {
-                pipFound = true;
+
                 for (int j = 0; j < eContents.size(); j++) {
                         
                     String name = eContents.get(j).toString();
