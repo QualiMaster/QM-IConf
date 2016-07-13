@@ -570,14 +570,14 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         }
 
         try {
-            // set some constant titels, such as the achses captions.
+            // set some constant titles, such as the achses captions.
             if (!pipelinesToDisplayInTableWithObservable.isEmpty()) {
                 PipelineGraphColoringWrapper wrapper = pipelinesToDisplayInTableWithObservable.get(0);
                 pipelineTitle.append(wrapper.getPipelineParent());
                 observableTitle.append(wrapper.getObs() + "...");
             }
 
-            pipelineTitle.append(")");
+            pipelineTitle.append(",...)");
             observableTitle.append(")");
 
             Font titleFont = new Font(Display.getCurrent(), "Arial", 11, SWT.BOLD);
@@ -617,7 +617,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
             String monitoringName = pipelineName + ":" + pipElementName;
             String actulName = pipelineName + ":" + pipElementName + " (" + obs + ")";
-            Axis axis = new Axis(observalbeForTrace, true);
+            Axis axis = new Axis(actulName, true);
             xyGraph.addAxis(axis);
             axis.setAutoFormat(true);
 
@@ -686,11 +686,14 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         String observalbeForTrace = determineQMObervable(obs, allPossibleObservables);
 
         if (observalbeForTrace != null) {
-
-            Axis axis = new Axis(observalbeForTrace, true);
+            
+            String actulName = pipelineName + " (" + observalbeForTrace + ")";
+            Axis axis = new Axis(actulName, true);
             xyGraph.addAxis(axis);
             axis.setAutoFormat(true);
 
+            
+            
             PipelineTrace pTrace = new PipelineTrace(pipelineName + " (" + observalbeForTrace + ")",
                     pipelineName + " (" + observalbeForTrace + ")", xyGraph.primaryXAxis, axis, observalbeForTrace);
             axis.setAutoScale(true);
@@ -1142,7 +1145,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
                     newWrapper.setObservable(observableName);
                     newWrapper
-                            .setColor(new Color(treeViewerColorChooser.getShell().getDisplay(), new RGB(124, 252, 0)));
+                            .setColor(new Color(treeViewerColorChooser.getShell().getDisplay(), new RGB(0, 204, 0)));
                     if (!containsWrapper(newWrapper)) {
                         if (newWrapper.getObs() != null) {
                             if (!alreadyContains(pipelinesToDisplayInTableWithObservable, selection)) {
@@ -1338,13 +1341,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         Infrastructure.unregisterDispatcher(this);
         Infrastructure.unregisterListener(this);
 
-        boolean answer = MessageDialog.openQuestion(this.getSite().getShell(), "Restore selections",
-                "Do you want to save the current selections?");
-
-        if (answer) {
-            saveTreeLocally();
-        }
-
         PipelinesRuntimeUtils instance = PipelinesRuntimeUtils.INSTANCE;
         instance.clearPipelines();
 
@@ -1362,10 +1358,14 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
                 TableItem item = treeViewerColorChooser.getItem(i);
                 String itemText = item.getText();
-                String[] parts = itemText.split(":");
+                
+                //Get the name from the items text.
+                String name = itemText.substring(0, itemText.indexOf(":"));
+                //Get the observable by cutting with the last occurence of : in the items text.
+                String observable = itemText.substring(itemText.lastIndexOf(":") + 1, itemText.length()).trim();
 
-                PipelineElementObservableWrapper wrapper = new PipelineElementObservableWrapper(parts[0].trim(),
-                        parts[1].trim());
+                PipelineElementObservableWrapper wrapper = new PipelineElementObservableWrapper(name.trim(),
+                        observable.trim());
                 wrapperList.add(wrapper);
             }
 
