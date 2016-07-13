@@ -468,17 +468,15 @@ public class ManifestConnection {
      */
     public List<Parameter> getParameters(String name, String artifactId) {
         List<Parameter> result = new ArrayList<Parameter>();
+        URLClassLoader loader = null;
         try {
-            
             URL[] urls = new URL[1];
-            URLClassLoader loader = new URLClassLoader(loadJars(out.getAbsolutePath()).toArray(urls));         
+            loader = new URLClassLoader(loadJars(out.getAbsolutePath()).toArray(urls));         
             Class<?> base = loadClass(name, loader); 
-            
             if (null != base) {
                 Method[] methods = base.getMethods();
                 for (Method m : methods) {
                     if (m.getName().startsWith("setParameter")) {
-                        
                         String pName = m.getName().substring("setParameter".length(), m.getName().length());
                         pName = lowerFirstLetter(pName); 
                         Parameter param = new Parameter(pName, ParameterType.valueOf(m.getParameterTypes()[0]));
@@ -520,17 +518,18 @@ public class ManifestConnection {
                     } 
                 }
             }
-            
-            loader.close();
-            
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (ManifestUtilsException e1) {
+            e1.printStackTrace();
+        } finally {
+            try {
+                loader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         
         return result;
@@ -563,11 +562,14 @@ public class ManifestConnection {
      * Loads the specified class via the given class loader.
      * @param name The (binary) name of the class to load.
      * @param loader The class loader to use (should make use of the downloaded JARs from {@link #out}.
-     * @return The loaded class or <tt>null</tt> in case that the specified class could not be loaded due to missing
-     *     dependent classes. In this case, an error log is produced.
+     * @return The loaded class or <tt>null</tt> if the name is <tt>null</tt>.
      * @throws ClassNotFoundException If the class was not found
+     * @throws ManifestUtilsException in case that the specified class could not be loaded due
+     *     to missing dependent classes
      */
-    private Class<?> loadClass(String name, URLClassLoader loader) throws ClassNotFoundException {
+    private Class<?> loadClass(String name, URLClassLoader loader) throws ClassNotFoundException,
+        ManifestUtilsException {
+        
         Class<?> result = null;
         
         if (null != name && !name.isEmpty()) {
@@ -575,18 +577,20 @@ public class ManifestConnection {
             try {
                 result = loader.loadClass(name);
             } catch (NoClassDefFoundError noDefError) {
-                StringBuffer errMsg = new StringBuffer("Error expected class \"");
-                errMsg.append(name);
-                errMsg.append("\" could not be loaded. Reason: Class \"");
+                // Short description
+                StringBuffer titleMsg = new StringBuffer("Error expected class \"");
+                titleMsg.append(name);
+                titleMsg.append("\" could not be loaded.");
+                String title = titleMsg.toString();
+                
+                // Detailed reason
+                StringBuffer errMsg = new StringBuffer(title);
+                errMsg.append("\" Reason: Class \"");
                 errMsg.append(noDefError.getMessage());
                 errMsg.append("\" was not found.");
-                logger.error(errMsg.toString());
-            } finally {
-                try {
-                    loader.close();
-                } catch (IOException e) {
-                    logger.exception(e);
-                }
+                String msg = errMsg.toString();
+                logger.error(msg);
+                throw new ManifestUtilsException(title, msg);
             }
         }
         

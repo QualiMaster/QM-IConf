@@ -226,7 +226,7 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             output = con.getOutput(className, artifactId);
             param = con.getParameters(className, artifactId);
         } catch (ManifestUtilsException e) {
-            Dialogs.showErrorDialog(e.getMessage(), e.getCause().getMessage());
+            Dialogs.showErrorDialog(e.getShortMessage(), e.getDetailedMessage());
         }
         Manifest uManifest = null;
         try {
