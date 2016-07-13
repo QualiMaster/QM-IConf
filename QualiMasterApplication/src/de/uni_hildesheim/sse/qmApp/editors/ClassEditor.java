@@ -221,12 +221,14 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
         List<Item> input = new ArrayList<Item>();
         List<Parameter> param = new ArrayList<Parameter>();
         List<Item> output = new ArrayList<Item>();
+        boolean failed = false;
         try {
             input = con.getInput(className, artifactId);
             output = con.getOutput(className, artifactId);
             param = con.getParameters(className, artifactId);
         } catch (ManifestUtilsException e) {
             Dialogs.showErrorDialog(e.getShortMessage(), e.getDetailedMessage());
+            failed = true;
         }
         Manifest uManifest = null;
         try {
@@ -235,17 +237,15 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             Dialogs.showErrorDialog("ERROR", "Manifest corrupt: " + e.getMessage());
             e.printStackTrace();
         }
-        ManifestType type = ManifestType.UNKNOWN;
-        
+        ManifestType type = ManifestType.UNKNOWN; 
         IDecisionVariable var = (IDecisionVariable) context.getParent();
-        
         if (null == uManifest) {
             Dialogs.showInfoDialog("No manifest", "No manifest could be found!");
         } else {
             type = uManifest.getType();
         }
         
-        if (takeOverValues(var, type)) {
+        if (!failed && takeOverValues(var, type)) {
             createMap(var);
             
             var.unfreeze(AssignmentState.ASSIGNED);
