@@ -23,6 +23,14 @@ import pipeline.impl.FamilyElementImpl;
 import pipeline.impl.SinkImpl;
 import pipeline.impl.SourceImpl;
 
+/*
+ * TODO SE: There are a lot of possible performance improvements:
+ * - To often toLowerCase is used (if possible, the element should only be turned only once into lower case and not
+ *   in each iteration of the loop)
+ * - For-Loops can be exited if the desired value is found
+ * - In total, too many loops are used -> consider maps
+ * Not an performance issue, but maintenance: Many duplicate code fragments -> consider to revise them.
+ */
 /**
  * Singleton-Class for highlighting Pipeline-Editors. <b>Assumes that the caller is in the correct UI-Thread!</b>
  * @author nowatzki
