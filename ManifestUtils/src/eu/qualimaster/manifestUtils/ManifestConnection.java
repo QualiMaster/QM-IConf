@@ -63,12 +63,19 @@ import net.ssehub.easy.basics.progress.ProgressObserver.ITask;
 /**
  * Builds and handles connections to the repository server.
  * @author pastuschek
- *
+ * @author El-Sharkawy
  */
 public class ManifestConnection {
 
     private static final String ANNOTATION_CLASS = "eu.qualimaster.base.algorithm.DefaultValue"; 
     private static final String DEFAULT_VALUE_METHOD_NAME = "value";
+    /**
+     * Classes, which shall not be offered to the user.
+     * <ul>
+     *   <li>package-info: This is an artificial class used for JavaDoc only</li>
+     * </ul>
+     */
+    private static final String CLASS_NAMES_TO_OMIT = "^.*package-info.*$";
     
     private static File ivyOut = null;
     
@@ -460,70 +467,69 @@ public class ManifestConnection {
      * @return A list with parameters for the class. Can be empty but never null.
      */
     public List<Parameter> getParameters(String name, String artifactId) {
-        
         List<Parameter> result = new ArrayList<Parameter>();
+        URLClassLoader loader = null;
         try {
-            
             URL[] urls = new URL[1];
-            URLClassLoader loader = new URLClassLoader(loadJars(out.getAbsolutePath()).toArray(urls));         
-            Class<?> base = loader.loadClass(name);    
-            Method[] methods = base.getMethods();
-            
-            for (Method m : methods) {
-
-                if (m.getName().startsWith("setParameter")) {
-                    
-                    String pName = m.getName().substring("setParameter".length(), m.getName().length());
-                    pName = lowerFirstLetter(pName); 
-                    Parameter param = new Parameter(pName, ParameterType.valueOf(m.getParameterTypes()[0]));
-                    if (null != m.getDefaultValue()) {
-                        param.setValue(m.getDefaultValue().toString());
-                    }
-                    try {
-                        
-                        Class<?> defaultValueClass = loader.loadClass(ANNOTATION_CLASS);
-                        @SuppressWarnings("unchecked")
-                        Class<Annotation> defaultValueAnnotationClass = (Class) defaultValueClass.getClass();
-                        Annotation annotation = m.getAnnotation(defaultValueAnnotationClass);
-                        if (null != annotation) {
-                            Method method = annotation.getClass().getMethod(DEFAULT_VALUE_METHOD_NAME);
-                            Object[] args = null;
-                            Object invokeResult = method.invoke(annotation, args);
-                            String defaultValue = (String) invokeResult;
-                            param.setValue(defaultValue);
+            loader = new URLClassLoader(loadJars(out.getAbsolutePath()).toArray(urls));         
+            Class<?> base = loadClass(name, loader); 
+            if (null != base) {
+                Method[] methods = base.getMethods();
+                for (Method m : methods) {
+                    if (m.getName().startsWith("setParameter")) {
+                        String pName = m.getName().substring("setParameter".length(), m.getName().length());
+                        pName = lowerFirstLetter(pName); 
+                        Parameter param = new Parameter(pName, ParameterType.valueOf(m.getParameterTypes()[0]));
+                        if (null != m.getDefaultValue()) {
+                            param.setValue(m.getDefaultValue().toString());
                         }
-                        
-                    } catch (ClassNotFoundException e) {
-                        System.out.println("ERROR: Unable to load Annotation Class: '" + ANNOTATION_CLASS + "'");
-                        logger.info("ERROR: Unable to load Annotation Class: '" + ANNOTATION_CLASS + "'");
-                        System.out.println("The used version of StormCommons does not support Annotations!");
-                        logger.info("The used version of StormCommons does not support Annotations!");
-                    } catch (ClassCastException e) {
-                        e.printStackTrace();
-                        System.out.println("ERROR: Unable to cast: '" + ANNOTATION_CLASS + "' to Annotation.");
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (IllegalArgumentException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
-                    result.add(param); 
-                }      
+                        try {
+                            
+                            Class<?> defaultValueClass = loader.loadClass(ANNOTATION_CLASS);
+                            @SuppressWarnings("unchecked")
+                            Class<Annotation> defaultValueAnnotationClass = (Class) defaultValueClass.getClass();
+                            Annotation annotation = m.getAnnotation(defaultValueAnnotationClass);
+                            if (null != annotation) {
+                                Method method = annotation.getClass().getMethod(DEFAULT_VALUE_METHOD_NAME);
+                                Object[] args = null;
+                                Object invokeResult = method.invoke(annotation, args);
+                                String defaultValue = (String) invokeResult;
+                                param.setValue(defaultValue);
+                            }
+                            
+                        } catch (ClassNotFoundException e) {
+                            System.out.println("ERROR: Unable to load Annotation Class: '" + ANNOTATION_CLASS + "'");
+                            logger.info("ERROR: Unable to load Annotation Class: '" + ANNOTATION_CLASS + "'");
+                            System.out.println("The used version of StormCommons does not support Annotations!");
+                            logger.info("The used version of StormCommons does not support Annotations!");
+                        } catch (ClassCastException e) {
+                            e.printStackTrace();
+                            System.out.println("ERROR: Unable to cast: '" + ANNOTATION_CLASS + "' to Annotation.");
+                        } catch (NoSuchMethodException e) {
+                            e.printStackTrace();
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        } catch (IllegalArgumentException e) {
+                            e.printStackTrace();
+                        } catch (InvocationTargetException e) {
+                            e.printStackTrace();
+                        }
+                        result.add(param); 
+                    } 
+                }
             }
-            
-            loader.close();
-            
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (ManifestUtilsException e1) {
+            e1.printStackTrace();
+        } finally {
+            try {
+                loader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         
         return result;
@@ -553,7 +559,53 @@ public class ManifestConnection {
     }
     
     /**
-     * Returns the class of given name of the resolved dependecy.
+     * Loads the specified class via the given class loader.
+     * @param name The (binary) name of the class to load.
+     * @param loader The class loader to use (should make use of the downloaded JARs from {@link #out}.
+     * @return The loaded class or <tt>null</tt> if the name is <tt>null</tt>.
+     * @throws ClassNotFoundException If the class was not found
+     * @throws ManifestUtilsException in case that the specified class could not be loaded due
+     *     to missing dependent classes
+     */
+    private Class<?> loadClass(String name, URLClassLoader loader) throws ClassNotFoundException,
+        ManifestUtilsException {
+        
+        Class<?> result = null;
+        
+        if (null != name && !name.isEmpty()) {
+
+            try {
+                result = loader.loadClass(name);
+            } catch (NoClassDefFoundError noDefError) {
+                // Short description
+                StringBuffer titleMsg = new StringBuffer("Error expected class \"");
+                titleMsg.append(name);
+                titleMsg.append("\" could not be loaded.");
+                String title = titleMsg.toString();
+                
+                // Detailed reason
+                StringBuffer errMsg = new StringBuffer(title);
+                errMsg.append("\" Reason: Class \"");
+                errMsg.append(noDefError.getMessage());
+                errMsg.append("\" was not found");
+                if (null != out) {
+                    errMsg.append(" at \"");
+                    errMsg.append(out.getAbsolutePath());
+                    errMsg.append("\".");
+                } else {
+                    errMsg.append(".");
+                }
+                String msg = errMsg.toString();
+                logger.error(msg);
+                throw new ManifestUtilsException(title, msg);
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Returns the class of given name of the resolved dependency.
      * @param name The name of the class. Can be null?
      * @param artifactId the id of the artifact.
      * @param getInput true if input should be returned, false for output.
@@ -568,27 +620,17 @@ public class ManifestConnection {
         try {
             URL[] urls = new URL[1];
             loader = new URLClassLoader(loadJars(out.getAbsolutePath()).toArray(urls)); 
+            Class<?> base = loadClass(name, loader);
             
-            if (null != name && !name.isEmpty()) {
-                
- 
-                Class<?> base = null;
-                
-                base = loader.loadClass(name);
-                
+            if (null != base) {
                 Method[] methods = base.getMethods();      
-                
                 List<String> inOut = new ArrayList<String>();
-  
                 result = getAlgorithmInOut(loader, methods, getInput, inOut);
                 
                 if (result.isEmpty()) {
-                    
                     result = getSinkInOut(loader, methods, getInput, inOut);
-                    
                 }
-                
-            }             
+            }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             throw new ManifestUtilsException("Missing dependency!", e);
@@ -1590,9 +1632,7 @@ public class ManifestConnection {
                         file.getAbsolutePath().length() - 4) + "-shaded.jar");
                 
                 if (replacement.exists()) {
-                    
                     file = replacement;
-                    
                 }
                 
             }
@@ -1603,7 +1643,10 @@ public class ManifestConnection {
                     if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
                         // This ZipEntry represents a class. Now, what class does it represent?
                         String className = entry.getName().replace('/', '.'); // including ".class"
-                        classNames.add(className.substring(0, className.length() - ".class".length()));
+                        className = className.substring(0, className.length() - ".class".length());
+                        if (!className.matches(CLASS_NAMES_TO_OMIT)) {
+                            classNames.add(className);
+                        }
                     }
                 }
             } catch (FileNotFoundException e) {

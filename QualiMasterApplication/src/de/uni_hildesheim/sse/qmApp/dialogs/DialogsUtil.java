@@ -80,7 +80,11 @@ public class DialogsUtil {
      * @return the active shell
      */
     public static Shell getActiveShell() {
-        return PlatformUI.getWorkbench().getDisplay().getActiveShell();
+        Shell shell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
+        if (null == shell) {
+            shell = new Shell(PlatformUI.getWorkbench().getDisplay());
+        }
+        return shell;
     }
 
 }
