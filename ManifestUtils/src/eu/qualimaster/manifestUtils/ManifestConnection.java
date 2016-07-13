@@ -587,7 +587,14 @@ public class ManifestConnection {
                 StringBuffer errMsg = new StringBuffer(title);
                 errMsg.append("\" Reason: Class \"");
                 errMsg.append(noDefError.getMessage());
-                errMsg.append("\" was not found.");
+                errMsg.append("\" was not found");
+                if (null != out) {
+                    errMsg.append(" at \"");
+                    errMsg.append(out.getAbsolutePath());
+                    errMsg.append("\".");
+                } else {
+                    errMsg.append(".");
+                }
                 String msg = errMsg.toString();
                 logger.error(msg);
                 throw new ManifestUtilsException(title, msg);
