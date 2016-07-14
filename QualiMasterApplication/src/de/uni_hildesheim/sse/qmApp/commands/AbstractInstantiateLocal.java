@@ -40,6 +40,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
     /**
      * Experimental: <tt>true</tt> use copied and cleaned up configuration for instantiation, 
      * <tt>false</tt> use underlying model and configuration.
+     * @see ModelModifier
      */
     private static final boolean PRUNE_CONFIG = false;
 
