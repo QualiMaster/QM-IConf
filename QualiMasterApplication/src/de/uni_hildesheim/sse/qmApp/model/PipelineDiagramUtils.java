@@ -26,15 +26,13 @@ import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gmf.runtime.diagram.ui.parts.DiagramEditor;
 import org.eclipse.gmf.runtime.emf.core.GMFEditingDomainFactory;
 import org.eclipse.gmf.runtime.emf.core.util.EMFCoreUtil;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.xtext.util.StringInputStream;
 
 import de.uni_hildesheim.sse.ModelUtility;
 import de.uni_hildesheim.sse.qmApp.pipelineUtils.Highlighter;
 import de.uni_hildesheim.sse.qmApp.pipelineUtils.HighlighterParam;
-import de.uni_hildesheim.sse.qmApp.pipelineUtils.StatusHighlighter;
-import de.uni_hildesheim.sse.qmApp.pipelineUtils.StatusHighlighter.PipelineDataflowInformationWrapper;
-import de.uni_hildesheim.sse.qmApp.treeView.ElementStatusIndicator;
 import net.ssehub.easy.basics.modelManagement.ModelInfo;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
@@ -43,11 +41,7 @@ import net.ssehub.easy.varModel.model.Project;
 import pipeline.Pipeline;
 import pipeline.PipelinePackage;
 import pipeline.diagram.part.PipelineDiagramEditorUtil;
-import pipeline.impl.DataManagementElementImpl;
-import pipeline.impl.FamilyElementImpl;
 import pipeline.impl.FlowImpl;
-import pipeline.impl.SinkImpl;
-import pipeline.impl.SourceImpl;
 import pipeline.presentation.PipelineModelWizard;
 import qualimasterapplication.Activator;
 
@@ -593,111 +587,41 @@ public class PipelineDiagramUtils {
     }
     
     /**
-     * Reset the marking of an opened Pipeline-Editor by changingthe color of all
+     * Reset the marking of an opened Pipeline-Editor by changing the color of all
      * contained {@link EObject} to black.
      */
     public static void resetDiagramMarkings() {
     
         // Get diagram.
-        DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+        IEditorReference[] editors = PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getActivePage().getEditorReferences();
+                
+        for (int i = 0; i < editors.length; i++) {
+            Object object = editors[i].getEditor(false);
+            if (object instanceof DiagramEditor) {
+                DiagramEditor editor = (DiagramEditor) object;
 
-        // highlightAdapter for highlighting diagram-elements.
-        Highlighter adapter = new Highlighter(diagram);
-        HighlighterParam param = new HighlighterParam();
-        
-        EObject element = diagram.getDiagram().getElement();
-        EList<EObject> eContents = element.eContents();
-        
-        for (int j = 0; j < eContents.size(); j++) {
-        
-            if (eContents.get(j) instanceof FlowImpl) {
-                adapter.resetFlow(eContents.get(j), param);
-                adapter.removeTooltip(eContents.get(j));
-            } else {
-                adapter.resetNode(eContents.get(j), param);
-                adapter.removeTooltip(eContents.get(j));
-            }
-        }
-    }
-    
-
-    /**
-     * Highlight a given Pipeline-Editor concerning its dataflow characteristics.
-     * The nodes will be coloured in different green tones.
-     * 
-     * @param eobject object to highlight.
-     * @param indicator Indicator which indicates the elements status.
-     */
-    public static void highlightDataFlow(EObject eobject, ElementStatusIndicator indicator) {
-
-        if (eobject instanceof SourceImpl) {
-            SourceImpl source = (SourceImpl) eobject;
-            StatusHighlighter.INSTANCE.highlightDataFlowForSource(source, indicator);
-        }
-        if (eobject instanceof FamilyElementImpl) {
-            FamilyElementImpl source = (FamilyElementImpl) eobject;
-            StatusHighlighter.INSTANCE.highlightDataFlowForFamily(source, indicator);
-        }
-        if (eobject instanceof SinkImpl) {
-            SinkImpl source = (SinkImpl) eobject;
-            StatusHighlighter.INSTANCE.highlightDataFlowForSink(source, indicator);
-        }
-        if (eobject instanceof DataManagementElementImpl) {
-            DataManagementElementImpl source = (DataManagementElementImpl) eobject;
-            StatusHighlighter.INSTANCE.highlightDataFlowForDatamangement(source, indicator);
-        }
-    }
-
-    /**
-     * Add color to pipeline.
-     */
-    public static void addPipelineColor() {
-        
-        // Get diagram.
-        DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-
-        String pipelineName = diagram.getTitle().toLowerCase();
-        
-        List<de.uni_hildesheim.sse.qmApp.pipelineUtils.StatusHighlighter.PipelineDataflowInformationWrapper>
-            wrapperList = StatusHighlighter.INSTANCE.getPipelineFlowInfo();
-
-        EObject element = diagram.getDiagram().getElement();
-        EList<EObject> eContents = element.eContents();
-        
-        for (int i = 0; i < wrapperList.size(); i++) {
-            
-            PipelineDataflowInformationWrapper wrapper = wrapperList.get(i);
-
-            if (wrapper.getPipelineName().toLowerCase().equals(pipelineName)) {
-
+                // highlightAdapter for highlighting diagram-elements.
+                Highlighter adapter = new Highlighter(editor);
+                HighlighterParam param = new HighlighterParam();
+                
+                EObject element = editor.getDiagram().getElement();
+                EList<EObject> eContents = element.eContents();
+                
                 for (int j = 0; j < eContents.size(); j++) {
-                        
-                    String name = eContents.get(j).toString();
-                    name = determineName(name);
-                   
-                    if (wrapper.getVariableName().equals(name)) {
-                        highlightDataFlow(eContents.get(j), wrapper.getIndicator());
-                    }    
+                
+                    if (eContents.get(j) instanceof FlowImpl) {
+                        adapter.resetFlow(eContents.get(j), param);
+                        adapter.removeTooltip(eContents.get(j));
+                    } else {
+                        adapter.resetNode(eContents.get(j), param);
+                        adapter.removeTooltip(eContents.get(j));
+                    }
                 }
             }
         }
     }
 
-    /**
-     * determine the name of a pipeline.
-     * @param name Given String.
-     * @return Found name within the given String.
-     */
-    private static String determineName(String name) {
-        name = name.substring(name.indexOf(":"), name.indexOf(","));
-        name = name.replaceAll("[^a-zA-Z0-9]", "");
-        name.replace(":", "");
-        name = name.trim();
-        
-        return name;
-    }
     /**
      * Save the information about the currently open PipelineEditor, aka which nodes 
      * belong to which flow.

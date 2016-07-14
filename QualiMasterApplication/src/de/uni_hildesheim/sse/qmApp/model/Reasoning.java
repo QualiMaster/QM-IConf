@@ -377,10 +377,19 @@ public class Reasoning {
         if (PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
                 instanceof DiagramEditor) {
         
-            DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench().
-                    getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-            if (diagram instanceof PipelineDiagramEditor) {
-                PipelineDiagramUtils.highlightDiagram();
+            
+            IEditorReference[] editors = PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getActivePage().getEditorReferences();
+                    
+            for (int i = 0; i < editors.length; i++) {
+                Object object = editors[i].getEditor(false);
+                if (object instanceof DiagramEditor) {
+                    DiagramEditor editor = (DiagramEditor) object;
+
+                    if (editor instanceof PipelineDiagramEditor) {
+                        PipelineDiagramUtils.highlightDiagram();
+                    }
+                }
             }
         }
     }

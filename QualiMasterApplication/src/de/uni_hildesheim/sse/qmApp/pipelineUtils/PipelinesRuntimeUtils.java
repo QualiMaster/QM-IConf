@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -792,8 +793,11 @@ public class PipelinesRuntimeUtils {
      * Update the content of the observalbesTable corresponding the the selected pipelines.
      * @param observablesTable Tabe for observale items.
      * @param type type of the currently selected pipeline element.
+     * @param deliveringObservables 
+     * @param selectedElementName name of the selected element.
      */
-    public void setObservablesTableSelections(Table observablesTable, PipelineNodeType type) {  
+    public void setObservablesTableSelections(Table observablesTable, PipelineNodeType type, HashMap<String,
+            Set<String>> deliveringObservables, String selectedElementName) {
         observablesTable.removeAll();
         observablesTable.redraw();
         for (String item : backupObservableItem) {
@@ -861,6 +865,49 @@ public class PipelinesRuntimeUtils {
         default:
             break;
         }
+        disableNonDeliveringObservables(observablesTable, deliveringObservables, selectedElementName);
+    }
+
+    /**
+     * Remove the observables from the table which wont provide data.
+     * @param observablesTable table which holds the observable items.
+     * @param deliveringObservables the delivering items we dont want to remove.
+     * @param selectedElementName currently selected element in pipeline selection table..
+     */
+    private void disableNonDeliveringObservables(Table observablesTable,
+            HashMap<String, Set<String>> deliveringObservables, String selectedElementName) {
+        
+        List<String> notSupportedObservables = new ArrayList<String>();
+        
+        String infoMessage = "The following observables could be selected for the pipelines element ,"
+                + "but it will not provide any data to display: \n";
+        
+        Set<String> observations = deliveringObservables.get(selectedElementName);
+        
+        for (int i = 0; i < observablesTable.getItemCount(); i++) {
+            TableItem item = observablesTable.getItem(i);
+            String itemText = item.getText().toUpperCase();
+            
+            if (observations != null) {
+                if (!observations.contains(itemText)) {
+                    
+                    if (!notSupportedObservables.contains(item.getText())) {
+                        notSupportedObservables.add(item.getText());
+
+                        observablesTable.remove(i);
+                    }
+                    
+                }
+            }
+        }
+        
+        for (int j = 0; j < notSupportedObservables.size(); j++) {
+            String notSuppObservable = notSupportedObservables.get(j);
+            infoMessage += notSuppObservable + "\n";
+            
+        }
+        observablesTable.redraw();
+        observablesTable.setToolTipText(infoMessage);
     }
 
     /**
@@ -887,21 +934,6 @@ public class PipelinesRuntimeUtils {
         }
         return toReturn;
     }
-    /**
-     * Check whether items should be removed from the observables table because they arent supported by
-     * the selected pipeline-element.
-     * @param observablesTable observables table.
-     * @param item Current item.
-     */
-//    private void checkTableItem(Table observablesTable, TableItem item) {
-//        String text = item.getText();
-//        String toContain = text.toLowerCase();
-//        toContain = toContain.replaceAll("[^a-zA-Z0-9]", ""); 
-//        
-//        if (!observableSink.contains(toContain)) {
-//            observablesTable.remove(observablesTable.indexOf(item));
-//        }
-//    }
     
     /**
      * This class provides the content for the tree in FileTree.
