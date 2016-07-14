@@ -103,6 +103,11 @@ public class IconManager {
     public static final String SVG_SOURCE_LOW = "source_low.svg";
     public static final String SVG_SOURCE_VERY_LOW = "source_very_low.svg";
     
+    public static final String SVG_SOURCE_STANDARD = "platform:/plugin/pipelineGEditor/svg/source.svg";
+    public static final String SVG_SINK_STANDARD = "platform:/plugin/pipelineGEditor/svg/sink.svg";
+    public static final String SVG_FAMILYELEMENT_STANDARD = "platform:/plugin/pipelineGEditor/svg/familyelement.svg";
+    public static final String SVG_DATAMANAGEMENT_STANDARD = "platform:/plugin/pipelineGEditor/svg/datamanagement.svg";
+    
     public static final org.eclipse.swt.graphics.Color DARK_GREEN =
             new org.eclipse.swt.graphics.Color(Display.getCurrent(), 102, 255, 102);
     public static final org.eclipse.swt.graphics.Color LIGHT_GREEN =
@@ -115,6 +120,9 @@ public class IconManager {
             new org.eclipse.swt.graphics.Color(Display.getCurrent(), 204, 0, 0);
     
     private static final Map<String, String> TYPE_MAP = new HashMap<String, String>();
+    
+
+    
     
     static {
         TYPE_MAP.put("Algorithm", ALGORITHM);

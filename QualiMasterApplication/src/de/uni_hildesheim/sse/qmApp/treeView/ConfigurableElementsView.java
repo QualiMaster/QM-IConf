@@ -55,6 +55,7 @@ import de.uni_hildesheim.sse.qmApp.model.QualiMasterDisplayNameProvider;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
 import de.uni_hildesheim.sse.qmApp.pipelineUtils.PipelineEditorListener;
+import de.uni_hildesheim.sse.qmApp.pipelineUtils.StatusHighlighter;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.EventKind;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.IChangeListener;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
@@ -355,7 +356,7 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                         if (diagram instanceof PipelineDiagramEditor) {
                             PipelineDiagramUtils.highlightDiagram();
                             
-                            PipelineDiagramUtils.addPipelineColor();
+                            StatusHighlighter.addPipelineColor();
                         }
                         
                        
@@ -696,9 +697,10 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
 
     /**
      * Force the viewer to refresh its input.
+     * @param element 
      */
-    public static void forceTreeRefresh() {
-        viewer.refresh();
+    public static void forceTreeRefresh(ConfigurableElement element) {
+        viewer.refresh(element, true);
     }
 
     /**

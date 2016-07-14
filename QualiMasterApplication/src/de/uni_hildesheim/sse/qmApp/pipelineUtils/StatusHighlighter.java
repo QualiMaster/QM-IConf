@@ -4,16 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.figures.BorderedNodeFigure;
 import org.eclipse.gmf.runtime.diagram.ui.parts.DiagramEditor;
 import org.eclipse.gmf.runtime.gef.ui.figures.DefaultSizeNodeFigure;
 import org.eclipse.gmf.runtime.lite.svg.SVGFigure;
+import org.eclipse.gmf.runtime.notation.impl.ShapeImpl;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.PlatformUI;
 
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
-import de.uni_hildesheim.sse.qmApp.model.PipelineDiagramUtils;
 import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElement;
 import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElementsView;
 import de.uni_hildesheim.sse.qmApp.treeView.ElementStatusIndicator;
@@ -23,14 +25,6 @@ import pipeline.impl.FamilyElementImpl;
 import pipeline.impl.SinkImpl;
 import pipeline.impl.SourceImpl;
 
-/*
- * TODO SE: There are a lot of possible performance improvements:
- * - To often toLowerCase is used (if possible, the element should only be turned only once into lower case and not
- *   in each iteration of the loop)
- * - For-Loops can be exited if the desired value is found
- * - In total, too many loops are used -> consider maps
- * Not an performance issue, but maintenance: Many duplicate code fragments -> consider to revise them.
- */
 /**
  * Singleton-Class for highlighting Pipeline-Editors. <b>Assumes that the caller is in the correct UI-Thread!</b>
  * @author nowatzki
@@ -187,7 +181,7 @@ public class StatusHighlighter {
             if (element.getDisplayName().toLowerCase().equals(pipelineName.toLowerCase())) {
                 
                 element.setStatus(indicator);
-                ConfigurableElementsView.forceTreeRefresh(); 
+                ConfigurableElementsView.forceTreeRefresh(element); 
                 // TODO inefficient, use viewer.refresh(element, true), refresh only if changed, consider UI thread
             }
         } 
@@ -206,7 +200,7 @@ public class StatusHighlighter {
             
             if (element.getDisplayName().toLowerCase().equals(elementName.toLowerCase())) {
                 element.setStatus(status);
-                ConfigurableElementsView.forceTreeRefresh();
+                ConfigurableElementsView.forceTreeRefresh(element);
             }
             
             for (int j = 0; j < element.getChildCount(); j++) {
@@ -229,7 +223,7 @@ public class StatusHighlighter {
         if (element.getDisplayName().toLowerCase().equals(elementName.toLowerCase())) {
             
             element.setStatus(status);
-            ConfigurableElementsView.forceTreeRefresh();
+            ConfigurableElementsView.forceTreeRefresh(element);
         } else {
             if (element.hasChildren()) {
                 for (int j = 0; j < element.getChildCount(); j++) {
@@ -249,7 +243,7 @@ public class StatusHighlighter {
             DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench().
                     getActiveWorkbenchWindow().getActivePage().getActiveEditor();
             if (diagram instanceof PipelineDiagramEditor) {
-                PipelineDiagramUtils.addPipelineColor();
+                StatusHighlighter.addPipelineColor();
             }
         }
     }
@@ -284,6 +278,14 @@ public class StatusHighlighter {
     }
     
     /**
+     * Clears the list which holds the info about data flow. Therefore no pipeline-element will be colored
+     * anymore after a connection is closed.
+     */
+    public void resetPipelineFlowInfo() {
+        pipelineDataflowList.clear();
+    }
+    
+    /**
      * Get editpart for a given diagram-element {@link EObject}.
      * 
      * @param semanticElement
@@ -300,6 +302,140 @@ public class StatusHighlighter {
         return editPart;
     }
      
+    /**
+     * Reset the dataflow-marking in all pipeline-diagrams.
+     */
+    public void resetPipelineDataFlowMarkings() {
+        IEditorReference[] editors = PlatformUI.getWorkbench()
+        .getActiveWorkbenchWindow().getActivePage().getEditorReferences();
+        
+        for (int i = 0; i < editors.length; i++) {
+            Object object = editors[i].getEditor(false);
+            if (object instanceof DiagramEditor) {
+                DiagramEditor editor = (DiagramEditor) object;
+                
+                EList<EObject> elementList = editor.getDiagram().eContents();
+                
+                for (int j = 0; j < elementList.size(); j++) {
+                    EObject eobject = elementList.get(j);
+                    
+                    if (eobject instanceof ShapeImpl) {
+                        ShapeImpl shape = (ShapeImpl) eobject;
+                        EObject element = shape.getElement();
+                       
+                        if (element instanceof SourceImpl) {
+                            SourceImpl source = (SourceImpl) element;
+                            StatusHighlighter.INSTANCE.highlightDataFlowForSource(source, ElementStatusIndicator.NONE);
+                        }
+                        if (element instanceof FamilyElementImpl) {
+                            FamilyElementImpl source = (FamilyElementImpl) element;
+                            StatusHighlighter.INSTANCE.highlightDataFlowForFamily(source, ElementStatusIndicator.NONE);
+                        }
+                        if (element instanceof SinkImpl) {
+                            SinkImpl source = (SinkImpl) element;
+                            StatusHighlighter.INSTANCE.highlightDataFlowForSink(source, ElementStatusIndicator.NONE);
+                        }
+                        if (element instanceof DataManagementElementImpl) {
+                            DataManagementElementImpl source = (DataManagementElementImpl) element;
+                            StatusHighlighter.INSTANCE.highlightDataFlowForDatamangement(source,
+                                    ElementStatusIndicator.NONE);
+                        }
+                    }
+                }
+                
+            }
+            
+        }
+    }
+    
+    /**
+     * Add color to pipeline.
+     */
+    public static void addPipelineColor() {
+        
+        List<de.uni_hildesheim.sse.qmApp.pipelineUtils.StatusHighlighter.PipelineDataflowInformationWrapper>
+            wrapperList = StatusHighlighter.INSTANCE.getPipelineFlowInfo();
+        
+        IEditorReference[] editors = PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getActivePage().getEditorReferences();
+                
+        for (int i = 0; i < editors.length; i++) {
+            Object object = editors[i].getEditor(false);
+            if (object instanceof DiagramEditor) {
+                DiagramEditor editor = (DiagramEditor) object;
+                        
+                EList<EObject> elementList = editor.getDiagram().eContents();
+                        
+                for (int j = 0; j < elementList.size(); j++) {
+  
+                    String pipelineName = editor.getTitle().toLowerCase();       
+ 
+                    EObject element = editor.getDiagram().getElement();
+                    EList<EObject> eContents = element.eContents();
+                            
+                    for (int k = 0; k < wrapperList.size(); k++) {
+                                
+                        PipelineDataflowInformationWrapper wrapper = wrapperList.get(k);
+                    
+                        if (wrapper.getPipelineName().toLowerCase().equals(pipelineName)) {
+                    
+                            for (int l = 0; l < eContents.size(); l++) {
+                                            
+                                String name = eContents.get(l).toString();
+                                name = determineName(name);
+                                       
+                                if (wrapper.getVariableName().equals(name)) {
+                                    highlightDataFlow(eContents.get(l), wrapper.getIndicator());
+                                }    
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Highlight a given Pipeline-Editor concerning its dataflow characteristics.
+     * The nodes will be coloured in different green tones.
+     * 
+     * @param eobject object to highlight.
+     * @param indicator Indicator which indicates the elements status.
+     */
+    public static void highlightDataFlow(EObject eobject, ElementStatusIndicator indicator) {
+
+        if (eobject instanceof SourceImpl) {
+            SourceImpl source = (SourceImpl) eobject;
+            StatusHighlighter.INSTANCE.highlightDataFlowForSource(source, indicator);
+        }
+        if (eobject instanceof FamilyElementImpl) {
+            FamilyElementImpl source = (FamilyElementImpl) eobject;
+            StatusHighlighter.INSTANCE.highlightDataFlowForFamily(source, indicator);
+        }
+        if (eobject instanceof SinkImpl) {
+            SinkImpl source = (SinkImpl) eobject;
+            StatusHighlighter.INSTANCE.highlightDataFlowForSink(source, indicator);
+        }
+        if (eobject instanceof DataManagementElementImpl) {
+            DataManagementElementImpl source = (DataManagementElementImpl) eobject;
+            StatusHighlighter.INSTANCE.highlightDataFlowForDatamangement(source, indicator);
+        }
+    }
+    
+    /**
+     * determine the name of a pipeline.
+     * @param name Given String.
+     * @return Found name within the given String.
+     */
+    private static String determineName(String name) {
+        name = name.substring(name.indexOf(":"), name.indexOf(","));
+        name = name.replaceAll("[^a-zA-Z0-9]", "");
+        name.replace(":", "");
+        name = name.trim();
+        
+        return name;
+    }
+    
     /**
      * Highlight a given source element.
      * 
@@ -334,8 +470,11 @@ public class StatusHighlighter {
             case VERYLOW:                 
                 uri += IconManager.SVG_SOURCE_VERY_LOW;
                 break;
+            case NONE:
+                uri = IconManager.SVG_SOURCE_STANDARD;
+                break;
             default:                
-                uri += IconManager.SVG_SOURCE_VERY_HIGH;
+                uri = IconManager.SVG_SOURCE_STANDARD;
                 break;
 
             }
@@ -378,8 +517,11 @@ public class StatusHighlighter {
             case VERYLOW:                 
                 uri += IconManager.SVG_SINK_VERY_LOW;
                 break;
+            case NONE:
+                uri = IconManager.SVG_SOURCE_STANDARD;
+                break;
             default:                
-                uri += IconManager.SVG_SINK_VERY_LOW;
+                uri = IconManager.SVG_SINK_STANDARD;
                 break;
 
             }
@@ -423,8 +565,11 @@ public class StatusHighlighter {
             case VERYLOW:                 
                 uri += IconManager.SVG_FAMILYELEMENT_VERY_LOW;
                 break;
+            case NONE:
+                uri = IconManager.SVG_SOURCE_STANDARD;
+                break;
             default:                
-                uri += IconManager.SVG_FAMILYELEMENT_VERY_LOW;
+                uri = IconManager.SVG_FAMILYELEMENT_STANDARD;
                 break;
 
             }
@@ -453,22 +598,25 @@ public class StatusHighlighter {
 
             switch(dataflow) {
             case VERYHIGH:  
-                uri += "datamanagement.svg";
+                uri += IconManager.SVG_DATAMANAGEMENT_VERY_HIGH;
                 break;
             case HIGH:    
-                uri += "datamanagement2.svg";
+                uri += IconManager.SVG_DATAMANAGEMENT_HIGH;
                 break;
             case MEDIUM:            
-                uri += "datamanagement3.svg";
+                uri += IconManager.SVG_DATAMANAGEMENT_MEDIUM;
                 break;
             case LOW:                 
-                uri += "datamanagement4.svg";
+                uri += IconManager.SVG_DATAMANAGEMENT_LOW;
                 break;
             case VERYLOW:                 
-                uri += "datamanagement5.svg";
+                uri += IconManager.SVG_DATAMANAGEMENT_VERY_LOW;
+                break;
+            case NONE:
+                uri = IconManager.SVG_SOURCE_STANDARD;
                 break;
             default:                
-                uri += "datamanagement.svg";
+                uri = IconManager.SVG_DATAMANAGEMENT_STANDARD;
                 break;
 
             }
