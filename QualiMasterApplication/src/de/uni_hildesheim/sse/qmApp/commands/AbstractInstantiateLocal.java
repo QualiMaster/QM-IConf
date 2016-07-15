@@ -27,6 +27,7 @@ import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.instantiation.core.model.common.VilException;
 import net.ssehub.easy.instantiation.core.model.execution.Executor;
 import net.ssehub.easy.instantiation.core.model.execution.TracerFactory;
+import net.ssehub.easy.producer.ui.productline_editor.EasyProducerDialog;
 import net.ssehub.easy.producer.ui.productline_editor.EclipseConsole;
 import net.ssehub.easy.varModel.confModel.Configuration;
 
@@ -198,7 +199,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
 
             @Override
             public void run() {
-                Dialogs.showErrorDialog(title, exception.getMessage());
+                EasyProducerDialog.showDialog(null, title, exception.getMessage(), true);
             }
         });
     }
