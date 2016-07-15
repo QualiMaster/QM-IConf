@@ -32,6 +32,8 @@ import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Definition;
 import de.uni_hildesheim.sse.vil.rt.RtVilModelUtility;
 import de.uni_hildesheim.sse.vil.templatelang.TemplateLangModelUtility;
 import eu.qualimaster.easy.extension.QmConstants;
+import eu.qualimaster.easy.extension.modelop.BasicIVMLModelOperations;
+import eu.qualimaster.easy.extension.modelop.QualiMasterConfigurationSaver;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
 import net.ssehub.easy.basics.modelManagement.AvailableModels;
 import net.ssehub.easy.basics.modelManagement.IModelListener;
@@ -945,7 +947,7 @@ public class ModelAccess {
         final String varInfix = "Var_";
         int nextIndex = -1;
         for (int e = 0; e < con.getNestedElementsCount(); e++) {
-            AbstractVariable var = IVMLModelOperations.getDeclaration(con.getNestedElement(e));
+            AbstractVariable var = BasicIVMLModelOperations.getDeclaration(con.getNestedElement(e));
             if (null != var) {
                 String varName = var.getName();
                 int pos = varName.indexOf(varInfix);

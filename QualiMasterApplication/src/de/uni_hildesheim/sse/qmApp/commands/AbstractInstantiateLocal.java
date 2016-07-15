@@ -17,16 +17,18 @@ import org.eclipse.swt.widgets.Shell;
 import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.dialogs.UiTracerFactory;
 import de.uni_hildesheim.sse.qmApp.model.Location;
-import de.uni_hildesheim.sse.qmApp.model.ModelModifier;
 import de.uni_hildesheim.sse.qmApp.model.ProjectDescriptor;
 import de.uni_hildesheim.sse.qmApp.model.Reasoning;
 import de.uni_hildesheim.sse.qmApp.model.SessionModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
+import eu.qualimaster.easy.extension.modelop.ModelModifier;
+import eu.qualimaster.easy.extension.modelop.ModelModifier.QMPlatformProvider;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.instantiation.core.model.common.VilException;
 import net.ssehub.easy.instantiation.core.model.execution.Executor;
 import net.ssehub.easy.instantiation.core.model.execution.TracerFactory;
 import net.ssehub.easy.producer.ui.productline_editor.EclipseConsole;
+import net.ssehub.easy.varModel.confModel.Configuration;
 
 /**
  * An abstract handler for local instantiation commands. This class supports the explicit selection
@@ -36,7 +38,7 @@ import net.ssehub.easy.producer.ui.productline_editor.EclipseConsole;
  * @author Holger Eichelberger
  * @author El-Sharkawy
  */
-public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandler {
+public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandler implements QMPlatformProvider {
     /**
      * Experimental: <tt>true</tt> use copied and cleaned up configuration for instantiation, 
      * <tt>false</tt> use underlying model and configuration.
@@ -79,7 +81,10 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                         ModelModifier modifier = null;
                         if (PRUNE_CONFIG) {
                             // Maybe null in case of any error
-                            modifier = new ModelModifier(trgFolder);
+                            modifier = new ModelModifier(trgFolder,
+                                VariabilityModel.Definition.TOP_LEVEL.getConfiguration().getProject(),
+                                Location.getModelLocationFile(),
+                                AbstractInstantiateLocal.this);
                             executor = modifier.createExecutor();
                         }
                         if (!PRUNE_CONFIG || null == executor) {
@@ -188,7 +193,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
      * @param title the dialog title
      * @param exception the causing exception
      */
-    private static void showExceptionDialog(final String title, final Exception exception) {
+    public void showExceptionDialog(final String title, final Exception exception) {
         Display.getDefault().asyncExec(new Runnable() {
 
             @Override
@@ -196,6 +201,11 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                 Dialogs.showErrorDialog(title, exception.getMessage());
             }
         });
+    }
+    
+    @Override
+    public void reason(Configuration config) {
+        Reasoning.reasonOn(false, config);
     }
 
     /**

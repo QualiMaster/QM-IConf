@@ -36,6 +36,7 @@ import de.uni_hildesheim.sse.qmApp.editors.QMPipelineEditor;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Definition;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager;
 import eu.qualimaster.easy.extension.QmConstants;
+import eu.qualimaster.easy.extension.modelop.BasicIVMLModelOperations;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
@@ -157,7 +158,7 @@ public class PipelineTranslationOperations {
         freezables = new ArrayList<IFreezable>();
         // add imports
         addImports(newProject);
-        IVMLModelOperations.addRuntimeAttributeToProject(newProject, modelProject);
+        BasicIVMLModelOperations.addRuntimeAttributeToProject(newProject, modelProject);
         DecisionVariableDeclaration pipelineVariable = null;
         if (!pipelineList.isEmpty() && pipelineList.size() == 1) {
             // add pipeline elements
@@ -175,11 +176,11 @@ public class PipelineTranslationOperations {
                     nameMap.put(pVariableName, pDisplayName);
                 }
             }
-            IVMLModelOperations.addFreezeBlock(freezables, newProject, modelProject);
+            BasicIVMLModelOperations.addFreezeBlock(freezables, newProject, modelProject);
         }
         // adds the imports in the main pipeline project
         ProjectImport pImport = new ProjectImport(newProject.getName(), null);
-        IVMLModelOperations.modifyImports(modelProject, IVMLModelOperations.ADD, pImport);
+        BasicIVMLModelOperations.modifyImports(modelProject, BasicIVMLModelOperations.ADD, pImport);
         // adds the pipeline to the main project
         IVMLModelOperations.addPipelineToMainProject(pipelineVariable);
         
@@ -412,7 +413,7 @@ public class PipelineTranslationOperations {
 
         // define pipeline
         String typeName = pipeline.getIsSubPipeline() ? QmConstants.TYPE_SUBPIPELINE : QmConstants.TYPE_PIPELINE;
-        DecisionVariableDeclaration pipelineVariable = IVMLModelOperations.getDecisionVariable(
+        DecisionVariableDeclaration pipelineVariable = BasicIVMLModelOperations.getDecisionVariable(
             context.getPipelineProject(), typeName, null, destProject);
         freezables.add(pipelineVariable);
         destProject.add(pipelineVariable);
@@ -436,7 +437,7 @@ public class PipelineTranslationOperations {
         if (!pipeline.getConstraints().isEmpty()) {
             String[] constraints = ConstraintUtils.splitConstraints(pipeline.getConstraints());                    
             for (int i = 0; i < constraints.length; i++) {                  
-                cstValList.add(IVMLModelOperations.obtainConstraintValue(constraints[i], 
+                cstValList.add(BasicIVMLModelOperations.obtainConstraintValue(constraints[i], 
                         pipelineVariable));                
             }
         }
@@ -465,14 +466,14 @@ public class PipelineTranslationOperations {
         handleConnectorsOfSubPipeline(pipeline, destProject, context, pipelineCompound);
         
         // add the compound variables in the project
-        Object[] pipelineObject = IVMLModelOperations.configureCompoundValues(pipelineVariable, pipelineCompound);
+        Object[] pipelineObject = BasicIVMLModelOperations.configureCompoundValues(pipelineVariable, pipelineCompound);
        
         //add the constraints into the value array
         ArrayList<Object> objList = new ArrayList<Object>(Arrays.asList(pipelineObject));
         objList.add("constraints");
         objList.add(cstValList.toArray());
            
-        destProject.add(IVMLModelOperations.getConstraint(objList.toArray(), pipelineVariable, destProject));
+        destProject.add(BasicIVMLModelOperations.getConstraint(objList.toArray(), pipelineVariable, destProject));
         return pipelineVariable;
     }
 
@@ -549,13 +550,13 @@ public class PipelineTranslationOperations {
         
         DecisionVariableDeclaration decisionVariable = null;
         // define source
-        decisionVariable = IVMLModelOperations.getDecisionVariable(context.getPipelineProject(), "Source", 
+        decisionVariable = BasicIVMLModelOperations.getDecisionVariable(context.getPipelineProject(), "Source", 
                 Integer.toString(sourceCount), destProject);
         freezables.add(decisionVariable);
         destProject.add(decisionVariable);
         sourceCount++;
         
-        Map<String, IDatatype> nameAndTypeMap = IVMLModelOperations
+        Map<String, IDatatype> nameAndTypeMap = BasicIVMLModelOperations
                 .getCompoundNameAndType(decisionVariable);
         IDecisionVariable sourceVariable = ModelAccess.getFromGlobalIndex(
                 datamanagementModelPart, nameAndTypeMap.get("source"),
@@ -565,7 +566,7 @@ public class PipelineTranslationOperations {
         processPipelineNodeValue(source, sourceCompound);
         if (sourceVariable != null) {
             sourceCompound.put("source",
-                IVMLModelOperations.getDeclaration(sourceVariable).getName());
+                BasicIVMLModelOperations.getDeclaration(sourceVariable).getName());
         }
         List<Flow> srcOutput = getOutput(source);
         ArrayList<String> fList = new ArrayList<String>();
@@ -597,8 +598,8 @@ public class PipelineTranslationOperations {
         throws PipelineTranslationException {
 
         // define flow
-        DecisionVariableDeclaration flowVariable = IVMLModelOperations.getDecisionVariable(context.getPipelineProject(),
-                "Flow", Integer.toString(flowCount), destProject);
+        DecisionVariableDeclaration flowVariable = BasicIVMLModelOperations.getDecisionVariable(
+            context.getPipelineProject(), "Flow", Integer.toString(flowCount), destProject);
         freezables.add(flowVariable);
         destProject.add(flowVariable);        
         flowCount++;
@@ -690,7 +691,7 @@ public class PipelineTranslationOperations {
         
         DecisionVariableDeclaration decisionVariable = null;
         // define familyelement
-        decisionVariable = IVMLModelOperations.getDecisionVariable(
+        decisionVariable = BasicIVMLModelOperations.getDecisionVariable(
                 context.getPipelineProject(), "FamilyElement",
                 Integer.toString(context.getFamilyCount()), destProject);
         freezables.add(decisionVariable);
@@ -699,7 +700,7 @@ public class PipelineTranslationOperations {
         if (decisionVariable != null) { //record the family element and its name in the context map
             context.addFamilyMapping(familyElement, decisionVariable.getName());
         }
-        Map<String, IDatatype> nameAndTypeMap = IVMLModelOperations
+        Map<String, IDatatype> nameAndTypeMap = BasicIVMLModelOperations
                 .getCompoundNameAndType(decisionVariable);
         IDecisionVariable familyVariable = ModelAccess.getFromGlobalIndex(
                 familyModelPart, nameAndTypeMap.get("family"),
@@ -710,7 +711,7 @@ public class PipelineTranslationOperations {
         processPipelineNodeValue(familyElement, familyElementCompound);
         if (familyVariable != null) {
             familyElementCompound.put("family",
-                IVMLModelOperations.getDeclaration(familyVariable).getName());
+                BasicIVMLModelOperations.getDeclaration(familyVariable).getName());
         }
         List<Flow> fOutput = getOutput(familyElement);
         List<String> fList = new ArrayList<String>();
@@ -753,13 +754,13 @@ public class PipelineTranslationOperations {
         
         DecisionVariableDeclaration decisionVariable = null;
         // define dataManagementElement
-        decisionVariable = IVMLModelOperations.getDecisionVariable(context.getPipelineProject(), 
+        decisionVariable = BasicIVMLModelOperations.getDecisionVariable(context.getPipelineProject(), 
                 "DataManagementElement", Integer.toString(dataManagementElementCount), destProject);
         freezables.add(decisionVariable);
         destProject.add(decisionVariable);
         dataManagementElementCount++;
 
-        Map<String, IDatatype> nameAndTypeMap = IVMLModelOperations
+        Map<String, IDatatype> nameAndTypeMap = BasicIVMLModelOperations
                 .getCompoundNameAndType(decisionVariable);
         IDecisionVariable dataManagementElementVariable = ModelAccess.getFromGlobalIndex(
                 datamanagementModelPart, nameAndTypeMap.get("dataManagement"),
@@ -770,7 +771,7 @@ public class PipelineTranslationOperations {
         processPipelineNodeValue(dataManagementElement, dataManagementElementCompound);
         if (dataManagementElementVariable != null) {
             dataManagementElementCompound.put("dataManagement",
-                IVMLModelOperations.getDeclaration(dataManagementElementVariable).getName());
+                BasicIVMLModelOperations.getDeclaration(dataManagementElementVariable).getName());
         }
         List<Flow> fOutput = getOutput(dataManagementElement);
         List<String> fList = new ArrayList<String>();
@@ -804,12 +805,12 @@ public class PipelineTranslationOperations {
         DecisionVariableDeclaration decisionVariable = null;
         // define sink
         String typeName = (sink instanceof ReplaySink) ? "ReplaySink" : "Sink";
-        decisionVariable = IVMLModelOperations.getDecisionVariable(context.getPipelineProject(), typeName, 
+        decisionVariable = BasicIVMLModelOperations.getDecisionVariable(context.getPipelineProject(), typeName, 
                 Integer.toString(context.getSinkCount()), destProject);
         freezables.add(decisionVariable);
         destProject.add(decisionVariable);
 
-        Map<String, IDatatype> nameAndTypeMap = IVMLModelOperations
+        Map<String, IDatatype> nameAndTypeMap = BasicIVMLModelOperations
                 .getCompoundNameAndType(decisionVariable);
         IDecisionVariable sinkVariable = ModelAccess.getFromGlobalIndex(
                 datamanagementModelPart, nameAndTypeMap.get("sink"),
@@ -821,7 +822,7 @@ public class PipelineTranslationOperations {
         //sinkCompound.put("input", sink.getInput().toArray()); // to be solved with actual variable name
         if (sinkVariable != null) {
             sinkCompound.put("sink",
-                IVMLModelOperations.getDeclaration(sinkVariable).getName());
+                BasicIVMLModelOperations.getDeclaration(sinkVariable).getName());
         }
         addPipelineElementToProject(sink, destProject, decisionVariable, sinkCompound);
         context.addSinkMapping(sink, decisionVariable.getName());
@@ -844,10 +845,10 @@ public class PipelineTranslationOperations {
     private static void addPipelineElementToProject(PipelineElement pipElement, Project destProject,
         DecisionVariableDeclaration declaration, Map<String, Object> compoundValueMapping) {
 
-        Object[] compoundValue = IVMLModelOperations.configureCompoundValues(declaration, compoundValueMapping);
+        Object[] compoundValue = BasicIVMLModelOperations.configureCompoundValues(declaration, compoundValueMapping);
         //add the configuration of constraints
         compoundValue = addConstraintToValues(pipElement, compoundValue, declaration);
-        destProject.add(IVMLModelOperations.getConstraint(compoundValue, declaration, destProject));
+        destProject.add(BasicIVMLModelOperations.getConstraint(compoundValue, declaration, destProject));
     }
     
     /**
@@ -870,8 +871,7 @@ public class PipelineTranslationOperations {
         if (!constraintString.isEmpty()) {
             String[] constraints = ConstraintUtils.splitConstraints(constraintString);                    
             for (int i = 0; i < constraints.length; i++) {                  
-                cstValList.add(IVMLModelOperations.obtainConstraintValue(constraints[i], 
-                        parent));                
+                cstValList.add(BasicIVMLModelOperations.obtainConstraintValue(constraints[i], parent));                
             }
         }
         //add the constraints into the preObjectList
