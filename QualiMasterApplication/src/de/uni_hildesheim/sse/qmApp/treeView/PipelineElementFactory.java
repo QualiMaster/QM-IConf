@@ -45,6 +45,7 @@ import de.uni_hildesheim.sse.qmApp.runtime.UIUtils;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import eu.qualimaster.adaptation.external.PipelineMessage;
 import eu.qualimaster.easy.extension.QmConstants;
+import eu.qualimaster.easy.extension.modelop.BasicIVMLModelOperations;
 import eu.qualimaster.manifestUtils.ManifestConnection;
 import eu.qualimaster.manifestUtils.ManifestUtilsException;
 import net.ssehub.easy.basics.modelManagement.ModelInfo;
@@ -309,8 +310,8 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
                     .getModelInfo(cfg.getProject());
             // delete the related elements in the main ivml file -PipelinesCfg.ivml
             ProjectImport pImport = new ProjectImport(projectName, null);
-            boolean dImport = IVMLModelOperations.modifyImports(cfg.getProject(),
-                    IVMLModelOperations.DEL, pImport);
+            boolean dImport = BasicIVMLModelOperations.modifyImports(cfg.getProject(),
+                BasicIVMLModelOperations.DEL, pImport);
 
             boolean dElement = IVMLModelOperations.deletePipelineElementFromMainProject(
                     cfg.getProject(), variable.getDeclaration());
