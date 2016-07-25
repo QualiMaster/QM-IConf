@@ -363,8 +363,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             public void widgetDisposed(DisposeEvent exc) {
                 saveTreeLocally();
             }
-        });
-        
+        });     
         createMoreControls(outer, innerLeft, innerRight, parent);
     }
 
@@ -372,7 +371,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
      * Prepare some standard colors for traces.
      */
     private void fillColorList() {
-        
         colorList.clear();
         
         Color green = new Color(Display.getCurrent(), new RGB(0, 204, 0));
@@ -532,7 +530,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
      *            The tabfolder which contains the graphs.
      */
     private void createButtons(Composite composite, final CTabFolder tabFolder) {
-
         // Add a tab
         Button button = new Button(composite, SWT.NONE);
         button.setText("Add Tab");
@@ -846,9 +843,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         treeViewerPipelineChooser.getTree().setLayoutData(data);
 
         // ------------------------------------------------------------------------------------------
-
         createObservableTable(innerLeftTop, innerLeftBottomRight);
-
     }
 
     /**
@@ -926,7 +921,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             }
 
         });
-
         createObservableTable2(innerLeftTop, innerLeftBottomRight);
     }
 
@@ -1065,7 +1059,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
         TableEditor editor = (TableEditor) tableItem.getData("ColorButton");
         TableEditor editor2 = (TableEditor) tableItem.getData("ColorLabel");
-        Label label = (Label) editor2.getEditor();
         treeViewerColorChooser.remove(treeViewerColorChooser.indexOf(tableItem));
 
         editor.getEditor().dispose();
@@ -1076,7 +1069,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         
         treeViewerColorChooser.update();
         treeViewerColorChooser.redraw();
-        
         //Go though the labels and update the colors in the pipelineColorChooser-table.
         updateColorLabels();
     }
@@ -1096,11 +1088,9 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             Label label = (Label) editor.getEditor();
             label.setBackground(color);
                    
-        }       
-        
+        }            
         treeViewerColorChooser.update();
-        treeViewerColorChooser.redraw();
-        
+        treeViewerColorChooser.redraw();       
     }
 
     /**
@@ -1140,7 +1130,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             if (observalbeSet.size() > 0) {
                 observalbeSet.clear();
             }
-
             for (int i = 0; i < container.getElementSize(); i++) {
 
                 CompoundValue cmpValue = (CompoundValue) container.getElement(i);
@@ -1153,7 +1142,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                     observalbeSet.add(nestedValue);
                 }
             }
-
             Object[] valueArray = observalbeSet.toArray();
 
             for (int k = 0; k < valueArray.length; k++) {
@@ -1570,9 +1558,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
             TableItem item = observablesTable.getItem(k);
             item.setChecked(false);
-
         }
-
     }
 
     /**
@@ -1660,29 +1646,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             usedHardwareMachines.setValue(0);
             usedHardwareMachines.setValid(false);
         }
-    }
-
-    /**
-     * Create meter-widget for monitoring panel.
-     * 
-     * @param parent
-     *            parent composite on which the widgets are placed.
-     */
-    @SuppressWarnings("unused")
-    private void createGauche(final Composite parent) {
-        // Canvas gaugeCanvas = new Canvas(parent, SWT.BORDER);
-        // GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        // gaugeCanvas.setLayoutData(gd);
-        //
-        // LightweightSystem lws = new LightweightSystem(gaugeCanvas);
-        // // Create widgets
-        //
-        // final GaugeFigure gauge = new GaugeFigure();
-        // gauge.setBackgroundColor(XYGraphMediaFactory.getInstance().getColor(0,
-        // 0, 0));
-        // gauge.setForegroundColor(XYGraphMediaFactory.getInstance().getColor(255,
-        // 255, 255));
-        // lws.setContents(gauge);
     }
 
     /**
@@ -1867,14 +1830,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         // data.verticalAlignment = GridData.FILL;
         data.horizontalAlignment = GridData.CENTER;
         control.setLayoutData(data);
-
-        // createGauche(panel);
-        // createTank(panel);
-        // control = createLatencyGraph(panel);
-        // data = new GridData(GridData.FILL_BOTH);
-        // //data.verticalAlignment = GridData.FILL;
-        // //data.horizontalAlignment = GridData.FILL;
-        // control.setLayoutData(data);
         return panel;
     }
 
@@ -2015,5 +1970,4 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     @Override
     public void handleReplayMessage(ReplayMessage arg0) {
     }
-
 }
