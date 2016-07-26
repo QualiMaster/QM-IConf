@@ -46,6 +46,12 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
      * @see ModelModifier
      */
     private static final boolean PRUNE_CONFIG = false;
+    
+    /**
+     * For testing purpose: <tt>true</tt> expected behavior, <tt>false</tt> Reasoning, model pruning,
+     * but no instantiation.
+     */
+    private static final boolean ENABLE_INSTANTIATION = true;
 
     private static String lastTargetLocation = Location.getModelLocation();
     
@@ -74,12 +80,12 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                 @SuppressWarnings("unused")
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
+                    ModelModifier modifier = null;
                     try {
                         File trgFolder = new File(targetLocation);
                         ProjectDescriptor source = new ProjectDescriptor();
                         ProjectDescriptor target = new ProjectDescriptor(source, trgFolder);
                         Executor executor = null;
-                        ModelModifier modifier = null;
                         if (PRUNE_CONFIG) {
                             // Maybe null in case of any error
                             modifier = new ModelModifier(trgFolder,
@@ -98,10 +104,8 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                             executor.addStartRuleName(startRuleName);
                         }
                         TracerFactory.setDefaultInstance(UiTracerFactory.INSTANCE);
-                        executor.execute();
-                        
-                        if (PRUNE_CONFIG && null != modifier) {
-                            modifier.clear();
+                        if (ENABLE_INSTANTIATION) {
+                            executor.execute();
                         }
                         
                         notifyInstantiationCompleted(shell);
@@ -109,6 +113,10 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                         showExceptionDialog("Model resolution problem", e);
                     } catch (VilException e) {
                         showExceptionDialog("Instantiation problem", e);
+                    } finally {
+                        if (PRUNE_CONFIG && null != modifier) {
+                            modifier.clear();
+                        }
                     }
                     return org.eclipse.core.runtime.Status.OK_STATUS;
                 }
