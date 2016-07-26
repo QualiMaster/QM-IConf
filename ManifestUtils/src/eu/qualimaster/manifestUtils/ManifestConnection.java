@@ -29,6 +29,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
 import org.apache.ivy.Ivy;
+import org.apache.ivy.ant.IvyAntSettings;
 import org.apache.ivy.ant.IvyConvertPom;
 import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
@@ -42,7 +43,10 @@ import org.apache.ivy.core.retrieve.RetrieveOptions;
 import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.plugins.resolver.ChainResolver;
 import org.apache.ivy.plugins.resolver.IBiblioResolver;
+import org.apache.ivy.util.url.URLHandlerRegistry;
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.ProjectComponent;
+import org.apache.tools.ant.types.Reference;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import eu.qualimaster.manifestUtils.PomReader.PomInfo;
@@ -84,127 +88,13 @@ public class ManifestConnection {
     private Ivy ivy = null;
     private File out = null;
     private String output = "";
-    private Interceptor sysOut;
+    private DownloadIntercepter sysOutDownload;
+    private UploadIntercepter sysOutUpload;
     private ResolveReport report = null;
     private String mainArtifactName = null;
     
     static {
         addDefaultRepositories();
-    }
-    
-    /**
-     * This class is used to intercept any output of the ivy component.
-     * @author pastuschek
-     *
-     */
-    private class Interceptor extends PrintStream {
-        
-        private String output;
-        private ProgressObserver monitor = null;
-        private ITask mainTask = null;
-        private int prog = 1;
-        private int max = 1;
-        private PrintStream original;
-        
-        /**
-         * Simple constructor.
-         * @param output the output String.
-         * @param original the original PrintStream.
-         * @throws FileNotFoundException 
-         */
-        public Interceptor(String output, PrintStream original) throws FileNotFoundException {
-            super(System.out, true);
-            this.output = output;     
-            this.original = original;
-        }
-        
-        /**
-         * Returns whether output should be processed or just stacked.
-         * @return True if output should be processed, false otherwise.
-         */
-        private boolean isProcessing() {
-            return (null != monitor && null != mainTask);
-        }
-        
-        /**
-         * The String to process.
-         * @param string The String to process.
-         */
-        private void process(String string) {
-            if (null != string) {
-                if (string.contains("found") || string.contains("downloading")) {
-                    if (prog < max) {
-                        monitor.notifyProgress(mainTask, prog);
-                        ProgressObserver.ISubtask subtask = monitor.registerSubtask(string);
-                        monitor.notifyStart(mainTask, subtask, 1);
-                        this.prog = this.prog + 1;
-                    } else {
-                        monitor.notifyProgress(mainTask, prog, max + 1);
-                    }
-                }
-            }
-        }
-        
-        /**
-         * Redirect the intercepted output.
-         */
-        @Override
-        public void print(String string) {
-            this.output += (string);
-            this.original.print(string);
-            if (isProcessing()) {
-                process(string);
-            }
-        }
-        
-        /**
-         * Redirect the intercepted output.
-         */
-        @Override
-        public void println(String string) {
-            this.output += ("\n" + string);
-            this.original.println(string);
-            if (isProcessing()) {
-                process(string);
-            }
-        }
-        
-        /**
-         * Sets the maximum progess for the monitor.
-         * @param max The maximum for the monitor.
-         */
-        public void setMax(int max) {
-            this.max = max;
-        }
-        
-        /**
-         * Sets the monitor that will be updated by intercepted information.
-         * @param monitor The monitor.
-         */
-        public void setMonitor(ProgressObserver monitor) {
-            this.monitor = monitor;
-        }
-        
-        /**
-         * Sets the main task. Can be null.
-         * @param task The current task, can be null.
-         */
-        public void setTask(ITask task) {
-            this.mainTask = task;
-            this.prog = 1;
-        }
-        
-        /**
-         * Returns the intercepted output.
-         * @return The intercepted output String.
-         */
-        @SuppressWarnings("unused")
-        public String getOutput() {
-            String buffer = this.output;
-            this.output = "";
-            return buffer;
-        }
-        
     }
     
     /**
@@ -214,7 +104,13 @@ public class ManifestConnection {
     public ManifestConnection() {
         
         try {
-            sysOut = new Interceptor(output, new PrintStream(new FileOutputStream(FileDescriptor.out)));
+            sysOutDownload = new DownloadIntercepter(output, new PrintStream(new FileOutputStream(FileDescriptor.out)));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        
+        try {
+            sysOutUpload = new UploadIntercepter(output, new PrintStream(new FileOutputStream(FileDescriptor.out)));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -252,6 +148,8 @@ public class ManifestConnection {
                 "[organisation]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]");
         ivySettings.setDefaultCacheIvyPattern(
                 "[organisation]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]");
+
+        
         
         ChainResolver chainResolver = new ChainResolver();
         chainResolver.setName("chainResolver");
@@ -391,7 +289,7 @@ public class ManifestConnection {
     public void load(ProgressObserver monitor, String groupId, String artifactId, String version) {
         
         ITask mainTask = monitor.registerTask("Loading Dependencies");
-        sysOut.setMonitor(monitor);
+        sysOutDownload.setMonitor(monitor);
         
         System.setProperty("jsse.enableSNIExtension", "false");
         Security.insertProviderAt(new BouncyCastleProvider(), 1);      
@@ -423,11 +321,11 @@ public class ManifestConnection {
         ModuleDescriptor m = null; 
         try {
             monitor.notifyStart(mainTask, 200);
-            sysOut.setMax(200);
-            sysOut.setTask(mainTask);
+            sysOutDownload.setMax(200);
+            sysOutDownload.setTask(mainTask);
             
-            System.setOut(sysOut);
-            System.setErr(sysOut);
+            System.setOut(sysOutDownload);
+            System.setErr(sysOutDownload);
             report = ivy.resolve(md, ro);
             m = report.getModuleDescriptor();
             if (report.hasError()) {
@@ -949,6 +847,7 @@ public class ManifestConnection {
         ModuleRevisionId mrId = new ModuleRevisionId(modId, version);
         List<String> srcArtifactPattern = new ArrayList<String>();
         srcArtifactPattern.add(file.substring(0, file.lastIndexOf("/")) + "/[module].[ext]");
+        //srcArtifactPattern.add(file.substring(0, file.lastIndexOf("/")) + "/[artifact](-[classifier]).[ext]");
         String resolverName = "publish_" + target;
         PublishOptions options = new PublishOptions();
         
@@ -981,28 +880,59 @@ public class ManifestConnection {
      * Publishes an artifact.
      * @param file The file to publish (should be a *.jar) <br>
      *        Example: "C:/Artifacts/test.jar"
-     * @param pomFile The pom file for publishing.
+     * @param pomPath The pom file for publishing.
      * @param repository The nexus repository. <br>
      *        Example: "https://nexus.sse.uni-hildesheim.de/content/repositories/qmproject/"
      * @param version the version of the artifact.
      * @param forceOverwrite forces an overwrite in the nexus.
      */
-    public void publishWithPom(String file, String pomFile, String repository, 
+    public void publishWithPom(String file, String pomPath, String repository, 
             String version, boolean forceOverwrite) {
         
-        File ivyFile = new File(pomFile);
+        File ivyFile = new File(pomPath);
+        if (!ivyFile.exists()) {
+            try {
+                ivyFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         ivyFile = ivyFile.getParentFile();
         ivyFile = new File(ivyFile.getAbsolutePath() + "/ivy.xml");
         
         System.out.println("Publishing with POM...");
         
+        
+        System.out.println(ivyFile.getAbsolutePath());
+        System.out.println(pomPath);
         IvyConvertPom converter = new IvyConvertPom();
-        converter.setPomFile(new File(pomFile));
+        converter.setPomFile(new File(pomPath));
 
         converter.setIvyFile(ivyFile);
+        Project project = new Project();
         
-        converter.setProject(new Project());
-        converter.doExecute();
+        IvyAntSettings settings = new IvyAntSettings();
+        settings.setProject(project);
+        project.addReference("ivy.instance", settings);
+//        settings.createIvyEngine(task);
+        
+        project.setBaseDir(new File("."));
+        project.setDefault("all");
+        project.setName("ConvertPomToIvy");
+        project.setBasedir(".");
+        
+        Reference ref = new Reference(project, "ConvertPomToIvy");
+//        converter.setSettingsRef(ref);
+//        
+        IvySettingsWrapperTask wrapper = new IvySettingsWrapperTask();
+        wrapper.setSettings(this.ivy.getSettings());
+//        converter.setProject(project);
+//        converter.doExecute();
+//        converter.setSettingsRef(ref);
+        wrapper.setProject(project);
+        wrapper.setPomFile(new File(pomPath));
+        wrapper.setIvyFile(ivyFile);
+        wrapper.doExecute();
         
         System.out.println("Converted to ivy...");
         
@@ -1034,8 +964,9 @@ public class ManifestConnection {
         
         //Is undefined, because ivy needs a Collection<Pattern> with actually just Strings inside it...
         Collection srcArtifactPattern = new ArrayList();
-        System.out.println(file.substring(0, file.lastIndexOf("/")) + "/[module].[ext]");
-        srcArtifactPattern.add(file.substring(0, file.lastIndexOf("/")) + "/[module].[ext]");
+        System.out.println(file.substring(0, file.lastIndexOf(File.separator)) + "\\[module].[ext]");
+        srcArtifactPattern.add(file.substring(0, file.lastIndexOf(File.separator)) + "\\[artifact](-[revision]).[ext]");
+        
         
         ModuleRevisionId ri = ModuleRevisionId.newInstance("", "", version);
         
@@ -1044,8 +975,9 @@ public class ManifestConnection {
         options.setOverwrite(forceOverwrite);
         options.setSrcIvyPattern(ivyFile);
         options.setUpdate(true);
-            
+        
         try {
+            URLHandlerRegistry.setDefault(new UrlPostHandler());
             ivy.publish(ri, srcArtifactPattern, "publish_" + repository, options);
         } catch (IOException exc) {
             exc.printStackTrace();
@@ -1085,9 +1017,6 @@ public class ManifestConnection {
                     converter.setIvyFile(ivyFile);
                     
                     converter.setProject(new Project());
-            //        Project project = new Project();
-            //        project.setBaseDir(new File("C:/TEST-thing/if-gen"));
-            //        converter.setProject(project);
                     converter.doExecute();
                     
                     System.out.println("Converted to ivy...");
@@ -1121,6 +1050,9 @@ public class ManifestConnection {
     public void publishDir(String dir,  String ivyFile, String repository, 
             boolean forceOverwrite, ProgressObserver monitor) {
         
+        ITask mainTask = monitor.registerTask("Loading Dependencies");
+        sysOutUpload.setMonitor(monitor);
+        
         IBiblioResolver testRes = new IBiblioResolver();
         testRes.setName("publish_" + repository);
         testRes.setRoot(repository);
@@ -1141,22 +1073,32 @@ public class ManifestConnection {
         
         ModuleRevisionId ri;
         ri = ModuleRevisionId.newInstance("", "", "");
- 
+        
         PublishOptions options = new PublishOptions();
         options.setHaltOnMissing(true);
         options.setOverwrite(forceOverwrite);
         options.setSrcIvyPattern(ivyFile);
         options.setUpdate(true);
-            
-        System.out.println("WOULD NOW PUBLISH!");
         
-//        try {
-//            ivy.publish(ri, srcArtifactPattern, "publish_" + repository, options);
-//        } catch (IOException exc) {
-//            exc.printStackTrace();
-//        } catch (IllegalStateException exc) {
-//            exc.printStackTrace();
-//        }
+        try {
+            monitor.notifyStart(mainTask, 200);
+            sysOutUpload.setMax(200);
+            sysOutUpload.setTask(mainTask);
+            
+            System.setOut(sysOutUpload);
+            System.setErr(sysOutUpload);
+            
+            ivy.publish(ri, srcArtifactPattern, "publish_" + repository, options);
+        } catch (IOException exc) {
+            exc.printStackTrace();
+        } catch (IllegalStateException exc) {
+            exc.printStackTrace();
+        }
+
+        System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));
+        System.setErr(new PrintStream(new FileOutputStream(FileDescriptor.err)));
+        monitor.notifyEnd(mainTask);
+        
         
     }
     

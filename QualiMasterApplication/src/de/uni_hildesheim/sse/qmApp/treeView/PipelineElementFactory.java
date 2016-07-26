@@ -50,6 +50,7 @@ import eu.qualimaster.manifestUtils.ManifestConnection;
 import eu.qualimaster.manifestUtils.ManifestUtilsException;
 import net.ssehub.easy.basics.modelManagement.ModelInfo;
 import net.ssehub.easy.producer.eclipse.observer.EclipseProgressObserver;
+import net.ssehub.easy.producer.ui.productline_editor.EasyProducerDialog;
 import net.ssehub.easy.varModel.confModel.CompoundVariable;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
@@ -375,10 +376,11 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
                     Action action = new Action() {
                         @Override
                         public void run() {
-                            IDecisionVariable var = getVariable(); // take data from
+                            IDecisionVariable pipelineVar = getVariable(); // take data from
                             Dialogs.showInfoDialog("Ivy Publish", "Will deploy '" 
-                                + ModelAccess.getDisplayName(var) + "' to " + deploymentUrl);
-                            createProgressDialog(DialogsUtil.getActiveShell());
+                                + ModelAccess.getDisplayName(pipelineVar) + "' to " + deploymentUrl
+                                + "eu/qualimaster/PatriksTestDeployment"); //TODO: !!!!
+                            createProgressDialog(DialogsUtil.getActiveShell(), pipelineVar);
                         }
                     };
                     action.setEnabled(isInfrastructureAdmin && (null != deploymentUrl && deploymentUrl.length() > 0));
@@ -423,8 +425,9 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
      * 
      * @param parent
      *            parent composite.
+     * @param pipelineVar the IDecisionVariable of the target pipeline.
      */
-    private static void createProgressDialog(Composite parent) {
+    private static void createProgressDialog(Composite parent, IDecisionVariable pipelineVar) {
         try {
             ProgressMonitorDialog pmd = new ProgressMonitorDialog(parent.getShell()) {
 
@@ -435,14 +438,15 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
                     setBlockOnOpen(false);
                 }
             };
-            pmd.run(false, true, new ProgressDialogOperation());
+            pmd.run(false, true, new ProgressDialogOperation(pipelineVar));
             
         } catch (final InvocationTargetException e) {
             Throwable exc = e;
             if (null != e.getCause()) {
                 exc = e.getCause();
             }
-            MessageDialog.openError(parent.getShell(), "Error", "Error: " + exc.getMessage());
+            EasyProducerDialog.showDialog(null, "Error", "Error: " + exc.getMessage(), true);
+//            MessageDialog.openError(parent.getShell(), "Error", "Error: " + exc.getMessage());
             e.printStackTrace();
         } catch (final InterruptedException e) {
             MessageDialog.openInformation(parent.getShell(), "Cancelled",
@@ -457,11 +461,22 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
      */
     private static class ProgressDialogOperation implements IRunnableWithProgress {
         
+        private IDecisionVariable pipelineVar;
+        
+        /**
+         * Calls the super constructor and handles the pipeline IDecisionVariable for uploading purposes.
+         * @param pipelineVar The IDecisionVariable of the target pipeline.
+         */
+        public ProgressDialogOperation(IDecisionVariable pipelineVar) {
+            super();
+            this.pipelineVar = pipelineVar;
+        }
+        
         @Override
         public void run(final IProgressMonitor monitor)
             throws InvocationTargetException, InterruptedException {
             
-            startDeployment(monitor);
+            startDeployment(monitor, pipelineVar);
             
             monitor.done();
         }
@@ -471,8 +486,9 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
     /**
      * Starts the deployment process and monitors it.
      * @param monitor The used monitor.
+     * @param pipelineVar The IDecisionVariable of the target pipeline.
      */
-    private static void startDeployment(IProgressMonitor monitor) {
+    private static void startDeployment(IProgressMonitor monitor, IDecisionVariable pipelineVar) {
         
         int userSelection = Dialogs.showInfoConfirmDialog("Overwrite?", 
                 "Do you want to overwrite, in case of an existing artifact?");
@@ -483,22 +499,42 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
             overwrite = false;
         }
         
+        System.out.println("Overwrite = " + overwrite);
+        
+        IDecisionVariable artifact = pipelineVar.getNestedElement("artifact");
+        //example: eu.qualimaster:PriorityPip:0.0.2-SNAPSHOT
+        String artifactName = artifact.getValue().getValue().toString();
+        
+        
+        
         EclipseProgressObserver obs = new EclipseProgressObserver();
         obs.register(monitor);
         
         ManifestConnection con = new ManifestConnection();
         File instFile = SessionModel.INSTANCE.getInstantationFolder();
+        instFile = new File("C:\\Instant_Test");
         if (null != instFile && instFile.exists()) {
-            String instDir = SessionModel.INSTANCE.getInstantationFolder().getAbsolutePath();
-            String pomFile = instDir + "/if-gen/pom.xml";
-            String dir = instDir + "/target";
-            final String deploymentUrl = ModelAccess.getDeploymentUrl();
-            
-            try {
-                con.publishDirWithPom(dir, pomFile, deploymentUrl, overwrite, obs);
-            } catch (ManifestUtilsException e) {
-                Dialogs.showErrorDialog("ERROR", e.getMessage());
+            String instDir = instFile.getAbsolutePath();
+            String pipelineDir = instDir + "\\pipelines"; //TODO: move to constants or find in model!!!!
+            String[] artifactNameSplitted = artifactName.split(":")[0].split("\\.");
+            for (int i = 0; i < artifactNameSplitted.length; i++) {
+                pipelineDir += "\\" + artifactNameSplitted[i];
             }
+            pipelineDir += "\\" + artifactName.split(":")[1];
+            String pomFile = pipelineDir + "\\pom.xml";
+            String dir = pipelineDir + "\\target";
+            String jarName = artifactName.split(":", 2)[1].replace(":", "-");
+            String jarFile = dir + "\\" + jarName + ".jar";
+            //TODO: !!!
+            final String deploymentUrl = ModelAccess.getDeploymentUrl() 
+                   + "eu/qualimaster/PatriksTestDeployment";
+            System.out.println("##### " + jarFile);
+//            try {
+                //con.publishDirWithPom(dir, pomFile, deploymentUrl, overwrite, obs);
+            con.publishWithPom(jarFile, pomFile, deploymentUrl, artifactName.split(":")[2], overwrite);
+//            } catch (ManifestUtilsException e) {
+//                Dialogs.showErrorDialog("ERROR", e.getMessage());
+//            }
         } else {
             Dialogs.showErrorDialog("ERROR", "Unable to locate instantiation folder at: '" + instFile + "'!");
         }

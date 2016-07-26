@@ -5,7 +5,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="lib/bcprov-1.45.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="lib/ivy-2.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/ivy-2.4.0.jar" sourcepath="C:/Users/pastuschek/Downloads/apache-ivy-2.4.0-src.zip"/>
 	<classpathentry kind="lib" path="lib/ant-1.8.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
