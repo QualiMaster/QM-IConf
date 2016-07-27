@@ -15,6 +15,7 @@ import static eu.qualimaster.easy.extension.QmConstants.PROJECT_OBSERVABLES;
 import static eu.qualimaster.easy.extension.QmConstants.PROJECT_PIPELINES;
 import static eu.qualimaster.easy.extension.QmConstants.PROJECT_RECONFHW;
 import static eu.qualimaster.easy.extension.QmConstants.PROJECT_TOP_LEVEL;
+import static eu.qualimaster.easy.extension.QmConstants.PROJECT_STRATEGIES_TACTICS;
 import static eu.qualimaster.easy.extension.QmConstants.SLOT_NAME;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_ADAPTIVITY_QPARAMWEIGHTING;
 import static eu.qualimaster.easy.extension.QmConstants.TYPE_ALGORITHM;
@@ -188,6 +189,10 @@ public class VariabilityModel {
             new String[] {VAR_ADAPTIVITY_PIPELINEIMPORTANCE, VAR_ADAPTIVITY_CROSSPIPELINETRADEOFFS}, 
             new String[] {TYPE_ADAPTIVITY_QPARAMWEIGHTING, TYPE_ADAPTIVITY_QPARAMWEIGHTING}, 
             SourceMode.VARIABLES), // add provided types
+        STRATEGIES_TACTICS(PROJECT_STRATEGIES_TACTICS, 
+            null, 
+            null, 
+            SourceMode.VARIABLES),
         PIPELINES(PROJECT_PIPELINES, 
             new String[] {VAR_PIPELINES_PIPELINES}, 
             new String[] {TYPE_PIPELINE, TYPE_SUBPIPELINE}, 
@@ -318,6 +323,7 @@ public class VariabilityModel {
         FAMILIES(Definition.FAMILIES), 
         OBSERVABLES(Definition.OBSERVABLES), 
         ADAPTIVITY(Definition.ADAPTIVITY), 
+        STRATEGIES_TACTICS(Definition.STRATEGIES_TACTICS),
         PIPELINES(Definition.PIPELINES), 
         INFRASTRUCTURE(Definition.INFRASTRUCTURE);
 
@@ -545,8 +551,6 @@ public class VariabilityModel {
      *            the elements data structure to be modified as a side effect
      */
     public static void createConfigurationElements(ConfigurableElements elements) {
-        boolean demoMode = ConfigurationProperties.DEMO_MODE.getBooleanValue();
-
         QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.BASICS, "Types");
         elements.variableToConfigurableElements(Configuration.BASICS, "de.uni_hildesheim.sse.qmApp.TypesEditor");
         
@@ -588,30 +592,32 @@ public class VariabilityModel {
         elements.addElement(tmp, "de.uni_hildesheim.sse.qmApp.InfrastructureEditor",
             new VarModelEditorInputCreator(Configuration.INFRASTRUCTURE, "Infrastructure"),
             Configuration.INFRASTRUCTURE);
+
+        QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.OBSERVABLES, 
+            "Observables");
+        elements.variableToConfigurableElements(Configuration.OBSERVABLES, 
+            "de.uni_hildesheim.sse.qmApp.ObservablesEditor");
         
-        if (!demoMode) {
-            QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.OBSERVABLES, 
-                "Observables");
-            elements.variableToConfigurableElements(Configuration.OBSERVABLES, 
-                "de.uni_hildesheim.sse.qmApp.ObservablesEditor");
-    
-            QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.ADAPTIVITY, 
-                "Adaptation");
-            ConfigurableElement elt = elements.addElement("Adaptation", "de.uni_hildesheim.sse.qmApp.AdaptationEditor", 
-                new VarModelEditorInputCreator(Configuration.ADAPTIVITY, "Adaptation"), Configuration.ADAPTIVITY);
-            elt.setImage(IconManager.retrieveImage(IconManager.ADAPTATION));
-            IEditorInputCreator editorInput = new RtVilEditorInputCreator();
-            if (editorInput.isEnabled()) {
-                ConfigurableElement rtVIL = new ConfigurableElement(elt, "rt-VIL", 
-                    "de.uni_hildesheim.sse.vil.rt.RtVil", editorInput);
-                rtVIL.setImage(IconManager.retrieveImage(IconManager.RTVIL)); // TODO preliminary - take from rtVIL
-                rtVIL.setMenuContributor(new RtVilMenuContributor());
-                elt.addChild(rtVIL);
-            }
-            elt = elements.addElement("Runtime", "de.uni_hildesheim.sse.qmApp.RuntimeEditor", 
-                    new EmptyEditorInputCreator("Runtime Input"), null);
-            elt.setImage(IconManager.retrieveImage(IconManager.RUNTIME));
+        QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.ADAPTIVITY, 
+            "Adaptation");
+        ConfigurableElement elt = elements.addElement("Adaptation", "de.uni_hildesheim.sse.qmApp.AdaptationEditor", 
+            new VarModelEditorInputCreator(Configuration.ADAPTIVITY, "Adaptation"), Configuration.ADAPTIVITY);
+        elt.setImage(IconManager.retrieveImage(IconManager.ADAPTATION));
+        ConfigurableElement stratTactics = new ConfigurableElement(elt, "Strategies/Tactics", 
+            "de.uni_hildesheim.sse.qmApp.StrategiesTacticsEditor", new VarModelEditorInputCreator(
+            Configuration.STRATEGIES_TACTICS, "Adaptation Strategies/Tactics"), Configuration.STRATEGIES_TACTICS);
+        elt.addChild(stratTactics);
+        IEditorInputCreator editorInput = new RtVilEditorInputCreator();
+        if (editorInput.isEnabled()) {
+            ConfigurableElement rtVIL = new ConfigurableElement(elt, "rt-VIL", 
+                "de.uni_hildesheim.sse.vil.rt.RtVil", editorInput);
+            rtVIL.setImage(IconManager.retrieveImage(IconManager.RTVIL)); // TODO preliminary - take from rtVIL
+            rtVIL.setMenuContributor(new RtVilMenuContributor());
+            elt.addChild(rtVIL);
         }
+        elt = elements.addElement("Runtime", "de.uni_hildesheim.sse.qmApp.RuntimeEditor", 
+                new EmptyEditorInputCreator("Runtime Input"), null);
+        elt.setImage(IconManager.retrieveImage(IconManager.RUNTIME));
     }
 
     /**
@@ -691,6 +697,7 @@ public class VariabilityModel {
         addReadRole(Configuration.HARDWARE, allRoles);
         addReadRole(Configuration.PIPELINES, allRoles);
         addReadRole(Configuration.ADAPTIVITY, allRoles);
+        addReadRole(Configuration.STRATEGIES_TACTICS, allRoles);
         addReadRole(Configuration.ALGORITHMS, allRoles);
         addReadRole(Configuration.DATA_MANAGEMENT, allRoles);
         addReadRole(Configuration.FAMILIES, allRoles);
@@ -701,6 +708,7 @@ public class VariabilityModel {
         addWriteRole(Configuration.HARDWARE, ApplicationRole.ADMIN, ApplicationRole.INFRASTRUCTURE_ADMIN);
         addWriteRole(Configuration.PIPELINES, ApplicationRole.ADMIN, ApplicationRole.PIPELINE_DESIGNER);
         addWriteRole(Configuration.ADAPTIVITY, ApplicationRole.ADMIN, ApplicationRole.ADAPTATION_MANAGER);
+        addWriteRole(Configuration.STRATEGIES_TACTICS, ApplicationRole.ADMIN, ApplicationRole.ADAPTATION_MANAGER);
         addWriteRole(Configuration.ALGORITHMS, ApplicationRole.ADMIN, ApplicationRole.INFRASTRUCTURE_ADMIN);
         addWriteRole(Configuration.DATA_MANAGEMENT, ApplicationRole.ADMIN, ApplicationRole.INFRASTRUCTURE_ADMIN);
         addWriteRole(Configuration.FAMILIES, ApplicationRole.ADMIN, ApplicationRole.INFRASTRUCTURE_ADMIN);

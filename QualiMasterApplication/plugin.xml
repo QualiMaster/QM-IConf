@@ -384,6 +384,11 @@
             id="de.uni_hildesheim.sse.qmApp.AdaptationEditor"
             name="Adaptation">
       </editor>
+      <editor class="de.uni_hildesheim.sse.qmApp.editors.ProjectEditor"
+            icon="icons/adaptation.png"
+            id="de.uni_hildesheim.sse.qmApp.StrategiesTacticsEditor"
+            name="Adaptation Strategies/Tactics">
+      </editor>
    </extension>
    
    <extension 
