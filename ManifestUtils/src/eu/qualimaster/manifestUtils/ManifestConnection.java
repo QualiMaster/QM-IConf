@@ -43,9 +43,9 @@ import org.apache.ivy.core.retrieve.RetrieveOptions;
 import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.plugins.resolver.ChainResolver;
 import org.apache.ivy.plugins.resolver.IBiblioResolver;
+import org.apache.ivy.util.Credentials;
 import org.apache.ivy.util.url.URLHandlerRegistry;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.ProjectComponent;
 import org.apache.tools.ant.types.Reference;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -85,6 +85,7 @@ public class ManifestConnection {
     
     private EASyLogger logger = EASyLoggerFactory.INSTANCE.getLogger(ManifestConnection.class, 
             "eu.qualimaster.ManifestUtils");
+
     private Ivy ivy = null;
     private File out = null;
     private String output = "";
@@ -92,6 +93,7 @@ public class ManifestConnection {
     private UploadIntercepter sysOutUpload;
     private ResolveReport report = null;
     private String mainArtifactName = null;
+    
     
     static {
         addDefaultRepositories();
@@ -258,11 +260,19 @@ public class ManifestConnection {
      * @param password The password.
      */
     public static void addCredentials(String username, String password) {
-        
         org.apache.ivy.util.url.CredentialsStore.INSTANCE
             .addCredentials("Sonatype Nexus Repository Manager", "nexus.sse.uni-hildesheim.de", 
                 username, password);
-        
+        System.out.println(username);
+    }
+    
+    /**
+     * Returns the credentials used to login during tool startup.
+     * @return The used credentials. Can be null if started without login.
+     */
+    public static Credentials getCredentials() {
+        return org.apache.ivy.util.url.CredentialsStore.INSTANCE.getCredentials("Sonatype Nexus Repository Manager",
+            "nexus.sse.uni-hildesheim.de");
     }
     
     /**
@@ -937,6 +947,11 @@ public class ManifestConnection {
         System.out.println("Converted to ivy...");
         
         publish(file, ivyFile.getAbsolutePath(), repository, version, forceOverwrite);
+        //TODO: translate the runtime exception into a 'normal' exception, for safer use of the method.
+//        try {
+//        } catch (ManifestRuntimeException mre) {
+//            throw new ManifestUtilsException(mre.getMessage());
+//        }
         
     }
     
@@ -977,7 +992,8 @@ public class ManifestConnection {
         options.setUpdate(true);
         
         try {
-            URLHandlerRegistry.setDefault(new UrlPostHandler());
+            UrlPostHandler urlPostHandler = new UrlPostHandler();
+            URLHandlerRegistry.setDefault(urlPostHandler);
             ivy.publish(ri, srcArtifactPattern, "publish_" + repository, options);
         } catch (IOException exc) {
             exc.printStackTrace();

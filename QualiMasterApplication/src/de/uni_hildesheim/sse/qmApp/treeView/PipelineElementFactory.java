@@ -512,23 +512,29 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
         
         ManifestConnection con = new ManifestConnection();
         File instFile = SessionModel.INSTANCE.getInstantationFolder();
-        instFile = new File("C:\\Instant_Test");
+        //TODO: commented line is a DIRTY hack for quicker testing of the publishing feature,
+        //since the instantiation path is discarded once the application is closed.
+        //instFile = new File("C:\\Instant_Test"); 
         if (null != instFile && instFile.exists()) {
+            
             String instDir = instFile.getAbsolutePath();
             String pipelineDir = instDir + "\\pipelines"; //TODO: move to constants or find in model!!!!
             String[] artifactNameSplitted = artifactName.split(":")[0].split("\\.");
             for (int i = 0; i < artifactNameSplitted.length; i++) {
                 pipelineDir += "\\" + artifactNameSplitted[i];
             }
+            
             pipelineDir += "\\" + artifactName.split(":")[1];
             String pomFile = pipelineDir + "\\pom.xml";
             String dir = pipelineDir + "\\target";
             String jarName = artifactName.split(":", 2)[1].replace(":", "-");
             String jarFile = dir + "\\" + jarName + ".jar";
-            //TODO: !!!
+            
+            //TODO: This is a testing hack. For safer testing all uploads are redirected to a test dir!
             final String deploymentUrl = ModelAccess.getDeploymentUrl() 
                    + "eu/qualimaster/PatriksTestDeployment";
             System.out.println("##### " + jarFile);
+            
 //            try {
                 //con.publishDirWithPom(dir, pomFile, deploymentUrl, overwrite, obs);
             con.publishWithPom(jarFile, pomFile, deploymentUrl, artifactName.split(":")[2], overwrite);
@@ -536,7 +542,7 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
 //                Dialogs.showErrorDialog("ERROR", e.getMessage());
 //            }
         } else {
-            Dialogs.showErrorDialog("ERROR", "Unable to locate instantiation folder at: '" + instFile + "'!");
+            Dialogs.showErrorDialog("ERROR", "Unable to locate instantiation folder at: '" + instFile + "'.");
         }
         
         obs.unregister(monitor);
