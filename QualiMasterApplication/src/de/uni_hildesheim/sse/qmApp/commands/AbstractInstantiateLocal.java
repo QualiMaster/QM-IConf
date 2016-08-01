@@ -53,7 +53,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
      */
     private static final boolean ENABLE_INSTANTIATION = true;
 
-    private static String lastTargetLocation = Location.getModelLocation();
+    private static String lastTargetLocation = Location.getInstantiationFolder().getAbsolutePath();
     
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {

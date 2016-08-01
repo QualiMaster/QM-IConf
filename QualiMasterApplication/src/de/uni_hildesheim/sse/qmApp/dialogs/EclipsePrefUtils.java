@@ -13,7 +13,7 @@ import net.ssehub.easy.instantiation.core.Bundle;
  * save and add preferences.
  * 
  * @author Sass
- *
+ * @author El-Sharkawy
  */
 public class EclipsePrefUtils {
     
@@ -25,6 +25,7 @@ public class EclipsePrefUtils {
     public static final String USERNAME_PREF_KEY = "user-name";
     public static final String APP_CONFIGURED_PREF_KEY = "app-configured";
     public static final String MANUAL_CONFIGURED_PREF_KEY = "app-configured-manually";
+    public static final String LAST_INSTANTIATION_FOLDER_KEY = "qm-instantiation-folder";
     
     
     private static EASyLogger logger = EASyLoggerFactory.INSTANCE.getLogger(EclipsePrefUtils.class, Bundle.ID);
@@ -42,7 +43,7 @@ public class EclipsePrefUtils {
      * Returns the specified default if there is no value associated with the key. The default will always be null.
      * 
      * @param key the specified key
-     * @return the value associated with the key or null if no value is associated
+     * @return the value associated with the key or <tt>null</tt> if no value is associated
      */
     public String getPreference(String key) {
         return prefs.get(key, null);

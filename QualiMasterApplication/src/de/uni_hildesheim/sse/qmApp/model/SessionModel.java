@@ -2,6 +2,8 @@ package de.uni_hildesheim.sse.qmApp.model;
 
 import java.io.File;
 
+import de.uni_hildesheim.sse.qmApp.dialogs.EclipsePrefUtils;
+
 /**
  * Stores temporary information about the current session, which shall not be saved permanently to
  * IVML/VIL.
@@ -36,6 +38,7 @@ public class SessionModel {
         
         if (null != tmpFolder && tmpFolder.exists() && tmpFolder.isDirectory()) {
             instantiationTargetFolder = tmpFolder;
+            EclipsePrefUtils.INSTANCE.addPreference(EclipsePrefUtils.LAST_INSTANTIATION_FOLDER_KEY, target);
         }
     }
     
@@ -44,6 +47,7 @@ public class SessionModel {
      * @return The root folder of the instantiation, or <tt>null</tt> if the instantiation
      * was not executed so far.
      * @see #wasInstantiated()
+     * @see Location#DEFAULT_INSTANTIATION_FOLDER
      */
     public File getInstantationFolder() {
         return instantiationTargetFolder;
