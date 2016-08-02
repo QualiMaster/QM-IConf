@@ -27,6 +27,8 @@ import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.instantiation.core.model.common.VilException;
 import net.ssehub.easy.instantiation.core.model.execution.Executor;
 import net.ssehub.easy.instantiation.core.model.execution.TracerFactory;
+import net.ssehub.easy.instantiation.core.model.vilTypes.IProjectDescriptor;
+import net.ssehub.easy.producer.core.persistence.standard.StandaloneProjectDescriptor;
 import net.ssehub.easy.producer.ui.productline_editor.EasyProducerDialog;
 import net.ssehub.easy.producer.ui.productline_editor.EclipseConsole;
 import net.ssehub.easy.varModel.confModel.Configuration;
@@ -83,8 +85,6 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                     ModelModifier modifier = null;
                     try {
                         File trgFolder = new File(targetLocation);
-                        ProjectDescriptor source = new ProjectDescriptor();
-                        ProjectDescriptor target = new ProjectDescriptor(source, trgFolder);
                         Executor executor = null;
                         if (PRUNE_CONFIG) {
                             // Maybe null in case of any error
@@ -93,12 +93,22 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                                 Location.getModelLocationFile(),
                                 AbstractInstantiateLocal.this);
                             executor = modifier.createExecutor();
+                            if (null != executor) {
+                                IProjectDescriptor source = modifier.getSourceDescriptor();
+                                if (null != source) {
+                                    IProjectDescriptor target = new StandaloneProjectDescriptor(
+                                        source.getMainVilScript(), trgFolder);
+                                    executor.addTarget(target);
+                                }
+                            }
                         }
                         if (!PRUNE_CONFIG || null == executor) {
+                            ProjectDescriptor source = new ProjectDescriptor();
+                            ProjectDescriptor target = new ProjectDescriptor(source, trgFolder);
                             executor = new Executor(source.getMainVilScript())
                                 .addConfiguration(source.getConfiguration());
+                            executor.addSource(source).addTarget(target);
                         }
-                        executor.addSource(source).addTarget(target);
                         String startRuleName = getStartRuleName();
                         if (null != startRuleName) {
                             executor.addStartRuleName(startRuleName);
