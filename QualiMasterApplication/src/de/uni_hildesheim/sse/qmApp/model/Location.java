@@ -30,6 +30,7 @@ public class Location {
      *   <li>{@link #getModelLocation()}</li>
      * </ol>
      * @return A possible suggestion where to find old instantiated files or where to instantiate next time.
+     * @see #hasInstantiated()
      */
     public static File getInstantiationFolder() {
         File result = null;
@@ -45,6 +46,16 @@ public class Location {
         }
         
         return result;
+    }
+    
+    /**
+     * Checks whether at least at one time the model was instantiated.
+     * @return <tt>true</tt> {@link #getInstantiationFolder()} returns the folder where last time elements where
+     * instantiated in, <tt>false</tt>{@link #getInstantiationFolder()} is equal to {@link #getModelLocation()}.
+     */
+    public static boolean hasInstantiated() {
+        File modelFolder = getModelLocationFile();
+        return null != modelFolder && modelFolder != getInstantiationFolder(); 
     }
     
     /**

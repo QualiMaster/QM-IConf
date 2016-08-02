@@ -1,6 +1,7 @@
 package de.uni_hildesheim.sse.qmApp.treeView;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -34,10 +35,10 @@ import de.uni_hildesheim.sse.qmApp.editors.QMPipelineEditor;
 import de.uni_hildesheim.sse.qmApp.images.ImageRegistry;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.model.IVMLModelOperations;
+import de.uni_hildesheim.sse.qmApp.model.Location;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.PipelineDiagramUtils;
 import de.uni_hildesheim.sse.qmApp.model.PipelineTranslationOperations;
-import de.uni_hildesheim.sse.qmApp.model.SessionModel;
 import de.uni_hildesheim.sse.qmApp.model.Utils;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure;
@@ -47,7 +48,6 @@ import eu.qualimaster.adaptation.external.PipelineMessage;
 import eu.qualimaster.easy.extension.QmConstants;
 import eu.qualimaster.easy.extension.modelop.BasicIVMLModelOperations;
 import eu.qualimaster.manifestUtils.ManifestConnection;
-import eu.qualimaster.manifestUtils.ManifestUtilsException;
 import net.ssehub.easy.basics.modelManagement.ModelInfo;
 import net.ssehub.easy.producer.eclipse.observer.EclipseProgressObserver;
 import net.ssehub.easy.producer.ui.productline_editor.EasyProducerDialog;
@@ -65,6 +65,7 @@ import net.ssehub.easy.varModel.persistency.StringProvider;
  * 
  * @author Holger Eichelberger
  * @author Cui Qin
+ * @author Patrik Pastuschek
  */
 public class PipelineElementFactory implements IConfigurableElementFactory {
 
@@ -368,7 +369,7 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
         @Override
         public IMenuContributor getMenuContributor() {
             return new IMenuContributor() {
-                
+                 
                 @Override
                 public void contributeTo(IMenuManager manager) {
                     boolean isInfrastructureAdmin = UserContext.INSTANCE.isInfrastructureAdmin();
@@ -383,10 +384,22 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
                             createProgressDialog(DialogsUtil.getActiveShell(), pipelineVar);
                         }
                     };
-                    action.setEnabled(isInfrastructureAdmin && (null != deploymentUrl && deploymentUrl.length() > 0));
+                    //only enable the deploy button if this specific pipeline has been instantiated
+                    action.setEnabled(isInfrastructureAdmin && (null != deploymentUrl && deploymentUrl.length() > 0)
+                            && isInstantiated());
                     action.setText("Deploy...");
+                    if (!action.isEnabled()) {
+                        String toolTip = null;
+                        if (!isInfrastructureAdmin) {
+                            toolTip = "You need to be infrastructure admin to deploy this pipeline.";
+                        } else if (!isInstantiated()) {
+                            toolTip = "The pipeline has not been instantiated yet.";
+                        } else if (!(null != deploymentUrl && deploymentUrl.length() > 0)) {
+                            toolTip = "Please specify the deployment URL.";
+                        }
+                        action.setToolTipText(toolTip);
+                    }
                     manager.add(action);
-
                     action = new Action() {
                         @Override
                         public void run() {
@@ -413,7 +426,7 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
         }
 
     }
-
+    
     /**
      * Prevents external creation.
      */
@@ -484,6 +497,21 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
     }
     
     /**
+     * Returns true if the specific pipeline has been instantiated.
+     * @return True if the specific pipeline has been instantiated. False otherwise.
+     */
+    private static boolean isInstantiated() {
+        
+        boolean isInstantiated = false;
+        File instantiationDir = Location.getInstantiationFolder();
+        if (Location.hasInstantiated()) {
+            isInstantiated = true; //pipelineVar
+        }
+        System.out.println("isInstantiated: " + isInstantiated);
+        return isInstantiated;
+    }
+    
+    /**
      * Starts the deployment process and monitors it.
      * @param monitor The used monitor.
      * @param pipelineVar The IDecisionVariable of the target pipeline.
@@ -511,24 +539,25 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
         obs.register(monitor);
         
         ManifestConnection con = new ManifestConnection();
-        File instFile = SessionModel.INSTANCE.getInstantationFolder();
+        File instFile = Location.getInstantiationFolder(); 
+        //SessionModel.INSTANCE.getInstantationFolder();
         //TODO: commented line is a DIRTY hack for quicker testing of the publishing feature,
         //since the instantiation path is discarded once the application is closed.
         //instFile = new File("C:\\Instant_Test"); 
         if (null != instFile && instFile.exists()) {
             
             String instDir = instFile.getAbsolutePath();
-            String pipelineDir = instDir + "\\pipelines"; //TODO: move to constants or find in model!!!!
+            String pipelineDir = instDir + File.separator + "pipelines"; //TODO: move to constants or find in model!!!!
             String[] artifactNameSplitted = artifactName.split(":")[0].split("\\.");
             for (int i = 0; i < artifactNameSplitted.length; i++) {
-                pipelineDir += "\\" + artifactNameSplitted[i];
+                pipelineDir += File.separator + artifactNameSplitted[i];
             }
             
-            pipelineDir += "\\" + artifactName.split(":")[1];
-            String pomFile = pipelineDir + "\\pom.xml";
-            String dir = pipelineDir + "\\target";
+            pipelineDir += File.separator + artifactName.split(":")[1];
+            String pomFile = pipelineDir + File.separator + "pom.xml";
+            String dir = pipelineDir + File.separator + "target";
             String jarName = artifactName.split(":", 2)[1].replace(":", "-");
-            String jarFile = dir + "\\" + jarName + ".jar";
+            String jarFile = dir + File.separator + jarName + ".jar";
             
             //TODO: This is a testing hack. For safer testing all uploads are redirected to a test dir!
             final String deploymentUrl = ModelAccess.getDeploymentUrl() 
@@ -542,7 +571,7 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
 //                Dialogs.showErrorDialog("ERROR", e.getMessage());
 //            }
         } else {
-            Dialogs.showErrorDialog("ERROR", "Unable to locate instantiation folder at: '" + instFile + "'.");
+            Dialogs.showErrorDialog("Error", "Unable to locate instantiation folder at: '" + instFile + "'.");
         }
         
         obs.unregister(monitor);
