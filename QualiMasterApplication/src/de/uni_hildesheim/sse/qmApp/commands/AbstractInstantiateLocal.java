@@ -53,7 +53,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
      * For testing purpose: <tt>true</tt> expected behavior, <tt>false</tt> Reasoning, model pruning,
      * but no instantiation.
      */
-    private static final boolean ENABLE_INSTANTIATION = false;
+    private static final boolean ENABLE_INSTANTIATION = true;
 
     private static String lastTargetLocation = Location.getInstantiationFolder().getAbsolutePath();
     
