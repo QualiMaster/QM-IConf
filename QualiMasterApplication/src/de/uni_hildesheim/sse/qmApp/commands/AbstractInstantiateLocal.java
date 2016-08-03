@@ -47,13 +47,13 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
      * <tt>false</tt> use underlying model and configuration.
      * @see ModelModifier
      */
-    private static final boolean PRUNE_CONFIG = false;
+    private static final boolean PRUNE_CONFIG = true;
     
     /**
      * For testing purpose: <tt>true</tt> expected behavior, <tt>false</tt> Reasoning, model pruning,
      * but no instantiation.
      */
-    private static final boolean ENABLE_INSTANTIATION = true;
+    private static final boolean ENABLE_INSTANTIATION = false;
 
     private static String lastTargetLocation = Location.getInstantiationFolder().getAbsolutePath();
     
