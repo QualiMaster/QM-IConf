@@ -28,6 +28,7 @@ import eu.qualimaster.adaptation.external.AuthenticateMessage;
 import eu.qualimaster.adaptation.external.ChangeParameterRequest;
 import eu.qualimaster.adaptation.external.ClientEndpoint;
 import eu.qualimaster.adaptation.external.CloudPipelineMessage;
+import eu.qualimaster.adaptation.external.ConfigurationChangeMessage;
 import eu.qualimaster.adaptation.external.ConnectedMessage;
 import eu.qualimaster.adaptation.external.DisconnectRequest;
 import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
@@ -44,6 +45,7 @@ import eu.qualimaster.adaptation.external.PipelineMessage;
 import eu.qualimaster.adaptation.external.PipelineStatusRequest;
 import eu.qualimaster.adaptation.external.PipelineStatusResponse;
 import eu.qualimaster.adaptation.external.ReplayMessage;
+import eu.qualimaster.adaptation.external.ResourceChangeMessage;
 import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
 import eu.qualimaster.adaptation.external.UpdateCloudResourceMessage;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
@@ -198,6 +200,20 @@ public class Infrastructure {
         public void handleReplayMessage(ReplayMessage message) {
             for (int d = 0, n = dispatchers.size(); d < n; d++) {
                 dispatchers.get(d).handleReplayMessage(message);
+            }
+        }
+
+        @Override
+        public void handleConfigurationChangeMessage(ConfigurationChangeMessage message) {
+            for (int d = 0, n = dispatchers.size(); d < n; d++) {
+                dispatchers.get(d).handleConfigurationChangeMessage(message);
+            }
+        }
+
+        @Override
+        public void handleResourceChangeMessage(ResourceChangeMessage message) {
+            for (int d = 0, n = dispatchers.size(); d < n; d++) {
+                dispatchers.get(d).handleResourceChangeMessage(message);
             }
         }
         

@@ -19,6 +19,7 @@ import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure.IClientDispatcher;
 import eu.qualimaster.adaptation.external.AlgorithmChangedMessage;
 import eu.qualimaster.adaptation.external.ChangeParameterRequest;
 import eu.qualimaster.adaptation.external.CloudPipelineMessage;
+import eu.qualimaster.adaptation.external.ConfigurationChangeMessage;
 import eu.qualimaster.adaptation.external.DisconnectRequest;
 import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
 import eu.qualimaster.adaptation.external.HardwareAliveMessage;
@@ -30,6 +31,7 @@ import eu.qualimaster.adaptation.external.PipelineMessage;
 import eu.qualimaster.adaptation.external.PipelineStatusRequest;
 import eu.qualimaster.adaptation.external.PipelineStatusResponse;
 import eu.qualimaster.adaptation.external.ReplayMessage;
+import eu.qualimaster.adaptation.external.ResourceChangeMessage;
 import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
 import eu.qualimaster.adaptation.external.UpdateCloudResourceMessage;
 
@@ -41,67 +43,75 @@ import eu.qualimaster.adaptation.external.UpdateCloudResourceMessage;
 public abstract class DispatcherAdapter implements IClientDispatcher {
 
     @Override
-    public void handleAlgorithmChangedMessage(AlgorithmChangedMessage arg0) {
+    public void handleAlgorithmChangedMessage(AlgorithmChangedMessage message) {
     }
 
     @Override
-    public void handleChangeParameterRequest(ChangeParameterRequest<?> arg0) {
+    public void handleChangeParameterRequest(ChangeParameterRequest<?> message) {
     }
 
     @Override
-    public void handleDisconnectRequest(DisconnectRequest arg0) {
+    public void handleDisconnectRequest(DisconnectRequest message) {
     }
 
     @Override
-    public void handleExecutionResponseMessage(ExecutionResponseMessage arg0) {
+    public void handleExecutionResponseMessage(ExecutionResponseMessage message) {
     }
 
     @Override
-    public void handleHardwareAliveMessage(HardwareAliveMessage arg0) {
+    public void handleHardwareAliveMessage(HardwareAliveMessage message) {
     }
 
     @Override
-    public void handleLoggingFilterRequest(LoggingFilterRequest arg0) {
+    public void handleLoggingFilterRequest(LoggingFilterRequest message) {
     }
 
     @Override
-    public void handleLoggingMessage(LoggingMessage arg0) {
+    public void handleLoggingMessage(LoggingMessage message) {
     }
 
     @Override
-    public void handleMonitoringDataMessage(MonitoringDataMessage arg0) {
+    public void handleMonitoringDataMessage(MonitoringDataMessage message) {
     }
 
     @Override
-    public void handlePipelineMessage(PipelineMessage arg0) {
+    public void handlePipelineMessage(PipelineMessage message) {
     }
 
     @Override
-    public void handleSwitchAlgorithmRequest(SwitchAlgorithmRequest arg0) {
+    public void handleSwitchAlgorithmRequest(SwitchAlgorithmRequest message) {
     }
 
     @Override
-    public void handleInformationMessage(InformationMessage arg0) {
+    public void handleInformationMessage(InformationMessage message) {
     }
 
     @Override
-    public void handlePipelineStatusRequest(PipelineStatusRequest arg0) {
+    public void handlePipelineStatusRequest(PipelineStatusRequest message) {
     }
 
     @Override
-    public void handlePipelineStatusResponse(PipelineStatusResponse arg0) {
+    public void handlePipelineStatusResponse(PipelineStatusResponse message) {
     }
 
     @Override
-    public void handleUpdateCloudResourceMessage(UpdateCloudResourceMessage arg0) {
+    public void handleUpdateCloudResourceMessage(UpdateCloudResourceMessage message) {
     }
 
     @Override
-    public void handleCloudPipelineMessage(CloudPipelineMessage arg0) {
+    public void handleCloudPipelineMessage(CloudPipelineMessage message) {
     }
 
     @Override
-    public void handleReplayMessage(ReplayMessage arg0) {
+    public void handleReplayMessage(ReplayMessage message) {
+    }
+
+    @Override
+    public void handleConfigurationChangeMessage(ConfigurationChangeMessage message) {
+    }
+
+    @Override
+    public void handleResourceChangeMessage(ResourceChangeMessage message) {
     }
 
 }

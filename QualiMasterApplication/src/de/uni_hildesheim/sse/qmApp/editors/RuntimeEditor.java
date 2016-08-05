@@ -101,6 +101,7 @@ import de.uni_hildesheim.sse.qmApp.runtime.Infrastructure.IClientDispatcher;
 import eu.qualimaster.adaptation.external.AlgorithmChangedMessage;
 import eu.qualimaster.adaptation.external.ChangeParameterRequest;
 import eu.qualimaster.adaptation.external.CloudPipelineMessage;
+import eu.qualimaster.adaptation.external.ConfigurationChangeMessage;
 import eu.qualimaster.adaptation.external.DisconnectRequest;
 import eu.qualimaster.adaptation.external.ExecutionResponseMessage;
 import eu.qualimaster.adaptation.external.HardwareAliveMessage;
@@ -112,6 +113,7 @@ import eu.qualimaster.adaptation.external.PipelineMessage;
 import eu.qualimaster.adaptation.external.PipelineStatusRequest;
 import eu.qualimaster.adaptation.external.PipelineStatusResponse;
 import eu.qualimaster.adaptation.external.ReplayMessage;
+import eu.qualimaster.adaptation.external.ResourceChangeMessage;
 import eu.qualimaster.adaptation.external.SwitchAlgorithmRequest;
 import eu.qualimaster.adaptation.external.UpdateCloudResourceMessage;
 import eu.qualimaster.easy.extension.QmConstants;
@@ -1970,4 +1972,13 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     @Override
     public void handleReplayMessage(ReplayMessage arg0) {
     }
+
+    @Override
+    public void handleConfigurationChangeMessage(ConfigurationChangeMessage arg0) {
+    }
+
+    @Override
+    public void handleResourceChangeMessage(ResourceChangeMessage arg0) {
+    }
+    
 }
