@@ -20,7 +20,9 @@ import java.security.Security;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -31,6 +33,8 @@ import javax.tools.ToolProvider;
 import org.apache.ivy.Ivy;
 import org.apache.ivy.ant.IvyAntSettings;
 import org.apache.ivy.ant.IvyConvertPom;
+import org.apache.ivy.ant.IvyPublish;
+import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
@@ -150,7 +154,6 @@ public class ManifestConnection {
                 "[organisation]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]");
         ivySettings.setDefaultCacheIvyPattern(
                 "[organisation]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]");
-
         
         
         ChainResolver chainResolver = new ChainResolver();
@@ -924,21 +927,15 @@ public class ManifestConnection {
         IvyAntSettings settings = new IvyAntSettings();
         settings.setProject(project);
         project.addReference("ivy.instance", settings);
-//        settings.createIvyEngine(task);
         
         project.setBaseDir(new File("."));
         project.setDefault("all");
         project.setName("ConvertPomToIvy");
         project.setBasedir(".");
         
-        Reference ref = new Reference(project, "ConvertPomToIvy");
-//        converter.setSettingsRef(ref);
-//        
+        Reference ref = new Reference(project, "ConvertPomToIvy"); 
         IvySettingsWrapperTask wrapper = new IvySettingsWrapperTask();
         wrapper.setSettings(this.ivy.getSettings());
-//        converter.setProject(project);
-//        converter.doExecute();
-//        converter.setSettingsRef(ref);
         wrapper.setProject(project);
         wrapper.setPomFile(new File(pomPath));
         wrapper.setIvyFile(ivyFile);
@@ -946,13 +943,13 @@ public class ManifestConnection {
         
         System.out.println("Converted to ivy...");
         
-        publish(file, ivyFile.getAbsolutePath(), repository, version, forceOverwrite);
-        //TODO: translate the runtime exception into a 'normal' exception, for safer use of the method.
-//        try {
-//        } catch (ManifestRuntimeException mre) {
-//            throw new ManifestUtilsException(mre.getMessage());
-//        }
-        
+        PomInfo info = PomReader.getInfo(new File(pomPath));     
+        if (null != info) {
+            System.out.println("PomInfo: " + info.toString());
+        }
+                
+        publish(file, ivyFile.getAbsolutePath(), repository, info, forceOverwrite);
+
     }
     
     /**
@@ -962,43 +959,78 @@ public class ManifestConnection {
      * @param ivyFile The ivy file for publishing.
      * @param repository The nexus repository. <br>
      *        Example: "https://nexus.sse.uni-hildesheim.de/content/repositories/qmproject/"
-     * @param version the version of the artifact.
+     * @param info Pom information.
      * @param forceOverwrite forces an overwrite in the nexus.
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void publish(String file, String ivyFile, String repository, 
-            String version, boolean forceOverwrite) {
+            PomInfo info, boolean forceOverwrite) {
         
         IBiblioResolver testRes = new IBiblioResolver();
         testRes.setName("publish_" + repository);
         testRes.setRoot(repository);
-        
+        for (Object pattern : testRes.getArtifactPatterns()) {
+            System.out.println("ArtifactPattern: " + pattern);
+        }
+        testRes.setM2compatible(true);
+        testRes.setUseMavenMetadata(true);
+        testRes.setUsepoms(true);
+
         if (null == this.ivy.getSettings().getResolver("publish_" + repository)) {
             this.ivy.getSettings().addResolver(testRes);
         }
         
+        //change the server side pattern, called local in Ivy for some reason...
+        Map<String, String> vars = new HashMap<String, String>();
+        vars.put("ivy.local.default.artifact.pattern", "[organisation]/[module]/[revision]/[artifact].[ext]");
+        this.ivy.getSettings().addAllVariables(vars, true);
+        System.out.println(this.ivy.getSettings().getVariable("ivy.local.default.artifact.pattern"));
+        
         //Is undefined, because ivy needs a Collection<Pattern> with actually just Strings inside it...
         Collection srcArtifactPattern = new ArrayList();
-        System.out.println(file.substring(0, file.lastIndexOf(File.separator)) + "\\[module].[ext]");
-        srcArtifactPattern.add(file.substring(0, file.lastIndexOf(File.separator)) + "\\[artifact](-[revision]).[ext]");
+        String targetPath = file.substring(0, file.lastIndexOf(File.separator));
+        String pomPath = targetPath.substring(0, targetPath.lastIndexOf(File.separator));
+        System.out.println("POMPATH = " + pomPath);
+//        System.out.println(file.substring(0, file.lastIndexOf(File.separator)) + "\\[module].[ext]");
+//        srcArtifactPattern.add(targetPath + "\\[artifact](-[revision])-jar-with-dependencies.[ext]");
+//        srcArtifactPattern.add(pomPath + "\\pom.xml");
+        srcArtifactPattern.add(targetPath + "\\[artifact](-[revision])-[type]s.[ext]");
+        srcArtifactPattern.add(targetPath + "\\[artifact](-[revision]).[ext]");
         
-        
-        ModuleRevisionId ri = ModuleRevisionId.newInstance("", "", version);
-        
+        //[organisation]/[module]/[revision]/[artifact].[ext]
+        ModuleRevisionId ri;
+        if (null != info) {
+            ri = ModuleRevisionId.newInstance(info.getGroupId(), info.getArtifactId(), info.getVersion());
+        } else {
+            ri = ModuleRevisionId.newInstance("", "", "");
+        }
         PublishOptions options = new PublishOptions();
         options.setHaltOnMissing(true);
         options.setOverwrite(forceOverwrite);
         options.setSrcIvyPattern(ivyFile);
         options.setUpdate(true);
+        options.setPubrevision(info.getVersion());
         
+//        Artifact[] extraArtifacts = new Artifact[2];     
+//        options.setExtraArtifacts(extraArtifacts);
         try {
+            URL dest = new URL(testRes.getRoot());
+            FTPSConnector.getInstance().initialize(dest);
             UrlPostHandler urlPostHandler = new UrlPostHandler();
+            urlPostHandler.upload(new File(pomPath + "/pom.xml"), new URL(dest + info.getGroupPath() 
+                + info.getArtifactId() + "/" + info.getVersion() + "/" + "pom.xml"), null); //DIRTY DIRTY DIRTY TODO:
+            urlPostHandler.upload(new File(targetPath + "/" + info.getArtifactId() + "-" + info.getVersion() 
+                + "-jar-with-dependencies.jar"), new URL(dest + "/" + info.getGroupPath() 
+                + info.getArtifactId() + "/" + info.getVersion() + "/" + info.getArtifactId() + "-" + info.getVersion() 
+                + "-jar-with-dependencies.jar"), null);
             URLHandlerRegistry.setDefault(urlPostHandler);
             ivy.publish(ri, srcArtifactPattern, "publish_" + repository, options);
         } catch (IOException exc) {
             exc.printStackTrace();
         } catch (IllegalStateException exc) {
             exc.printStackTrace();
+        } finally {
+            FTPSConnector.getInstance().disconnect();
         }
         
     }

@@ -49,6 +49,18 @@ public class PomReader {
         }
         
         /**
+         * Returns the GroupId as path.
+         * @return String GroupId as path (i.e. eu/qualimaster/).
+         */
+        public String getGroupPath() {
+            String result = "";
+            for (String s : this.groupId.split("\\.")) {
+                result += s + "/";
+            }
+            return result;
+        }
+        
+        /**
          * Returns the ArtifactId.
          * @return String ArtifactId.
          */
@@ -62,6 +74,11 @@ public class PomReader {
          */
         public String getVersion() {
             return this.version;
+        }
+        
+        @Override
+        public String toString() {
+            return this.groupId + "#" + this.artifactId + "#" + this.version;
         }
         
     }
@@ -81,7 +98,7 @@ public class PomReader {
         //Transformer transformer = null;
         Document doc = null;
         
-        if (file != null && file.length() > 0) {
+        if (file != null && file.exists() && file.length() > 0) {
             
             try { 
                 

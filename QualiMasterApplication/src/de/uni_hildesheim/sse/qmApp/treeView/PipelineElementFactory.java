@@ -540,10 +540,7 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
         
         ManifestConnection con = new ManifestConnection();
         File instFile = Location.getInstantiationFolder(); 
-        //SessionModel.INSTANCE.getInstantationFolder();
-        //TODO: commented line is a DIRTY hack for quicker testing of the publishing feature,
-        //since the instantiation path is discarded once the application is closed.
-        //instFile = new File("C:\\Instant_Test"); 
+
         if (null != instFile && instFile.exists()) {
             
             String instDir = instFile.getAbsolutePath();
