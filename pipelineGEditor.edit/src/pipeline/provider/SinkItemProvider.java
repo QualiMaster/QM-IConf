@@ -55,6 +55,7 @@ public class SinkItemProvider
 			super.getPropertyDescriptors(object);
 
 			addSinkPropertyDescriptor(object);
+			addPermissibleParametersPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -73,6 +74,28 @@ public class SinkItemProvider
 				 getString("_UI_Sink_sink_feature"),
 				 getString("_UI_PropertyDescriptor_description", "_UI_Sink_sink_feature", "_UI_Sink_type"),
 				 PipelinePackage.Literals.SINK__SINK,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+/**
+	 * This adds a property descriptor for the Permissible Parameters feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addPermissibleParametersPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Sink_permissibleParameters_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Sink_permissibleParameters_feature", "_UI_Sink_type"),
+				 PipelinePackage.Literals.SINK__PERMISSIBLE_PARAMETERS,
 				 true,
 				 false,
 				 false,
@@ -122,6 +145,7 @@ public class SinkItemProvider
 
 		switch (notification.getFeatureID(Sink.class)) {
 			case PipelinePackage.SINK__SINK:
+			case PipelinePackage.SINK__PERMISSIBLE_PARAMETERS:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 		}

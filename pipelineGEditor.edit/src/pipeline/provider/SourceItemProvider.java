@@ -55,6 +55,7 @@ public class SourceItemProvider
 			super.getPropertyDescriptors(object);
 
 			addSourcePropertyDescriptor(object);
+			addPermissibleParametersPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -73,6 +74,28 @@ public class SourceItemProvider
 				 getString("_UI_Source_source_feature"),
 				 getString("_UI_PropertyDescriptor_description", "_UI_Source_source_feature", "_UI_Source_type"),
 				 PipelinePackage.Literals.SOURCE__SOURCE,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+/**
+	 * This adds a property descriptor for the Permissible Parameters feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addPermissibleParametersPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Source_permissibleParameters_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Source_permissibleParameters_feature", "_UI_Source_type"),
+				 PipelinePackage.Literals.SOURCE__PERMISSIBLE_PARAMETERS,
 				 true,
 				 false,
 				 false,
@@ -122,6 +145,7 @@ public class SourceItemProvider
 
 		switch (notification.getFeatureID(Source.class)) {
 			case PipelinePackage.SOURCE__SOURCE:
+			case PipelinePackage.SOURCE__PERMISSIBLE_PARAMETERS:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 		}

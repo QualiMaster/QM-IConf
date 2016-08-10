@@ -386,13 +386,22 @@ public interface PipelinePackage extends EPackage
     int SOURCE__SOURCE = PIPELINE_NODE_FEATURE_COUNT + 0;
 
 /**
+	 * The feature id for the '<em><b>Permissible Parameters</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SOURCE__PERMISSIBLE_PARAMETERS = PIPELINE_NODE_FEATURE_COUNT + 1;
+
+/**
 	 * The number of structural features of the '<em>Source</em>' class.
 	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-  int SOURCE_FEATURE_COUNT = PIPELINE_NODE_FEATURE_COUNT + 1;
+  int SOURCE_FEATURE_COUNT = PIPELINE_NODE_FEATURE_COUNT + 2;
 
   /**
 	 * The meta object id for the '{@link pipeline.impl.SinkImpl <em>Sink</em>}' class.
@@ -450,13 +459,22 @@ public interface PipelinePackage extends EPackage
     int SINK__SINK = PIPELINE_NODE_FEATURE_COUNT + 0;
 
 /**
+	 * The feature id for the '<em><b>Permissible Parameters</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SINK__PERMISSIBLE_PARAMETERS = PIPELINE_NODE_FEATURE_COUNT + 1;
+
+/**
 	 * The number of structural features of the '<em>Sink</em>' class.
 	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-  int SINK_FEATURE_COUNT = PIPELINE_NODE_FEATURE_COUNT + 1;
+  int SINK_FEATURE_COUNT = PIPELINE_NODE_FEATURE_COUNT + 2;
 
   /**
 	 * The meta object id for the '{@link pipeline.impl.ReplaySinkImpl <em>Replay Sink</em>}' class.
@@ -512,6 +530,15 @@ public interface PipelinePackage extends EPackage
 	 * @ordered
 	 */
 	int REPLAY_SINK__SINK = SINK__SINK;
+
+/**
+	 * The feature id for the '<em><b>Permissible Parameters</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int REPLAY_SINK__PERMISSIBLE_PARAMETERS = SINK__PERMISSIBLE_PARAMETERS;
 
 /**
 	 * The number of structural features of the '<em>Replay Sink</em>' class.
@@ -652,13 +679,22 @@ public interface PipelinePackage extends EPackage
 	int FAMILY_ELEMENT__DEFAULT = PROCESSING_ELEMENT_FEATURE_COUNT + 2;
 
 								/**
+	 * The feature id for the '<em><b>Permissible Parameters</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FAMILY_ELEMENT__PERMISSIBLE_PARAMETERS = PROCESSING_ELEMENT_FEATURE_COUNT + 3;
+
+								/**
 	 * The number of structural features of the '<em>Family Element</em>' class.
 	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-    int FAMILY_ELEMENT_FEATURE_COUNT = PROCESSING_ELEMENT_FEATURE_COUNT + 3;
+    int FAMILY_ELEMENT_FEATURE_COUNT = PROCESSING_ELEMENT_FEATURE_COUNT + 4;
 
         /**
 	 * The meta object id for the '{@link pipeline.impl.DataManagementElementImpl <em>Data Management Element</em>}' class.
@@ -984,6 +1020,17 @@ public interface PipelinePackage extends EPackage
     EAttribute getSource_Source();
 
 /**
+	 * Returns the meta object for the attribute list '{@link pipeline.Source#getPermissibleParameters <em>Permissible Parameters</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute list '<em>Permissible Parameters</em>'.
+	 * @see pipeline.Source#getPermissibleParameters()
+	 * @see #getSource()
+	 * @generated
+	 */
+	EAttribute getSource_PermissibleParameters();
+
+/**
 	 * Returns the meta object for class '{@link pipeline.Sink <em>Sink</em>}'.
 	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -1003,6 +1050,17 @@ public interface PipelinePackage extends EPackage
 	 * @generated
 	 */
     EAttribute getSink_Sink();
+
+/**
+	 * Returns the meta object for the attribute list '{@link pipeline.Sink#getPermissibleParameters <em>Permissible Parameters</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute list '<em>Permissible Parameters</em>'.
+	 * @see pipeline.Sink#getPermissibleParameters()
+	 * @see #getSink()
+	 * @generated
+	 */
+	EAttribute getSink_PermissibleParameters();
 
 /**
 	 * Returns the meta object for class '{@link pipeline.ReplaySink <em>Replay Sink</em>}'.
@@ -1066,6 +1124,17 @@ public interface PipelinePackage extends EPackage
 	 * @generated
 	 */
 	EAttribute getFamilyElement_Default();
+
+/**
+	 * Returns the meta object for the attribute list '{@link pipeline.FamilyElement#getPermissibleParameters <em>Permissible Parameters</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute list '<em>Permissible Parameters</em>'.
+	 * @see pipeline.FamilyElement#getPermissibleParameters()
+	 * @see #getFamilyElement()
+	 * @generated
+	 */
+	EAttribute getFamilyElement_PermissibleParameters();
 
 /**
 	 * Returns the meta object for class '{@link pipeline.DataManagementElement <em>Data Management Element</em>}'.
@@ -1314,6 +1383,14 @@ public interface PipelinePackage extends EPackage
         EAttribute SOURCE__SOURCE = eINSTANCE.getSource_Source();
 
     /**
+		 * The meta object literal for the '<em><b>Permissible Parameters</b></em>' attribute list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute SOURCE__PERMISSIBLE_PARAMETERS = eINSTANCE.getSource_PermissibleParameters();
+
+				/**
 		 * The meta object literal for the '{@link pipeline.impl.SinkImpl <em>Sink</em>}' class.
 		 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -1332,6 +1409,14 @@ public interface PipelinePackage extends EPackage
         EAttribute SINK__SINK = eINSTANCE.getSink_Sink();
 
     /**
+		 * The meta object literal for the '<em><b>Permissible Parameters</b></em>' attribute list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute SINK__PERMISSIBLE_PARAMETERS = eINSTANCE.getSink_PermissibleParameters();
+
+				/**
 		 * The meta object literal for the '{@link pipeline.impl.ReplaySinkImpl <em>Replay Sink</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -1384,6 +1469,14 @@ public interface PipelinePackage extends EPackage
 		 * @generated
 		 */
 		EAttribute FAMILY_ELEMENT__DEFAULT = eINSTANCE.getFamilyElement_Default();
+
+				/**
+		 * The meta object literal for the '<em><b>Permissible Parameters</b></em>' attribute list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute FAMILY_ELEMENT__PERMISSIBLE_PARAMETERS = eINSTANCE.getFamilyElement_PermissibleParameters();
 
 				/**
 		 * The meta object literal for the '{@link pipeline.impl.DataManagementElementImpl <em>Data Management Element</em>}' class.

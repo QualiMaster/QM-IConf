@@ -48,6 +48,7 @@ public class FamilyElementItemProvider extends ProcessingElementItemProvider {
 			addFamilyPropertyDescriptor(object);
 			addIsConnectorPropertyDescriptor(object);
 			addDefaultPropertyDescriptor(object);
+			addPermissibleParametersPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -119,6 +120,28 @@ public class FamilyElementItemProvider extends ProcessingElementItemProvider {
 	}
 
 				/**
+	 * This adds a property descriptor for the Permissible Parameters feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addPermissibleParametersPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_FamilyElement_permissibleParameters_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_FamilyElement_permissibleParameters_feature", "_UI_FamilyElement_type"),
+				 PipelinePackage.Literals.FAMILY_ELEMENT__PERMISSIBLE_PARAMETERS,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+				/**
 	 * This returns FamilyElement.gif.
 	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -159,6 +182,7 @@ public class FamilyElementItemProvider extends ProcessingElementItemProvider {
 			case PipelinePackage.FAMILY_ELEMENT__FAMILY:
 			case PipelinePackage.FAMILY_ELEMENT__IS_CONNECTOR:
 			case PipelinePackage.FAMILY_ELEMENT__DEFAULT:
+			case PipelinePackage.FAMILY_ELEMENT__PERMISSIBLE_PARAMETERS:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 		}

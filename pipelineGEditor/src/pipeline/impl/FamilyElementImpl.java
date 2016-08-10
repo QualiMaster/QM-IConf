@@ -2,12 +2,15 @@
  */
 package pipeline.impl;
 
+import java.util.Collection;
 import org.eclipse.emf.common.notify.Notification;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
+import org.eclipse.emf.ecore.util.EDataTypeUniqueEList;
 import pipeline.FamilyElement;
 import pipeline.PipelinePackage;
 
@@ -21,6 +24,7 @@ import pipeline.PipelinePackage;
  *   <li>{@link pipeline.impl.FamilyElementImpl#getFamily <em>Family</em>}</li>
  *   <li>{@link pipeline.impl.FamilyElementImpl#getIsConnector <em>Is Connector</em>}</li>
  *   <li>{@link pipeline.impl.FamilyElementImpl#getDefault <em>Default</em>}</li>
+ *   <li>{@link pipeline.impl.FamilyElementImpl#getPermissibleParameters <em>Permissible Parameters</em>}</li>
  * </ul>
  * </p>
  *
@@ -86,6 +90,16 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 	 * @ordered
 	 */
 	protected String default_ = DEFAULT_EDEFAULT;
+
+				/**
+	 * The cached value of the '{@link #getPermissibleParameters() <em>Permissible Parameters</em>}' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getPermissibleParameters()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<String> permissibleParameters;
 
 				/**
 	 * <!-- begin-user-doc -->
@@ -171,6 +185,18 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 
 				/**
 	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<String> getPermissibleParameters() {
+		if (permissibleParameters == null) {
+			permissibleParameters = new EDataTypeUniqueEList<String>(String.class, this, PipelinePackage.FAMILY_ELEMENT__PERMISSIBLE_PARAMETERS);
+		}
+		return permissibleParameters;
+	}
+
+				/**
+	 * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -183,6 +209,8 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 				return getIsConnector();
 			case PipelinePackage.FAMILY_ELEMENT__DEFAULT:
 				return getDefault();
+			case PipelinePackage.FAMILY_ELEMENT__PERMISSIBLE_PARAMETERS:
+				return getPermissibleParameters();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -192,7 +220,8 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
      * <!-- end-user-doc -->
 	 * @generated
 	 */
-    @Override
+    @SuppressWarnings("unchecked")
+				@Override
     public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case PipelinePackage.FAMILY_ELEMENT__FAMILY:
@@ -203,6 +232,10 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 				return;
 			case PipelinePackage.FAMILY_ELEMENT__DEFAULT:
 				setDefault((String)newValue);
+				return;
+			case PipelinePackage.FAMILY_ELEMENT__PERMISSIBLE_PARAMETERS:
+				getPermissibleParameters().clear();
+				getPermissibleParameters().addAll((Collection<? extends String>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -225,6 +258,9 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 			case PipelinePackage.FAMILY_ELEMENT__DEFAULT:
 				setDefault(DEFAULT_EDEFAULT);
 				return;
+			case PipelinePackage.FAMILY_ELEMENT__PERMISSIBLE_PARAMETERS:
+				getPermissibleParameters().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -243,6 +279,8 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 				return IS_CONNECTOR_EDEFAULT == null ? isConnector != null : !IS_CONNECTOR_EDEFAULT.equals(isConnector);
 			case PipelinePackage.FAMILY_ELEMENT__DEFAULT:
 				return DEFAULT_EDEFAULT == null ? default_ != null : !DEFAULT_EDEFAULT.equals(default_);
+			case PipelinePackage.FAMILY_ELEMENT__PERMISSIBLE_PARAMETERS:
+				return permissibleParameters != null && !permissibleParameters.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -263,6 +301,8 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 		result.append(isConnector);
 		result.append(", default: ");
 		result.append(default_);
+		result.append(", permissibleParameters: ");
+		result.append(permissibleParameters);
 		result.append(')');
 		return result.toString();
 	}

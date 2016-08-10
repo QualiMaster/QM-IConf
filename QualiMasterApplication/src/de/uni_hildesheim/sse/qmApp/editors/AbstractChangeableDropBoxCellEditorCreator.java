@@ -67,6 +67,15 @@ public abstract class AbstractChangeableDropBoxCellEditorCreator implements IEdi
         return pipeline;
     }
     
+    /**
+     * Setter for the {@link UIConfiguration}, should only be used if
+     * {@link #createCellEditor(UIConfiguration, IDecisionVariable, Composite)} is overwritten by a sub class.
+     * @param config The configuration passed to this creator.
+     */
+    protected void setUIConfiguration(UIConfiguration config) {
+        this.config = config;
+    }
+    
     @Override
     public CellEditor createCellEditor(UIConfiguration config, IDecisionVariable variable, Composite parent) {
         this.config = config;

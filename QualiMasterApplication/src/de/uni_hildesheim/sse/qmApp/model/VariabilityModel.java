@@ -67,6 +67,7 @@ import de.uni_hildesheim.sse.qmApp.editors.FamilyEditor;
 import de.uni_hildesheim.sse.qmApp.editors.FamilySelectionCellEditor;
 import de.uni_hildesheim.sse.qmApp.editors.MultipleLineText;
 import de.uni_hildesheim.sse.qmApp.editors.ParameterEditor;
+import de.uni_hildesheim.sse.qmApp.editors.PermissibleParameterCellEditorCreator;
 import de.uni_hildesheim.sse.qmApp.editors.QualityParameterWeightingEditor;
 import de.uni_hildesheim.sse.qmApp.editors.SourceSinkEditor;
 import de.uni_hildesheim.sse.qmApp.editors.TupleTypeEditor;
@@ -809,6 +810,12 @@ public class VariabilityModel {
         ConfigurationTableEditorFactory.registerEditorCreator("refTo(Basics::Tuple)", TupleTypeEditor.CREATOR);
         ConfigurationTableEditorFactory.registerEditorCreator("refTo(Algorithms::Algorithm)",
             DefaultAlgorithmCellEditor.CREATOR);
+        // TODO: 
+        // Advice: Use qualified type instead of qualified declaration name as there are 3 declarations and only 1 type
+        // Qualified declaration name (1 of 3): Pipelines::FamilyElement::permissibleParameters
+        // Qualified type name: setOf(refTo(Basics::Parameter))
+        ConfigurationTableEditorFactory.registerEditorCreator("setOf(refTo(Basics::Parameter))",
+            PermissibleParameterCellEditorCreator.CREATOR);
         
         // TODO: change to refTo(Families::Family), but this will affect older configurations
         ConfigurationTableEditorFactory.registerEditorCreator("Pipelines::SubPipeline::subPipelineFamily",
