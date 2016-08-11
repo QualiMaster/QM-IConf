@@ -57,6 +57,7 @@ import pipeline.impl.PipelineImpl;
 public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEditorCreator {
 
     public static final String ROOT_PARAMETER_NAME = "PipelineRoot";
+    public static final String PIPELINE_PARAMETER_NAME = "PipelineElement";
     
     private static final String IMPL_SUFFIX = "Impl";
     
@@ -462,9 +463,16 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
      * @return The {@link Pipeline} (the parent of <tt>data</tt>) as it can be processed by EASy editors.
      */
     protected Map<UIParameter, Object> createParameters(final Object data) {
-        UIParameter parameter = new UIParameter(ROOT_PARAMETER_NAME, ((EObject) data).eContainer());
         Map<UIParameter, Object> parameters = new HashMap<UIParameter, Object>();
-        parameters.put(parameter, parameter.getDefaultValue());
+
+        // Complete pipeline
+        UIParameter root = new UIParameter(ROOT_PARAMETER_NAME, ((EObject) data).eContainer());
+        parameters.put(root, root.getDefaultValue());
+        
+        // Complete pipeline element to be configured (not only its property)
+        UIParameter pipelineElement = new UIParameter(PIPELINE_PARAMETER_NAME, data);
+        parameters.put(pipelineElement, pipelineElement.getDefaultValue());
+        
         return parameters;
     }
 
