@@ -5,19 +5,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.DialogCellEditor;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Dialog;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
@@ -42,9 +42,7 @@ class PermissibleParameterDialogCellEditor extends DialogCellEditor {
      */
     private class SelectionDialog extends Dialog {
         
-        private List<String> selection;
         private Set<ConstraintSyntaxTree> selectedConstraints;
-        private Shell dialog;
 
         /**
          * Single constructor.
@@ -53,61 +51,38 @@ class PermissibleParameterDialogCellEditor extends DialogCellEditor {
         private SelectionDialog(Shell parent) {
             super(parent);
             selectedConstraints = new HashSet<>();
-            selection = PermissibleParameterDialogCellEditor.this.currentSelectionAsList;
         }
 
-        /**
-         * Opens the dialog.
-         * @return The selected constraints (references) as parseable Strings.
-         */
-        private List<String> open() {
-            createDialog();
-
+        @Override
+        protected void configureShell(Shell shell) {
+            super.configureShell(shell);
+            shell.setText("Select permissible Parameters for " + pipElement.getName());
+        }
+        
+        @Override
+        protected Point getInitialSize() {
+            return new Point(775, 150);
+        }
+        
+        @Override
+        protected boolean isResizable() {
+            return true;
+        }
+        
+        @Override
+        protected Control createDialogArea(Composite parent) {
+            Composite container = (Composite) super.createDialogArea(parent);
+            container.setLayout(new FillLayout(SWT.VERTICAL));
+            
             // Create checkboxes for possible values
-            ScrolledComposite scrollPane = new ScrolledComposite(dialog, SWT.H_SCROLL | SWT.V_SCROLL);
+            ScrolledComposite scrollPane = new ScrolledComposite(container, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
             Composite chkBoxContainer = new Composite(scrollPane, SWT.NONE);
             chkBoxContainer.setLayout(new GridLayout(2, true));
             createCheckboxArea(chkBoxContainer);
             chkBoxContainer.setSize(chkBoxContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-            scrollPane.setContent(chkBoxContainer);
+            scrollPane.setContent(chkBoxContainer);            
             
-            // Create OK and cancel button
-            Composite btnArea = new Composite(dialog, SWT.NONE);
-            btnArea.setLayout(new GridLayout(2, true));
-            Button btnOK = new Button(btnArea, SWT.PUSH);
-            btnOK.setText("OK");
-            btnOK.addSelectionListener(new SelectionListener() {
-                
-                @Override
-                public void widgetSelected(SelectionEvent evt) {
-                    selection = new ArrayList<>();
-                    for (ConstraintSyntaxTree selectedCST : selectedConstraints) {
-                        String parseableCSTString = StringProvider.toIvmlString(selectedCST);
-                        selection.add(parseableCSTString);
-                    }
-                    SelectionDialog.this.dialog.close();
-                }
-                
-                @Override
-                public void widgetDefaultSelected(SelectionEvent evt) {}
-            });
-            Button btnCancel = new Button(btnArea, SWT.PUSH);
-            btnCancel.setText("Cancel");
-            btnCancel.addSelectionListener(new SelectionListener() {
-                
-                @Override
-                public void widgetSelected(SelectionEvent evt) {
-                    // Keep previous selection and close dialog
-                    SelectionDialog.this.dialog.close();
-                }
-                
-                @Override
-                public void widgetDefaultSelected(SelectionEvent evt) {}
-            });
-            btnArea.setSize(btnArea.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-            
-            openDialog();
-            return selection;
+            return container;
         }
 
         /**
@@ -147,29 +122,29 @@ class PermissibleParameterDialogCellEditor extends DialogCellEditor {
             }
         }
 
-        /**
-         * Makes the dialog visible and runs the dialog until it is closes.
-         */
-        private void openDialog() {
-            dialog.open();
-            Display display = getParent().getDisplay();
-            while (!dialog.isDisposed()) {
-                if (!display.readAndDispatch()) {
-                    display.sleep();
-                }
-            }
-        }
-
-        /**
-         * Creates the dialog.
-         */
-        private void createDialog() {
-            Shell parent = getParent();
-            dialog = new Shell(parent, SWT.SHELL_TRIM | SWT.APPLICATION_MODAL);
-            dialog.setText("Select permissible Parameters for " + pipElement.getName());
-            dialog.setLayout(new FillLayout(SWT.VERTICAL));
-            dialog.setSize(750, 155);
-        }
+//        /**
+//         * Makes the dialog visible and runs the dialog until it is closes.
+//         */
+//        private void openDialog() {
+//            dialog.open();
+//            Display display = getParent().getDisplay();
+//            while (!dialog.isDisposed()) {
+//                if (!display.readAndDispatch()) {
+//                    display.sleep();
+//                }
+//            }
+//        }
+//
+//        /**
+//         * Creates the dialog.
+//         */
+//        private void createDialog() {
+//            Shell parent = getParent();
+//            dialog = new Shell(parent, SWT.SHELL_TRIM | SWT.APPLICATION_MODAL);
+//            dialog.setText("Select permissible Parameters for " + pipElement.getName());
+//            dialog.setLayout(new FillLayout(SWT.VERTICAL));
+//            dialog.setSize(750, 155);
+//        }
     }
 
     private List<ConstraintSyntaxTree> cstValues;
@@ -205,7 +180,16 @@ class PermissibleParameterDialogCellEditor extends DialogCellEditor {
 
     @Override
     protected Object openDialogBox(Control cellEditorWindow) {
+        // null = no chane / cancel pressed
+        List<String> selection = null;
         SelectionDialog dialog = new SelectionDialog(cellEditorWindow.getShell());
-        return dialog.open();
+        if (dialog.open() == Window.OK) {
+            selection = new ArrayList<>();
+            for (ConstraintSyntaxTree selectedCST : dialog.selectedConstraints) {
+                String parseableCSTString = StringProvider.toIvmlString(selectedCST);
+                selection.add(parseableCSTString);
+            }
+        }
+        return selection;
     }
 }
