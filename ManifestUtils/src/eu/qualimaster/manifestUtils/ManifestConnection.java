@@ -20,9 +20,7 @@ import java.security.Security;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -83,6 +81,7 @@ public class ManifestConnection {
     private static final String SOURCES_JAR = "-sources.jar";
     private static final String JAR = ".jar";
     private static final String POM_NAME = "pom.xml";
+    private static final String POM_DEST_NAME = ".pom";
     private static final String METAFILE_NAME = "maven-metadata.xml";
     
     private static File ivyOut = null;
@@ -972,7 +971,7 @@ public class ManifestConnection {
         testRes.setName("publish_" + repository);
         testRes.setRoot(repository);
         for (Object pattern : testRes.getArtifactPatterns()) {
-            System.out.println("ArtifactPattern: " + pattern);
+            System.out.println("ArtifactPatter  n: " + pattern);
         }        
         
         String targetPath = file.substring(0, file.lastIndexOf(File.separator));
@@ -1013,7 +1012,8 @@ public class ManifestConnection {
             FTPSConnector.getInstance().initialize(dest);
             FTPSHandler urlPostHandler = new FTPSHandler();
             urlPostHandler.uploadWithoutIvy(new File(pomPath + "/" + POM_NAME), 
-                new URL(destination + POM_NAME), monitor);
+                new URL(destination + info.getArtifactId() + "-" + info.getVersion() 
+                + POM_DEST_NAME), monitor);
             urlPostHandler.uploadWithoutIvy(new File(targetPath + "/" + info.getArtifactId() + "-" + info.getVersion() 
                 + JAR_WITH_DEPENDENCIES), new URL(destination + info.getArtifactId() + "-" + info.getVersion() 
                 + JAR_WITH_DEPENDENCIES), monitor);

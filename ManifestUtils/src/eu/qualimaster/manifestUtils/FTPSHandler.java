@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -184,7 +185,20 @@ public class FTPSHandler extends BasicURLHandler {
         String hashType) throws MalformedURLException, IOException, FileNotFoundException, CopyStreamException,
         NoSuchAlgorithmException {
         
-        URL url = new URL(dest, source.getName() + "." + hashType.toLowerCase());
+        String name = null;
+        try {
+            String stringUrl = dest.toURI().toString();
+            name = stringUrl.substring(stringUrl.lastIndexOf('/') + 1, stringUrl.length());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        
+        if (null == name) {
+            name = source.getName();
+        }
+        
+        
+        URL url = new URL(dest, name + "." + hashType.toLowerCase());
         upload(getHash(source, hashType), url, client, monitor, false);
     }
     
