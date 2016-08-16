@@ -33,8 +33,6 @@ import javax.tools.ToolProvider;
 import org.apache.ivy.Ivy;
 import org.apache.ivy.ant.IvyAntSettings;
 import org.apache.ivy.ant.IvyConvertPom;
-import org.apache.ivy.ant.IvyPublish;
-import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
@@ -48,7 +46,6 @@ import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.plugins.resolver.ChainResolver;
 import org.apache.ivy.plugins.resolver.IBiblioResolver;
 import org.apache.ivy.util.Credentials;
-import org.apache.ivy.util.url.URLHandlerRegistry;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.Reference;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -57,8 +54,8 @@ import eu.qualimaster.manifestUtils.PomReader.PomInfo;
 import eu.qualimaster.manifestUtils.data.Field;
 import eu.qualimaster.manifestUtils.data.FieldType;
 import eu.qualimaster.manifestUtils.data.Item;
-import eu.qualimaster.manifestUtils.data.JarInfo;
 import eu.qualimaster.manifestUtils.data.Manifest;
+import eu.qualimaster.manifestUtils.data.Metadata;
 import eu.qualimaster.manifestUtils.data.Parameter;
 import eu.qualimaster.manifestUtils.data.Parameter.ParameterType;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
@@ -82,6 +79,11 @@ public class ManifestConnection {
      * </ul>
      */
     private static final String CLASS_NAMES_TO_OMIT = "^.*package-info.*$";
+    private static final String JAR_WITH_DEPENDENCIES = "-jar-with-dependencies.jar";
+    private static final String SOURCES_JAR = "-sources.jar";
+    private static final String JAR = ".jar";
+    private static final String POM_NAME = "pom.xml";
+    private static final String METAFILE_NAME = "maven-metadata.xml";
     
     private static File ivyOut = null;
     
@@ -896,11 +898,11 @@ public class ManifestConnection {
      * @param pomPath The pom file for publishing.
      * @param repository The nexus repository. <br>
      *        Example: "https://nexus.sse.uni-hildesheim.de/content/repositories/qmproject/"
-     * @param version the version of the artifact.
      * @param forceOverwrite forces an overwrite in the nexus.
+     * @param monitor The ProgressObserver to track progress.
      */
-    public void publishWithPom(String file, String pomPath, String repository, 
-            String version, boolean forceOverwrite) {
+    public void publishWithPom(String file, String pomPath, String repository, boolean forceOverwrite, 
+            ProgressObserver monitor) {
         
         File ivyFile = new File(pomPath);
         if (!ivyFile.exists()) {
@@ -914,8 +916,6 @@ public class ManifestConnection {
         ivyFile = new File(ivyFile.getAbsolutePath() + "/ivy.xml");
         
         System.out.println("Publishing with POM...");
-        
-        
         System.out.println(ivyFile.getAbsolutePath());
         System.out.println(pomPath);
         IvyConvertPom converter = new IvyConvertPom();
@@ -926,14 +926,16 @@ public class ManifestConnection {
         
         IvyAntSettings settings = new IvyAntSettings();
         settings.setProject(project);
-        project.addReference("ivy.instance", settings);
         
+        //creating a "dummy" project for the converter.
+        project.addReference("ivy.instance", settings);
         project.setBaseDir(new File("."));
         project.setDefault("all");
         project.setName("ConvertPomToIvy");
         project.setBasedir(".");
-        
         Reference ref = new Reference(project, "ConvertPomToIvy"); 
+        
+        //create a wrapper for the ivy settings to access additional (hidden) settings.
         IvySettingsWrapperTask wrapper = new IvySettingsWrapperTask();
         wrapper.setSettings(this.ivy.getSettings());
         wrapper.setProject(project);
@@ -948,7 +950,7 @@ public class ManifestConnection {
             System.out.println("PomInfo: " + info.toString());
         }
                 
-        publish(file, ivyFile.getAbsolutePath(), repository, info, forceOverwrite);
+        publish(file, repository, info, forceOverwrite, monitor);
 
     }
     
@@ -956,48 +958,28 @@ public class ManifestConnection {
      * Publishes an artifact.
      * @param file The file to publish (should be a *.jar) <br>
      *        Example: "C:/Artifacts/test.jar"
-     * @param ivyFile The ivy file for publishing.
      * @param repository The nexus repository. <br>
      *        Example: "https://nexus.sse.uni-hildesheim.de/content/repositories/qmproject/"
      * @param info Pom information.
      * @param forceOverwrite forces an overwrite in the nexus.
+     * @param monitor The ProgressObserver to track progress.
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public void publish(String file, String ivyFile, String repository, 
-            PomInfo info, boolean forceOverwrite) {
+    public void publish(String file, String repository, 
+            PomInfo info, boolean forceOverwrite, ProgressObserver monitor) {
         
         IBiblioResolver testRes = new IBiblioResolver();
         testRes.setName("publish_" + repository);
         testRes.setRoot(repository);
         for (Object pattern : testRes.getArtifactPatterns()) {
             System.out.println("ArtifactPattern: " + pattern);
-        }
-        testRes.setM2compatible(true);
-        testRes.setUseMavenMetadata(true);
-        testRes.setUsepoms(true);
-
-        if (null == this.ivy.getSettings().getResolver("publish_" + repository)) {
-            this.ivy.getSettings().addResolver(testRes);
-        }
+        }        
         
-        //change the server side pattern, called local in Ivy for some reason...
-        Map<String, String> vars = new HashMap<String, String>();
-        vars.put("ivy.local.default.artifact.pattern", "[organisation]/[module]/[revision]/[artifact].[ext]");
-        this.ivy.getSettings().addAllVariables(vars, true);
-        System.out.println(this.ivy.getSettings().getVariable("ivy.local.default.artifact.pattern"));
-        
-        //Is undefined, because ivy needs a Collection<Pattern> with actually just Strings inside it...
-        Collection srcArtifactPattern = new ArrayList();
         String targetPath = file.substring(0, file.lastIndexOf(File.separator));
         String pomPath = targetPath.substring(0, targetPath.lastIndexOf(File.separator));
         System.out.println("POMPATH = " + pomPath);
-//        System.out.println(file.substring(0, file.lastIndexOf(File.separator)) + "\\[module].[ext]");
-//        srcArtifactPattern.add(targetPath + "\\[artifact](-[revision])-jar-with-dependencies.[ext]");
-//        srcArtifactPattern.add(pomPath + "\\pom.xml");
-        srcArtifactPattern.add(targetPath + "\\[artifact](-[revision])-[type]s.[ext]");
-        srcArtifactPattern.add(targetPath + "\\[artifact](-[revision]).[ext]");
-        
-        //[organisation]/[module]/[revision]/[artifact].[ext]
+
+
         ModuleRevisionId ri;
         if (null != info) {
             ri = ModuleRevisionId.newInstance(info.getGroupId(), info.getArtifactId(), info.getVersion());
@@ -1007,79 +989,49 @@ public class ManifestConnection {
         PublishOptions options = new PublishOptions();
         options.setHaltOnMissing(true);
         options.setOverwrite(forceOverwrite);
-        options.setSrcIvyPattern(ivyFile);
         options.setUpdate(true);
         options.setPubrevision(info.getVersion());
         
-//        Artifact[] extraArtifacts = new Artifact[2];     
-//        options.setExtraArtifacts(extraArtifacts);
+        MetaGenerator gen = new MetaGenerator();
+        Metadata meta = new Metadata();
+        meta.setLastUpdated(meta.generateTimestamp());
+        meta.setArtifactId(info.getArtifactId());
+        meta.setGroupId(info.getGroupId());
+        meta.addVersion(info.getVersion());
+        if (!info.getVersion().contains("SNAPSHOT")) {
+            meta.setReleaseVersion(info.getVersion());
+        }
+        gen.writeMetaData(meta, new File(targetPath + "/" + METAFILE_NAME));
+        
         try {
             URL dest = new URL(testRes.getRoot());
+            
+            String preDestination = dest + "/" + info.getGroupPath() 
+                + info.getArtifactId() + "/";
+            String destination = preDestination + info.getVersion() + "/";
+            
             FTPSConnector.getInstance().initialize(dest);
-            UrlPostHandler urlPostHandler = new UrlPostHandler();
-            urlPostHandler.upload(new File(pomPath + "/pom.xml"), new URL(dest + info.getGroupPath() 
-                + info.getArtifactId() + "/" + info.getVersion() + "/" + "pom.xml"), null); //DIRTY DIRTY DIRTY TODO:
-            urlPostHandler.upload(new File(targetPath + "/" + info.getArtifactId() + "-" + info.getVersion() 
-                + "-jar-with-dependencies.jar"), new URL(dest + "/" + info.getGroupPath() 
-                + info.getArtifactId() + "/" + info.getVersion() + "/" + info.getArtifactId() + "-" + info.getVersion() 
-                + "-jar-with-dependencies.jar"), null);
-            URLHandlerRegistry.setDefault(urlPostHandler);
-            ivy.publish(ri, srcArtifactPattern, "publish_" + repository, options);
+            FTPSHandler urlPostHandler = new FTPSHandler();
+            urlPostHandler.uploadWithoutIvy(new File(pomPath + "/" + POM_NAME), 
+                new URL(destination + POM_NAME), monitor);
+            urlPostHandler.uploadWithoutIvy(new File(targetPath + "/" + info.getArtifactId() + "-" + info.getVersion() 
+                + JAR_WITH_DEPENDENCIES), new URL(destination + info.getArtifactId() + "-" + info.getVersion() 
+                + JAR_WITH_DEPENDENCIES), monitor);
+            urlPostHandler.uploadWithoutIvy(new File(targetPath + "/" + info.getArtifactId() + "-" + info.getVersion() 
+                + JAR), new URL(destination + info.getArtifactId() + "-" + info.getVersion() 
+                + JAR), monitor);
+            urlPostHandler.uploadWithoutIvy(new File(targetPath + "/" + info.getArtifactId() + "-" + info.getVersion() 
+                + SOURCES_JAR), new URL(destination + info.getArtifactId() + "-" + info.getVersion() 
+                + SOURCES_JAR), monitor);
+            urlPostHandler.uploadWithoutIvy(new File(targetPath + "/" + METAFILE_NAME), 
+                new URL(preDestination + METAFILE_NAME), monitor);
+
         } catch (IOException exc) {
             exc.printStackTrace();
         } catch (IllegalStateException exc) {
             exc.printStackTrace();
         } finally {
             FTPSConnector.getInstance().disconnect();
-        }
-        
-    }
-    
-    /**
-     * Publishes an artifact.
-     * @param dir The folder to publish<br>
-     *        Example: "C:/Artifacts/test.jar"
-     * @param pomFile The pom file for publishing.
-     * @param repository The nexus repository. <br>
-     *        Example: "https://nexus.sse.uni-hildesheim.de/content/repositories/qmproject/"
-     * @param forceOverwrite forces an overwrite in the nexus.
-     * @param monitor The ProgressObserver to monitor the current progress.
-     * @throws ManifestUtilsException 
-     */
-    public void publishDirWithPom(String dir, String pomFile, String repository, 
-            boolean forceOverwrite, ProgressObserver monitor) throws ManifestUtilsException {
-        
-        boolean failed = false;
-        if (null != pomFile) {
-            File ivyFile = new File(pomFile);
-            if (null != ivyFile) {
-                ivyFile = ivyFile.getParentFile();
-                if (null != ivyFile) {
-                    ivyFile = new File(ivyFile.getAbsolutePath() + "/ivy.xml");
-                    
-                    System.out.println("Publishing with POM...");
-                    
-                    IvyConvertPom converter = new IvyConvertPom();
-                    converter.setPomFile(new File(pomFile));
-            
-                    converter.setIvyFile(ivyFile);
-                    
-                    converter.setProject(new Project());
-                    converter.doExecute();
-                    
-                    System.out.println("Converted to ivy...");
-                    
-                    publishDir(dir, ivyFile.getAbsolutePath(), repository, forceOverwrite, monitor);
-                } else {
-                    failed = true;
-                }
-            }
-        } else {
-            failed = true;
-        }
-        
-        if (failed) {
-            throw new ManifestUtilsException("Unable to convert pom: '" + pomFile + "'!");
         }
         
     }
@@ -1094,7 +1046,7 @@ public class ManifestConnection {
      * @param forceOverwrite forces an overwrite in the nexus.
      * @param monitor The ProgressObserver to monitor the current progress.
      */
-    @SuppressWarnings({ "rawtypes", "unchecked", "unused" })
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void publishDir(String dir,  String ivyFile, String repository, 
             boolean forceOverwrite, ProgressObserver monitor) {
         
@@ -1438,27 +1390,6 @@ public class ManifestConnection {
      */
     public List<Class<?>> getClassList(File pom) {
         return null;
-    }
-    
-    /**
-     * Returns a list of all JarInfos for the pom.
-     * @param pom The pom file to resolve by.
-     * @return A list of JarInfo, can be empty.
-     */
-    public List<JarInfo> getJarInfo(File pom) {
-        List<JarInfo> result = new ArrayList<JarInfo>();
-        
-        List<File> jars = getJarFiles(pom);
-        URL[] urls = new URL[jars.size()];
-        for (int i = 0; i < jars.size(); i++) {
-            try {
-                urls[i] = jars.get(i).toURI().toURL();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-        }
-        
-        return result;
     }
     
     /**
@@ -1813,22 +1744,6 @@ public class ManifestConnection {
      */
     public String getMainArtifactName() {
         return this.mainArtifactName;
-    }
-
-    /**
-     * Main method for regular quick testing of singular functions.
-     * @param args The default arguments.
-     */
-    public static void main(String[] args) {
-        
-        ManifestConnection con = new ManifestConnection();
-        try {
-            con.publishDirWithPom("C:/TEST-thing/if-gen/target", "C:/TEST-thing/if-gen/pom.xml", 
-                    "https://nexus.sse.uni-hildesheim.de/content/repositories/qmproject/", false, null);
-        } catch (ManifestUtilsException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
     
 }
