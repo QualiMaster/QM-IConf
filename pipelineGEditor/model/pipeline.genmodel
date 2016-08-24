@@ -33,9 +33,11 @@
     </genClasses>
     <genClasses ecoreClass="pipeline.ecore#//Source">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Source/source"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Source/permissibleParameters"/>
     </genClasses>
     <genClasses ecoreClass="pipeline.ecore#//Sink">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Sink/sink"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//Sink/permissibleParameters"/>
     </genClasses>
     <genClasses ecoreClass="pipeline.ecore#//ReplaySink"/>
     <genClasses image="false" ecoreClass="pipeline.ecore#//ProcessingElement"/>
@@ -43,6 +45,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//FamilyElement/family"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//FamilyElement/isConnector"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//FamilyElement/default"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//FamilyElement/permissibleParameters"/>
     </genClasses>
     <genClasses ecoreClass="pipeline.ecore#//DataManagementElement">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//DataManagementElement/dataManagement"/>

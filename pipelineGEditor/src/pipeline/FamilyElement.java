@@ -2,6 +2,8 @@
  */
 package pipeline;
 
+import org.eclipse.emf.common.util.EList;
+
 
 /**
  * <!-- begin-user-doc -->
@@ -14,6 +16,7 @@ package pipeline;
  *   <li>{@link pipeline.FamilyElement#getFamily <em>Family</em>}</li>
  *   <li>{@link pipeline.FamilyElement#getIsConnector <em>Is Connector</em>}</li>
  *   <li>{@link pipeline.FamilyElement#getDefault <em>Default</em>}</li>
+ *   <li>{@link pipeline.FamilyElement#getPermissibleParameters <em>Permissible Parameters</em>}</li>
  * </ul>
  * </p>
  *
@@ -101,5 +104,21 @@ public interface FamilyElement extends ProcessingElement {
 	 * @generated
 	 */
 	void setDefault(String value);
+
+				/**
+	 * Returns the value of the '<em><b>Permissible Parameters</b></em>' attribute list.
+	 * The list contents are of type {@link java.lang.String}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Permissible Parameters</em>' attribute list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Permissible Parameters</em>' attribute list.
+	 * @see pipeline.PipelinePackage#getFamilyElement_PermissibleParameters()
+	 * @model
+	 * @generated
+	 */
+	EList<String> getPermissibleParameters();
 
 } // FamilyElement

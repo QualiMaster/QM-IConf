@@ -38,7 +38,7 @@ import net.ssehub.easy.varModel.model.values.ReferenceValue;
  * @author El-Sharkawy
  *
  */
-public class FamilySelectionCellEditor extends AbstractChangeableDropBoxCellEditorCreator {
+public class FamilySelectionCellEditor extends AbstractChangeableConstraintCellEditorCreator {
     
     public static final IEditorCreator CREATOR = new FamilySelectionCellEditor();
     

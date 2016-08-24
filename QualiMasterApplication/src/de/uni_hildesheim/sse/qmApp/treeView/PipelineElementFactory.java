@@ -69,7 +69,11 @@ import net.ssehub.easy.varModel.persistency.StringProvider;
 public class PipelineElementFactory implements IConfigurableElementFactory {
 
     public static final IConfigurableElementFactory INSTANCE = new PipelineElementFactory();
-
+    private static final String DEFAULT_POM_NAME = "pom.xml";
+    private static final String TARGET_FOLDER_NAME = "target";
+    private static final String JAR_SUFFIX = ".jar";
+    private static final String PIPELINES_DIR = "pipelines";
+    
     /**
      * Implements a deferred editor input so that missing models are created when the editor requests them.
      * 
@@ -531,44 +535,34 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
         IDecisionVariable artifact = pipelineVar.getNestedElement("artifact");
         //example: eu.qualimaster:PriorityPip:0.0.2-SNAPSHOT
         String artifactName = artifact.getValue().getValue().toString();
-        
-        
-        
+
         EclipseProgressObserver obs = new EclipseProgressObserver();
         obs.register(monitor);
         
         ManifestConnection con = new ManifestConnection();
         File instFile = Location.getInstantiationFolder(); 
-        //SessionModel.INSTANCE.getInstantationFolder();
-        //TODO: commented line is a DIRTY hack for quicker testing of the publishing feature,
-        //since the instantiation path is discarded once the application is closed.
-        //instFile = new File("C:\\Instant_Test"); 
+
         if (null != instFile && instFile.exists()) {
             
             String instDir = instFile.getAbsolutePath();
-            String pipelineDir = instDir + File.separator + "pipelines"; //TODO: move to constants or find in model!!!!
+            String pipelineDir = instDir + File.separator + PIPELINES_DIR;
             String[] artifactNameSplitted = artifactName.split(":")[0].split("\\.");
             for (int i = 0; i < artifactNameSplitted.length; i++) {
                 pipelineDir += File.separator + artifactNameSplitted[i];
             }
             
             pipelineDir += File.separator + artifactName.split(":")[1];
-            String pomFile = pipelineDir + File.separator + "pom.xml";
-            String dir = pipelineDir + File.separator + "target";
+            String pomFile = pipelineDir + File.separator + DEFAULT_POM_NAME;
+            String dir = pipelineDir + File.separator + TARGET_FOLDER_NAME;
             String jarName = artifactName.split(":", 2)[1].replace(":", "-");
-            String jarFile = dir + File.separator + jarName + ".jar";
+            String jarFile = dir + File.separator + jarName + JAR_SUFFIX;
             
             //TODO: This is a testing hack. For safer testing all uploads are redirected to a test dir!
-            final String deploymentUrl = ModelAccess.getDeploymentUrl() 
-                   + "eu/qualimaster/PatriksTestDeployment";
+            final String deploymentUrl = ModelAccess.getDeploymentUrl();
+//                   + "eu/qualimaster/PatriksTestDeployment";
             System.out.println("##### " + jarFile);
-            
-//            try {
-                //con.publishDirWithPom(dir, pomFile, deploymentUrl, overwrite, obs);
-            con.publishWithPom(jarFile, pomFile, deploymentUrl, artifactName.split(":")[2], overwrite);
-//            } catch (ManifestUtilsException e) {
-//                Dialogs.showErrorDialog("ERROR", e.getMessage());
-//            }
+            con.publishWithPom(jarFile, pomFile, deploymentUrl, overwrite, obs);
+
         } else {
             Dialogs.showErrorDialog("Error", "Unable to locate instantiation folder at: '" + instFile + "'.");
         }

@@ -13,6 +13,7 @@ import org.eclipse.emf.common.util.EList;
  * The following features are supported:
  * <ul>
  *   <li>{@link pipeline.Source#getSource <em>Source</em>}</li>
+ *   <li>{@link pipeline.Source#getPermissibleParameters <em>Permissible Parameters</em>}</li>
  * </ul>
  * </p>
  *
@@ -48,5 +49,21 @@ public interface Source extends PipelineNode
 	 * @generated
 	 */
     void setSource(Integer value);
+
+/**
+	 * Returns the value of the '<em><b>Permissible Parameters</b></em>' attribute list.
+	 * The list contents are of type {@link java.lang.String}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Permissible Parameters</em>' attribute list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Permissible Parameters</em>' attribute list.
+	 * @see pipeline.PipelinePackage#getSource_PermissibleParameters()
+	 * @model
+	 * @generated
+	 */
+	EList<String> getPermissibleParameters();
 
 } // Source

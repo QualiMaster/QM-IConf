@@ -41,7 +41,7 @@ import qualimasterapplication.Activator;
  * @author El-Sharkawy
  *
  */
-public class TupleTypeEditor extends AbstractChangeableDropBoxCellEditorCreator {
+public class TupleTypeEditor extends AbstractChangeableConstraintCellEditorCreator {
 
     public static final IEditorCreator CREATOR = new TupleTypeEditor();
     

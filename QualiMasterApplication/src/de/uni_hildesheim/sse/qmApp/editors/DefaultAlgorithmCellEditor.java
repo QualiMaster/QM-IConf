@@ -23,7 +23,7 @@ import net.ssehub.easy.varModel.model.values.ReferenceValue;
  * @author El-Sharkawy
  *
  */
-public class DefaultAlgorithmCellEditor extends AbstractChangeableDropBoxCellEditorCreator {
+public class DefaultAlgorithmCellEditor extends AbstractChangeableConstraintCellEditorCreator {
 
     public static final IEditorCreator CREATOR = new DefaultAlgorithmCellEditor();
     

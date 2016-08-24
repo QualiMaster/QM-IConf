@@ -162,7 +162,7 @@ public class PipelineTranslationOperations {
         DecisionVariableDeclaration pipelineVariable = null;
         if (!pipelineList.isEmpty() && pipelineList.size() == 1) {
             // add pipeline elements
-            pipeline = pipelineList.get(0); //defautly only one pipeline in one editor
+            pipeline = pipelineList.get(0); //default only one pipeline in one editor
             pipelineVariable = addPipelineElement(pipeline, newProject, context);
             handleDisconnectedElements(newProject, context); //handle the disconnected elements in the pipeline
             String pVariableName = pipelineVariable.getName();
@@ -575,8 +575,11 @@ public class PipelineTranslationOperations {
         }
         if (!fList.isEmpty()) {
             sourceCompound.put("output", fList.toArray());
-        }        
+        }
 
+        List<String> permParameters = source.getPermissibleParameters();
+        storePermissibleParameters(sourceCompound, permParameters);
+        
         addPipelineElementToProject(source, destProject, decisionVariable, sourceCompound);
         pipProcessedNodes.add(source);
         return decisionVariable.getName();
@@ -724,6 +727,8 @@ public class PipelineTranslationOperations {
         
         String algorithmRef = familyElement.getDefault();
         convertCSTBasedReference(familyElementCompound, algorithmRef, "default");
+        List<String> permParameters = familyElement.getPermissibleParameters();
+        storePermissibleParameters(familyElementCompound, permParameters);
         
         addPipelineElementToProject(familyElement, destProject, decisionVariable, familyElementCompound);
         context.addFamilyMapping(familyElement, decisionVariable.getName());
@@ -735,6 +740,33 @@ public class PipelineTranslationOperations {
         }
 
         return decisionVariable.getName();
+    }
+
+    /**
+     * Stores selected permissible parameters in the given map, which in turn is used to save the value for a given
+     * compound.
+     * @param compoundValue The map which is used to create the value for a given compound.
+     * @param permissibleParameters The selected permissible parameters.
+     */
+    private static void storePermissibleParameters(Map<String, Object> compoundValue,
+        List<String> permissibleParameters) {
+        
+        if (null != permissibleParameters && !permissibleParameters.isEmpty()) {
+            List<ConstraintSyntaxTree> refValues = new ArrayList<>();
+            for (int i = 0, end = permissibleParameters.size(); i < end; i++) {
+                String parseableCST = permissibleParameters.get(i);
+                try {
+                    ConstraintSyntaxTree cstValue = ModelUtility.INSTANCE.createExpression(parseableCST,
+                        ModelAccess.getModel(VariabilityModel.Definition.TOP_LEVEL));
+                    refValues.add(cstValue);
+                } catch (CSTSemanticException e) {
+                    Activator.getLogger(PipelineTranslationOperations.class).exception(e);
+                } catch (ConstraintSyntaxException e) {
+                    Activator.getLogger(PipelineTranslationOperations.class).exception(e);
+                }
+            }
+            compoundValue.put(QmConstants.SLOT_PIPELINE_ELEMENT_PERMISSIBLE_PARAMETERS, refValues.toArray());
+        }
     }
 
     /**
@@ -824,6 +856,10 @@ public class PipelineTranslationOperations {
             sinkCompound.put("sink",
                 BasicIVMLModelOperations.getDeclaration(sinkVariable).getName());
         }
+        
+        List<String> permParameters = sink.getPermissibleParameters();
+        storePermissibleParameters(sinkCompound, permParameters);
+        
         addPipelineElementToProject(sink, destProject, decisionVariable, sinkCompound);
         context.addSinkMapping(sink, decisionVariable.getName());
         pipProcessedNodes.add(sink);
@@ -879,11 +915,6 @@ public class PipelineTranslationOperations {
         System.arraycopy(preObjectList, 0, postObjectList, 0, preObjectList.length);
         postObjectList[preObjectList.length] = "constraints";
         postObjectList[preObjectList.length + 1] = cstValList.toArray();
-        
-//        ArrayList<Object> objList = new ArrayList<Object>(Arrays.asList(preObjectList));
-//        objList.add("constraints");
-//        objList.add(cstValList.toArray());
-//        return objList.toArray();
 
         return postObjectList;
     }

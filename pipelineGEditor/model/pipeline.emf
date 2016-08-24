@@ -43,11 +43,13 @@ abstract class PipelineNode extends PipelineElement {
 @gmf.node(figure="svg", svg.uri="platform:/plugin/pipelineGEditor/svg/source.svg", size="60,60")
 class Source extends PipelineNode {
   attr Integer source = -1; // references become integers holding the global index of all defined variables, -1 is unselected, count+1 = nullValue if supported
+  attr String[*] permissibleParameters; // List of references
 }
 
 @gmf.node(figure="svg", svg.uri="platform:/plugin/pipelineGEditor/svg/sink.svg", size="55,55")
 class Sink extends PipelineNode {
   attr Integer sink = -1; // references become integer (see above)
+  attr String[*] permissibleParameters; // List of references
 }
 
 @gmf.node(figure="svg", svg.uri="platform:/plugin/pipelineGEditor/svg/ReplaySink.svg", size="55,55")
@@ -63,6 +65,7 @@ class FamilyElement extends ProcessingElement {
   attr Integer family = -1; // references become integer (see above)
   attr Boolean isConnector = false; // Should only be visible if Pipeline.isSubPipeline = true, can be a Boolean, since this is not modeled in IVML
   attr String default;
+  attr String[*] permissibleParameters; // List of references
 }
 
 @gmf.node(figure="svg", svg.uri="platform:/plugin/pipelineGEditor/svg/datamanagement.svg", size="60,60")

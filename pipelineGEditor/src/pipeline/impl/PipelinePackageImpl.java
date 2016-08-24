@@ -388,6 +388,15 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 
 /**
 	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getSource_PermissibleParameters() {
+		return (EAttribute)sourceEClass.getEStructuralFeatures().get(1);
+	}
+
+/**
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -403,6 +412,15 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 	 */
     public EAttribute getSink_Sink() {
 		return (EAttribute)sinkEClass.getEStructuralFeatures().get(0);
+	}
+
+/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getSink_PermissibleParameters() {
+		return (EAttribute)sinkEClass.getEStructuralFeatures().get(1);
 	}
 
 /**
@@ -458,6 +476,15 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 	 */
 	public EAttribute getFamilyElement_Default() {
 		return (EAttribute)familyElementEClass.getEStructuralFeatures().get(2);
+	}
+
+/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getFamilyElement_PermissibleParameters() {
+		return (EAttribute)familyElementEClass.getEStructuralFeatures().get(3);
 	}
 
 /**
@@ -536,9 +563,11 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 
 		sourceEClass = createEClass(SOURCE);
 		createEAttribute(sourceEClass, SOURCE__SOURCE);
+		createEAttribute(sourceEClass, SOURCE__PERMISSIBLE_PARAMETERS);
 
 		sinkEClass = createEClass(SINK);
 		createEAttribute(sinkEClass, SINK__SINK);
+		createEAttribute(sinkEClass, SINK__PERMISSIBLE_PARAMETERS);
 
 		replaySinkEClass = createEClass(REPLAY_SINK);
 
@@ -548,6 +577,7 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 		createEAttribute(familyElementEClass, FAMILY_ELEMENT__FAMILY);
 		createEAttribute(familyElementEClass, FAMILY_ELEMENT__IS_CONNECTOR);
 		createEAttribute(familyElementEClass, FAMILY_ELEMENT__DEFAULT);
+		createEAttribute(familyElementEClass, FAMILY_ELEMENT__PERMISSIBLE_PARAMETERS);
 
 		dataManagementElementEClass = createEClass(DATA_MANAGEMENT_ELEMENT);
 		createEAttribute(dataManagementElementEClass, DATA_MANAGEMENT_ELEMENT__DATA_MANAGEMENT);
@@ -620,9 +650,11 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 
 		initEClass(sourceEClass, Source.class, "Source", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getSource_Source(), ecorePackage.getEIntegerObject(), "source", "-1", 0, 1, Source.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getSource_PermissibleParameters(), ecorePackage.getEString(), "permissibleParameters", null, 0, -1, Source.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(sinkEClass, Sink.class, "Sink", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getSink_Sink(), ecorePackage.getEIntegerObject(), "sink", "-1", 0, 1, Sink.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getSink_PermissibleParameters(), ecorePackage.getEString(), "permissibleParameters", null, 0, -1, Sink.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(replaySinkEClass, ReplaySink.class, "ReplaySink", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
@@ -632,6 +664,7 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 		initEAttribute(getFamilyElement_Family(), ecorePackage.getEIntegerObject(), "family", "-1", 0, 1, FamilyElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getFamilyElement_IsConnector(), ecorePackage.getEBooleanObject(), "isConnector", "false", 0, 1, FamilyElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getFamilyElement_Default(), ecorePackage.getEString(), "default", null, 0, 1, FamilyElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getFamilyElement_PermissibleParameters(), ecorePackage.getEString(), "permissibleParameters", null, 0, -1, FamilyElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(dataManagementElementEClass, DataManagementElement.class, "DataManagementElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getDataManagementElement_DataManagement(), ecorePackage.getEIntegerObject(), "dataManagement", "-1", 0, 1, DataManagementElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

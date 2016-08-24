@@ -119,9 +119,16 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
 	 * @generated
 	 */
 	protected IFigure createNodeShape() {
-	    FamilyElement model = (FamilyElement) ((ShapeImpl) getModel()).getElement();
+		/*
+         * Not generated -> hand crafted code, copied from
+         * http://www.eclipse.org/epsilon/doc/articles/eugenia-nodes-with-runtime-images/ ;-)
+         */
+		FamilyElement model = (FamilyElement) ((ShapeImpl) getModel()).getElement();
 	    Boolean isConnector = model.getIsConnector();
 	    return primaryShape = new FamilyElementFigure(isConnector);
+	    /*
+         * end of manually added code
+         */
 	}
 
 	/**
@@ -240,11 +247,11 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
 	 */
 	protected void handleNotificationEvent(Notification event) {
 		if (event.getNotifier() == getModel()
-                && EcorePackage.eINSTANCE.getEModelElement_EAnnotations()
-                        .equals(event.getFeature())) {
-            handleMajorSemanticChange();
-        } else {
-            /*
+				&& EcorePackage.eINSTANCE.getEModelElement_EAnnotations()
+						.equals(event.getFeature())) {
+			handleMajorSemanticChange();
+		} else {
+			/*
              * Not generated -> hand crafted code, copied from
              * http://www.eclipse.org/epsilon/doc/articles/eugenia-nodes-with-runtime-images/ ;-)
              */
@@ -262,8 +269,8 @@ public class FamilyElementEditPart extends AbstractBorderedShapeEditPart {
             /*
              * end of manually added code
              */
-            super.handleNotificationEvent(event);
-        }
+			super.handleNotificationEvent(event);
+		}
 	}
 
 	/**
