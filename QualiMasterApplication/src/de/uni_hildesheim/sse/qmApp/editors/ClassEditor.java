@@ -16,7 +16,7 @@
 package de.uni_hildesheim.sse.qmApp.editors;
 
 import static eu.qualimaster.easy.extension.QmConstants.SLOT_ALGORITHM_DESCRIPTION;
-import static eu.qualimaster.easy.extension.QmConstants.SLOT_ALGORITHM_TOPOLOGYCLASS;
+import static eu.qualimaster.easy.extension.QmConstants.SLOT_SOFTWAREALGORITHM_TOPOLOGYCLASS;
 import static eu.qualimaster.easy.extension.QmConstants.SLOT_INPUT;
 import static eu.qualimaster.easy.extension.QmConstants.SLOT_OUTPUT;
 import static eu.qualimaster.easy.extension.QmConstants.SLOT_PARAMETERS;
@@ -354,7 +354,7 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
      */
     private void setTopoClass(IDecisionVariable var, ManifestType type, String className) {
         try {
-            IDecisionVariable topo = var.getNestedElement(SLOT_ALGORITHM_TOPOLOGYCLASS);
+            IDecisionVariable topo = var.getNestedElement(SLOT_SOFTWAREALGORITHM_TOPOLOGYCLASS);
             if (null != topo && StringType.TYPE.isAssignableFrom(topo.getDeclaration().getType())) {
                 String topoCls = null;
                 if (ManifestType.STORMBASED == type) {

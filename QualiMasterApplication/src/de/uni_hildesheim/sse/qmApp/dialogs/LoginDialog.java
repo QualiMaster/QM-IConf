@@ -39,7 +39,6 @@ import de.uni_hildesheim.sse.repositoryConnector.svnConnector.ConnectorException
 import de.uni_hildesheim.sse.repositoryConnector.svnConnector.RepositoryEventHandler;
 import de.uni_hildesheim.sse.repositoryConnector.svnConnector.SVNConnector;
 import eu.qualimaster.manifestUtils.ManifestConnection;
-import eu.qualimaster.manifestUtils.data.Manifest;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
 import net.ssehub.easy.instantiation.core.Bundle;

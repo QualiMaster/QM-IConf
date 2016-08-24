@@ -1,7 +1,6 @@
 package de.uni_hildesheim.sse.qmApp.treeView;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -503,7 +502,7 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
     private static boolean isInstantiated() {
         
         boolean isInstantiated = false;
-        File instantiationDir = Location.getInstantiationFolder();
+        //File instantiationDir = Location.getInstantiationFolder();
         if (Location.hasInstantiated()) {
             isInstantiated = true; //pipelineVar
         }

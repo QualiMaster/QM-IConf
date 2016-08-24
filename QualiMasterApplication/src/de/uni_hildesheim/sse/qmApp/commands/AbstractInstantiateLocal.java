@@ -79,7 +79,6 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
         if (null != targetLocation) {
             Job job = new Job("QualiMaster Infrastructure Instantiation Process") {
                 
-                @SuppressWarnings("unused")
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
                     ModelModifier modifier = null;
