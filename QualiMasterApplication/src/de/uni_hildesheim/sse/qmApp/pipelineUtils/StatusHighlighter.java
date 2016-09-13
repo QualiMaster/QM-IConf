@@ -39,9 +39,12 @@ import pipeline.impl.SourceImpl;
  */
 public class StatusHighlighter {
 
-    public static final StatusHighlighter INSTANCE = new StatusHighlighter();
+    private static final Object LOCK = new Object();
+    private static volatile StatusHighlighter instance;
+    
     private List<PipelineDataflowInformationWrapper> pipelineDataflowList = 
             new ArrayList<PipelineDataflowInformationWrapper>();
+    private String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
     
     /**
      * // Exists only to avoid instantiation.
@@ -49,16 +52,23 @@ public class StatusHighlighter {
     private StatusHighlighter() {
     }
     
-//    /**
-//     * Constructs an instance of PipelineStatusHighlighter.
-//     * @return instance singelton instance.
-//     */
-//    public static PipelineStatusHighlighter getInstance() {
-//        if (instance == null) {
-//            instance = new PipelineStatusHighlighter();
-//        }
-//        return instance;
-//    }
+    /**
+     * Constructs an instance of PipelineStatusHighlighter.
+     * @return instance singelton instance.
+     */
+    public static StatusHighlighter getInstance() {
+        StatusHighlighter r = instance;
+        if (r == null) {
+            synchronized (LOCK) {    // While we were waiting for the lock, another 
+                r = instance;        // thread may have instantiated the object.
+                if (r == null) {  
+                    r = new StatusHighlighter();
+                    instance = r;
+                }
+            }
+        }
+        return r;
+    }
     
     /**
      * Wraps up info about Pipeline-Elements and the status of them.
@@ -189,8 +199,8 @@ public class StatusHighlighter {
             if (element.getDisplayName().toLowerCase().equals(pipelineName.toLowerCase())) {
                 
                 element.setStatus(indicator);
-                ConfigurableElementsView.forceTreeRefresh(element); 
-                // TODO inefficient, use viewer.refresh(element, true), refresh only if changed, consider UI thread
+                ConfigurableElementsView.forceTreeRefresh(element);
+                break;
             }
         } 
     }
@@ -333,19 +343,22 @@ public class StatusHighlighter {
                        
                         if (element instanceof SourceImpl) {
                             SourceImpl source = (SourceImpl) element;
-                            StatusHighlighter.INSTANCE.highlightDataFlowForSource(source, ElementStatusIndicator.NONE);
+                            StatusHighlighter.getInstance().highlightDataFlowForSource(source,
+                                    ElementStatusIndicator.NONE);
                         }
                         if (element instanceof FamilyElementImpl) {
                             FamilyElementImpl source = (FamilyElementImpl) element;
-                            StatusHighlighter.INSTANCE.highlightDataFlowForFamily(source, ElementStatusIndicator.NONE);
+                            StatusHighlighter.getInstance().highlightDataFlowForFamily(source,
+                                    ElementStatusIndicator.NONE);
                         }
                         if (element instanceof SinkImpl) {
                             SinkImpl source = (SinkImpl) element;
-                            StatusHighlighter.INSTANCE.highlightDataFlowForSink(source, ElementStatusIndicator.NONE);
+                            StatusHighlighter.getInstance().highlightDataFlowForSink(source,
+                                    ElementStatusIndicator.NONE);
                         }
                         if (element instanceof DataManagementElementImpl) {
                             DataManagementElementImpl source = (DataManagementElementImpl) element;
-                            StatusHighlighter.INSTANCE.highlightDataFlowForDatamangement(source,
+                            StatusHighlighter.getInstance().highlightDataFlowForDatamangement(source,
                                     ElementStatusIndicator.NONE);
                         }
                     }
@@ -362,7 +375,7 @@ public class StatusHighlighter {
     public static void addPipelineColor() {
         
         List<de.uni_hildesheim.sse.qmApp.pipelineUtils.StatusHighlighter.PipelineDataflowInformationWrapper>
-            wrapperList = StatusHighlighter.INSTANCE.getPipelineFlowInfo();
+            wrapperList = StatusHighlighter.getInstance().getPipelineFlowInfo();
         
         IEditorReference[] editors = PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getActivePage().getEditorReferences();
@@ -414,19 +427,19 @@ public class StatusHighlighter {
 
         if (eobject instanceof SourceImpl) {
             SourceImpl source = (SourceImpl) eobject;
-            StatusHighlighter.INSTANCE.highlightDataFlowForSource(source, indicator);
+            StatusHighlighter.getInstance().highlightDataFlowForSource(source, indicator);
         }
         if (eobject instanceof FamilyElementImpl) {
             FamilyElementImpl source = (FamilyElementImpl) eobject;
-            StatusHighlighter.INSTANCE.highlightDataFlowForFamily(source, indicator);
+            StatusHighlighter.getInstance().highlightDataFlowForFamily(source, indicator);
         }
         if (eobject instanceof SinkImpl) {
             SinkImpl source = (SinkImpl) eobject;
-            StatusHighlighter.INSTANCE.highlightDataFlowForSink(source, indicator);
+            StatusHighlighter.getInstance().highlightDataFlowForSink(source, indicator);
         }
         if (eobject instanceof DataManagementElementImpl) {
             DataManagementElementImpl source = (DataManagementElementImpl) eobject;
-            StatusHighlighter.INSTANCE.highlightDataFlowForDatamangement(source, indicator);
+            StatusHighlighter.getInstance().highlightDataFlowForDatamangement(source, indicator);
         }
     }
     
@@ -458,7 +471,6 @@ public class StatusHighlighter {
         IFigure figure = getTargetFigure(editPartForSemanticElement);
 
         SVGFigure svgFigure = (SVGFigure) figure;
-        String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
         
         if (eobject instanceof SourceImpl) {
 
@@ -505,7 +517,6 @@ public class StatusHighlighter {
         IFigure figure = getTargetFigure(editPartForSemanticElement);
 
         SVGFigure svgFigure = (SVGFigure) figure;
-        String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
         
         if (eobject instanceof SinkImpl) {
 
@@ -553,8 +564,6 @@ public class StatusHighlighter {
 
         SVGFigure svgFigure = (SVGFigure) figure;
         
-        String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
-        
         if (eobject instanceof FamilyElementImpl) {
 
             switch(dataflow) {
@@ -600,7 +609,6 @@ public class StatusHighlighter {
         IFigure figure = getTargetFigure(editPartForSemanticElement);
 
         SVGFigure svgFigure = (SVGFigure) figure;
-        String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
         
         if (eobject instanceof DataManagementElementImpl) {
 

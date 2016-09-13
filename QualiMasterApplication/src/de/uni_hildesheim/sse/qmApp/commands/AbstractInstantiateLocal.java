@@ -57,6 +57,8 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
 
     private static String lastTargetLocation = Location.getInstantiationFolder().getAbsolutePath();
     
+    private static boolean isEnabled = true;
+    
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         HandlerUtils.saveDirty(true);
@@ -67,18 +69,33 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
         return null;
     }
         
+    @Override
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+    
+    /**
+     * Set enabled-state for the context-menus.
+     * @param enabled false if the items should be disabled, true if otherwise.
+     */
+    public static void setEnabled(boolean enabled) {
+        isEnabled = enabled;
+    }
     /**
      * Implements the actual instantiation by calling VIL.
      */
     protected void instantiate() {        
         EclipseConsole.INSTANCE.clearConsole();
         EclipseConsole.INSTANCE.displayConsole();
+        
+        setEnabled(false);
+        
         final String targetLocation = selectTargetFolder(getMessage());
         SessionModel.INSTANCE.setInstantiationFolder(targetLocation);
         final Shell shell = Dialogs.getDefaultShell(); 
         if (null != targetLocation) {
             Job job = new Job("QualiMaster Infrastructure Instantiation Process") {
-                
+
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
                     ModelModifier modifier = null;
@@ -149,7 +166,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
             }
             
         });
-        
+        setEnabled(true);
     }
     
     /**
@@ -248,5 +265,4 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
     protected boolean instantiateAlways() {
         return false;
     }
-
 }

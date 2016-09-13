@@ -7,25 +7,20 @@ import static eu.qualimaster.easy.extension.QmObservables.RESOURCEUSAGE_USED_MAC
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import org.csstudio.swt.widgets.figures.MeterFigure;
-import org.csstudio.swt.widgets.figures.TankFigure;
 import org.csstudio.swt.xygraph.dataprovider.CircularBufferDataProvider;
 import org.csstudio.swt.xygraph.dataprovider.Sample;
 import org.csstudio.swt.xygraph.figures.Axis;
@@ -45,8 +40,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.TableEditor;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -86,7 +79,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
 import de.uni_hildesheim.sse.qmApp.WorkspaceUtils;
-import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
@@ -150,21 +142,17 @@ import net.ssehub.easy.varModel.model.values.Value;
  */
 public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInfrastructureListener {
 
-    private static int counter = 0;
     private static CTabFolder tabFolder;
-
     private static Label infoLabel;
     private static final int PIPELINE_DISPLAY_BUFFER_SIZE = 50;
     private static final int PIPELINE_DISPLAY_DELAY = 100;
+    private static final String[] FILENAMES = {"runtimeSavedItems0.ser", "runtimeSavedItems1.ser",
+        "runtimeSavedItems2.ser", "runtimeSavedItems3.ser", "runtimeSavedItems4.ser", "runtimeSavedItems5.ser"}; 
     private Collection<Value> observalbeSet = new ArrayList<Value>();
     private String executionTimeString = "execution time (s)";
     private String pipelineActivityString = "pipeline activity (";
     private String observablesString = "observables (";
     private String saveSelectionsText = "Save Selections";
-
-    @SuppressWarnings("unused")
-    private int insertMark = 0;
-
     private MeterFigure usedClusterMachines;
     private MeterFigure usedHardwareMachines;
     private Map<String, ArrayList<PipelineTrace>> pipelineTraces = new HashMap<String, ArrayList<PipelineTrace>>();
@@ -174,12 +162,12 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     private Table treeViewerColorChooser;
     private Table observablesTable;
     private List<Color> colorList = new ArrayList<Color>();
-    private int colorIndex = 0;
-    
+    private int colorIndex = 0;  
     private List<PipelineGraphColoringWrapper> pipelinesToDisplayInTableWithObservable =
             new ArrayList<PipelineGraphColoringWrapper>();
     private HashMap<String, Set<String>> deliveringObservables = new HashMap<String, Set<String>>();
-    private int pointStyleIndicator = 0;
+    private int pointStyleIndicator = 0;  
+    private HashMap<RuntimeGraphTabItem, Integer> indexes = new HashMap<RuntimeGraphTabItem, Integer>();
     
     /**
      * Represents a pipeline trace, i.e., an observation buffer and an XY-graph trace.
@@ -260,10 +248,8 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                         dataProvider.addSample(new Sample(System.currentTimeMillis(), observation.doubleValue()));
                     }
                 });
-
             }
         }
-
     }
 
     @Override
@@ -295,10 +281,8 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     /**
      * Let a tab pop out.
      * 
-     * @param tabItem
-     *            The tabItem which will be popped out.
-     * @param location
-     *            Location for the lew opped out dialog.
+     * @param tabItem The tabItem which will be popped out.
+     * @param location Location for the popped out dialog.
      */
     private static void popOut(CTabItem tabItem, Point location) {
         Control control = tabItem.getControl();
@@ -358,14 +342,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         fData.right = new FormAttachment(100);
         fData.bottom = new FormAttachment(60);
         innerRight.setLayoutData(fData);
-
-        parent.addDisposeListener(new DisposeListener() {
-
-            @Override
-            public void widgetDisposed(DisposeEvent exc) {
-                saveTreeLocally();
-            }
-        });     
+        
         createMoreControls(outer, innerLeft, innerRight, parent);
     }
 
@@ -452,11 +429,10 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
         addTabFolder(innerLeftTop, topButtons, parent);
 
-        boolean answer = MessageDialog.openQuestion(this.getSite().getShell(), "Restore selections",
-                "Do you want to load the selections from the last session?");
+        if (getItemsFile(FILENAMES[0]).exists()) {
 
-        if (answer) {
             loadItemsLocally();
+            
         }
     }
 
@@ -759,6 +735,8 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
                 String currentObservable = allPossibleObservables.get(j);
 
+                observableName = observableName.replaceAll("[^a-zA-Z0-9]", "");
+                currentObservable = currentObservable.replaceAll("[^a-zA-Z0-9]", "");
                 if (observableName.trim().toLowerCase().contains(currentObservable.trim().toLowerCase())
                         || currentObservable.trim().toLowerCase().contains(observableName.trim().toLowerCase())) {
 
@@ -986,7 +964,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             @Override
             public void widgetSelected(SelectionEvent evt) {
                 // Draw the graph with the collected info so far.
-                drawGraphsInNewTab();
+                drawGraphsInNewTab(false);
             }
             @Override
             public void widgetDefaultSelected(SelectionEvent evt) {
@@ -1145,24 +1123,47 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                 }
             }
             Object[] valueArray = observalbeSet.toArray();
-
+            //sort valueArray
+            valueArray = removeNull(valueArray);
+            Arrays.sort(valueArray);
+            
+            //clear backup
+            PipelinesRuntimeUtils.INSTANCE.getBackupObservableItem().clear();
+            
             for (int k = 0; k < valueArray.length; k++) {
                 Object obj = valueArray[k];
 
-                if (obj != null && obj instanceof StringValue) {
-                    StringValue stringValue = (StringValue) obj;
-
-                    String observalbeName = stringValue.getValue();
+                if (obj != null && obj instanceof String) {
+                    String stringValue = (String) obj;
 
                     TableItem treeItem = new TableItem(observablesTable, 0);
-                    treeItem.setText(observalbeName);
+                    treeItem.setText(stringValue);
 
-                    PipelinesRuntimeUtils.INSTANCE.getBackupObservableItem().add(observalbeName);
+                    PipelinesRuntimeUtils.INSTANCE.getBackupObservableItem().add(stringValue);
                 }
             }
         }
     }
 
+    /**
+     * Remove null values from an array.
+     * @param array Given array of Strings.
+     * @return toReturn Same array without null values.
+     */
+    public String[] removeNull(Object[] array) {
+        String[] toReturn = null;
+        
+        ArrayList<String> removed = new ArrayList<String>();
+        for (Object str : array) {
+            if (str != null) {
+                StringValue toAdd = (StringValue) str;
+                removed.add(toAdd.getValue());
+            }
+        }
+        toReturn = removed.toArray(new String[0]);
+        return toReturn;
+    }
+    
     /**
      * Save the users selections concerning the observables.
      */
@@ -1248,12 +1249,17 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
     /**
      * Draw the graphs.
+     * @param loading true if items shall be loaded, false otherwise.
      */
-    private void drawGraphsInNewTab() {
+    private void drawGraphsInNewTab(boolean loading) {
 
         final RuntimeGraphTabItem newTabItem = new RuntimeGraphTabItem(tabFolder, SWT.NONE);
         newTabItem.setText("New Tab");
-
+        
+        if (!loading) {
+            saveTreeLocally();
+        }
+        
         Control control = createGraphPanel(tabFolder);
         GridData data = new GridData(GridData.FILL_BOTH);
         data.grabExcessHorizontalSpace = true;
@@ -1264,16 +1270,11 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         Infrastructure.registerListener(newTabItem);
 
         newTabItem.setControl(control);
+        indexes.put(newTabItem, tabFolder.indexOf(newTabItem));
         
         //Let the new tabItem be shown
         tabFolder.setSelection(newTabItem);
-        tabFolder.showItem(newTabItem);
-
-        newTabItem.addListener(SWT.Dispose, new Listener() {
-            public void handleEvent(Event event) {
-                Infrastructure.unregisterListener(newTabItem);
-            }
-        });
+        tabFolder.showItem(newTabItem);  
 
     }
 
@@ -1434,79 +1435,137 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                         observable.trim());
                 wrapperList.add(wrapper);
             }
-
-            try {
-                FileOutputStream fileoutputstream = new FileOutputStream(getItemsFile());
-                ObjectOutputStream outputstream = new ObjectOutputStream(fileoutputstream);
-                outputstream.writeObject(wrapperList);
-                outputstream.close();
-            } catch (FileNotFoundException e) {
-                Dialogs.showErrorDialog("Error storing the Maven artifacts tree cache", e.getMessage());
-            } catch (IOException e) {
-                Dialogs.showErrorDialog("Error storing the Maven artifacts tree cache", e.getMessage());
-            }
+                
+            storeInfoInMetadata(wrapperList);
+  
         }
 
     }
 
     /**
+     * Store selected elements. They can be loaded with the next aplpications startup.
+     * @param wrapperList list of selected elements to save.
+     */
+    private void storeInfoInMetadata(List<PipelineElementObservableWrapper> wrapperList) {
+        try {
+            boolean possFile = false;
+            for (int i = 0; i < FILENAMES.length; i++) {
+                String name = FILENAMES[i];
+                if (!new File(WorkspaceUtils.getMetadataFolder(), name).exists()) {
+                    possFile = true;
+                    FileOutputStream fileoutputstream;
+                    
+                    fileoutputstream = new FileOutputStream(getItemsFile(name));
+                    
+                    ObjectOutputStream outputstream = new ObjectOutputStream(fileoutputstream);
+                    outputstream.writeObject(wrapperList);
+                    outputstream.close();
+                    break;
+                }
+            }
+            
+            if (!possFile) {
+                boolean answer = MessageDialog.openQuestion(this.getSite().getShell(), "Reset savings",
+                        "Do you want to discard all previous saved data in order to save the current selections?");
+                
+                if (answer) {
+                    for (int j = 0; j < FILENAMES.length; j++) {
+                        new File(WorkspaceUtils.getMetadataFolder(), FILENAMES[j]).delete();
+                    }
+                    storeInfoInMetadata(wrapperList);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    /**
      * Load the serialized tree. Use the extracted list to set the treeviewer input.
      */
     private void loadItemsLocally() {
+        
+        boolean answer = MessageDialog.openQuestion(this.getSite().getShell(), "Load previous tabs?",
+                " Do you want to load currently saved tabs? \n"
+                + "If not they will be permanently deleted. Therefore newly created tabs will be saved.");
+        
+        if (answer) {
+            loadItems();
+        } else {
+            for (int j = 0; j < FILENAMES.length; j++) {
+                new File(WorkspaceUtils.getMetadataFolder(), FILENAMES[j]).delete();
+            }
+        }
+    }
+
+    /**
+     * Load items.
+     */
+    private void loadItems() {
+
         try {
-            FileInputStream fileIn = new FileInputStream(getItemsFile());
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            @SuppressWarnings("unchecked")
-            List<PipelineElementObservableWrapper> wrapperList = (ArrayList<PipelineElementObservableWrapper>) in
-                    .readObject();
-            pipelinesToDisplayInTableWithObservable.clear();
-            for (int i = 0; i < wrapperList.size(); i++) {
-                PipelineElementObservableWrapper wrapper = wrapperList.get(i);
-
-                String name = wrapper.getName();
-                String observable = wrapper.getObservable();
-                // get real variable and declaration
-                for (int j = 0; j < treeViewerPipelineChooser.getTree().getItemCount(); j++) {
-
-                    TreeItem outerItem = treeViewerPipelineChooser.getTree().getItem(j);
-                    if (outerItem.getText().equals(name)) {
-                        outerItem.setChecked(true);
-                        
-                        for (int m = 0; m < observablesTable.getItemCount(); m++) {
-                            TableItem obsItem = observablesTable.getItem(m);
-                            if (obsItem.getText().equals(observable)) {
-                                obsItem.setChecked(true);
-                            }
-                        }
-                        saveSelections();
-                        removeSelections();
-                    }
-                    for (int l = 0; l < outerItem.getItemCount(); l++) {
-
-                        TreeItem innerItem = outerItem.getItem(l);
-
-                        if (innerItem.getText().equals(name)) {
-                            innerItem.setChecked(true);
-
-                            for (int m = 0; m < observablesTable.getItemCount(); m++) {
-                                TableItem obsItem = observablesTable.getItem(m);
-
-                                if (obsItem.getText().equals(observable)) {
-                                    obsItem.setChecked(true);
+            for (int a = 0; a < FILENAMES.length; a++) {
+                
+                if (getItemsFile(FILENAMES[a]) != null) {
+                    
+                    FileInputStream fileIn = new FileInputStream(getItemsFile(FILENAMES[a]));
+                    if (fileIn != null) {
+                        ObjectInputStream in = new ObjectInputStream(fileIn);
+                        @SuppressWarnings("unchecked")
+                        List<PipelineElementObservableWrapper> wrapperList =
+                                (ArrayList<PipelineElementObservableWrapper>) in.readObject();
+                        pipelinesToDisplayInTableWithObservable.clear();
+                        for (int i = 0; i < wrapperList.size(); i++) {
+                            PipelineElementObservableWrapper wrapper = wrapperList.get(i);
+            
+                            String name = wrapper.getName();
+                            String observable = wrapper.getObservable();
+                            // get real variable and declaration
+                            for (int j = 0; j < treeViewerPipelineChooser.getTree().getItemCount(); j++) {
+            
+                                TreeItem outerItem = treeViewerPipelineChooser.getTree().getItem(j);
+                                if (outerItem.getText().equals(name)) {
+                                    outerItem.setChecked(true);
+                                    
+                                    for (int m = 0; m < observablesTable.getItemCount(); m++) {
+                                        TableItem obsItem = observablesTable.getItem(m);
+                                        if (obsItem.getText().equals(observable)) {
+                                            obsItem.setChecked(true);
+                                        }
+                                    }
+                                    saveSelections();
+                                    removeSelections();
+                                }
+                                for (int l = 0; l < outerItem.getItemCount(); l++) {
+            
+                                    TreeItem innerItem = outerItem.getItem(l);
+            
+                                    if (innerItem.getText().equals(name)) {
+                                        innerItem.setChecked(true);
+            
+                                        for (int m = 0; m < observablesTable.getItemCount(); m++) {
+                                            TableItem obsItem = observablesTable.getItem(m);
+            
+                                            if (obsItem.getText().equals(observable)) {
+                                                obsItem.setChecked(true);
+                                            }
+                                        }
+                                        saveSelections();
+                                        removeSelections();
+                                    }
                                 }
                             }
-                            saveSelections();
-                            removeSelections();
+                            removeSelections();   
                         }
+                        drawGraphsInNewTab(true);
+                        in.close();
+                        fileIn.close();
                     }
                 }
-                removeSelections();
             }
-            in.close();
-            fileIn.close();
         } catch (IOException | ClassNotFoundException e) {
-            Dialogs.showErrorDialog("Error loading the elements cache", e.getMessage());
+            //...
         }
+        
     }
 
     /**
@@ -1565,11 +1624,15 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
     /**
      * Returns the file for storing the Maven tree persistently (offline use).
+     * @param name 
      * 
      * @return the file
      */
-    private File getItemsFile() {
-        return new File(WorkspaceUtils.getMetadataFolder(), "runtimeSavedItems.ser");
+    private File getItemsFile(String name) {
+        File toReturn = null;
+        toReturn = new File(WorkspaceUtils.getMetadataFolder(), name);
+        
+        return toReturn;
     }
 
     /**
@@ -1648,52 +1711,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             usedHardwareMachines.setValue(0);
             usedHardwareMachines.setValid(false);
         }
-    }
-
-    /**
-     * Create meter-widget for monitoring panel.
-     * 
-     * @param parent
-     *            parent composite on which the widgets are placed.
-     */
-    @SuppressWarnings("unused")
-    private void createTank(final Composite parent) {
-
-        Canvas tankCanvas = new Canvas(parent, SWT.BORDER);
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        tankCanvas.setLayoutData(gd);
-        LightweightSystem lws = new LightweightSystem(tankCanvas);
-
-        // Create widget
-        final TankFigure tank = new TankFigure();
-
-        // Init widget
-        tank.setBackgroundColor(XYGraphMediaFactory.getInstance().getColor(255, 255, 255));
-
-        tank.setBorder(new SchemeBorder(SchemeBorder.SCHEMES.ETCHED));
-
-        tank.setRange(-100, 100);
-        tank.setLoLevel(-50);
-        tank.setLoloLevel(-80);
-        tank.setHiLevel(60);
-        tank.setHihiLevel(80);
-        tank.setMajorTickMarkStepHint(50);
-
-        lws.setContents(tank);
-
-        // Update the widget in another thread.
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                Display.getDefault().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        tank.setValue(Math.sin(counter++ / 10.0) * 100);
-                    }
-                });
-            }
-        }, 100, 100, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -1886,7 +1903,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                 }
 
             }
-
         }
     }
 

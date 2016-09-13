@@ -5,5 +5,5 @@ package de.uni_hildesheim.sse.qmApp.pipelineUtils;
  * @author nowatzki
  */
 public enum PipelineNodeType {
-    Source, Sink, FamilyElement, DataManagementElement, Pipeline, Flow, ProcessingElement;
+    Source, Sink, FamilyElement, DataManagementElement, Pipeline, Flow, ProcessingElement, SubPipeline;
 }

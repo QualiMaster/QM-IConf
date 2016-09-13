@@ -136,6 +136,9 @@
             </command>
             <command commandId="de.uni_hildesheim.sse.qmApp.commands.DisconnectHandler"
                 label="Disconnect"> 
+            </command>        
+            <command commandId="de.uni_hildesheim.sse.qmApp.commands.PipelineColoringHandler"
+                label="Preferences Pipeline Coloring"> 
             </command>
          </menu>
          <menu label="Window" id="window">
@@ -236,6 +239,10 @@
           id="de.uni_hildesheim.sse.qmApp.commands.DisconnectHandler"
           name="Disconnect">
       </command>
+      <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.PipelineColoringHandler"
+          id="de.uni_hildesheim.sse.qmApp.commands.PipelineColoringHandler"
+          name="Pipeline Coloring">
+      </command>
       <category
             name="QM-IConf Documentation"
             id="de.uni_hildesheim.sse.qmApp.help.category">
@@ -245,7 +252,8 @@
             id="de.uni_hildesheim.sse.qmApp.commands.HelpCommand"
             name="QM-IConf Documentation">
       </command>
-   </extension>   
+   </extension>  
+    
    <extension
          point="org.eclipse.ui.handlers">
       <handler

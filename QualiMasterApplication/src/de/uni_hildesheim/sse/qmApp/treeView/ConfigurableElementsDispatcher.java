@@ -162,7 +162,7 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
     
                 @Override
                 public void run() {
-                    StatusHighlighter.INSTANCE.markPipeline(pipelineName, elementName, eltIndicator);
+                    StatusHighlighter.getInstance().markPipeline(pipelineName, elementName, eltIndicator);
                 }
             });
         }

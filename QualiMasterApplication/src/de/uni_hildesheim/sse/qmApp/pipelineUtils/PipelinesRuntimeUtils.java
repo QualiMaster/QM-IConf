@@ -586,6 +586,9 @@ public class PipelinesRuntimeUtils {
         if (typeName.equalsIgnoreCase(PipelineNodeType.Pipeline.name())) {
             type = PipelineNodeType.Pipeline;
         }
+        if (typeName.equalsIgnoreCase(PipelineNodeType.SubPipeline.name())) {
+            type = PipelineNodeType.SubPipeline;
+        }
         return type;
     }
 
@@ -799,6 +802,7 @@ public class PipelinesRuntimeUtils {
     public void setObservablesTableSelections(Table observablesTable, PipelineNodeType type, HashMap<String,
             Set<String>> deliveringObservables, String selectedElementName) {
         observablesTable.removeAll();
+        observablesTable.clearAll();
         observablesTable.redraw();
         for (String item : backupObservableItem) {
             TableItem tableItem = new TableItem(observablesTable, SWT.CHECK);
@@ -855,7 +859,6 @@ public class PipelinesRuntimeUtils {
             for (TableItem item : observablesTable.getItems()) {
                 String text = item.getText();
                 String toContain = text.toLowerCase().replaceAll("[^a-zA-Z0-9]", "");
-                
                 if (!containsObservable(observablePipelines, toContain)) {
                     observablesTable.remove(observablesTable.indexOf(item));
                 }
