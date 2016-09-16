@@ -382,8 +382,8 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
                         public void run() {
                             IDecisionVariable pipelineVar = getVariable(); // take data from
                             Dialogs.showInfoDialog("Ivy Publish", "Will deploy '" 
-                                + ModelAccess.getDisplayName(pipelineVar) + "' to " + deploymentUrl
-                                + "eu/qualimaster/PatriksTestDeployment"); //TODO: !!!!
+                                + ModelAccess.getDisplayName(pipelineVar) + "' to " + deploymentUrl);
+//                                + "eu/qualimaster/PatriksTestDeployment"); //TODO: !!!!
                             createProgressDialog(DialogsUtil.getActiveShell(), pipelineVar);
                         }
                     };

@@ -129,6 +129,7 @@ public class FTPSHandler extends BasicURLHandler {
                 if (null != listener) {
                     listener.endTask();
                 }
+                //also upload checksums if necessary.
                 if (checksums) {
                     try {
                         generateAndUploadHash(source, dest, client, monitor, SHA1);
