@@ -30,6 +30,8 @@ import eu.qualimaster.manifestUtils.data.FieldType;
 import eu.qualimaster.manifestUtils.data.Item;
 import eu.qualimaster.manifestUtils.data.Manifest;
 import eu.qualimaster.manifestUtils.data.Manifest.ManifestType;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
 import eu.qualimaster.manifestUtils.data.Parameter;
 
 /**
@@ -45,7 +47,6 @@ public class ManifestParser {
     private static final String ALGORITHM = "algorithm";
     private static final String BYPASS = "bypass";
     private static final String DESCRIPTION = "description";
-    //private static final String STATIC = "static";
     private static final String INPUT = "input";
     private static final String OUTPUT = "output";
     private static final String PARAMETER = "parameter";
@@ -76,24 +77,27 @@ public class ManifestParser {
     private static final String VALUE = "value";
     private static final String LOAD = "load";
     
+    //XML reader objects.
     private DocumentBuilderFactory factory;
     private DocumentBuilder builder;
     private TransformerFactory transformerFactory;
     private Transformer transformer;
     private Document doc;
-    //private File file;
+    
+    private EASyLogger logger = EASyLoggerFactory.INSTANCE.getLogger(ManifestParser.class, 
+            "eu.qualimaster.ManifestUtils");
     
     /**
      * Constructor, initializes certain builder and factories used by w3c dom.
      */
     public ManifestParser() {
+        //Initialize the XML reader.
         try {
             factory = DocumentBuilderFactory.newInstance();
             builder = factory.newDocumentBuilder();
             transformerFactory = TransformerFactory.newInstance();
             transformer = transformerFactory.newTransformer();
         } catch (ParserConfigurationException | TransformerConfigurationException exc) {
-            // TODO Auto-generated catch block
             exc.printStackTrace();
         }
         
@@ -128,12 +132,14 @@ public class ManifestParser {
                 
             } else {
                 
-                System.out.println("Unable to parse manifest!");
+                logger.warn("Unable to parse manifest: " + file.getAbsolutePath());
                 
             }
         
         } catch (NullPointerException e) {
+            
             throw new ManifestUtilsException("Manifest parsing error: " + e.getMessage());
+            
         }
             
         return manifest;
@@ -141,10 +147,11 @@ public class ManifestParser {
     }
     
     /**
-     * Prints a XML-Node tree.
+     * Prints a XML-Node tree. Utility for bug fixing.
      * @param elem The root element.
      */
-    public void printTree(Node elem) {
+    @SuppressWarnings("unused")
+    private void printTree(Node elem) {
         
         for (int i = 0; i < elem.getChildNodes().getLength(); i++) {
             
@@ -168,6 +175,7 @@ public class ManifestParser {
             
             Node subNode = node.getChildNodes().item(i);
             
+            //read all tuples
             if (TUPLE.equals(subNode.getNodeName())) {
                 
                 Item item = new Item();
@@ -176,6 +184,7 @@ public class ManifestParser {
                     
                     Node subNode2 = subNode.getChildNodes().item(j);
                     
+                    //read all fields for the current tuple
                     if (FIELD.equals(subNode2.getNodeName())) {
                         
                         String name = subNode2.getAttributes().getNamedItem(NAME).getNodeValue();
@@ -183,12 +192,13 @@ public class ManifestParser {
                         
                         try {
                             
+                            //try to create the actual Field object.
                             Field field = new Field(name, FieldType.valueOf(type.toUpperCase()));
                             item.addField(field);
                             
                         } catch (IllegalArgumentException exc) {
                             
-                            System.out.println("[Error:] At Tuple-Node: " + j + ", name: " + name 
+                            logger.warn("[Error:] At Tuple-Node: " + j + ", name: " + name 
                                     + ", illegal field declaration!");
                             
                         }
@@ -221,6 +231,7 @@ public class ManifestParser {
         
             Element elem = doc.getDocumentElement();
             
+            //read the manifest if available.
             if (null != elem && MANIFEST.equals(elem.getNodeName())) {
                 
                 for (int i = 0; i < elem.getChildNodes().getLength(); i++) {
@@ -229,12 +240,13 @@ public class ManifestParser {
                     
                     readProvides(mType, node, family);
                     
+                    //this is actually not entirely defined yet:
                     if (null != node && REQUIRES.equals(node.getNodeName())) {
                         
                         try {
                             
-                            node.getAttributes().getNamedItem(CPU).getNodeValue(); //String cpu = 
-                            node.getAttributes().getNamedItem(DFE).getNodeValue(); //String dfe = 
+                            node.getAttributes().getNamedItem(CPU).getNodeValue(); 
+                            node.getAttributes().getNamedItem(DFE).getNodeValue(); 
                             
                         } catch (NullPointerException exc) {
                             //is optional, so nothing to worry here!
@@ -248,6 +260,7 @@ public class ManifestParser {
                 
             }
             
+            //mark the family as MultiHardware if several hardware definitions were found.
             if (null != family.getMembers() && family.getMembers().size() > 1 
                     && mType == ManifestType.SINGLE_HARDWARE) {
                 
@@ -308,6 +321,7 @@ public class ManifestParser {
      */
     private void readProvides(ManifestType mType, Node node, Manifest manifest) {
         
+        //first node defines the family type and gives additional information about the family.
         if (null != node && PROVIDES.equals(node.getNodeName())) {
             
             if (null != node.getAttributes() && node.getAttributes().getLength() > 0) {
@@ -319,6 +333,7 @@ public class ManifestParser {
                 }
             }
             
+            //read actual algorithm information.
             for (int j = 0; j < node.getChildNodes().getLength(); j++) {      
                 Node subNode = node.getChildNodes().item(j);
                 if (null != subNode && ALGORITHM.equals(subNode.getNodeName())) {
@@ -347,8 +362,9 @@ public class ManifestParser {
                     if (null != algorithm && null != manifest) {
                         manifest.addMember(algorithm);
                     }       
-                } else if (null != subNode && COMPONENT.equals(subNode.getNodeName())) {             
-                    subNode.getAttributes().getNamedItem(CLASS).getNodeValue(); //String fgn =        
+                } else if (null != subNode && COMPONENT.equals(subNode.getNodeName())) { 
+                    //this is not entirely defined yet.
+                    subNode.getAttributes().getNamedItem(CLASS).getNodeValue();        
                 } else if (null != subNode && DESCRIPTION.equals(subNode.getNodeName())) {
                     manifest.setDescription(ManifestParser.normalizeText(subNode.getTextContent()));
                 }
@@ -367,14 +383,17 @@ public class ManifestParser {
     private void readAdditionalInfo(Node node, Algorithm algorithm) {
         
         if (null != algorithm && null != node) {
+            //read input tuples
             if (INPUT.equals(node.getNodeName())) {   
                 for (Item it : getTuples(node)) {
                     algorithm.addInput(it);
                 }     
+            //read output tuples
             } else if (OUTPUT.equals(node.getNodeName())) {       
                 for (Item it : getTuples(node)) {
                     algorithm.addOutput(it);
-                }                      
+                }        
+            //read parameters
             } else if (PARAMETER.equals(node.getNodeName())) {
                 
                 NamedNodeMap map = node.getAttributes();
@@ -396,6 +415,7 @@ public class ManifestParser {
                         defaultValue = node.getAttributes().getNamedItem(DEFAULT_VALUE).getNodeValue();
                     }
                     
+                    //try to create the parameter, can fail if type does not match.
                     try { 
                         if (null != name && null != type) {
                             Parameter param = new Parameter(name, Parameter.ParameterType
@@ -405,20 +425,21 @@ public class ManifestParser {
                         }
                                       
                     } catch (IllegalArgumentException exc) {  
-                        System.out.println("[ERROR:] Illegal Parameter: " + type);   
+                        logger.warn("Illegal parameter type: " + type);   
                     } 
                     
                 }      
                 
+            //flow and bypass are not entirely defined yet.
             } else if (FLOW.equals(node.getNodeName())) {       
                 try {
-                    node.getAttributes().getNamedItem(TO).getNodeValue(); //String flow = 
+                    node.getAttributes().getNamedItem(TO).getNodeValue();
                 } catch (NullPointerException exc) {
                 }                
             } else if (BYPASS.equals(node.getNodeName())) {              
                 try {
                     node.getFirstChild().getNextSibling().getAttributes()
-                            .getNamedItem(PARAM).getNodeValue(); //String bypass = 
+                            .getNamedItem(PARAM).getNodeValue(); 
                 } catch (NullPointerException exc) {
                 }              
             } else if (DESCRIPTION.equals(node.getNodeName())) {
@@ -434,6 +455,7 @@ public class ManifestParser {
      */
     private void readQuality(Node node) {
         
+        //these parameters are not entirely defined yet and are not used.
         if (null != node && QUALITY.equals(node.getNodeName())) {
             
             for (int j = 0; j < node.getChildNodes().getLength(); j++) {
@@ -463,7 +485,7 @@ public class ManifestParser {
                         //Parameter param = new Parameter(name, Parameter.ParameterType.valueOf(value));
                     } catch (IllegalArgumentException exc) {
                         
-                        System.out.println("[ERROR:] Illegal qualityParameter: " + "Name: " + name 
+                        logger.warn("Illegal quality parameter: " + "Name: " + name 
                                 + ", Value: " + value);
                         
                     }
@@ -474,177 +496,34 @@ public class ManifestParser {
                 
         }
     }
-    
-    /**
-     * Validates the manifest with the given artifact OR creates a new manifest if none exists yet.
-     * @param name The name of the "main" class inside the artifact.
-     * @param groupId The id of the group of the artifact.
-     * @param artifactId The id of the actual artifact.
-     * @param version The version of the artifact.
-     * @param manifest The underlying manifest. If null, then a new one is created.
-     */
-    public void validate(String name, String groupId, String artifactId, String version, Manifest manifest) {
 
-        if (null == manifest) {
-            
-            manifest = new Manifest(artifactId);
-            
-        }
-        
-        ManifestConnection con = new ManifestConnection();
-        con.load(null, groupId, artifactId, version);
-        List<Item> input = new ArrayList<Item>();
-        List<Parameter> parameters = new ArrayList<Parameter>();
-        List<Item> output = new ArrayList<Item>();
-        try {
-            input = con.getInput(name, artifactId);
-            output = con.getOutput(name, artifactId);
-            parameters = con.getParameters(name, artifactId);
-        } catch (ManifestUtilsException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
-        //Validate existence of the algorithm.
-        Algorithm algorithm = null;
-        
-        if (!manifest.hasAlgorithm(name)) {
-            manifest.addMember(new Algorithm(name, null, null, null));
-        }    
-        algorithm = manifest.getMember(name);
-        
-        //Validate input fields.
-//        Item inputItem = new Item();
-        
-//        for (Field field : input) {
-//            inputItem.addField(new Field(field.getName(), field.getFieldType()));
-//        }
-        
-        for (Item item : input) {
-            if (!algorithm.hasInput(item)) {
-                algorithm.addInput(item);
-            }
-        }
-        
-        //Validate output fields.
-//        Item outputItem = new Item();
-        
-//        for (Field field : output) {
-//            outputItem.addField(new Field(field.getName(), field.getFieldType()));
-//        }
-        
-        for (Item item : output) {
-            if (!algorithm.hasOutput(item)) {
-                algorithm.addOutput(item);
-            }
-        }
-        
-        for (Parameter param : parameters) {
-            if (!algorithm.hasParameter(param)) {
-                algorithm.addParameter(param);
-            }
-        }
-        
-    }
-    
-    /**
-     * Validates a manifest against a given class.
-     * @param manifest The base manifest.
-     * @param cs The class to validate against.
-     * @return The modified Manifest.
-     */
-    public Manifest validateWithClass(Manifest manifest, Class<?> cs) {
-        
-        Algorithm alg = manifest.getMember(cs.getSimpleName());
-        
-        if (null == alg) {
-            alg = new Algorithm(cs.getSimpleName(), cs.getName(), null, null);
-            manifest.addMember(alg);
-        }
-        
-        System.out.println(cs.getSimpleName());
-        
-        for (Method m : cs.getDeclaredMethods()) {
-            
-            if (m.getName().equals("calculate")) {
-                
-                Class<?>[] param = m.getParameterTypes();
-                
-                for (Class<?> p : param) {
-                    
-                    try {
-                        
-                        Class<?> ioClass = cs.getClassLoader().loadClass(p.getName());
-                        Method[] methods = ioClass.getMethods();
-                        
-                        if (p.getName().endsWith("Input")) {                   
-                            for (Method met : methods) {      
-                                if (met.getName().startsWith("set")) {
-                                    Item item = new Item();
-                                    Field field = new Field(met.getName().substring(3), 
-                                            FieldType.valueOf(met.getParameterTypes()[0]));
-                                    item.addField(field);
-                                    alg.addInput(item);
-                                }                
-                            }                
-                        } else {               
-                            for (Method met : methods) {              
-                                if (met.getName().startsWith("set")) {
-                                    Item item = new Item();
-                                    Field field = new Field(met.getName().substring(3), 
-                                            FieldType.valueOf(met.getParameterTypes()[0]));
-                                    item.addField(field);
-                                    alg.addOutput(item);
-                                }                 
-                            }                        
-                        }
-                        
-                    } catch (ClassNotFoundException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    
-                }
-                
-            } else if (m.getName().startsWith("setParameter")) {
-                
-                String pName = m.getName().substring(12);
-                Class<?>[] param = m.getParameterTypes();
-                
-                for (Class<?> p : param) {
-                    Parameter parameter = new Parameter(pName, Parameter.ParameterType.valueOf(p));
-                    alg.addParameter(parameter);
-                }
-                
-            }
-            
-        }
-        
-        return manifest;
-        
-    }
     
     /**
      * Creates a Manifest from a class.
+     * Is not currently used but could be useful in the future for automated manifest creation.
      * @param cs The class to parse.
      * @return the created Manifest.
      */
     public Manifest createFromClass(Class<?> cs) {
         
+        //initialize an empty undefined manifest.
         Manifest manifest = new Manifest(cs.getSimpleName());
         manifest.setType(ManifestType.UNKNOWN);
         manifest.setProvider(cs.getName());
         Algorithm alg = new Algorithm(cs.getSimpleName(), cs.getName(), null, null);
         manifest.addMember(alg);
         
+        //add the available information to the manifest.
         for (Method m : cs.getDeclaredMethods()) {
             
+            //these methods define in and output for single java algorithms.
             if (m.getName().equals("calculate")) {
                 
                 manifest.setType(ManifestType.SINGLE_JAVA);
                 
                 getInOut(m, alg, cs);
                 
+            //these methods define parameters.
             } else if (m.getName().startsWith("setParameter")) {
                 
                 String pName = ManifestConnection.lowerFirstLetter(m.getName().substring(12));
@@ -655,6 +534,7 @@ public class ManifestParser {
                     alg.addParameter(parameter);
                 }
                 
+            //these methods define in and output for pipeline sinks.
             } else if (m.getName().startsWith("post")) {
                 
                 manifest.setType(ManifestType.PIPELINE_SINK);
@@ -664,6 +544,8 @@ public class ManifestParser {
             
         }  
         
+        //if no manifest type could be detected yet, it is likely a pipeline source algorithm.
+        //define it as such and get in and output information.
         if (manifest.getType().equals(ManifestType.UNKNOWN)) {
             manifest.setType(ManifestType.PIPELINE_SOURCE);
             
@@ -696,6 +578,7 @@ public class ManifestParser {
                 Class<?> ioClass = cs.getClassLoader().loadClass(p.getName());
                 Method[] methods = ioClass.getMethods();
                 
+                //get input tuple / field information
                 if (p.getName().endsWith("Input")) { 
                     Item item = new Item();
                     for (Method met : methods) {      
@@ -710,6 +593,7 @@ public class ManifestParser {
                     }
                     alg.addInput(item);
                 } else {               
+                    //get output tuple / field information.
                     Item item = new Item();
                     for (Method met : methods) {              
                         if (met.getName().startsWith("set")) {
@@ -725,7 +609,6 @@ public class ManifestParser {
                 }
                 
             } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             
@@ -733,14 +616,13 @@ public class ManifestParser {
     }
     
     /**
-     * Writes a Manifest to a file.
+     * Writes a Manifest to a file. Is not used but may become useful in the future.
      * @param file The file to write to.
      * @param manifest The Manifest to write.
      */
     public void writeToFile(File file, Manifest manifest) {
         
-        Document doc = builder.newDocument();
-        
+        Document doc = builder.newDocument(); 
         Element root = doc.createElement("manifest");
         doc.appendChild(root);
         
@@ -784,6 +666,7 @@ public class ManifestParser {
         }
         root.appendChild(provides);
         
+        //add algorithms
         for (Algorithm alg : manifest.getMembers()) {
             Element algorithm = doc.createElement("algorithm");
             algorithm.setAttribute("family", alg.getName());
@@ -794,6 +677,7 @@ public class ManifestParser {
             generateParameters(alg, doc, algorithm);
         }
         
+        //write the document.
         DOMSource source = new DOMSource(doc);
         StreamResult result = new StreamResult(file);    
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -949,49 +833,6 @@ public class ManifestParser {
         }
         
         return result;
-        
-    }
-    
-    /**
-     * Just for testing purposes!
-     * @param args main args.
-     */
-    public static void main(String[] args) {
-        
-//        ManifestParser mp = new ManifestParser();
-//        String name = "eu.qualimaster.algorithms.imp.correlation.hardwaresubtopology.
-        //TopoHardwareCorrelationFinancial";
-//        
-//        List<URL> urls = mp.loadJars("C:/.m2/repository/ivy");
-//        URL[] u = new URL[1];
-//        
-//        Class<?> cs = null;
-//        URLClassLoader loader = new URLClassLoader(urls.toArray(u));
-//
-//        try {
-//            cs = loader.loadClass(name);
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        
-//        Manifest manifest = mp.createFromClass(cs);
-//        mp.writeToFile(new File("C:/Test/manifest.xml"), manifest);
-//        try {
-//            loader.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        ManifestParser mp = new ManifestParser();
-        Manifest manifest;
-        try {
-            manifest = mp.parseFile(new File("C:/Test/manifest.xml"));
-            System.out.println(manifest);
-        } catch (ManifestUtilsException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        
         
     }
     

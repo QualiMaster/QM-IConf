@@ -18,9 +18,10 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
 import org.apache.commons.net.io.CopyStreamException;
-import org.apache.ivy.util.CopyProgressListener;
 import org.apache.ivy.util.url.BasicURLHandler;
 
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
 import net.ssehub.easy.basics.progress.ProgressObserver;
 
 /**
@@ -37,15 +38,9 @@ public class FTPSHandler extends BasicURLHandler {
     private static final String EDIT_ACCESS_COMMAND = "chmod g+w ";
     private static final String SHA1 = "SHA1";
     private static final String MD5 = "MD5";
-//    private static final int BUFFER_SIZE = 64 * 1024;
     
-//    private static final int TIMEOUT = 10000; //10 seconds?
-    
-//    private static final int PORT = 21; //port 22 is SSH! port 21 should be correct!
-//    private static final int LOGIN_REPLY_CODE = 230;
-//    private static final String PROTOCOL = "SSL";
-    
-//    private String requestMethod = "POST";
+    private EASyLogger logger = EASyLoggerFactory.INSTANCE.getLogger(FTPSHandler.class, 
+            "eu.qualimaster.ManifestUtils");
     
     /**
      * Downloads a file from the FTPS URL and stores it to destination.
@@ -56,16 +51,6 @@ public class FTPSHandler extends BasicURLHandler {
      */
     public File download(URL source, File destination) throws IOException {
         return null;
-    }
-    
-    @Override
-    public void upload(File source, URL dest, CopyProgressListener listener) throws IOException {
-
-        if (!source.getName().matches(IVY_XML_REGEX)) {
-            FTPSClient client = FTPSConnector.getInstance().getClient();
-            upload(source, dest, client, null, true);
-        }
-        
     }
     
     /**
@@ -116,14 +101,17 @@ public class FTPSHandler extends BasicURLHandler {
         UploadListener listener = null;
         
         if (null != client) {
+            //add progress monitor and listener to track the progress.
             if (null != monitor) {
                 listener = new UploadListener(monitor, source);
                 client.setCopyStreamListener(listener);
             }
+            
+            //get the actual destination for the file and traverse to it.
             String finalDestination = dest.getPath();          
             String workingDir = "";
-            
             String[] split = finalDestination.split("/");
+            
             for (int i = 3; i < split.length; i++) {
                 if (!((i == split.length - 1) && split[i].contains("."))) {
                     workingDir += "/" + split[i];
@@ -134,6 +122,7 @@ public class FTPSHandler extends BasicURLHandler {
 
             String fileName = split[split.length - 1];       
             
+            //start the upload for the file and send the necessary commands.
             try (InputStream input = new FileInputStream(source)) {
                 client.setFileType(FTPClient.BINARY_FILE_TYPE);
                 client.setConnectTimeout(5000);
@@ -145,6 +134,7 @@ public class FTPSHandler extends BasicURLHandler {
                 if (null != listener) {
                     listener.endTask();
                 }
+                //also upload checksums if necessary.
                 if (checksums) {
                     try {
                         generateAndUploadHash(source, dest, client, monitor, SHA1);
@@ -164,7 +154,7 @@ public class FTPSHandler extends BasicURLHandler {
             } 
 
         } else {
-            Bundle.getLogger(FTPSHandler.class).error("FATAL ERROR: CLIENT == NULL!");
+            logger.error("FTPSClient has not been initialized correctly.");
         }
     }
 
@@ -185,6 +175,7 @@ public class FTPSHandler extends BasicURLHandler {
         String hashType) throws MalformedURLException, IOException, FileNotFoundException, CopyStreamException,
         NoSuchAlgorithmException {
         
+        //generate the name for the hash file.
         String name = null;
         try {
             String stringUrl = dest.toURI().toString();
@@ -196,10 +187,11 @@ public class FTPSHandler extends BasicURLHandler {
         if (null == name) {
             name = source.getName();
         }
-        
-        
+          
+        //upload the hash file.
         URL url = new URL(dest, name + "." + hashType.toLowerCase());
         upload(getHash(source, hashType), url, client, monitor, false);
+        
     }
     
     /**
@@ -212,6 +204,7 @@ public class FTPSHandler extends BasicURLHandler {
      */
     private File getHash(final File file, String hashType) throws NoSuchAlgorithmException, IOException {
         
+        //get the hash type and add a suffix to the file name.
         MessageDigest messageDigest = MessageDigest.getInstance(hashType);
         String suffix;
         if (SHA1.equals(hashType)) {
@@ -224,6 +217,7 @@ public class FTPSHandler extends BasicURLHandler {
             result.createNewFile();
         }
         
+        //read the original file into the messageDigest buffer.
         try (InputStream is = new BufferedInputStream(new FileInputStream(file))) {
             final byte[] buffer = new byte[1024];
             for (int read = 0; (read != -1);) {
@@ -241,6 +235,7 @@ public class FTPSHandler extends BasicURLHandler {
             hash = formatter.toString();
         }
         
+        //write the file.
         PrintWriter writer = new PrintWriter(result, "UTF-8");
         writer.print(hash);
         writer.close();
@@ -258,25 +253,23 @@ public class FTPSHandler extends BasicURLHandler {
         if (null != client && null != dir) {
             
             String[] split = dir.split("/");
-            
-                
+      
             for (int i = 0; i < split.length; i++) {
                 
+                //attempt to traverse to the next dir. May fail if the dir does not exist yet.
                 if (null != split[i] && !split[i].isEmpty()) {
                     try {
                         client.sendSiteCommand(EDIT_ACCESS_COMMAND + split[i]);
                         client.changeWorkingDirectory(split[i]);
-//                        System.out.println("Traversing to: " + split[i]);
                     } catch (IOException e) {
                         //ignore since there is a second chance
                     }
+                    //if unsucessful try to create the dir and then traverse to it.
                     if (client.getReplyCode() != 250) {
                         try {
                             client.makeDirectory(split[i]);
-//                            System.out.println("Creating dir: " + split[i]);
                             client.sendSiteCommand(EDIT_ACCESS_COMMAND + split[i]);
                             client.changeWorkingDirectory(split[i]);
-//                            System.out.println("Traversing to: " + split[i]);
                         } catch (IOException e) {
                             //kill the process or it will become inconsistent
                             e.printStackTrace();

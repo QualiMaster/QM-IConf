@@ -19,22 +19,14 @@ import java.net.URLClassLoader;
 import java.security.Security;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.tools.JavaCompiler;
-import javax.tools.ToolProvider;
-
 import org.apache.ivy.Ivy;
-import org.apache.ivy.ant.IvyAntSettings;
-import org.apache.ivy.ant.IvyConvertPom;
 import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
-import org.apache.ivy.core.module.id.ModuleId;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.publish.PublishOptions;
 import org.apache.ivy.core.report.ResolveReport;
@@ -44,8 +36,6 @@ import org.apache.ivy.core.settings.IvySettings;
 import org.apache.ivy.plugins.resolver.ChainResolver;
 import org.apache.ivy.plugins.resolver.IBiblioResolver;
 import org.apache.ivy.util.Credentials;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.types.Reference;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import eu.qualimaster.manifestUtils.PomReader.PomInfo;
@@ -95,7 +85,6 @@ public class ManifestConnection {
     private File out = null;
     private String output = "";
     private DownloadIntercepter sysOutDownload;
-    private UploadIntercepter sysOutUpload;
     private ResolveReport report = null;
     private String mainArtifactName = null;
     
@@ -112,12 +101,6 @@ public class ManifestConnection {
         
         try {
             sysOutDownload = new DownloadIntercepter(output, new PrintStream(new FileOutputStream(FileDescriptor.out)));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        
-        try {
-            sysOutUpload = new UploadIntercepter(output, new PrintStream(new FileOutputStream(FileDescriptor.out)));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -149,14 +132,14 @@ public class ManifestConnection {
                 e.printStackTrace();
             }
         }
-        
+        //ivy cache path and patterns.
         ivySettings.setDefaultCache(new File(mavenPath + "/ivy_cache"));
         ivySettings.setDefaultCacheArtifactPattern(
                 "[organisation]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]");
         ivySettings.setDefaultCacheIvyPattern(
                 "[organisation]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]");
         
-        
+        //initialize chain resolver to enable use of several repositories.
         ChainResolver chainResolver = new ChainResolver();
         chainResolver.setName("chainResolver");
         
@@ -181,6 +164,7 @@ public class ManifestConnection {
     public Manifest getUnderlyingManifest(String artifactId) throws ManifestUtilsException {
         Manifest manifest = null;
         
+        //find the manifest of the artifact and parse it.
         if (null != artifactId && extractManifest(artifactId)) {
             ManifestParser mp = new ManifestParser();
             manifest = mp.parseFile(new File(out + "/manifest.xml"));
@@ -308,11 +292,13 @@ public class ManifestConnection {
         System.setProperty("jsse.enableSNIExtension", "false");
         Security.insertProviderAt(new BouncyCastleProvider(), 1);      
         
+        //clear our temp folder.
         deleteDir(this.out);
         setRetrievalFolder(this.out);
-        System.out.println("RETRIEVAL: " + this.out);  
+        logger.info("RETRIEVAL: " + this.out);
         ResolveOptions ro = new ResolveOptions();
 
+        //set the resolver to transitive.
         ro.setResolveMode(ResolveOptions.RESOLVEMODE_DYNAMIC);
         ro.setTransitive(true);
         ro.setDownload(true);  
@@ -320,24 +306,22 @@ public class ManifestConnection {
             ModuleRevisionId.newInstance(groupId, artifactId + "-envelope", version)
         );
         ModuleRevisionId ri = ModuleRevisionId.newInstance(groupId, artifactId, version);
+        //add all configurations, since ivy will fail to download some parts otherwise.
         DefaultDependencyDescriptor dd = new DefaultDependencyDescriptor(md, ri, false, false, true);
         dd.addDependencyConfiguration("default", "compile");
         dd.addDependencyConfiguration("default", "default");
         dd.addDependencyConfiguration("default", "master");
         dd.addDependencyConfiguration("default", "runtime");
         dd.addDependencyConfiguration("default", "provided");
-//        dd.addDependencyConfiguration("*", "*");
         md.addDependency(dd);
-//        ModuleId modId = new ModuleId("eu.qualimaster", "QualiMaster.Events");
-//        PatternMatcher pattMatch = new org.apache.ivy.plugins.matcher.ExactPatternMatcher();
-//        DependencyDescriptorMediator ddm = new TestMediator();
-//        md.addDependencyDescriptorMediator(modId, pattMatch, ddm);
         ModuleDescriptor m = null; 
+        
+        //start the download process. Progress is tracked via an intercepter since ivy doesn't provide
+        //direct access to progress.
         try {
             monitor.notifyStart(mainTask, 200);
             sysOutDownload.setMax(200);
-            sysOutDownload.setTask(mainTask);
-            
+            sysOutDownload.setTask(mainTask); 
             System.setOut(sysOutDownload);
             System.setErr(sysOutDownload);
             report = ivy.resolve(md, ro);
@@ -361,6 +345,7 @@ public class ManifestConnection {
             e.printStackTrace();
         }
         
+        //end the process and disable the intercepter.
         ModuleRevisionId.newInstance(groupId, artifactId, version);
         PublishOptions options = new PublishOptions();
         options.setUpdate(false);
@@ -377,26 +362,32 @@ public class ManifestConnection {
      * @return A list with parameters for the class. Can be empty but never null.
      */
     public List<Parameter> getParameters(String name, String artifactId) {
+        
         List<Parameter> result = new ArrayList<Parameter>();
         URLClassLoader loader = null;
         try {
+            //load all necessary classes into the classloader.
             URL[] urls = new URL[1];
             loader = new URLClassLoader(loadJars(out.getAbsolutePath()).toArray(urls));         
             Class<?> base = loadClass(name, loader); 
             if (null != base) {
+                //if the base class of the algorithm is available:
                 Method[] methods = base.getMethods();
                 for (Method m : methods) {
+                    //analyze methods that set parameters.
                     if (m.getName().startsWith("setParameter")) {
                         String pName = m.getName().substring("setParameter".length(), m.getName().length());
                         pName = lowerFirstLetter(pName); 
                         Parameter param = new Parameter(pName, ParameterType.valueOf(m.getParameterTypes()[0]));
+                        //add the parameter to the result.
                         if (null != m.getDefaultValue()) {
                             param.setValue(m.getDefaultValue().toString());
                         }
+                        
+                        //read the default value for the parameter from annotations.
                         try {
-                            
                             Class<?> defaultValueClass = loader.loadClass(ANNOTATION_CLASS);
-                            @SuppressWarnings("unchecked")
+                            @SuppressWarnings({ "unchecked", "rawtypes" })
                             Class<Annotation> defaultValueAnnotationClass = (Class) defaultValueClass.getClass();
                             Annotation annotation = m.getAnnotation(defaultValueAnnotationClass);
                             if (null != annotation) {
@@ -405,21 +396,14 @@ public class ManifestConnection {
                                 Object invokeResult = method.invoke(annotation, args);
                                 String defaultValue = (String) invokeResult;
                                 param.setValue(defaultValue);
-                            }
-                            
+                            }   
                         } catch (ClassNotFoundException e) {
-                            System.out.println("ERROR: Unable to load Annotation Class: '" + ANNOTATION_CLASS + "'");
                             logger.info("ERROR: Unable to load Annotation Class: '" + ANNOTATION_CLASS + "'");
-                            System.out.println("The used version of StormCommons does not support Annotations!");
                             logger.info("The used version of StormCommons does not support Annotations!");
                         } catch (ClassCastException e) {
                             e.printStackTrace();
-                            System.out.println("ERROR: Unable to cast: '" + ANNOTATION_CLASS + "' to Annotation.");
-                        } catch (NoSuchMethodException e) {
-                            e.printStackTrace();
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        } catch (IllegalArgumentException e) {
+                            logger.info("ERROR: Unable to cast: '" + ANNOTATION_CLASS + "' to Annotation.");
+                        } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException e) {
                             e.printStackTrace();
                         } catch (InvocationTargetException e) {
                             e.printStackTrace();
@@ -428,12 +412,8 @@ public class ManifestConnection {
                     } 
                 }
             }
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | SecurityException | ManifestUtilsException e) {
             e.printStackTrace();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (ManifestUtilsException e1) {
-            e1.printStackTrace();
         } finally {
             try {
                 loader.close();
@@ -527,24 +507,25 @@ public class ManifestConnection {
         List<Item> result = new ArrayList<Item>();
         URLClassLoader loader = null;
         
+        //load all necessary classes for the analysis
         try {
             URL[] urls = new URL[1];
             loader = new URLClassLoader(loadJars(out.getAbsolutePath()).toArray(urls)); 
             Class<?> base = loadClass(name, loader);
             
+            //if the base class of the algorithm is available proceed to read in/output.
             if (null != base) {
                 Method[] methods = base.getMethods();      
                 List<String> inOut = new ArrayList<String>();
                 result = getAlgorithmInOut(loader, methods, getInput, inOut);
                 
+                //if no in/output was found it is probably a sink and the information has to be read
+                //from different methods.
                 if (result.isEmpty()) {
                     result = getSinkInOut(loader, methods, getInput, inOut);
                 }
             }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            throw new ManifestUtilsException("Missing dependency!", e);
-        } catch (NoClassDefFoundError e) {
+        } catch (ClassNotFoundException | NoClassDefFoundError e) {
             e.printStackTrace();
             throw new ManifestUtilsException("Missing dependency!", e);
         } catch (SecurityException e) {
@@ -579,6 +560,7 @@ public class ManifestConnection {
         Class<?> io = null;
         
         for (Method m : methods) {
+            //get the input information.
             if (!getInput && m.getName().startsWith("get") 
                     && !m.getName().startsWith("getParameter")) {
 
@@ -589,12 +571,14 @@ public class ManifestConnection {
                 if (null != io) { 
                     Item newItem = getSetter(io, itemName);
 
+                    //prevent doubles.
                     if (!doubleItems(result, newItem)) {
                         result.add(newItem);
                         io = null;
                     }
                 }                
                 
+            //get the output information.
             } else if (getInput && m.getName().startsWith("post")) {
 
                 Class<?>[] param = m.getParameterTypes();
@@ -605,12 +589,15 @@ public class ManifestConnection {
                 }
                 if (null != io) { 
                     Item newItem = getSetter(io, itemName);
+                    
+                    //prevent doubles.
                     if (!doubleItems(result, newItem)) {
                         result.add(newItem);
                         io = null;
                     }
                 } else {
-                    System.out.println("UNABLE TO FIND IN / OUTPUT!"); 
+                    logger.info("No Input/Output found for sink-methods. May be an algorithm."); 
+                    //not fatal since it could be an algorithm and not a sink.
                 } 
                 
             }
@@ -641,9 +628,11 @@ public class ManifestConnection {
                 Class<?>[] param = m.getParameterTypes();
                 for (int i = 0; i < param.length; i++) {
                     inOut.add(param[i].getName());
+                    //get input information
                     if (getInput && param[i].getName().toLowerCase().contains("input")) {
                         io = loader.loadClass(param[i].getName());
                         itemName = decrypt(param[i]);
+                    //get output information
                     } else if (!getInput && param[i].getName().toLowerCase().contains("output")) {
                         io = loader.loadClass(param[i].getName());
                         itemName = decrypt(param[i]);
@@ -651,12 +640,14 @@ public class ManifestConnection {
                 }
                 if (null != io) { 
                     Item newItem = getSetter(io, itemName);
+                    //prevent doubles.
                     if (!doubleItems(result, newItem)) {
                         result.add(newItem);
                         io = null;
                     }
                 } else {
-                    System.out.println("UNABLE TO FIND IN / OUTPUT!"); 
+                    logger.info("No Input/Output found for algorithm-methods. May be a sink.");
+                    //not fatal since it could be a sink and not an algorithm.
                 }  
             }
         }
@@ -691,7 +682,9 @@ public class ManifestConnection {
      * @return The decrypted paramter name.
      */
     public static String decrypt(Class<?> param) {
+        
         String itemName = "";
+        
         try {
             String[] splited = param.getName().split("\\.");
             String[] splited2 = splited[splited.length - 1].split("\\$");
@@ -711,6 +704,7 @@ public class ManifestConnection {
         }
         
         return itemName;
+        
     }
     
     /**
@@ -724,8 +718,8 @@ public class ManifestConnection {
     }
     
     /**
-     * Does stuff.
-     * @param io the io class.
+     * Returns a Field for a given item name.
+     * @param io the IO class.
      * @param itemName the name for the item.
      * @return Item an item.
      */
@@ -737,6 +731,7 @@ public class ManifestConnection {
         item.setName(itemName);
         for (Method met : io.getMethods()) {
             if (met.getName().contains("set")) {
+                //get the class type and get the name of that type
                 Class<?> cls = met.getParameterTypes()[0];
                 String string = met.getName().substring(3);
                 char[] c = string.toCharArray();
@@ -745,6 +740,7 @@ public class ManifestConnection {
                 
                 FieldType fType = null;
                 
+                //find the corresponding type in our type list.
                 Type[] genericParameterTypes = met.getGenericParameterTypes();
                 for (int i = 0; i < genericParameterTypes.length; i++) {
                     if (genericParameterTypes[i] instanceof ParameterizedType) {
@@ -793,7 +789,7 @@ public class ManifestConnection {
         
         for (File file : dir.listFiles()) {
             
-            System.out.println("FOUND: " + file.getAbsolutePath());
+            logger.info("Found jar: " + file.getAbsolutePath());
             
             if (!file.isDirectory()) {
                 String outPath = out.getAbsolutePath();
@@ -813,85 +809,6 @@ public class ManifestConnection {
     
     /**
      * Publishes an artifact.
-     * @param ri The ModuleRevisionId
-     * @param srcArtifactPattern A Collection with artifact patterns.
-     * @param resolverName The name of the Resolver as String.
-     * @param options PublishOptions for the publish.
-     * @param revision The revison id.
-     */
-    public void publish(ModuleRevisionId ri, Collection<Pattern> srcArtifactPattern, 
-            String resolverName, PublishOptions options, String revision) {
-
-        System.out.println("Attempting to publish...");
-        System.out.println("ModuleRevisionId == " + ri.getName());
-        System.out.println("Resolver Name == " + resolverName);
-        
-        IBiblioResolver testRes = new IBiblioResolver();
-        testRes.setName("publisher");
-        // TODO fixed URL?? -> shall be configured from outside
-        testRes.setRoot("https://nexus.sse.uni-hildesheim.de/content/repositories/qmproject/");
-        this.ivy.getSettings().addResolver(testRes);
-        System.out.println("CACHE: " + this.ivy.getSettings().getDefaultCache());
-        
-        try {
-            // TODO UNCLEAR C:/ no .m2 -> mavenPath?
-            ivy.deliver(ri, revision, 
-                    "C:/m2/repository/[organisation]/[module]/[revision]/[module]-[revision].[ext]");
-            ivy.publish(ri, srcArtifactPattern, resolverName, options);
-        } catch (IOException exc) {
-            exc.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        
-    }
-    
-    /**
-     * Publishes an artifact to the target.
-     * @param file The actual artifact file.
-     * @param groupId The groupId.
-     * @param artifactId The artifactId.
-     * @param version The (new) version.
-     * @param target The target server.
-     */
-    public void publish(String file, String groupId, String artifactId, String version, String target) {
-        
-        ModuleId modId = new ModuleId(groupId, artifactId);
-        
-        ModuleRevisionId mrId = new ModuleRevisionId(modId, version);
-        List<String> srcArtifactPattern = new ArrayList<String>();
-        srcArtifactPattern.add(file.substring(0, file.lastIndexOf("/")) + "/[module].[ext]");
-        //srcArtifactPattern.add(file.substring(0, file.lastIndexOf("/")) + "/[artifact](-[classifier]).[ext]");
-        String resolverName = "publish_" + target;
-        PublishOptions options = new PublishOptions();
-        
-        IBiblioResolver testRes = new IBiblioResolver();
-        testRes.setName("publish_" + target);
-        testRes.setRoot(target);
-        testRes.setM2compatible(true);
-        testRes.setUseMavenMetadata(true);
-        
-        System.out.println("Deploying artifact \"" + mrId + "\" to " + target);
-        System.out.println("Artifact in: " + srcArtifactPattern.get(0));
-        System.out.println("Resolver: " + resolverName);
-        
-        if (null == this.ivy.getSettings().getResolver("publish_" + target)) {
-            this.ivy.getSettings().addResolver(testRes);
-            System.out.println("Resolver initialized!");
-        } else {
-            System.out.println("Resolver found!");
-        }
-        
-        try {
-            ivy.publish(mrId, srcArtifactPattern, resolverName, options);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-    }
-    
-    /**
-     * Publishes an artifact.
      * @param file The file to publish (should be a *.jar) <br>
      *        Example: "C:/Artifacts/test.jar"
      * @param pomPath The pom file for publishing.
@@ -903,46 +820,8 @@ public class ManifestConnection {
     public void publishWithPom(String file, String pomPath, String repository, boolean forceOverwrite, 
             ProgressObserver monitor) {
         
-        File ivyFile = new File(pomPath);
-        if (!ivyFile.exists()) {
-            try {
-                ivyFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        ivyFile = ivyFile.getParentFile();
-        ivyFile = new File(ivyFile.getAbsolutePath() + "/ivy.xml");
-        
-        System.out.println("Publishing with POM...");
-        System.out.println(ivyFile.getAbsolutePath());
-        System.out.println(pomPath);
-        IvyConvertPom converter = new IvyConvertPom();
-        converter.setPomFile(new File(pomPath));
-
-        converter.setIvyFile(ivyFile);
-        Project project = new Project();
-        
-        IvyAntSettings settings = new IvyAntSettings();
-        settings.setProject(project);
-        
-        //creating a "dummy" project for the converter.
-        project.addReference("ivy.instance", settings);
-        project.setBaseDir(new File("."));
-        project.setDefault("all");
-        project.setName("ConvertPomToIvy");
-        project.setBasedir(".");
-        Reference ref = new Reference(project, "ConvertPomToIvy"); 
-        
-        //create a wrapper for the ivy settings to access additional (hidden) settings.
-        IvySettingsWrapperTask wrapper = new IvySettingsWrapperTask();
-        wrapper.setSettings(this.ivy.getSettings());
-        wrapper.setProject(project);
-        wrapper.setPomFile(new File(pomPath));
-        wrapper.setIvyFile(ivyFile);
-        wrapper.doExecute();
-        
-        System.out.println("Converted to ivy...");
+        logger.info("Publishing with POM...");
+        logger.info("Path of pom: " + pomPath); 
         
         PomInfo info = PomReader.getInfo(new File(pomPath));     
         if (null != info) {
@@ -963,34 +842,19 @@ public class ManifestConnection {
      * @param forceOverwrite forces an overwrite in the nexus.
      * @param monitor The ProgressObserver to track progress.
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void publish(String file, String repository, 
             PomInfo info, boolean forceOverwrite, ProgressObserver monitor) {
         
         IBiblioResolver testRes = new IBiblioResolver();
         testRes.setName("publish_" + repository);
-        testRes.setRoot(repository);
-        for (Object pattern : testRes.getArtifactPatterns()) {
-            System.out.println("ArtifactPatter  n: " + pattern);
-        }        
+        testRes.setRoot(repository);     
         
+        //calculate target paths.
         String targetPath = file.substring(0, file.lastIndexOf(File.separator));
         String pomPath = targetPath.substring(0, targetPath.lastIndexOf(File.separator));
-        System.out.println("POMPATH = " + pomPath);
-
-
-        ModuleRevisionId ri;
-        if (null != info) {
-            ri = ModuleRevisionId.newInstance(info.getGroupId(), info.getArtifactId(), info.getVersion());
-        } else {
-            ri = ModuleRevisionId.newInstance("", "", "");
-        }
-        PublishOptions options = new PublishOptions();
-        options.setHaltOnMissing(true);
-        options.setOverwrite(forceOverwrite);
-        options.setUpdate(true);
-        options.setPubrevision(info.getVersion());
+        logger.info("Target path for pom: " + pomPath);
         
+        //generate meta data for the artifact.
         MetaGenerator gen = new MetaGenerator();
         Metadata meta = new Metadata();
         meta.setLastUpdated(meta.generateTimestamp());
@@ -1002,6 +866,7 @@ public class ManifestConnection {
         }
         gen.writeMetaData(meta, new File(targetPath + "/" + METAFILE_NAME));
         
+        //upload all files.
         try {
             URL dest = new URL(testRes.getRoot());
             
@@ -1011,18 +876,24 @@ public class ManifestConnection {
             
             FTPSConnector.getInstance().initialize(dest);
             FTPSHandler urlPostHandler = new FTPSHandler();
+            
+            //upload the pom
             urlPostHandler.uploadWithoutIvy(new File(pomPath + "/" + POM_NAME), 
                 new URL(destination + info.getArtifactId() + "-" + info.getVersion() 
                 + POM_DEST_NAME), monitor);
+            //upload the jar with dependencies
             urlPostHandler.uploadWithoutIvy(new File(targetPath + "/" + info.getArtifactId() + "-" + info.getVersion() 
                 + JAR_WITH_DEPENDENCIES), new URL(destination + info.getArtifactId() + "-" + info.getVersion() 
                 + JAR_WITH_DEPENDENCIES), monitor);
+            //upload the jar
             urlPostHandler.uploadWithoutIvy(new File(targetPath + "/" + info.getArtifactId() + "-" + info.getVersion() 
                 + JAR), new URL(destination + info.getArtifactId() + "-" + info.getVersion() 
                 + JAR), monitor);
+            //upload the sources
             urlPostHandler.uploadWithoutIvy(new File(targetPath + "/" + info.getArtifactId() + "-" + info.getVersion() 
                 + SOURCES_JAR), new URL(destination + info.getArtifactId() + "-" + info.getVersion() 
                 + SOURCES_JAR), monitor);
+            //upload the metadata
             urlPostHandler.uploadWithoutIvy(new File(targetPath + "/" + METAFILE_NAME), 
                 new URL(preDestination + METAFILE_NAME), monitor);
 
@@ -1036,92 +907,6 @@ public class ManifestConnection {
         
     }
     
-    /**
-     * Publishes an artifact.
-     * @param dir The dir to publish<br>
-     *        Example: "C:/Artifacts/target"
-     * @param ivyFile The ivy file for publishing. For pom use the wrapper method.
-     * @param repository The nexus repository. <br>
-     *        Example: "https://nexus.sse.uni-hildesheim.de/content/repositories/qmproject/"
-     * @param forceOverwrite forces an overwrite in the nexus.
-     * @param monitor The ProgressObserver to monitor the current progress.
-     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public void publishDir(String dir,  String ivyFile, String repository, 
-            boolean forceOverwrite, ProgressObserver monitor) {
-        
-        ITask mainTask = monitor.registerTask("Loading Dependencies");
-        sysOutUpload.setMonitor(monitor);
-        
-        IBiblioResolver testRes = new IBiblioResolver();
-        testRes.setName("publish_" + repository);
-        testRes.setRoot(repository);
-        
-        List<File> files = getFilesFromDir(dir);
-        
-        if (null == this.ivy.getSettings().getResolver("publish_" + repository)) {
-            this.ivy.getSettings().addResolver(testRes);
-        }
-        
-        //Is undefined, because ivy needs a Collection<Pattern> with actually just Strings inside it...
-        Collection srcArtifactPattern = new ArrayList();
-        for (File file : files) {
-            String filePath = file.getAbsolutePath();
-            System.out.println(filePath.substring(0, filePath.lastIndexOf("/")) + "/[module].[ext]");
-            srcArtifactPattern.add(filePath.substring(0, filePath.lastIndexOf("/")) + "/[module].[ext]");
-        }
-        
-        ModuleRevisionId ri;
-        ri = ModuleRevisionId.newInstance("", "", "");
-        
-        PublishOptions options = new PublishOptions();
-        options.setHaltOnMissing(true);
-        options.setOverwrite(forceOverwrite);
-        options.setSrcIvyPattern(ivyFile);
-        options.setUpdate(true);
-        
-        try {
-            monitor.notifyStart(mainTask, 200);
-            sysOutUpload.setMax(200);
-            sysOutUpload.setTask(mainTask);
-            
-            System.setOut(sysOutUpload);
-            System.setErr(sysOutUpload);
-            
-            ivy.publish(ri, srcArtifactPattern, "publish_" + repository, options);
-        } catch (IOException exc) {
-            exc.printStackTrace();
-        } catch (IllegalStateException exc) {
-            exc.printStackTrace();
-        }
-
-        System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out)));
-        System.setErr(new PrintStream(new FileOutputStream(FileDescriptor.err)));
-        monitor.notifyEnd(mainTask);
-        
-        
-    }
-    
-    /**
-     * Returns all files inside a folder and its subfolders.
-     * @param dir The root folder.
-     * @return A list of all files inside the folder and its subfolders.
-     */
-    public static List<File> getFilesFromDir(String dir) {
-        List<File> files = new ArrayList<File>();
-        File directory = new File(dir);
-
-        // get all the files from a directory
-        File[] fList = directory.listFiles();
-        for (File file : fList) {
-            if (file.isFile()) {
-                files.add(file);
-            } else if (file.isDirectory()) {
-                files.addAll(getFilesFromDir(file.getAbsolutePath()));
-            }
-        }
-        return files;
-    }
     
     /**
      * Extracts the manifest from a jar file.
@@ -1136,6 +921,7 @@ public class ManifestConnection {
         
         try {
             
+            //generate the URL
             url = new URL(createJarAccessorURLString(out, artifactId) + "/manifest.xml");
             InputStream is;
             try {
@@ -1147,7 +933,7 @@ public class ManifestConnection {
             }
             byte[] buffer = new byte[is.available()];
             is.read(buffer);
-         
+
             File targetFile = new File(out + "/manifest.xml");
             outStream = new FileOutputStream(targetFile);
             outStream.write(buffer);
@@ -1169,7 +955,6 @@ public class ManifestConnection {
                 try {
                     outStream.close();
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
@@ -1216,127 +1001,6 @@ public class ManifestConnection {
         return result;
         
     } 
-    
-    /**
-     * Resolves an artifact.
-     * @param groupId The group ID of the target artifact.
-     * @param artifactId The artifact ID of the target artifact.
-     * @param version The version of the target artifact.
-     * @return ResolveReport The report of the resolving.
-     */
-    public ResolveReport resolve(String groupId, String artifactId, String version) {
-        
-        ResolveReport report = null;
-        
-//        System.setOut(sysOut);
-//        System.setErr(sysOut);
-        System.setProperty("jsse.enableSNIExtension", "false");
-        Security.insertProviderAt(new BouncyCastleProvider(), 1);      
-        
-        //deleteDir(new File("ivy/cache"));
-        //deleteDir(new File("out"));
-        
-        addCredentials("testuser", "nexustest");
-        
-        ResolveOptions ro = new ResolveOptions();
-        ro.setResolveMode(ResolveOptions.RESOLVEMODE_DYNAMIC);
-        ro.setTransitive(true);
-        ro.setDownload(true);    
-        DefaultModuleDescriptor md = DefaultModuleDescriptor.newDefaultInstance(
-            ModuleRevisionId.newInstance(groupId, artifactId + "-envelope", version)
-        );
-        ModuleRevisionId ri = ModuleRevisionId.newInstance(groupId, artifactId, version);
-        DefaultDependencyDescriptor dd = new DefaultDependencyDescriptor(md, ri, false, false, true);
-        dd.addDependencyConfiguration("default", "compile"); //master
-        dd.addDependencyConfiguration("default", "default");
-        dd.addDependencyConfiguration("default", "master");
-        dd.addDependencyConfiguration("default", "runtime");
-        dd.addDependencyConfiguration("default", "provided");
-        md.addDependency(dd); 
-        try {
-            report = ivy.resolve(md, ro);
-            report.getModuleDescriptor();
-            if (report.hasError()) {
-                throw new RuntimeException(report.getAllProblemMessages().toString());
-            }                
-        } catch (IOException exc) {
-            exc.printStackTrace();
-        } catch (ParseException exc) {
-            exc.printStackTrace();
-        }  
-        
-        return report;
-        
-    }
-    
-    /**
-     * Returns all referenced jars for the target artifact.
-     * @param groupId The group ID of the target artifact.
-     * @param artifactId The artifact ID of the target artifact.
-     * @param version The version of the target artifact.
-     * @return A list with the names of the referenced jars.
-     */
-    public List<String> getJarList(String groupId, String artifactId, String version) {
-        
-        List<String> jarList = new ArrayList<String>();
-        
-        for (Object o : resolve(groupId, artifactId, version).getArtifacts()) {
-            jarList.add(o.toString());
-        }
-        
-        return jarList;
-        
-    }
-    
-    /**
-     * Returns all referenced jar files for the target artifact.
-     * @param groupId The group ID of the target artifact.
-     * @param artifactId The artifact ID of the target artifact.
-     * @param version The version of the target artifact.
-     * @return A list of all referenced (and downloaded) jar files.
-     */
-    public List<File> getJarFiles(String groupId, String artifactId, String version) {
-        
-        List<File> fileList = new ArrayList<File>();
-        List<String> list = getJarList(groupId, artifactId, version);
-        
-        for (String s : list) {
-            System.out.println(s);
-            
-            String wip = s.substring(s.lastIndexOf('!') + 1);
-            
-            fileList.add(new File(this.out.getAbsolutePath() + "/" 
-                    + wip.substring(0, wip.lastIndexOf(".jar") + 4)));
-        }
-        
-        return fileList;
-        
-    }
-    
-    /**
-     * Returns all referenced jar files for the target artifact.
-     * @param pom a pom.xml
-     * @return A list of all referenced (and downloaded) jar files.
-     */
-    public List<File> getJarFiles(File pom) {
-        
-        PomInfo info = PomReader.getInfo(pom);
-        
-        List<File> fileList = new ArrayList<File>();
-        List<String> list = getJarList(info.getGroupId(), info.getArtifactId(), info.getVersion());
-        
-        for (String s : list) {
-            System.out.println(s);
-            
-            String wip = s.substring(s.lastIndexOf('!') + 1);
-            
-            fileList.add(new File(this.out.getAbsolutePath() + "/" 
-                    + wip.substring(0, wip.lastIndexOf(".jar") + 4)));
-        }
-        
-        return fileList;
-        
-    }
     
     /**
      * Validates the jar list, aka checks if all files exist. 
@@ -1405,16 +1069,14 @@ public class ManifestConnection {
             zip = new ZipInputStream(new FileInputStream(file.getAbsolutePath()));
             for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
                 if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
-                    // This ZipEntry represents a class. Now, what class does it represent?
+                    // Which class does this zip entry represent?
                     String className = entry.getName().replace('/', '.'); // including ".class"
                     classNames.add(className.substring(0, className.length() - ".class".length()));
                 }
             }
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         
@@ -1432,56 +1094,6 @@ public class ManifestConnection {
         return classes;
     }
     
-    /**
-     * Compiles a source file into a class.
-     * @param file The source file.
-     * @param className The name of the class.
-     * @return The compiled class, or null.
-     */
-    public Class<?> compileClass(File file, String className) {
-        
-        List<URL> urls = loadJars(file.getParentFile().getAbsolutePath());
-        String[] array = new String[urls.size() + 1];
-        array[array.length - 1] = file.getPath();
-        for (int i = 0; i < urls.size(); i++) {
-            array[i] = urls.get(i).getPath().substring(1, urls.get(i).getPath().length());
-        }
-        Class<?> result = null;
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        compiler.run(null, null, null, array);
-        
-        @SuppressWarnings("unused")
-        File dir = null;
-        
-        if (file.isDirectory()) {
-            dir = file;
-        } else {
-            dir = file.getParentFile();
-        }
-        
-//        URLClassLoader classLoader;
-//        try {
-//            classLoader = URLClassLoader.newInstance(new URL[] {dir.toURI().toURL()});
-//            result = Class.forName(className, true, classLoader);
-//        } catch (MalformedURLException e) {
-//            e.printStackTrace();
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-        
-        return result;
-    }
-    
-    /**
-     * Returns a list of all class names inside a jar file. Only classes with "Calculate" methods are returned.
-     * @param file The jar file.
-     * @return A List<String> with the class names inside the jar. Can be empty.
-     */
-    public List<String> getAllValidClasses(File file) {
-        List<String> result = getAllClasses(file);
-        
-        return result;
-    }
     
     /**
      * Retrieves the artifact Id from an artifact name.
@@ -1494,7 +1106,7 @@ public class ManifestConnection {
             try {
                 result = artifact.split(":")[1].trim();
             } catch (ArrayIndexOutOfBoundsException exc) {
-                //Some kind of report is needed!
+                //do nothing!
             }
         }
         return result;
@@ -1511,7 +1123,7 @@ public class ManifestConnection {
             try {
                 result = artifact.split(":")[0].trim();
             } catch (ArrayIndexOutOfBoundsException exc) {
-                //Some kind of report is needed!
+              //do nothing!
             }
         }
         return result;
@@ -1528,7 +1140,7 @@ public class ManifestConnection {
             try {
                 result = artifact.split(":")[2].trim();
             } catch (ArrayIndexOutOfBoundsException exc) {
-                //Some kind of report is needed!
+              //do nothing!
             }
         }
         return result;
@@ -1547,20 +1159,20 @@ public class ManifestConnection {
             
             if (!file.exists()) {
 
+                //some jars have the shaded suffix and can not be found otherwise.
                 File replacement = new File(file.getAbsolutePath().substring(0, 
                         file.getAbsolutePath().length() - 4) + "-shaded.jar");
                 
                 if (replacement.exists()) {
                     file = replacement;
-                }
-                
+                }  
             }
             
             try {
                 zip = new ZipInputStream(new FileInputStream(file.getAbsolutePath()));
                 for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
                     if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
-                        // This ZipEntry represents a class. Now, what class does it represent?
+                     // Which class does this zip entry represent?
                         String className = entry.getName().replace('/', '.'); // including ".class"
                         className = className.substring(0, className.length() - ".class".length());
                         if (!className.matches(CLASS_NAMES_TO_OMIT)) {
@@ -1577,60 +1189,6 @@ public class ManifestConnection {
         
         return classNames;
 
-    }
-    
-    /**
-     * Returns a list of all class names inside a jar file. Only classes with "Calculate" methods are returned.
-     * @param files The jar file.
-     * @return A List<String> with the class names inside the jar. Can be empty.
-     */
-    public List<String> getAllValidClasses(List<File> files) {
-        
-        List<String> result = new ArrayList<String>();
-        
-        if (null != files && !files.isEmpty()) {
-            
-            List<String> classNames = getAllClasses(files);
-            URLClassLoader loader = null;
-            
-            URL[] urls = new URL[files.size()];
-            try {
-                for (int i = 0; i < files.size(); i++) {
-                    urls[i] = files.get(i).toURI().toURL();
-                }
-                loader = new URLClassLoader(urls);
-                
-                for (String s : classNames) {
-                    
-                    result.add(s);
-                    try {
-                        Class<?> cls = loader.loadClass(s);
-                        for (Method method : cls.getMethods()) {
-                            if (method.getName().equalsIgnoreCase("calculate")) {
-                                result.add(cls.getCanonicalName());
-                            }
-                        }
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                    
-                }
-                
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } finally {
-                if (null != loader) {
-                    try {
-                        loader.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        
-        }
-        
-        return result;
     }
     
     /**

@@ -28,17 +28,22 @@ public class UploadListener implements CopyStreamListener {
      * @param source The file that is being observed by this listener-observer combination.
      */
     public UploadListener(ProgressObserver monitor, File source) {
+        
+        //initialize and start the task
         super();
         this.monitor = monitor;
         this.source = source;
         this.task = monitor.registerTask(source.getName());
         monitor.notifyStart(this.task, 100);
-        System.out.println("Starting upload task for: " + source.getAbsolutePath());
         this.done = false;
+        
+        System.out.println("Starting upload task for: " + source.getAbsolutePath());
+        
         mbSize = (int) ((double) source.length() / 1000000);
         ProgressObserver.ISubtask subtask = monitor.registerSubtask(
                 0 + " / " + mbSize + " Mbyte");
         monitor.notifyStart(this.task, subtask, 1);
+        
     }
     
     @Override
@@ -49,25 +54,41 @@ public class UploadListener implements CopyStreamListener {
 
     @Override
     public void bytesTransferred(long totalBytesTransferred, int bytesTransferred, long streamSize) {
+        
+        //calculate the current progress and the according percentage.
         int transfer = (int) ((double) totalBytesTransferred / 1000000);
         double progress = ((double) totalBytesTransferred / source.length());
         int step = ((int) (progress * 100));
+        
+        //if 100% is reached, end the task.
         if (step >= 100) {
+            
             monitor.notifyProgress(this.task, 100);
             monitor.notifyEnd(this.task);
             System.out.println("Finished upload task for: " + source.getAbsolutePath());
             done = true;
+            
         } else {
+            
+            //if the task is not done keep updating the progress.
             if (!done) {
+                
                 monitor.notifyProgress(this.task, step);
+                
+                //update only if we have actually made some progress.
                 if (transfer > mbTransferred) {
+                    
                     mbTransferred = transfer;
                     ProgressObserver.ISubtask subtask = monitor.registerSubtask(
                             mbTransferred + " / " + mbSize + " Mbyte");
                     monitor.notifyStart(this.task, subtask, 1);
+                    
                 }
+                
             } 
+            
         }
+        
     }
     
     /**
