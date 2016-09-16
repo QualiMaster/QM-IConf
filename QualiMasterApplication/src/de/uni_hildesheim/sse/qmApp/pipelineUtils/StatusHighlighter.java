@@ -44,7 +44,6 @@ public class StatusHighlighter {
     
     private List<PipelineDataflowInformationWrapper> pipelineDataflowList = 
             new ArrayList<PipelineDataflowInformationWrapper>();
-    private String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
     
     /**
      * // Exists only to avoid instantiation.
@@ -471,6 +470,7 @@ public class StatusHighlighter {
         IFigure figure = getTargetFigure(editPartForSemanticElement);
 
         SVGFigure svgFigure = (SVGFigure) figure;
+        String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
         
         if (eobject instanceof SourceImpl) {
 
@@ -517,6 +517,7 @@ public class StatusHighlighter {
         IFigure figure = getTargetFigure(editPartForSemanticElement);
 
         SVGFigure svgFigure = (SVGFigure) figure;
+        String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
         
         if (eobject instanceof SinkImpl) {
 
@@ -563,6 +564,7 @@ public class StatusHighlighter {
         IFigure figure = getTargetFigure(editPartForSemanticElement);
 
         SVGFigure svgFigure = (SVGFigure) figure;
+        String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
         
         if (eobject instanceof FamilyElementImpl) {
 
@@ -609,6 +611,7 @@ public class StatusHighlighter {
         IFigure figure = getTargetFigure(editPartForSemanticElement);
 
         SVGFigure svgFigure = (SVGFigure) figure;
+        String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
         
         if (eobject instanceof DataManagementElementImpl) {
 
