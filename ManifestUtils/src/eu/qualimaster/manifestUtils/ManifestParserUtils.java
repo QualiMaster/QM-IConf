@@ -3,7 +3,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.ivy.plugins.resolver.IBiblioResolver;
-import org.apache.ivy.plugins.resolver.ResolverSettings;
 
 /**
  * Defines some helpful methods for the ManifestParser etc.
@@ -31,7 +30,7 @@ public class ManifestParserUtils {
             resolver.setPattern("[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]");
             resolver.setUseMavenMetadata(true);
             resolver.setCheckmodified(true);
-            ResolverSettings set = resolver.getSettings();
+            resolver.getSettings();
             resolver.setValidate(true);
             result.add(resolver);
             System.out.println("REP#" + i + " = " + repositories.get(i));

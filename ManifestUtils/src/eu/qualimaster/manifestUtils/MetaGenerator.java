@@ -60,6 +60,7 @@ public class MetaGenerator {
         Element root = doc.createElement("metadata");
         doc.appendChild(root);
         
+        //create necessary elements
         Element groupId = doc.createElement("groupId");
         groupId.setTextContent(metadata.getGroupId());
         Element artifactId = doc.createElement("artifactId");
@@ -71,6 +72,7 @@ public class MetaGenerator {
         Element lastUpdated = doc.createElement("lastUpdated");
         lastUpdated.setTextContent(metadata.getLastUpdated());  
         
+        //append all the elements in appropriate places
         root.appendChild(groupId);
         root.appendChild(artifactId);
         root.appendChild(versioning);
@@ -85,6 +87,7 @@ public class MetaGenerator {
         
         versioning.appendChild(lastUpdated);
         
+        //create the actual XML
         DOMSource source = new DOMSource(doc);
         StreamResult result = new StreamResult(target);    
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -159,6 +162,7 @@ public class MetaGenerator {
                     
                     Node child = root.getChildNodes().item(i);
                     
+                    //try to read available information
                     if (null != child && child.getNodeName().equals("groupId")) {
                         metadata.setGroupId(child.getTextContent());
                     } else if (null != child && child.getNodeName().equals("artifactId")) {
@@ -223,35 +227,6 @@ public class MetaGenerator {
                 
             }
             
-        }
-        
-    }
-    
-    /**
-     * Testing main method.
-     * @param args Arguments.
-     */
-    public static void main(String[] args) {
-        
-        MetaGenerator gen = new MetaGenerator();
-        File target = new File("C:/Test/maven-metadat_NEW.xml");
-        Metadata metadata = new Metadata();
-        metadata.setArtifactId("PriorityPip");
-        metadata.setGroupId("eu.qualimaster");
-        metadata.setReleaseVersion("0.1.0");
-        metadata.addVersion("0.0.1-SNAPSHOT");
-        metadata.addVersion("0.0.2-SNAPSHOT");
-        metadata.addVersion("0.1.0");
-        metadata.addVersion("0.2.0-SNAPSHOT");
-        metadata.setLastUpdated("20160816105748");
-//        gen.writeMetaData(metadata, target);
-        
-        try {
-            Metadata meta = gen.readMetadata(new File("C:/Test/maven-metadata_OUTER.xml"));
-            gen.writeMetaData(meta, target);
-        } catch (ManifestUtilsException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
         
     }

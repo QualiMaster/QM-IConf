@@ -19,7 +19,6 @@ public class FTPSConnector {
     private static final FTPSConnector INSTANCE = new FTPSConnector();
     private static final String PROTOCOL = "SSL";
     private static final int PORT = 21; //port 22 is SSH! port 21 should be correct!
-    private static final int LOGIN_REPLY_CODE = 230;
     
     private FTPSClient client;
     
@@ -51,8 +50,8 @@ public class FTPSConnector {
      */
     public void initialize(URL dest) throws IOException {
         
-        Credentials cred = ManifestConnection.getCredentials();
-        
+        //get the credentials
+        Credentials cred = ManifestConnection.getCredentials(); 
         String username = null;
         String password = null;
         String host = null;
@@ -65,18 +64,16 @@ public class FTPSConnector {
             throw new ManifestRuntimeException("You are not logged in. Please log in to use this feature.");
         }
         
+        //connect
         System.out.println("Initializing FTPS-connection to " + host);      
         client = new FTPSClient(PROTOCOL, false);
-        
-//        if (client.isConnected()) {
-//            client.disconnect();
-//        }
         client.connect(host, PORT);
 
         // Set protection buffer size and data channel protection to private
         client.execPBSZ(0);
         client.execPROT("P");
                 
+        //login
         try {
             client.login(username, password);
         } catch (IOException e) {
@@ -86,6 +83,7 @@ public class FTPSConnector {
             throw new ManifestRuntimeException("The login failed. Please check your credentials.");
         }
         
+        //additional settings.
         client.setFileType(FTPClient.BINARY_FILE_TYPE);
         client.setFileTransferMode(FTPClient.BINARY_FILE_TYPE);
         client.enterLocalPassiveMode();

@@ -1,6 +1,5 @@
 package eu.qualimaster.manifestUtils;
 
-import org.apache.ivy.Ivy;
 import org.apache.ivy.ant.IvyConvertPom;
 import org.apache.ivy.core.settings.IvySettings;
 import org.apache.tools.ant.BuildException;

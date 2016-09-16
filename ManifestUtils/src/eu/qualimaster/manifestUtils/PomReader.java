@@ -90,12 +90,11 @@ public class PomReader {
      */
     public static PomInfo getInfo(File file) {
         
+        //initialize
         PomInfo result = new PomInfo();
         
         DocumentBuilderFactory factory = null;
         DocumentBuilder builder = null;
-        //TransformerFactory transformerFactory = null;
-        //Transformer transformer = null;
         Document doc = null;
         
         if (file != null && file.exists() && file.length() > 0) {
@@ -104,8 +103,6 @@ public class PomReader {
                 
                 factory = DocumentBuilderFactory.newInstance();
                 builder = factory.newDocumentBuilder();
-                //transformerFactory = TransformerFactory.newInstance();
-                //transformer = transformerFactory.newTransformer();
                 doc = builder.parse(file);
                 
             } catch (SAXException exc) {
@@ -125,9 +122,9 @@ public class PomReader {
             Element root = doc.getDocumentElement();
             NodeList list = root.getChildNodes();
             
+            //read in the pom information if available.
             for (int i = 0; i < list.getLength(); i++) {
                 Node node = list.item(i);
-                //System.out.println(node.getNodeName() + " = " + node.getTextContent());
                 if (node.getNodeName().equalsIgnoreCase("groupId")) {
                     result.groupId = node.getTextContent();
                 }
@@ -150,25 +147,6 @@ public class PomReader {
         }
         
         return result;
-        
-    }
-    
-    /**
-     * Main method for testing purposes.
-     * @param args String arguments.
-     */
-    public static void main(String[] args) {
-        
-        String test = "";
-        File file = new File("C:/Test/pom.xml");
-        if (file.exists()) {
-            System.out.println("DA");
-        }
-        test = getInfo(file).getFullPath();
-        System.out.println(test);
-        System.out.println(getInfo(file).getArtifactId());
-        System.out.println(getInfo(file).getGroupId());
-        System.out.println(getInfo(file).getVersion());
         
     }
     
