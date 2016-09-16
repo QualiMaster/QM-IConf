@@ -20,6 +20,8 @@ import org.apache.commons.net.ftp.FTPSClient;
 import org.apache.commons.net.io.CopyStreamException;
 import org.apache.ivy.util.url.BasicURLHandler;
 
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
 import net.ssehub.easy.basics.progress.ProgressObserver;
 
 /**
@@ -36,6 +38,9 @@ public class FTPSHandler extends BasicURLHandler {
     private static final String EDIT_ACCESS_COMMAND = "chmod g+w ";
     private static final String SHA1 = "SHA1";
     private static final String MD5 = "MD5";
+    
+    private EASyLogger logger = EASyLoggerFactory.INSTANCE.getLogger(FTPSHandler.class, 
+            "eu.qualimaster.ManifestUtils");
     
     /**
      * Downloads a file from the FTPS URL and stores it to destination.
@@ -149,7 +154,7 @@ public class FTPSHandler extends BasicURLHandler {
             } 
 
         } else {
-            Bundle.getLogger(FTPSHandler.class).error("FATAL ERROR: CLIENT == NULL!");
+            logger.error("FTPSClient has not been initialized correctly.");
         }
     }
 

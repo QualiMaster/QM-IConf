@@ -4,12 +4,18 @@ import java.util.List;
 
 import org.apache.ivy.plugins.resolver.IBiblioResolver;
 
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
+
 /**
  * Defines some helpful methods for the ManifestParser etc.
  * @author Patrik Pastuschek
  *
  */
 public class ManifestParserUtils {
+
+    private static EASyLogger logger = EASyLoggerFactory.INSTANCE.getLogger(ManifestParserUtils.class, 
+            "eu.qualimaster.ManifestUtils");
 
     /**
      * Will create a List of IBiblioResolvers from a List of repositories (String).
@@ -33,7 +39,7 @@ public class ManifestParserUtils {
             resolver.getSettings();
             resolver.setValidate(true);
             result.add(resolver);
-            System.out.println("REP#" + i + " = " + repositories.get(i));
+            logger.info("REP#" + i + " = " + repositories.get(i));
             
         }
         

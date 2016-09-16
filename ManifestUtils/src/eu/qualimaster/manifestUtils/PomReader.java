@@ -97,6 +97,7 @@ public class PomReader {
         DocumentBuilder builder = null;
         Document doc = null;
         
+        //parse the file
         if (file != null && file.exists() && file.length() > 0) {
             
             try { 
@@ -140,6 +141,7 @@ public class PomReader {
             System.out.println("FAILED!");   
         }
         
+        //generate the full path if possible (example: de.uni-hildesheim.sse.ivml)
         if (null != result.groupId && null != result.artifactId) {
             result.fullPath = result.groupId + "." + result.artifactId;
         } else {

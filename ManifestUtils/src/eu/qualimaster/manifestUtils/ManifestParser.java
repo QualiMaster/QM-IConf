@@ -30,6 +30,8 @@ import eu.qualimaster.manifestUtils.data.FieldType;
 import eu.qualimaster.manifestUtils.data.Item;
 import eu.qualimaster.manifestUtils.data.Manifest;
 import eu.qualimaster.manifestUtils.data.Manifest.ManifestType;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
 import eu.qualimaster.manifestUtils.data.Parameter;
 
 /**
@@ -82,6 +84,9 @@ public class ManifestParser {
     private Transformer transformer;
     private Document doc;
     
+    private EASyLogger logger = EASyLoggerFactory.INSTANCE.getLogger(ManifestParser.class, 
+            "eu.qualimaster.ManifestUtils");
+    
     /**
      * Constructor, initializes certain builder and factories used by w3c dom.
      */
@@ -127,7 +132,7 @@ public class ManifestParser {
                 
             } else {
                 
-                System.out.println("Unable to parse manifest!");
+                logger.warn("Unable to parse manifest: " + file.getAbsolutePath());
                 
             }
         
@@ -193,7 +198,7 @@ public class ManifestParser {
                             
                         } catch (IllegalArgumentException exc) {
                             
-                            System.out.println("[Error:] At Tuple-Node: " + j + ", name: " + name 
+                            logger.warn("[Error:] At Tuple-Node: " + j + ", name: " + name 
                                     + ", illegal field declaration!");
                             
                         }
@@ -420,7 +425,7 @@ public class ManifestParser {
                         }
                                       
                     } catch (IllegalArgumentException exc) {  
-                        System.out.println("[ERROR:] Illegal Parameter: " + type);   
+                        logger.warn("Illegal parameter type: " + type);   
                     } 
                     
                 }      
@@ -480,7 +485,7 @@ public class ManifestParser {
                         //Parameter param = new Parameter(name, Parameter.ParameterType.valueOf(value));
                     } catch (IllegalArgumentException exc) {
                         
-                        System.out.println("[ERROR:] Illegal qualityParameter: " + "Name: " + name 
+                        logger.warn("Illegal quality parameter: " + "Name: " + name 
                                 + ", Value: " + value);
                         
                     }

@@ -20,6 +20,8 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import eu.qualimaster.manifestUtils.data.Metadata;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
 
 /**
  * Generates metadata for an artifact.
@@ -33,6 +35,9 @@ public class MetaGenerator {
     private TransformerFactory transformerFactory;
     private Transformer transformer;
     private Document doc;
+    
+    private EASyLogger logger = EASyLoggerFactory.INSTANCE.getLogger(MetaGenerator.class, 
+            "eu.qualimaster.ManifestUtils");
     
     /**
      * Simple Constructor.
@@ -131,7 +136,7 @@ public class MetaGenerator {
                 
             } else {
                 
-                System.out.println("Unable to parse manifest!");
+                logger.info("Unable to parse manifest!");
                 
             }
         

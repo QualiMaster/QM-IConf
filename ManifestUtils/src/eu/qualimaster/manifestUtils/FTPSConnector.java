@@ -8,6 +8,9 @@ import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
 import org.apache.ivy.util.Credentials;
 
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
+
 /**
  * Handles the FTPSClient-Connection to ensure persistence.
  * @author pastuschek
@@ -21,6 +24,9 @@ public class FTPSConnector {
     private static final int PORT = 21; //port 22 is SSH! port 21 should be correct!
     
     private FTPSClient client;
+    
+    private EASyLogger logger = EASyLoggerFactory.INSTANCE.getLogger(FTPSConnector.class, 
+            "eu.qualimaster.ManifestUtils");
     
     /**
      * Singleton pattern.
@@ -65,7 +71,7 @@ public class FTPSConnector {
         }
         
         //connect
-        System.out.println("Initializing FTPS-connection to " + host);      
+        logger.info("Initializing FTPS-connection to " + host);      
         client = new FTPSClient(PROTOCOL, false);
         client.connect(host, PORT);
 

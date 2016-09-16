@@ -295,7 +295,7 @@ public class ManifestConnection {
         //clear our temp folder.
         deleteDir(this.out);
         setRetrievalFolder(this.out);
-        System.out.println("RETRIEVAL: " + this.out);  
+        logger.info("RETRIEVAL: " + this.out);
         ResolveOptions ro = new ResolveOptions();
 
         //set the resolver to transitive.
@@ -596,7 +596,8 @@ public class ManifestConnection {
                         io = null;
                     }
                 } else {
-                    System.out.println("UNABLE TO FIND IN / OUTPUT!"); 
+                    logger.info("No Input/Output found for sink-methods. May be an algorithm."); 
+                    //not fatal since it could be an algorithm and not a sink.
                 } 
                 
             }
@@ -645,7 +646,8 @@ public class ManifestConnection {
                         io = null;
                     }
                 } else {
-                    System.out.println("UNABLE TO FIND IN / OUTPUT!"); 
+                    logger.info("No Input/Output found for algorithm-methods. May be a sink.");
+                    //not fatal since it could be a sink and not an algorithm.
                 }  
             }
         }
@@ -787,7 +789,7 @@ public class ManifestConnection {
         
         for (File file : dir.listFiles()) {
             
-            System.out.println("FOUND: " + file.getAbsolutePath());
+            logger.info("Found jar: " + file.getAbsolutePath());
             
             if (!file.isDirectory()) {
                 String outPath = out.getAbsolutePath();
@@ -818,8 +820,8 @@ public class ManifestConnection {
     public void publishWithPom(String file, String pomPath, String repository, boolean forceOverwrite, 
             ProgressObserver monitor) {
         
-        System.out.println("Publishing with POM...");
-        System.out.println(pomPath); 
+        logger.info("Publishing with POM...");
+        logger.info("Path of pom: " + pomPath); 
         
         PomInfo info = PomReader.getInfo(new File(pomPath));     
         if (null != info) {
@@ -850,7 +852,7 @@ public class ManifestConnection {
         //calculate target paths.
         String targetPath = file.substring(0, file.lastIndexOf(File.separator));
         String pomPath = targetPath.substring(0, targetPath.lastIndexOf(File.separator));
-        System.out.println("POMPATH = " + pomPath);
+        logger.info("Target path for pom: " + pomPath);
         
         //generate meta data for the artifact.
         MetaGenerator gen = new MetaGenerator();
@@ -919,6 +921,7 @@ public class ManifestConnection {
         
         try {
             
+            //generate the URL
             url = new URL(createJarAccessorURLString(out, artifactId) + "/manifest.xml");
             InputStream is;
             try {
@@ -930,7 +933,7 @@ public class ManifestConnection {
             }
             byte[] buffer = new byte[is.available()];
             is.read(buffer);
-         
+
             File targetFile = new File(out + "/manifest.xml");
             outStream = new FileOutputStream(targetFile);
             outStream.write(buffer);

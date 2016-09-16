@@ -29,7 +29,7 @@ public class UploadListener implements CopyStreamListener {
      */
     public UploadListener(ProgressObserver monitor, File source) {
         
-        //initialize
+        //initialize and start the task
         super();
         this.monitor = monitor;
         this.source = source;
