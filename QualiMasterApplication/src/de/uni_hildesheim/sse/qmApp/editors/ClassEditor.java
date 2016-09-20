@@ -117,7 +117,7 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
     
     private String artifact = null;
     private ManifestConnection con = null;
-    private Map<String, AbstractVariable> instances;
+    private Map<AbstractVariable, String> instances;
     
     /**
      * Prevents external creation.
@@ -417,13 +417,11 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             IDecisionVariable var = found.get(0); 
             container = (ContainerVariable) var;
             addManifestParameters(param, manifest, algorithmName);
-            
             for (Parameter p : param) {
                 
                 try {
 
                     container.addNestedElement(); 
-
                     IDatatype containerType = container.getDeclaration().getType();
                     // The container could be a deriveddatatype -> resolve to basis to be sure that we have a container
                     containerType = DerivedDatatype.resolveToBasis(containerType);
@@ -432,7 +430,12 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
                         containedType = ((Container) containerType).getContainedType();
                     }
                     
-                    AbstractVariable parameterType = instances.get(p.getNormalizedTypeName());
+                    AbstractVariable parameterType = null;
+                    for (AbstractVariable abstractVar : instances.keySet()) {
+                        if (instances.get(abstractVar).equalsIgnoreCase(p.getNormalizedTypeName())) {
+                            parameterType = abstractVar;
+                        }
+                    }
                     parameterType = getVarInstance(p.getNormalizedTypeName());     
                     DatatypeFinder finder = new DatatypeFinder(project, FilterType.ALL, containedType);
                     List<CustomDatatype> foundTypes = finder.getFoundDatatypes();
@@ -594,7 +597,7 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
                             .setValue(ValueFactory.createValue(StringType.TYPE, f.getName()), 
                                     AssignmentState.ASSIGNED);
                         
-                        AbstractVariable neededType = getVarInstance(f.getFieldType().getNormalizedName()); 
+                        AbstractVariable neededType = getVarInstance(f.getFieldType().name()); 
                         
                         if (null != neededType) {
                             
@@ -629,12 +632,13 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
         }
         
         AbstractVariable result = null;
-        Set<String> keys = instances.keySet();
-        for (String key : keys) {
-            String temp = instances.get(key).getName().toLowerCase();
+        Set<AbstractVariable> keys = instances.keySet();
+        for (AbstractVariable key : keys) {
+            String temp = key.getName().toLowerCase();
+            System.out.println(temp);
             if (temp.substring(0, temp.length() - 4).equals(name.toLowerCase())) {
                     //|| temp.equals(name.toLowerCase())) { //|| temp.contains(name.toLowerCase())
-                result = instances.get(key);
+                result = key;
                 break;
             }
         }
@@ -655,10 +659,10 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             type = ModelQuery.findType(project, "FieldType", null);
             DeclarationFinder finder = new DeclarationFinder(project, FilterType.ALL, type);
             List<AbstractVariable> declarations = finder.getVariableDeclarations(VisibilityType.ALL);
-            instances = new HashMap<String, AbstractVariable>();
+            instances = new HashMap<AbstractVariable, String>();
             for (int i = 0; i < declarations.size(); i++) {
                 IDecisionVariable variable = var.getConfiguration().getDecision(declarations.get(i));
-                instances.put(variable.getNestedElement(1).getValue().getValue().toString(), variable.getDeclaration());
+                instances.put(variable.getDeclaration(), variable.getNestedElement(1).getValue().getValue().toString());
             }
         } catch (ModelQueryException e) {
             e.printStackTrace();

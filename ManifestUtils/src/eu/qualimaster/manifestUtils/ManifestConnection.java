@@ -59,7 +59,33 @@ import net.ssehub.easy.basics.progress.ProgressObserver;
 import net.ssehub.easy.basics.progress.ProgressObserver.ITask;
 
 /**
- * Builds and handles connections to the repository server.
+ * Builds and handles connections to the repository server. TODO: what does it do it exactly in WHAT ORDER?
+ * 
+ * <br/>
+ * Example manifest:
+ * <pre><code>
+ * <manifest>
+ &lt;provides class="eu.qualimaster.algorithms.imp.correlation.Preprocessor"&gt;
+  &lt;algorithm family="fPreprocessor"&gt;
+      &lt;description&gt;The financial preprocessor&lt;/description&gt;
+      &lt;input&gt;
+          &lt;tuple name="springStream"&gt;
+              &lt;field name="symbolTuple" type="STRING"/&gt;
+          &lt;/tuple&gt;
+      &lt;/input&gt;
+      &lt;output&gt;
+          &lt;tuple name="preprocessedStream"&gt;
+              &lt;field name="value" type="DOUBLE"/&gt;
+              &lt;field name="timestamp" type="LONG"/&gt;
+              &lt;field name="symbolId" type="STRING"/&gt;
+              &lt;field name="volume" type="INTEGER"/&gt;
+              &lt;field name="taskId" type="INTEGER"/&gt;
+          &lt;/tuple&gt;
+      &lt;/output&gt;
+  &lt;/algorithm&gt;
+ &lt;/provides&gt;
+&lt;/manifest&gt;
+ * </code></pre>
  * @author pastuschek
  * @author El-Sharkawy
  */
@@ -321,7 +347,7 @@ public class ManifestConnection {
         ExcludeRule rule = new DefaultExcludeRule(aId, new ExactOrRegexpPatternMatcher(), map);
         System.out.println("##### " + rule.toString());
         md.addDependency(dd);
-        md.addExcludeRule(rule);
+        //md.addExcludeRule(rule);
         ModuleDescriptor m = null; 
         
         //start the download process. Progress is tracked via an intercepter since ivy doesn't provide
