@@ -217,25 +217,15 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
      * @param context The current context.
      */
     private void updateArtifactInfo(String className, String artifactId, IDecisionVariable context) {
-
         List<Item> input = new ArrayList<Item>();
         List<Parameter> param = new ArrayList<Parameter>();
         List<Item> output = new ArrayList<Item>();
-        boolean failed = false;
-        try {
-            input = con.getInput(className, artifactId);
-            output = con.getOutput(className, artifactId);
-            param = con.getParameters(className, artifactId);
-        } catch (ManifestUtilsException e) {
-            Dialogs.showErrorDialog(e.getShortMessage(), e.getDetailedMessage());
-            failed = true;
-        }
+        //Read the manifest first to find out how artifact information is stored.
         Manifest uManifest = null;
         try {
             uManifest = con.getUnderlyingManifest(artifactId);
         } catch (ManifestUtilsException e) {
-            Dialogs.showErrorDialog("ERROR", "Manifest corrupt: " + e.getMessage());
-            e.printStackTrace();
+            Dialogs.showErrorDialog("Warning", "The manifest is corrupt: " + e.getMessage());
         }
         ManifestType type = ManifestType.UNKNOWN; 
         IDecisionVariable var = (IDecisionVariable) context.getParent();
@@ -244,31 +234,42 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
         } else {
             type = uManifest.getType();
         }
-        
+        //if its a hardware algorithm we have to rely on the manifest for information.
+        boolean failed = false;
+        if (type == ManifestType.SINGLE_HARDWARE || type == ManifestType.MULTI_HARDWARE) {
+            input = new ArrayList<Item>(uManifest.getInput());
+            output = new ArrayList<Item>(uManifest.getOutput());
+            param = new ArrayList<Parameter>(uManifest.getParameters());
+        } else {
+            //if its software, we can extract the information ourselves.
+            try {
+                input = con.getInput(className, artifactId);
+                output = con.getOutput(className, artifactId);
+                param = con.getParameters(className, artifactId);
+            } catch (ManifestUtilsException e) {
+                Dialogs.showErrorDialog(e.getShortMessage(), e.getDetailedMessage());
+                failed = true;
+            }
+        }
         if (!failed && takeOverValues(var, type)) {
             createMap(var);
-            
             var.unfreeze(AssignmentState.ASSIGNED);
             List<IDecisionVariable> inputVars = getIDecisionVariable(var, SLOT_INPUT);
             List<IDecisionVariable> outputVars = getIDecisionVariable(var, SLOT_OUTPUT);
             List<IDecisionVariable> parameterVars = getIDecisionVariable(var, SLOT_PARAMETERS);
-            
             if (type.isSource() || type.isSink()) {
                 List<IDecisionVariable> tmp = inputVars;
                 inputVars = outputVars;
                 outputVars = tmp;
             }
-            
             ensureParent(outputVars);
             ensureParent(parameterVars);
             clearInput(inputVars);
             clearInput(outputVars);
-            clearInput(parameterVars);
-            
+            clearInput(parameterVars);   
             if (outputVars.size() > 0) {
                 outputVars.remove(0);
-            }
-            
+            }  
             addInOut(input, inputVars, true);
             addInOut(output, outputVars, false);
             addParameter(param, parameterVars, uManifest, artifactId);
@@ -283,10 +284,9 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
                 }
             }
             ModelAccess.freezeAgain(var);
-        }
-        
+        }   
     }
-
+    
     /**
      * Adds the parent to <code>vars</code> - whyever.
      * 

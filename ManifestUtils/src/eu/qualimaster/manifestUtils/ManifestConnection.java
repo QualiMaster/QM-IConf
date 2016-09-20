@@ -19,20 +19,27 @@ import java.net.URLClassLoader;
 import java.security.Security;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.ivy.Ivy;
 import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
+import org.apache.ivy.core.module.descriptor.DefaultExcludeRule;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
+import org.apache.ivy.core.module.descriptor.ExcludeRule;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
+import org.apache.ivy.core.module.id.ArtifactId;
+import org.apache.ivy.core.module.id.ModuleId;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.publish.PublishOptions;
 import org.apache.ivy.core.report.ResolveReport;
 import org.apache.ivy.core.resolve.ResolveOptions;
 import org.apache.ivy.core.retrieve.RetrieveOptions;
 import org.apache.ivy.core.settings.IvySettings;
+import org.apache.ivy.plugins.matcher.ExactOrRegexpPatternMatcher;
 import org.apache.ivy.plugins.resolver.ChainResolver;
 import org.apache.ivy.plugins.resolver.IBiblioResolver;
 import org.apache.ivy.util.Credentials;
@@ -288,14 +295,13 @@ public class ManifestConnection {
         
         ITask mainTask = monitor.registerTask("Loading Dependencies");
         sysOutDownload.setMonitor(monitor);
-        
         System.setProperty("jsse.enableSNIExtension", "false");
         Security.insertProviderAt(new BouncyCastleProvider(), 1);      
         
         //clear our temp folder.
         deleteDir(this.out);
         setRetrievalFolder(this.out);
-        logger.info("RETRIEVAL: " + this.out);
+        logger.info("Retrieval dir: " + this.out);
         ResolveOptions ro = new ResolveOptions();
 
         //set the resolver to transitive.
@@ -306,14 +312,16 @@ public class ManifestConnection {
             ModuleRevisionId.newInstance(groupId, artifactId + "-envelope", version)
         );
         ModuleRevisionId ri = ModuleRevisionId.newInstance(groupId, artifactId, version);
-        //add all configurations, since ivy will fail to download some parts otherwise.
-        DefaultDependencyDescriptor dd = new DefaultDependencyDescriptor(md, ri, false, false, true);
-        dd.addDependencyConfiguration("default", "compile");
-        dd.addDependencyConfiguration("default", "default");
-        dd.addDependencyConfiguration("default", "master");
-        dd.addDependencyConfiguration("default", "runtime");
-        dd.addDependencyConfiguration("default", "provided");
+        DefaultDependencyDescriptor dd = this.getDefaultDependencyDescriptor(md, ri);
+        
+        ModuleId moduleId = new ModuleId("eu.qualimaster", "QualiMaster.Events");
+        ArtifactId aId = new ArtifactId(moduleId, "QualiMaster.Events-tests", "jar", "jar");
+        Map<String, String> map = new HashMap<String, String>();
+        //map.put("classifier", "tests");
+        ExcludeRule rule = new DefaultExcludeRule(aId, new ExactOrRegexpPatternMatcher(), map);
+        System.out.println("##### " + rule.toString());
         md.addDependency(dd);
+        md.addExcludeRule(rule);
         ModuleDescriptor m = null; 
         
         //start the download process. Progress is tracked via an intercepter since ivy doesn't provide
@@ -330,15 +338,14 @@ public class ManifestConnection {
                 throw new RuntimeException(report.getAllProblemMessages().toString());
             }        
             
-        } catch (IOException exc) {
+        } catch (IOException | ParseException exc) {
             exc.printStackTrace();
-        } catch (ParseException exc) {
-            exc.printStackTrace();
-        }      
+        }
+        
         try {
             ivy.retrieve(
                     m.getModuleRevisionId(),
-                    out.getAbsolutePath() + "/[artifact](-[classifier]).[ext]",
+                    out.getAbsolutePath() + "/[artifact](-[classifier]).[ext]", //
                     new RetrieveOptions().setConfs(new String[]{"default"})
             ); 
         } catch (IOException e) {
@@ -353,6 +360,25 @@ public class ManifestConnection {
         System.setErr(new PrintStream(new FileOutputStream(FileDescriptor.err)));
         monitor.notifyEnd(mainTask);
 
+    }
+    
+    /**
+     * Returns a configured DependencyDescriptor.
+     * @param md The ModuleDescriptor.
+     * @param ri The ModuleRevisionId.
+     * @return The configured DependencyDescriptor.
+     */
+    private DefaultDependencyDescriptor getDefaultDependencyDescriptor(ModuleDescriptor md, ModuleRevisionId ri) {
+        
+        //add all configurations, since ivy will fail to download some parts otherwise.
+        DefaultDependencyDescriptor dd = new DefaultDependencyDescriptor(md, ri, false, false, true);
+        dd.addDependencyConfiguration("default", "compile");
+        dd.addDependencyConfiguration("default", "default");
+        dd.addDependencyConfiguration("default", "master");
+        dd.addDependencyConfiguration("default", "runtime");
+        dd.addDependencyConfiguration("default", "provided");
+        return dd;
+        
     }
     
     /**
@@ -512,6 +538,11 @@ public class ManifestConnection {
             URL[] urls = new URL[1];
             loader = new URLClassLoader(loadJars(out.getAbsolutePath()).toArray(urls)); 
             Class<?> base = loadClass(name, loader);
+
+            //TODO: remove?
+            ManifestParser mp = new ManifestParser();
+            Manifest genManifest = mp.createFromClass(base);
+            mp.writeToFile(new File(out + "/generated_manifest.xml"), genManifest);
             
             //if the base class of the algorithm is available proceed to read in/output.
             if (null != base) {
@@ -1258,7 +1289,7 @@ public class ManifestConnection {
      
         List<File> fileList = new ArrayList<File>();
      
-        if (!report.getArtifacts().isEmpty()) {
+        if (null != report && !report.getArtifacts().isEmpty()) {
             String s = report.getArtifacts().get(0).toString();
          
             String wip = s.substring(s.lastIndexOf('!') + 1);
