@@ -139,7 +139,8 @@
             </command>
             
             <command commandId="de.uni_hildesheim.sse.qmApp.commands.PipelineColoringHandler"
-                label="Preferences Pipeline Coloring"> 
+                label="Preferences Pipeline Coloring"
+                icon = "icons/colorwheel.png">
             </command>
          </menu>
          <menu label="Window" id="window">

@@ -48,4 +48,6 @@ Link to creators webiste: http://www.aha-soft.com/
 runtime: https://www.iconfinder.com/icons/131918/analytics_chart_diagram_graph_graphs_line_statistics_xy_icon#size=32
 free for commercial use
 
+coloring-wheel: https://www.iconfinder.com/icons/1055087/color_wheel_palette_swatch_icon#size=16
+free for commercial use
 Non-listed icons are self-made or created out of the the listed icons.
