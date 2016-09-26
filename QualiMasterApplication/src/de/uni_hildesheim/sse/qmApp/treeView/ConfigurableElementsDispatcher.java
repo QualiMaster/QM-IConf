@@ -21,6 +21,8 @@ import java.util.Map;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Display;
 
+import de.uni_hildesheim.sse.qmApp.dialogs.EclipsePrefUtils;
+import de.uni_hildesheim.sse.qmApp.dialogs.PipelineColoringDialog;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration;
@@ -178,35 +180,67 @@ class ConfigurableElementsDispatcher extends DispatcherAdapter implements IInfra
      */
     private ElementStatusIndicator getPipelineStatusIndicator(String pipeline, String element, 
         Map<String, Double> observations) {
+     
         ElementStatusIndicator result = ElementStatusIndicator.NONE;
         Double throughput = observations.get(QmObservables.TIMEBEHAVIOR_THROUGHPUT_ITEMS);
         
-        double center = 500;
-        /*if ("SwitchPip".equals(pipeline)) {
-            center = 500;
-        } else {
-            center = 1000;
-        }*/
-        double low = center * 0.8;
-        double high = center * 0.8;
+        //Check if all preference are there
+        String veryLowToLow = EclipsePrefUtils.INSTANCE.getPreference(PipelineColoringDialog.VERYLOW_TO_LOW_DES);
+            
+        String lowToMedium = EclipsePrefUtils.INSTANCE.getPreference(PipelineColoringDialog.LOW_TO_MEDIUM_DES);
+            
+        String mediumToHigh = EclipsePrefUtils.INSTANCE.getPreference(PipelineColoringDialog.MEDIUM_TO_HIGH_DES);
         
-        Double items = observations.get(QmObservables.SCALABILITY_ITEMS);
-        if (null == throughput || null == items) {
-            result = ElementStatusIndicator.NONE;
+        String highToVeryHigh = EclipsePrefUtils.INSTANCE.getPreference(PipelineColoringDialog.HIGH_TO_VERYHIGH_DES);
+    
+        if (veryLowToLow != null && lowToMedium != null && mediumToHigh != null && highToVeryHigh != null) {
+            
+            Double items = observations.get(QmObservables.SCALABILITY_ITEMS);
+            if (null == throughput || null == items) {
+                result = ElementStatusIndicator.NONE;
+            } else {
+                if (null != items) {
+                    if (items < Integer.valueOf(veryLowToLow)) {
+                        result = ElementStatusIndicator.VERYLOW;
+                    } else if (items < Integer.valueOf(lowToMedium)) {
+                        result = ElementStatusIndicator.LOW;
+                    } else if (items < Integer.valueOf(mediumToHigh)) {
+                        result = ElementStatusIndicator.HIGH;
+                    } else if (items < Integer.valueOf(highToVeryHigh)) {
+                        result = ElementStatusIndicator.VERYHIGH;
+                    } else {
+                        result = ElementStatusIndicator.VERYLOW;
+                    }
+                } 
+            }
         } else {
-            if (null != items) {
-                if (items < low) {
-                    result = ElementStatusIndicator.LOW;
-                } else if (items < center) {
-                    result = ElementStatusIndicator.MEDIUM;
-                } else if (items < high) {
-                    result = ElementStatusIndicator.LOW;
-                } else {
+            double center = 500;
+            /*if ("SwitchPip".equals(pipeline)) {
+                center = 500;
+            } else {
+                center = 1000;
+            }*/
+            double low = center * 0.8;
+            double high = center * 0.8;
+            
+            Double items = observations.get(QmObservables.SCALABILITY_ITEMS);
+            if (null == throughput || null == items) {
+                result = ElementStatusIndicator.NONE;
+            } else {
+                if (null != items) {
+                    if (items < low) {
+                        result = ElementStatusIndicator.LOW;
+                    } else if (items < center) {
+                        result = ElementStatusIndicator.MEDIUM;
+                    } else if (items < high) {
+                        result = ElementStatusIndicator.LOW;
+                    } else {
+                        result = ElementStatusIndicator.VERYLOW;
+                    }
+                } 
+                if (null != throughput && throughput < 10) {
                     result = ElementStatusIndicator.VERYLOW;
                 }
-            } 
-            if (null != throughput && throughput < 10) {
-                result = ElementStatusIndicator.VERYLOW;
             }
         }
         return result;

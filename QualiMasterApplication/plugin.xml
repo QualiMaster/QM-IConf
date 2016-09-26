@@ -86,7 +86,7 @@
                   label="Commit to Repository">
             </command>
             <command commandId="de.uni_hildesheim.sse.qmApp.resetModel"
-            	  label="Reset model">
+                  label="Reset model">
             </command>
             <command commandId="de.uni_hildesheim.sse.qmApp.revertModel"
                   label="Revert all">
@@ -136,7 +136,8 @@
             </command>
             <command commandId="de.uni_hildesheim.sse.qmApp.commands.DisconnectHandler"
                 label="Disconnect"> 
-            </command>        
+            </command>
+            
             <command commandId="de.uni_hildesheim.sse.qmApp.commands.PipelineColoringHandler"
                 label="Preferences Pipeline Coloring"> 
             </command>
@@ -170,15 +171,15 @@
                   id="de.uni_hildesheim.sse.qmApp.helpCommand">
             </command>
          <!--
-         	<command commandId="org.eclipse.equinox.p2.ui.sdk.update"
-				label="Check for updates">
-			</command> -->
-			<command commandId="de.uni_hildesheim.sse.qmApp.commands.P2UpdateHandler"
-				label="Check for updates">
-			</command>
-			<command commandId="de.uni_hildesheim.sse.qmApp.commands.AboutHandler"
-			    label="About..."> 
-			</command>
+            <command commandId="org.eclipse.equinox.p2.ui.sdk.update"
+                label="Check for updates">
+            </command> -->
+            <command commandId="de.uni_hildesheim.sse.qmApp.commands.P2UpdateHandler"
+                label="Check for updates">
+            </command>
+            <command commandId="de.uni_hildesheim.sse.qmApp.commands.AboutHandler"
+                label="About..."> 
+            </command>
          </menu>
          <menu id="about" label="helpMenu">
              <separator name="additions" visible="false"></separator>
@@ -186,6 +187,8 @@
          </menu>
       </menuContribution>
    </extension>
+  
+   
    <extension point="org.eclipse.ui.commands">
       <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.SaveAllHandler"
             id="de.uni_hildesheim.sse.qmApp.saveAll"
@@ -211,11 +214,11 @@
             id="de.uni_hildesheim.sse.qmApp.validateAll"
             name="ValidateAll">
       </command>
-      <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.InstantiateLocal"
+      <command
             id="de.uni_hildesheim.sse.qmApp.instantiateLocal"
             name="InstantiateLocal">
       </command>
-      <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.InstantiateInterfacesLocal"
+      <command
             id="de.uni_hildesheim.sse.qmApp.instantiateInterfacesLocal"
             name="InstantiateInterfacesLocal">
       </command>
@@ -224,8 +227,8 @@
             name="SwitchToInitialPerspective">
       </command>
       <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.P2UpdateHandler"
-      		id="de.uni_hildesheim.sse.qmApp.commands.P2UpdateHandler"
-      		name="P2UpdateHandler">
+            id="de.uni_hildesheim.sse.qmApp.commands.P2UpdateHandler"
+            name="P2UpdateHandler">
       </command>
       <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.AboutHandler"
           id="de.uni_hildesheim.sse.qmApp.commands.AboutHandler"
@@ -241,7 +244,7 @@
       </command>
       <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.PipelineColoringHandler"
           id="de.uni_hildesheim.sse.qmApp.commands.PipelineColoringHandler"
-          name="Pipeline Coloring">
+          name="Disconnect">
       </command>
       <category
             name="QM-IConf Documentation"
@@ -261,7 +264,7 @@
             class="de.uni_hildesheim.sse.qmApp.commands.HelpCommand">
       </handler>
    </extension>
-   
+
    <extension
        point="org.eclipse.ui.commandImages">
            

@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Display;
 
 /**
  * Highlighter is responsible for highlighting elements in the Pipeline by
- * changing the color of elements or adding boders to elements.
+ * changing the color of elements or adding borders to elements.
  * 
  * @author Niko
  */

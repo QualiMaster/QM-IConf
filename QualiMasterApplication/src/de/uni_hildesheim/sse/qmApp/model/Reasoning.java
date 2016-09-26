@@ -244,12 +244,13 @@ public class Reasoning {
      * Mark the flawed pipeline-elements in the currently opened Pipeline-Diagram.
      */
     private static void resetOpenedPipelineEditorMarkings() {
-        if (PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
-                instanceof DiagramEditor) {
         
-            DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench().
-                    getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-            if (diagram instanceof PipelineDiagramEditor) {
+        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        IEditorReference[] allOpenEditors = page.getEditorReferences();
+        for (int i = 0; i < allOpenEditors.length; i++) {
+            IEditorPart editor = allOpenEditors[i].getEditor(false);
+            
+            if (editor instanceof PipelineDiagramEditor) {
                 PipelineDiagramUtils.resetDiagramMarkings();
             }
         }

@@ -26,7 +26,9 @@ import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gmf.runtime.diagram.ui.parts.DiagramEditor;
 import org.eclipse.gmf.runtime.emf.core.GMFEditingDomainFactory;
 import org.eclipse.gmf.runtime.emf.core.util.EMFCoreUtil;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.xtext.util.StringInputStream;
 
@@ -628,24 +630,33 @@ public class PipelineDiagramUtils {
      */
     public static void saveConnections() {
         
-        DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-        
-        if (null != diagram && null != diagram.getDiagram()) { // in shutdown
-            EObject element = diagram.getDiagram().getElement();
-            EList<EObject> eContents = element.eContents();
+        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        IEditorReference[] allOpenEditors = page.getEditorReferences();
+        for (int i = 0; i < allOpenEditors.length; i++) {
+            IEditorPart editor = allOpenEditors[i].getEditor(false);
             
-            for (int j = 0; j < eContents.size(); j++) {
+            if (editor instanceof DiagramEditor) {
                 
-                if (eContents.get(j) instanceof FlowImpl) {
+                DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench()
+                         .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+    
+                if (null != diagram && null != diagram.getDiagram()) { // in shutdown
+                    EObject element = diagram.getDiagram().getElement();
+                    EList<EObject> eContents = element.eContents();
                     
-                    FlowImpl flow = (FlowImpl) eContents.get(j);
+                    for (int j = 0; j < eContents.size(); j++) {
+                        
+                        if (eContents.get(j) instanceof FlowImpl) {
                             
-                    String source = flow.getSource().getName();
-                    String target = flow.getDestination().getName();
-                    
-                    ConnectorWrapper wrapper = new ConnectorWrapper(source, target, flow);
-                    connectionsList.add(wrapper);
+                            FlowImpl flow = (FlowImpl) eContents.get(j);
+                                    
+                            String source = flow.getSource().getName();
+                            String target = flow.getDestination().getName();
+                            
+                            ConnectorWrapper wrapper = new ConnectorWrapper(source, target, flow);
+                            connectionsList.add(wrapper);
+                        }
+                    }
                 }
             }
         }

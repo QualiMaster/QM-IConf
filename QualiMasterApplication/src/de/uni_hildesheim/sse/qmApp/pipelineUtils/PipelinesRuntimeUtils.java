@@ -1,14 +1,19 @@
 package de.uni_hildesheim.sse.qmApp.pipelineUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -16,14 +21,19 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
+import de.uni_hildesheim.sse.qmApp.WorkspaceUtils;
+import de.uni_hildesheim.sse.qmApp.editors.RuntimeEditor;
 import eu.qualimaster.easy.extension.QmConstants;
 import net.ssehub.easy.dslCore.TranslationResult;
 import net.ssehub.easy.varModel.confModel.CompoundVariable;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.confModel.SequenceVariable;
+import net.ssehub.easy.varModel.confModel.SetVariable;
 import net.ssehub.easy.varModel.cst.ConstantValue;
 import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.AttributeAssignment;
@@ -46,6 +56,10 @@ import net.ssehub.easy.varModel.model.values.Value;
 public class PipelinesRuntimeUtils {
 
     public static final PipelinesRuntimeUtils INSTANCE = new PipelinesRuntimeUtils();
+    
+    public static final String[] FILENAMES = {"runtimeSavedItems1.ser", "runtimeSavedItems2.ser",
+        "runtimeSavedItems3.ser",
+        "runtimeSavedItems4.ser", "runtimeSavedItems5.ser", "runtimeSavedItems6.ser"};
     
     private static final String EASY_STRING = "EASy";
     private static final String IVML_STRING = ".ivml";
@@ -586,9 +600,6 @@ public class PipelinesRuntimeUtils {
         if (typeName.equalsIgnoreCase(PipelineNodeType.Pipeline.name())) {
             type = PipelineNodeType.Pipeline;
         }
-        if (typeName.equalsIgnoreCase(PipelineNodeType.SubPipeline.name())) {
-            type = PipelineNodeType.SubPipeline;
-        }
         return type;
     }
 
@@ -801,13 +812,9 @@ public class PipelinesRuntimeUtils {
      */
     public void setObservablesTableSelections(Table observablesTable, PipelineNodeType type, HashMap<String,
             Set<String>> deliveringObservables, String selectedElementName) {
-        observablesTable.removeAll();
-        observablesTable.clearAll();
-        observablesTable.redraw();
-        for (String item : backupObservableItem) {
-            TableItem tableItem = new TableItem(observablesTable, SWT.CHECK);
-            tableItem.setText(item);
-        }
+        
+        removeAndCollect(observablesTable);
+        
         switch (type) {
         case Source:
             for (TableItem item : observablesTable.getItems()) {
@@ -859,6 +866,7 @@ public class PipelinesRuntimeUtils {
             for (TableItem item : observablesTable.getItems()) {
                 String text = item.getText();
                 String toContain = text.toLowerCase().replaceAll("[^a-zA-Z0-9]", "");
+                
                 if (!containsObservable(observablePipelines, toContain)) {
                     observablesTable.remove(observablesTable.indexOf(item));
                 }
@@ -872,6 +880,34 @@ public class PipelinesRuntimeUtils {
     }
 
     /**
+     * Remove all items from the observableTable and collect all qualityparameters again.
+     * Then add these observables back to the table.
+     * @param observablesTable The table which displays obserbalves- items.
+     */
+    private void removeAndCollect(Table observablesTable) {
+        
+        observablesTable.removeAll();
+        observablesTable.redraw();
+        
+        net.ssehub.easy.varModel.confModel.Configuration config =
+                de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration.
+                OBSERVABLES.getConfiguration();
+        Iterator<IDecisionVariable> iter = config.iterator();
+
+        while (iter.hasNext()) {
+            Object object = iter.next();
+            if (object instanceof SetVariable || object instanceof SequenceVariable) {
+                RuntimeEditor.collectQualityParameters(object);
+            }
+        }
+        for (String item : backupObservableItem) {
+            TableItem tableItem = new TableItem(observablesTable, SWT.CHECK);
+            tableItem.setText(item);
+        }
+        
+    }
+
+    /**
      * Remove the observables from the table which wont provide data.
      * @param observablesTable table which holds the observable items.
      * @param deliveringObservables the delivering items we dont want to remove.
@@ -880,37 +916,54 @@ public class PipelinesRuntimeUtils {
     private void disableNonDeliveringObservables(Table observablesTable,
             HashMap<String, Set<String>> deliveringObservables, String selectedElementName) {
         
-        List<String> notSupportedObservables = new ArrayList<String>();
-        
-        String infoMessage = "The following observables could be selected for the pipelines element ,"
-                + "but it will not provide any data to display: \n";
+        List<String> supportedObservables = new ArrayList<String>();
         
         Set<String> observations = deliveringObservables.get(selectedElementName);
         
         for (int i = 0; i < observablesTable.getItemCount(); i++) {
             TableItem item = observablesTable.getItem(i);
-            String itemText = item.getText().toUpperCase();
+            String itemText = item.getText();
             
             if (observations != null) {
-                if (!observations.contains(itemText)) {
+                
                     
-                    if (!notSupportedObservables.contains(item.getText())) {
-                        notSupportedObservables.add(item.getText());
+                Iterator<String> iterator = observations.iterator();
+                
+                //boolean contains = false;
+                
+                while (iterator.hasNext()) {
+ 
+                    String iterObs = (String) iterator.next();
 
-                        observablesTable.remove(i);
+                    HashMap<String, String> observablesMap = RuntimeEditor.getObservablesMap();
+                    String observableToCompare = observablesMap.get(itemText);
+ 
+                    if (iterObs.equals(observableToCompare)) {
+      
+                        //Dann enthalten bzw. delivers
+                        //contains = true;
+
+                        supportedObservables.add(itemText.trim());
                     }
-                    
                 }
             }
-        }
-        
-        for (int j = 0; j < notSupportedObservables.size(); j++) {
-            String notSuppObservable = notSupportedObservables.get(j);
-            infoMessage += notSuppObservable + "\n";
-            
-        }
+        }         
+         
+        Set<String> supportedObservablesWithoutDuplicates = new HashSet<String>(supportedObservables);
+        observablesTable.removeAll();
         observablesTable.redraw();
-        observablesTable.setToolTipText(infoMessage);
+        
+      
+        Iterator<String> iterator = supportedObservablesWithoutDuplicates.iterator();
+        
+        while (iterator.hasNext()) {
+            String itemText = (String) iterator.next();
+            
+            TableItem item = new TableItem(observablesTable, SWT.CHECK);
+            item.setText(itemText);
+        }
+
+        observablesTable.redraw();
     }
 
     /**
@@ -1032,6 +1085,58 @@ public class PipelinesRuntimeUtils {
     }
     
     /**
+     * Store selected items as metadata. They can be loaded with the next session.
+     * @param wrapperList List of selected elements to save.
+     */
+    public static void storeInfoInMetadata(List<PipelineElementObservableWrapper> wrapperList) {
+        try {
+            boolean possFile = false;
+            for (int i = 0; i < FILENAMES.length; i++) {
+                String name = FILENAMES[i];
+                if (!new File(WorkspaceUtils.getMetadataFolder(), name).exists()) {
+                    possFile = true;
+                    FileOutputStream fileoutputstream;
+                    
+                    fileoutputstream = new FileOutputStream(getItemsFile(name));
+                    
+                    ObjectOutputStream outputstream = new ObjectOutputStream(fileoutputstream);
+                    outputstream.writeObject(wrapperList);
+                    outputstream.close();
+                    break;
+                }
+            }
+            
+            if (!possFile) {
+                boolean answer = MessageDialog.openQuestion(Display.getCurrent().getActiveShell(), "Reset savings",
+                        "Do you want to discard all previous saved"
+                        + "data in order to save the current selections?");
+                
+                if (answer) {
+                    for (int j = 0; j < FILENAMES.length; j++) {
+                        new File(WorkspaceUtils.getMetadataFolder(), FILENAMES[j]).delete();
+                    }
+                    storeInfoInMetadata(wrapperList);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Returns the file for storing the Maven tree persistently (offline use).
+     * @param name 
+     * 
+     * @return the file
+     */
+    public static File getItemsFile(String name) {
+        File toReturn = null;
+        toReturn = new File(WorkspaceUtils.getMetadataFolder(), name);
+        
+        return toReturn;
+    }
+    
+    /**
      * Get the backUp-List for the observable-Elements.
      * @return backupObservableItem backUp-List for the observable-Elements.
      */
@@ -1052,5 +1157,14 @@ public class PipelinesRuntimeUtils {
     public void clearPipelines() {   
         pipelines.clear();
         pipelinesToDisplayInTable.clear();
+    }
+
+    /**
+     * Check if stored data exists and can be loaded. True if data is stored, false otherwise.
+     * @return toReturn true if data is found, false otherwise.
+     */
+    public static boolean storedDataExist() {
+        boolean toReturn = getItemsFile(FILENAMES[0]).exists();
+        return toReturn;
     }
 }

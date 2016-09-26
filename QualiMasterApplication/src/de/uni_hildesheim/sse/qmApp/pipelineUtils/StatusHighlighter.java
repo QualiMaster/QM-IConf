@@ -257,10 +257,18 @@ public class StatusHighlighter {
         if (PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
                 instanceof DiagramEditor) {
         
-            DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench().
-                    getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-            if (diagram instanceof PipelineDiagramEditor) {
-                StatusHighlighter.addPipelineColor();
+            if (PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
+                    instanceof DiagramEditor) {
+            
+                IEditorReference[] editors = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getActivePage().getEditorReferences();
+                        
+                for (int i = 0; i < editors.length; i++) {
+                    Object object = editors[i].getEditor(false);
+                    if (object instanceof DiagramEditor) {
+                        StatusHighlighter.addPipelineColor();
+                    }
+                }
             }
         }
     }
@@ -467,39 +475,42 @@ public class StatusHighlighter {
     public void highlightDataFlowForSource(EObject eobject, ElementStatusIndicator dataflow) {
 
         IGraphicalEditPart editPartForSemanticElement = getEditPartForSemanticElement(eobject);
-        IFigure figure = getTargetFigure(editPartForSemanticElement);
-
-        SVGFigure svgFigure = (SVGFigure) figure;
-        String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
         
-        if (eobject instanceof SourceImpl) {
-
-            switch(dataflow) {
-            case VERYHIGH:  
-                uri += IconManager.SVG_SOURCE_VERY_HIGH;
-                break;
-            case HIGH:    
-                uri += IconManager.SVG_SOURCE_HIGH;
-                break;
-            case MEDIUM:            
-                uri += IconManager.SVG_SOURCE_MEDIUM;
-                break;
-            case LOW:                 
-                uri += IconManager.SVG_SOURCE_LOW;
-                break;
-            case VERYLOW:                 
-                uri += IconManager.SVG_SOURCE_VERY_LOW;
-                break;
-            case NONE:
-                uri = IconManager.SVG_SOURCE_STANDARD;
-                break;
-            default:                
-                uri = IconManager.SVG_SOURCE_STANDARD;
-                break;
-
+        if (editPartForSemanticElement != null) {
+            IFigure figure = getTargetFigure(editPartForSemanticElement);
+    
+            SVGFigure svgFigure = (SVGFigure) figure;
+            String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
+            
+            if (eobject instanceof SourceImpl) {
+    
+                switch(dataflow) {
+                case VERYHIGH:  
+                    uri += IconManager.SVG_SOURCE_VERY_HIGH;
+                    break;
+                case HIGH:    
+                    uri += IconManager.SVG_SOURCE_HIGH;
+                    break;
+                case MEDIUM:            
+                    uri += IconManager.SVG_SOURCE_MEDIUM;
+                    break;
+                case LOW:                 
+                    uri += IconManager.SVG_SOURCE_LOW;
+                    break;
+                case VERYLOW:                 
+                    uri += IconManager.SVG_SOURCE_VERY_LOW;
+                    break;
+                case NONE:
+                    uri = IconManager.SVG_SOURCE_STANDARD;
+                    break;
+                default:                
+                    uri = IconManager.SVG_SOURCE_STANDARD;
+                    break;
+    
+                }
+                svgFigure.setURI(uri);
+                svgFigure.repaint();
             }
-            svgFigure.setURI(uri);
-            svgFigure.repaint();
         }
     }
 
@@ -514,39 +525,43 @@ public class StatusHighlighter {
     public void highlightDataFlowForSink(EObject eobject, ElementStatusIndicator dataflow) {
 
         IGraphicalEditPart editPartForSemanticElement = getEditPartForSemanticElement(eobject);
-        IFigure figure = getTargetFigure(editPartForSemanticElement);
-
-        SVGFigure svgFigure = (SVGFigure) figure;
-        String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
         
-        if (eobject instanceof SinkImpl) {
+        if (editPartForSemanticElement != null) {
 
-            switch(dataflow) {
-            case VERYHIGH:  
-                uri += IconManager.SVG_SINK_VERY_HIGH;
-                break;
-            case HIGH:    
-                uri += IconManager.SVG_SINK_HIGH;
-                break;
-            case MEDIUM:            
-                uri += IconManager.SVG_SINK_MEDIUM;
-                break;
-            case LOW:                 
-                uri += IconManager.SVG_SINK_LOW;
-                break;
-            case VERYLOW:                 
-                uri += IconManager.SVG_SINK_VERY_LOW;
-                break;
-            case NONE:
-                uri = IconManager.SVG_SOURCE_STANDARD;
-                break;
-            default:                
-                uri = IconManager.SVG_SINK_STANDARD;
-                break;
-
+            IFigure figure = getTargetFigure(editPartForSemanticElement);
+    
+            SVGFigure svgFigure = (SVGFigure) figure;
+            String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
+            
+            if (eobject instanceof SinkImpl) {
+    
+                switch(dataflow) {
+                case VERYHIGH:  
+                    uri += IconManager.SVG_SINK_VERY_HIGH;
+                    break;
+                case HIGH:    
+                    uri += IconManager.SVG_SINK_HIGH;
+                    break;
+                case MEDIUM:            
+                    uri += IconManager.SVG_SINK_MEDIUM;
+                    break;
+                case LOW:                 
+                    uri += IconManager.SVG_SINK_LOW;
+                    break;
+                case VERYLOW:                 
+                    uri += IconManager.SVG_SINK_VERY_LOW;
+                    break;
+                case NONE:
+                    uri = IconManager.SVG_SOURCE_STANDARD;
+                    break;
+                default:                
+                    uri = IconManager.SVG_SINK_STANDARD;
+                    break;
+    
+                }
+                svgFigure.setURI(uri);
+                svgFigure.repaint();
             }
-            svgFigure.setURI(uri);
-            svgFigure.repaint();
         }
     }
 
@@ -561,39 +576,42 @@ public class StatusHighlighter {
     public void highlightDataFlowForFamily(EObject eobject, ElementStatusIndicator dataflow) {
 
         IGraphicalEditPart editPartForSemanticElement = getEditPartForSemanticElement(eobject);
-        IFigure figure = getTargetFigure(editPartForSemanticElement);
-
-        SVGFigure svgFigure = (SVGFigure) figure;
-        String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
         
-        if (eobject instanceof FamilyElementImpl) {
-
-            switch(dataflow) {
-            case VERYHIGH:  
-                uri += IconManager.SVG_FAMILYELEMENT_VERY_HIGH;
-                break;
-            case HIGH:    
-                uri += IconManager.SVG_FAMILYELEMENT_HIGH;
-                break;
-            case MEDIUM:            
-                uri += IconManager.SVG_FAMILYELEMENT_MEDIUM;
-                break;
-            case LOW:                 
-                uri += IconManager.SVG_FAMILYELEMENT_LOW;
-                break;
-            case VERYLOW:                 
-                uri += IconManager.SVG_FAMILYELEMENT_VERY_LOW;
-                break;
-            case NONE:
-                uri = IconManager.SVG_SOURCE_STANDARD;
-                break;
-            default:                
-                uri = IconManager.SVG_FAMILYELEMENT_STANDARD;
-                break;
-
+        if (editPartForSemanticElement != null) {
+            IFigure figure = getTargetFigure(editPartForSemanticElement);
+    
+            SVGFigure svgFigure = (SVGFigure) figure;
+            String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
+            
+            if (eobject instanceof FamilyElementImpl) {
+    
+                switch(dataflow) {
+                case VERYHIGH:  
+                    uri += IconManager.SVG_FAMILYELEMENT_VERY_HIGH;
+                    break;
+                case HIGH:    
+                    uri += IconManager.SVG_FAMILYELEMENT_HIGH;
+                    break;
+                case MEDIUM:            
+                    uri += IconManager.SVG_FAMILYELEMENT_MEDIUM;
+                    break;
+                case LOW:                 
+                    uri += IconManager.SVG_FAMILYELEMENT_LOW;
+                    break;
+                case VERYLOW:                 
+                    uri += IconManager.SVG_FAMILYELEMENT_VERY_LOW;
+                    break;
+                case NONE:
+                    uri = IconManager.SVG_SOURCE_STANDARD;
+                    break;
+                default:                
+                    uri = IconManager.SVG_FAMILYELEMENT_STANDARD;
+                    break;
+    
+                }
+                svgFigure.setURI(uri);
+                svgFigure.repaint();
             }
-            svgFigure.setURI(uri);
-            svgFigure.repaint();
         }
     }
 
@@ -608,39 +626,42 @@ public class StatusHighlighter {
     public void highlightDataFlowForDatamangement(EObject eobject, ElementStatusIndicator dataflow) {
 
         IGraphicalEditPart editPartForSemanticElement = getEditPartForSemanticElement(eobject);
-        IFigure figure = getTargetFigure(editPartForSemanticElement);
-
-        SVGFigure svgFigure = (SVGFigure) figure;
-        String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
         
-        if (eobject instanceof DataManagementElementImpl) {
-
-            switch(dataflow) {
-            case VERYHIGH:  
-                uri += IconManager.SVG_DATAMANAGEMENT_VERY_HIGH;
-                break;
-            case HIGH:    
-                uri += IconManager.SVG_DATAMANAGEMENT_HIGH;
-                break;
-            case MEDIUM:            
-                uri += IconManager.SVG_DATAMANAGEMENT_MEDIUM;
-                break;
-            case LOW:                 
-                uri += IconManager.SVG_DATAMANAGEMENT_LOW;
-                break;
-            case VERYLOW:                 
-                uri += IconManager.SVG_DATAMANAGEMENT_VERY_LOW;
-                break;
-            case NONE:
-                uri = IconManager.SVG_SOURCE_STANDARD;
-                break;
-            default:                
-                uri = IconManager.SVG_DATAMANAGEMENT_STANDARD;
-                break;
-
+        if (editPartForSemanticElement != null) {
+            IFigure figure = getTargetFigure(editPartForSemanticElement);
+    
+            SVGFigure svgFigure = (SVGFigure) figure;
+            String uri = "platform:/plugin/QualiMasterApplication/icons/pipelineDataflow/";
+            
+            if (eobject instanceof DataManagementElementImpl) {
+    
+                switch(dataflow) {
+                case VERYHIGH:  
+                    uri += IconManager.SVG_DATAMANAGEMENT_VERY_HIGH;
+                    break;
+                case HIGH:    
+                    uri += IconManager.SVG_DATAMANAGEMENT_HIGH;
+                    break;
+                case MEDIUM:            
+                    uri += IconManager.SVG_DATAMANAGEMENT_MEDIUM;
+                    break;
+                case LOW:                 
+                    uri += IconManager.SVG_DATAMANAGEMENT_LOW;
+                    break;
+                case VERYLOW:                 
+                    uri += IconManager.SVG_DATAMANAGEMENT_VERY_LOW;
+                    break;
+                case NONE:
+                    uri = IconManager.SVG_SOURCE_STANDARD;
+                    break;
+                default:                
+                    uri = IconManager.SVG_DATAMANAGEMENT_STANDARD;
+                    break;
+    
+                }
+                svgFigure.setURI(uri);
+                svgFigure.repaint();
             }
-            svgFigure.setURI(uri);
-            svgFigure.repaint();
         }
     }
 }

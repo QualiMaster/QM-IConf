@@ -343,17 +343,17 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                 if (tSel.getFirstElement() instanceof ConfigurableElement) {
                     openEditor((ConfigurableElement) tSel.getFirstElement());
                     
-                    if (PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
-                            instanceof DiagramEditor) {
-                    
-                        DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench().
-                                getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-                               
-                        if (DIAGRAM_STATUS_LISTENER) {
-                            listenOnDiagrm(diagram);
-                        }
+                    IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+                    IEditorReference[] allOpenEditors = page.getEditorReferences();
+                    for (int i = 0; i < allOpenEditors.length; i++) {
+                        IEditorPart editor = allOpenEditors[i].getEditor(false);
                         
-                        if (diagram instanceof PipelineDiagramEditor) {
+                        if (editor instanceof PipelineDiagramEditor) {
+                            if (DIAGRAM_STATUS_LISTENER) {
+                                
+                                DiagramEditor diagramEditor = (DiagramEditor) editor;
+                                listenOnDiagrm(diagramEditor);
+                            }
                             PipelineDiagramUtils.highlightDiagram();
                             
                             StatusHighlighter.addPipelineColor();
@@ -565,7 +565,6 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                 }
                 
                 Image newImage = IconManager.addErrorToImage(image);
-                System.out.println(elem.getDisplayName());
                 originalErrorIconReminder.put(elem.getDisplayName(), image);
                 image = newImage;
                 
