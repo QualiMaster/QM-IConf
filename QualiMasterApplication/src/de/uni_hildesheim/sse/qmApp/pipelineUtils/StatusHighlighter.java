@@ -19,7 +19,6 @@ import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElement;
 import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElementsView;
 import de.uni_hildesheim.sse.qmApp.treeView.ElementStatusIndicator;
-import pipeline.diagram.part.PipelineDiagramEditor;
 import pipeline.impl.DataManagementElementImpl;
 import pipeline.impl.FamilyElementImpl;
 import pipeline.impl.SinkImpl;
@@ -41,6 +40,8 @@ public class StatusHighlighter {
 
     private static final Object LOCK = new Object();
     private static volatile StatusHighlighter instance;
+    
+    private static final String PIP_INDICATOR = "Pipelines";
     
     private List<PipelineDataflowInformationWrapper> pipelineDataflowList = 
             new ArrayList<PipelineDataflowInformationWrapper>();
@@ -134,9 +135,7 @@ public class StatusHighlighter {
         }
         
         //Go through all saved information
-        for (int i = 0; i < pipelineDataflowList.size(); i++) {
-            
-            PipelineDataflowInformationWrapper existingWrapper = pipelineDataflowList.get(i);
+        for (PipelineDataflowInformationWrapper existingWrapper : pipelineDataflowList) {
             
             // if combination of pipeline and variable is found, change indicator of existing wrapper!
             if (existingWrapper.pipelineName.equals(wrapper.pipelineName)
@@ -171,10 +170,9 @@ public class StatusHighlighter {
     public void markPipelineStatus(String pipelineName, ElementStatusIndicator indicator) {
         
         ConfigurableElement[] elements = ConfigurableElementsView.getElements();
-        for (int i = 0; i < elements.length; i++) {
-            ConfigurableElement topLevel = elements[i];
-            
-            if (topLevel.getDisplayName().equals("Pipelines")) { // TODO more portable to search for the part type
+        for (ConfigurableElement topLevel : elements) {
+
+            if (topLevel.getDisplayName().equals(PIP_INDICATOR)) { // TODO more portable to search for the part type
                 markPipelineElement(topLevel, pipelineName, indicator);
             }
 
@@ -191,14 +189,15 @@ public class StatusHighlighter {
     private void markPipelineElement(ConfigurableElement topLevel, String pipelineName,
             ElementStatusIndicator indicator) {
         
-        for (int i = 0; i < topLevel.getChildCount(); i++) {
+        pipelineName = pipelineName.toLowerCase();
+        ConfigurableElement[] elements = topLevel.getChildren();
+        
+        for (ConfigurableElement elem : elements) {
             
-            ConfigurableElement element = topLevel.getChild(i);
-            
-            if (element.getDisplayName().toLowerCase().equals(pipelineName.toLowerCase())) {
+            if (elem.getDisplayName().toLowerCase().equals(pipelineName)) {
                 
-                element.setStatus(indicator);
-                ConfigurableElementsView.forceTreeRefresh(element);
+                elem.setStatus(indicator);
+                ConfigurableElementsView.forceTreeRefresh(elem);
                 break;
             }
         } 
@@ -212,10 +211,11 @@ public class StatusHighlighter {
     public void markConfigurableElementsStatus(String elementName, ElementStatusIndicator status) {
         ConfigurableElement[] elements = ConfigurableElementsView.getElements();
         
-        for (int i = 0; i < elements.length; i++) {
-            ConfigurableElement element = elements[i];
+        elementName = elementName.toLowerCase();
+        
+        for (ConfigurableElement element : elements) {
             
-            if (element.getDisplayName().toLowerCase().equals(elementName.toLowerCase())) {
+            if (element.getDisplayName().toLowerCase().equals(elementName)) {
                 element.setStatus(status);
                 ConfigurableElementsView.forceTreeRefresh(element);
             }
