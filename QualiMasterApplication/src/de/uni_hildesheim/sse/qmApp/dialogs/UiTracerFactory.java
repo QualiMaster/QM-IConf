@@ -140,7 +140,7 @@ public class UiTracerFactory extends TracerFactory {
         }
 
         @Override
-        public void visitScript(Script script) {
+        public void visitScript(Script script, RuntimeEnvironment environment) {
             write("Executing script: " + script.getName());
         }
 
