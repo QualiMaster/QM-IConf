@@ -13,9 +13,13 @@ import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator.CloneMode;
 import de.uni_hildesheim.sse.qmApp.editorInput.IVariableEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
+import de.uni_hildesheim.sse.qmApp.model.QualiMasterDisplayNameProvider;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
+import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElements.IElementReferrer;
+import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.ContainerVariable;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.datatypes.Compound;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 
@@ -107,6 +111,7 @@ public class ConfigurableElement { // unsure whether this shall be a resource
     public IModelPart getModelPart() {
         return modelPart;
     }
+
     
     /**
      * Tries to cast the given Object in {@link ConfigurableElement}.
@@ -125,6 +130,20 @@ public class ConfigurableElement { // unsure whether this shall be a resource
             result = null;
         }
         return result;
+    }
+    
+    /**
+     * Add a child to this configurable element. The parent of
+     * <code>child</code> shall be <b>this</b>.
+     * 
+     * @param child the child to be added
+     */
+    public void addChildAtTop(ConfigurableElement child) {
+        assert this == child.getParent();
+        if (null == children) {
+            children = new ArrayList<ConfigurableElement>();
+        }
+        children.add(0, child);
     }
     
     /**

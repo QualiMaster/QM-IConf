@@ -50,6 +50,20 @@ public class FTPSConnector {
     }
     
     /**
+     * Disconnects the FTPSClient.
+     */
+    public void disconnect() {
+        if (null != this.client) {
+            try {
+                client.logout();
+                client.disconnect();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    /**
      * Initializes the FTPSClient-Connection.
      * @param dest The host URL.
      * @throws IOException if connection failed on the IO-level.
@@ -94,20 +108,6 @@ public class FTPSConnector {
         client.setFileTransferMode(FTPClient.BINARY_FILE_TYPE);
         client.enterLocalPassiveMode();
         
-    }
-    
-    /**
-     * Disconnects the FTPSClient.
-     */
-    public void disconnect() {
-        if (null != this.client) {
-            try {
-                client.logout();
-                client.disconnect();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
     
 }

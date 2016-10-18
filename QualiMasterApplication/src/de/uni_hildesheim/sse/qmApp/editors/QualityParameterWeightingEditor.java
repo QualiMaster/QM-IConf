@@ -55,6 +55,11 @@ import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 import net.ssehub.easy.varModel.model.values.CompoundValue;
 import net.ssehub.easy.varModel.model.values.ContainerValue;
 import net.ssehub.easy.varModel.model.values.Value;
+import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
+import net.ssehub.easy.varModel.model.values.ValueFactory;
+import net.ssehub.easy.varModel.model.datatypes.IntegerType;
+import net.ssehub.easy.varModel.model.datatypes.RealType;
+import net.ssehub.easy.varModel.model.datatypes.StringType;
 import qualimasterapplication.Activator;
 
 /**
@@ -392,11 +397,13 @@ public class QualityParameterWeightingEditor extends AbstractContainerOfCompound
      */
     private void createRows(ContainerValue cVal, Table table, Compound compound) {
         int rows = cVal.getElementSize();
-        Configuration config = getVariable().getConfiguration();
+        Configuration config = getVariable().getConfiguration(); 
+        boolean nameFound = false;
         for (int r = 0; r < rows; r++) {
             Value eVal = cVal.getElement(r);
             String name = "";
             String weight = null;
+            nameFound = false;
             if (eVal instanceof CompoundValue) {
                 CompoundValue v = (CompoundValue) eVal;
                 for (int e = 0; e < compound.getInheritedElementCount(); e++) {
@@ -407,12 +414,34 @@ public class QualityParameterWeightingEditor extends AbstractContainerOfCompound
                             Value nVal = Configuration.dereference(config, v.getNestedValue(decl.getName()));
                             if (nVal instanceof CompoundValue) {
                                 name = getCompoundSlot((CompoundValue) nVal, QmConstants.SLOT_OBSERVABLE_TYPE);
-                            }
+                                nameFound = true;
+                            } 
                         }
                     }
                 }
                 // get the parameter value for the VALUE column
                 weight = getCompoundSlot(v, QmConstants.SLOT_QPARAMWEIGHTING_WEIGHT);
+                if (null == weight || weight.isEmpty()) {
+                    System.out.println(name + " was initialized incorrectly and has no weight!");
+                    try {                        
+                        Value compoundValue = ValueFactory.createValue(compound, "name", name, "weight", 0);
+                        v.setValue(compoundValue);
+                        weight = getCompoundSlot(v, QmConstants.SLOT_QPARAMWEIGHTING_WEIGHT);
+
+                    } catch (ValueDoesNotMatchTypeException e) {
+                        e.printStackTrace();
+                    }
+                    
+                }
+                
+                if (null == name) {
+                    name = "null";
+                }
+                
+                if (!nameFound) {
+                    name = "null";
+                }
+                
             }
             
             // Add parameter to list.

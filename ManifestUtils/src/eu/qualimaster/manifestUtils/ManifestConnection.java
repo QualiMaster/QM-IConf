@@ -59,7 +59,21 @@ import net.ssehub.easy.basics.progress.ProgressObserver;
 import net.ssehub.easy.basics.progress.ProgressObserver.ITask;
 
 /**
- * Builds and handles connections to the repository server. TODO: what does it do it exactly in WHAT ORDER?
+ * Builds and handles connections to the repository server.
+ * 
+ * Instantiating the ManifestConnection will set up the connection with necessary settings to start downloading
+ * an artifact via the load() method.
+ * 
+ * To load an artifact you need the groupId, artifactId and desired version. First, the artifact will be resolved.
+ * Ivy will check for all necessary dependencies in a transitive way. Once that process is finished the actual 
+ * dependencies will be downloaded from the available servers (which can be added with addRepository()).
+ * 
+ * The downloaded artifact and dependencies will be stored in the Maven repository aswell as in Ivys temp folder.
+ * Information of the artifact can then be retrieved with the getOutput(), getInput() and getParameters() methods, 
+ * which require the class name and the artifactId. Also the manifest can be extracted from the jar 
+ * via extractManifest().
+ * 
+ * On top of that, an artifact can be uploaded with publish().
  * 
  * <br/>
  * Example manifest:

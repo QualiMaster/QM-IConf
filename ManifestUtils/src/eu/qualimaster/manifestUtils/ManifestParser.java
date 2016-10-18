@@ -104,6 +104,22 @@ public class ManifestParser {
     }
     
     /**
+     * Prints a XML-Node tree. Utility for bug fixing.
+     * @param elem The root element.
+     */
+    @SuppressWarnings("unused")
+    private void printTree(Node elem) {
+        
+        for (int i = 0; i < elem.getChildNodes().getLength(); i++) {
+            
+            System.out.print(elem.getChildNodes().item(i).getNodeName() + " ");
+            System.out.println(elem.getChildNodes().item(i).getNodeValue());
+            printTree(elem.getChildNodes().item(i));
+            
+        }
+    }
+    
+    /**
      * Parses a manifest into a representative manifest data structure.
      * @param file The file of the manifest.
      * @return Manifest The representative manifest.
@@ -144,22 +160,6 @@ public class ManifestParser {
             
         return manifest;
         
-    }
-    
-    /**
-     * Prints a XML-Node tree. Utility for bug fixing.
-     * @param elem The root element.
-     */
-    @SuppressWarnings("unused")
-    private void printTree(Node elem) {
-        
-        for (int i = 0; i < elem.getChildNodes().getLength(); i++) {
-            
-            System.out.print(elem.getChildNodes().item(i).getNodeName() + " ");
-            System.out.println(elem.getChildNodes().item(i).getNodeValue());
-            printTree(elem.getChildNodes().item(i));
-            
-        }
     }
     
     /**

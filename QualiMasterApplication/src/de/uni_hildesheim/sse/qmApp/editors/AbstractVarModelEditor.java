@@ -144,7 +144,20 @@ public abstract class AbstractVarModelEditor extends EditorPart implements IChan
             ((org.eclipse.swt.widgets.List) control).addSelectionListener(dirtyListener);
         }
         if (control instanceof Combo) {
-            ((Combo) control).addSelectionListener(dirtyListener);
+            Combo combo = (Combo) control;
+            combo.addSelectionListener(dirtyListener);
+            IDecisionVariable derefName = Configuration.dereference(
+                    ((IDecisionVariable) var.getParent()).getNestedElement(0));
+            //preselect the saved value.
+            for (int i = 0; i < combo.getItemCount(); i++) {
+                String[] dNames = derefName.getQualifiedName().split("::");
+                String item = combo.getItem(i);
+                if (item.equals(dNames[dNames.length - 1].replaceAll("\\s+", ""))) {
+                    combo.select(i);
+                    break;
+                }
+            }
+            
         }
         if (control instanceof Table) {
             ((Table) control).addSelectionListener(dirtyListener);
@@ -325,6 +338,15 @@ public abstract class AbstractVarModelEditor extends EditorPart implements IChan
      */
     protected Map<UIParameter, Object> getUiParameter() {
         return null;
+    }
+    
+    /**
+     * Returns whether change event processing is enabled.
+     * 
+     * @return <code>true</code> for enabled, <code>false</code> else
+     */
+    protected boolean isChangeEventProcessingEnabled() {
+        return enableChangeEventProcessing;
     }
 
 }

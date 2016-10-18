@@ -601,20 +601,20 @@ public class VariabilityModel {
         
         QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.ADAPTIVITY, 
             "Adaptation");
-        ConfigurableElement elt = elements.addElement("Adaptation", "de.uni_hildesheim.sse.qmApp.AdaptationEditor", 
-            new VarModelEditorInputCreator(Configuration.ADAPTIVITY, "Adaptation"), Configuration.ADAPTIVITY);
+        ConfigurableElement elt = elements.variableToConfigurableElements(Configuration.ADAPTIVITY, 
+                "de.uni_hildesheim.sse.qmApp.AdaptationEditor");
         elt.setImage(IconManager.retrieveImage(IconManager.ADAPTATION));
         ConfigurableElement stratTactics = new ConfigurableElement(elt, "Strategies/Tactics", 
             "de.uni_hildesheim.sse.qmApp.StrategiesTacticsEditor", new VarModelEditorInputCreator(
             Configuration.STRATEGIES_TACTICS, "Adaptation Strategies/Tactics"), Configuration.STRATEGIES_TACTICS);
-        elt.addChild(stratTactics);
+        elt.addChildAtTop(stratTactics);
         IEditorInputCreator editorInput = new RtVilEditorInputCreator();
         if (editorInput.isEnabled()) {
             ConfigurableElement rtVIL = new ConfigurableElement(elt, "rt-VIL", 
                 "de.uni_hildesheim.sse.vil.rt.RtVil", editorInput);
             rtVIL.setImage(IconManager.retrieveImage(IconManager.RTVIL)); // TODO preliminary - take from rtVIL
             rtVIL.setMenuContributor(new RtVilMenuContributor());
-            elt.addChild(rtVIL);
+            elt.addChildAtTop(rtVIL);
         }
         elt = elements.addElement("Runtime", "de.uni_hildesheim.sse.qmApp.RuntimeEditor", 
                 new EmptyEditorInputCreator("Runtime Input"), null);

@@ -181,6 +181,11 @@ public class ChangeManager {
     private void notifyListeners(Object source, EventKind kind, IDecisionVariable variable, int globalIndex) {
         for (int l = 0; l < listeners.size(); l++) {
             IChangeListener listener = listeners.get(l);
+            //TODO: What about listeners of editors that are not opened right now?
+            //Those listeners will have been removed (or not yet added) and the correct Editors 
+            //will not trigger the initialization procedures of the appropriate editor.
+            //e.g. unless the main AdaptivityEditor is open, new elements will not run through initialization.
+            //Thus weights are not being added correctly, etc.
             if (source != listener) { // yes, shall be the same in terms of reference
                 listener.variableChanged(kind, variable, globalIndex);
             }
