@@ -45,6 +45,7 @@ import de.uni_hildesheim.sse.qmApp.commands.InstantiateLocal;
 import de.uni_hildesheim.sse.qmApp.dialogs.CloneNumberInputDialog;
 import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator.CloneMode;
+import de.uni_hildesheim.sse.qmApp.editors.FamilyEditor;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.qmApp.images.ImageRegistry;
 import de.uni_hildesheim.sse.qmApp.model.ConnectorUtils;
@@ -60,6 +61,7 @@ import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.EventKind;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.IChangeListener;
 import de.uni_hildesheim.sse.repositoryConnector.UserContext;
 import eu.qualimaster.easy.extension.QmConstants;
+import net.ssehub.easy.producer.ui.productline_editor.IRefreshableEditor;
 import net.ssehub.easy.varModel.confModel.ContainerVariable;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.model.AbstractVariable;
@@ -196,6 +198,7 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                     }
                     if (cloneCount > 0) {
                         // clone does the event notifications, notify others via ChangeManagement, avoid self-messages
+                        
                         List<ConfigurableElement> elements = selectedElement.clone(ConfigurableElementsView.this,
                                 cloneCount);
                         if (null != elements) {
@@ -206,6 +209,7 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                             for (int e = 0; e < elements.size(); e++) {
                                 viewer.add(parent, elements.get(e));
                             }
+                            refreshNestedEditors();
                         }
                     }
                 }
@@ -218,6 +222,23 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
             
             cloneAction.setText("Clone '" + selectedElement.getDisplayName() + "'" + suffix);
             manager.add(cloneAction);
+        }
+    }
+
+    /**
+     * Refreshes all nested editors.
+     */
+    public void refreshNestedEditors() {
+        
+        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        IEditorReference[] allOpenEditors = page.getEditorReferences();
+        for (int i = 0; i < allOpenEditors.length; i++) {
+            IEditorPart editor = allOpenEditors[i].getEditor(false);
+            if (editor instanceof FamilyEditor) {
+                if (editor instanceof IRefreshableEditor) {
+                    ((IRefreshableEditor) editor).refresh();
+                }
+            }
         }
     }
 
@@ -319,6 +340,8 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                                     viewer.add(selectedElement, newElt);
                                     openEditor(newElt);
                                 }
+                                
+                                refreshNestedEditors();
                             }
                         }
                     };
@@ -358,8 +381,6 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                             
                             StatusHighlighter.addPipelineColor();
                         }
-                        
-                       
                     }
                 }
             }

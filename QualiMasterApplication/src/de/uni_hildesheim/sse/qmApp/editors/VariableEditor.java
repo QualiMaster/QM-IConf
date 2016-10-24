@@ -305,6 +305,14 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
     }
     
     /**
+     * Get the list of controls for this VariableEditor.
+     * @return plainControlsList List of controls within this editor.
+     */
+    public Control[] getEditorControls() {
+        return inner.getChildren();
+    }
+    
+    /**
      * Returns the actual variable processed by this editor.
      * 
      * @return the variable
