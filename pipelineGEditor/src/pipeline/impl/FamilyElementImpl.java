@@ -23,7 +23,7 @@ import pipeline.PipelinePackage;
  * <ul>
  *   <li>{@link pipeline.impl.FamilyElementImpl#getFamily <em>Family</em>}</li>
  *   <li>{@link pipeline.impl.FamilyElementImpl#getIsConnector <em>Is Connector</em>}</li>
- *   <li>{@link pipeline.impl.FamilyElementImpl#getDefault <em>Default</em>}</li>
+ *   <li>{@link pipeline.impl.FamilyElementImpl#getDefaultAlgorithm <em>Default Algorithm</em>}</li>
  *   <li>{@link pipeline.impl.FamilyElementImpl#getPermissibleParameters <em>Permissible Parameters</em>}</li>
  * </ul>
  * </p>
@@ -72,24 +72,24 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 	protected Boolean isConnector = IS_CONNECTOR_EDEFAULT;
 
 				/**
-	 * The default value of the '{@link #getDefault() <em>Default</em>}' attribute.
+	 * The default value of the '{@link #getDefaultAlgorithm() <em>Default Algorithm</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getDefault()
+	 * @see #getDefaultAlgorithm()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String DEFAULT_EDEFAULT = null;
+	protected static final String DEFAULT_ALGORITHM_EDEFAULT = null;
 
 				/**
-	 * The cached value of the '{@link #getDefault() <em>Default</em>}' attribute.
+	 * The cached value of the '{@link #getDefaultAlgorithm() <em>Default Algorithm</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getDefault()
+	 * @see #getDefaultAlgorithm()
 	 * @generated
 	 * @ordered
 	 */
-	protected String default_ = DEFAULT_EDEFAULT;
+	protected String defaultAlgorithm = DEFAULT_ALGORITHM_EDEFAULT;
 
 				/**
 	 * The cached value of the '{@link #getPermissibleParameters() <em>Permissible Parameters</em>}' attribute list.
@@ -167,8 +167,8 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String getDefault() {
-		return default_;
+	public String getDefaultAlgorithm() {
+		return defaultAlgorithm;
 	}
 
 				/**
@@ -176,11 +176,11 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setDefault(String newDefault) {
-		String oldDefault = default_;
-		default_ = newDefault;
+	public void setDefaultAlgorithm(String newDefaultAlgorithm) {
+		String oldDefaultAlgorithm = defaultAlgorithm;
+		defaultAlgorithm = newDefaultAlgorithm;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, PipelinePackage.FAMILY_ELEMENT__DEFAULT, oldDefault, default_));
+			eNotify(new ENotificationImpl(this, Notification.SET, PipelinePackage.FAMILY_ELEMENT__DEFAULT_ALGORITHM, oldDefaultAlgorithm, defaultAlgorithm));
 	}
 
 				/**
@@ -207,8 +207,8 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 				return getFamily();
 			case PipelinePackage.FAMILY_ELEMENT__IS_CONNECTOR:
 				return getIsConnector();
-			case PipelinePackage.FAMILY_ELEMENT__DEFAULT:
-				return getDefault();
+			case PipelinePackage.FAMILY_ELEMENT__DEFAULT_ALGORITHM:
+				return getDefaultAlgorithm();
 			case PipelinePackage.FAMILY_ELEMENT__PERMISSIBLE_PARAMETERS:
 				return getPermissibleParameters();
 		}
@@ -230,8 +230,8 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 			case PipelinePackage.FAMILY_ELEMENT__IS_CONNECTOR:
 				setIsConnector((Boolean)newValue);
 				return;
-			case PipelinePackage.FAMILY_ELEMENT__DEFAULT:
-				setDefault((String)newValue);
+			case PipelinePackage.FAMILY_ELEMENT__DEFAULT_ALGORITHM:
+				setDefaultAlgorithm((String)newValue);
 				return;
 			case PipelinePackage.FAMILY_ELEMENT__PERMISSIBLE_PARAMETERS:
 				getPermissibleParameters().clear();
@@ -255,8 +255,8 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 			case PipelinePackage.FAMILY_ELEMENT__IS_CONNECTOR:
 				setIsConnector(IS_CONNECTOR_EDEFAULT);
 				return;
-			case PipelinePackage.FAMILY_ELEMENT__DEFAULT:
-				setDefault(DEFAULT_EDEFAULT);
+			case PipelinePackage.FAMILY_ELEMENT__DEFAULT_ALGORITHM:
+				setDefaultAlgorithm(DEFAULT_ALGORITHM_EDEFAULT);
 				return;
 			case PipelinePackage.FAMILY_ELEMENT__PERMISSIBLE_PARAMETERS:
 				getPermissibleParameters().clear();
@@ -277,8 +277,8 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 				return FAMILY_EDEFAULT == null ? family != null : !FAMILY_EDEFAULT.equals(family);
 			case PipelinePackage.FAMILY_ELEMENT__IS_CONNECTOR:
 				return IS_CONNECTOR_EDEFAULT == null ? isConnector != null : !IS_CONNECTOR_EDEFAULT.equals(isConnector);
-			case PipelinePackage.FAMILY_ELEMENT__DEFAULT:
-				return DEFAULT_EDEFAULT == null ? default_ != null : !DEFAULT_EDEFAULT.equals(default_);
+			case PipelinePackage.FAMILY_ELEMENT__DEFAULT_ALGORITHM:
+				return DEFAULT_ALGORITHM_EDEFAULT == null ? defaultAlgorithm != null : !DEFAULT_ALGORITHM_EDEFAULT.equals(defaultAlgorithm);
 			case PipelinePackage.FAMILY_ELEMENT__PERMISSIBLE_PARAMETERS:
 				return permissibleParameters != null && !permissibleParameters.isEmpty();
 		}
@@ -299,8 +299,8 @@ public class FamilyElementImpl extends ProcessingElementImpl implements FamilyEl
 		result.append(family);
 		result.append(", isConnector: ");
 		result.append(isConnector);
-		result.append(", default: ");
-		result.append(default_);
+		result.append(", defaultAlgorithm: ");
+		result.append(defaultAlgorithm);
 		result.append(", permissibleParameters: ");
 		result.append(permissibleParameters);
 		result.append(')');

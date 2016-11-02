@@ -44,7 +44,7 @@
     <genClasses ecoreClass="pipeline.ecore#//FamilyElement">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//FamilyElement/family"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//FamilyElement/isConnector"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//FamilyElement/default"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//FamilyElement/defaultAlgorithm"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pipeline.ecore#//FamilyElement/permissibleParameters"/>
     </genClasses>
     <genClasses ecoreClass="pipeline.ecore#//DataManagementElement">
