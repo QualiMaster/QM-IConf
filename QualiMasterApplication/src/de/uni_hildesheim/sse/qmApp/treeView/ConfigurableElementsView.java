@@ -766,6 +766,14 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                     break; // cannot handle, shall not occur
                 }
             }
+        } else {
+            if (null != variable.getParent() 
+                && variable.getParent().getParent() instanceof net.ssehub.easy.varModel.confModel.Configuration) {
+                
+                ConfigurableElement element = elements.findElement(variable);
+                viewer.refresh(element, true);
+                
+            }
         }
     }
     

@@ -300,10 +300,17 @@ public abstract class AbstractVarModelEditor extends EditorPart implements IChan
 
     @Override
     public void doSave(IProgressMonitor monitor) {
+
+        //super dirty, but does not work if commit is called before or after only....
         enableChangeEventProcessing = false;
         uiCfg.commitValues(ChangeManager.INSTANCE.getUIChangeListener());
         enableChangeEventProcessing = true;
         ModelAccess.store(getConfiguration());
+        enableChangeEventProcessing = false;
+        uiCfg.commitValues(ChangeManager.INSTANCE.getUIChangeListener());
+        enableChangeEventProcessing = true;
+        
+        parent.refresh();
         
         if (this instanceof VariableEditor) {
             try {
