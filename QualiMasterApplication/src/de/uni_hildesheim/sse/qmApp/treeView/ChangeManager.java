@@ -186,6 +186,7 @@ public class ChangeManager {
             //will not trigger the initialization procedures of the appropriate editor.
             //e.g. unless the main AdaptivityEditor is open, new elements will not run through initialization.
             //Thus weights are not being added correctly, etc.
+            //On the other hand, hard-adding some of the listeners undermines this entire system...
             if (source != listener) { // yes, shall be the same in terms of reference
                 listener.variableChanged(kind, variable, globalIndex);
             }

@@ -68,7 +68,13 @@ public class ContainerVariableEditorInputCreator extends AbstractVariableEditorI
     @Override
     public boolean holds(IDecisionVariable variable) {
         // not equals or contains!
-        return getVariable().equals(variable);
+        boolean equal = getVariable().equals(variable);
+        if (!equal) {
+            // Fall back compare parent variable name and index
+            String varName = getVariableName() + " [" + index + "]";
+            equal = varName.equals(variable.getDeclaration().getName());
+        }
+        return equal;
     }
 
     @Override

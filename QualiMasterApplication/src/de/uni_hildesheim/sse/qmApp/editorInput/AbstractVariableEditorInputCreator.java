@@ -163,7 +163,7 @@ public abstract class AbstractVariableEditorInputCreator implements IVariableEdi
      * Returns the variable name of the handled variable.
      * @return The name of the variable, which is used as reference to handle the variable itself.
      */
-    protected String getVariableName() {
+    public String getVariableName() {
         return variableName;
     }
 

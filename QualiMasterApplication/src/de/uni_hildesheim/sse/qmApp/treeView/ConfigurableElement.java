@@ -12,6 +12,7 @@ import de.uni_hildesheim.sse.qmApp.editorInput.ContainerVariableEditorInputCreat
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator.CloneMode;
 import de.uni_hildesheim.sse.qmApp.editorInput.IVariableEditorInputCreator;
+import de.uni_hildesheim.sse.qmApp.editorInput.VarModelEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.model.QualiMasterDisplayNameProvider;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
@@ -279,7 +280,7 @@ public class ConfigurableElement { // unsure whether this shall be a resource
      *     an inner node
      */
     public boolean isTopLevel() {
-        return null == parent;
+        return null == parent; // || parent.input instanceof VarModelEditorInputCreator;
     }
     
     /**
@@ -330,6 +331,18 @@ public class ConfigurableElement { // unsure whether this shall be a resource
                 if (index >= 0) {
                     ConfigurableElement parent = child.getParent();
                     String name = parent.getDisplayName();
+                    if (child.input instanceof ContainerVariableEditorInputCreator) {
+                        name = ((ContainerVariableEditorInputCreator) child.input).getVariableName();
+                    }
+                    
+//                    String name = child.input.getName();
+                    ContainerVariableEditorInputChangeListener.INSTANCE.notifyDeletetion(name, index);
+                }
+            } else {
+                int index = children.indexOf(child);
+                if (index >= 0) {
+                    String name = child.getDisplayName();
+//                    String name = child.input.getName();
                     ContainerVariableEditorInputChangeListener.INSTANCE.notifyDeletetion(name, index);
                 }
             }
@@ -346,6 +359,7 @@ public class ConfigurableElement { // unsure whether this shall be a resource
     public void delete(Object source) {
         input.delete(source, modelPart);
         if (null != parent) {
+            
             parent.deleteFromChildren(this);
         }
     }
