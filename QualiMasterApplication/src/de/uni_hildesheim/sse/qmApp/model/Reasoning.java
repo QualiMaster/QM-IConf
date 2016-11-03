@@ -377,8 +377,7 @@ public class Reasoning {
     private static void annotateOpenedPipelineEditor() {
         if (PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
                 instanceof DiagramEditor) {
-        
-            
+
             IEditorReference[] editors = PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getActivePage().getEditorReferences();
                     
@@ -388,7 +387,7 @@ public class Reasoning {
                     DiagramEditor editor = (DiagramEditor) object;
 
                     if (editor instanceof PipelineDiagramEditor) {
-                        PipelineDiagramUtils.highlightDiagram();
+                        PipelineDiagramUtils.highlightDiagram(editor);
                     }
                 }
             }

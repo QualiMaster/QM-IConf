@@ -12,6 +12,7 @@ import org.eclipse.gmf.runtime.diagram.ui.parts.DiagramEditor;
 import org.eclipse.gmf.runtime.gef.ui.figures.DefaultSizeNodeFigure;
 import org.eclipse.gmf.runtime.lite.svg.SVGFigure;
 import org.eclipse.gmf.runtime.notation.impl.ShapeImpl;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.PlatformUI;
 
@@ -266,7 +267,8 @@ public class StatusHighlighter {
                 for (int i = 0; i < editors.length; i++) {
                     Object object = editors[i].getEditor(false);
                     if (object instanceof DiagramEditor) {
-                        StatusHighlighter.addPipelineColor();
+                        DiagramEditor editor = (DiagramEditor) object;
+                        StatusHighlighter.addPipelineColor(editor);
                     }
                 }
             }
@@ -378,44 +380,39 @@ public class StatusHighlighter {
     
     /**
      * Add color to pipeline.
+     * @param editor pipeline-editor to annotate with color.
      */
-    public static void addPipelineColor() {
+    public static void addPipelineColor(IEditorPart editor) {
         
         List<de.uni_hildesheim.sse.qmApp.pipelineUtils.StatusHighlighter.PipelineDataflowInformationWrapper>
             wrapperList = StatusHighlighter.getInstance().getPipelineFlowInfo();
         
-        IEditorReference[] editors = PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getActivePage().getEditorReferences();
-                
-        for (int i = 0; i < editors.length; i++) {
-            Object object = editors[i].getEditor(false);
-            if (object instanceof DiagramEditor) {
-                DiagramEditor editor = (DiagramEditor) object;
+        if (editor instanceof DiagramEditor) {
+            DiagramEditor diagramEditor = (DiagramEditor) editor;
                         
-                EList<EObject> elementList = editor.getDiagram().eContents();
+            EList<EObject> elementList = diagramEditor.getDiagram().eContents();
                         
-                for (int j = 0; j < elementList.size(); j++) {
+            for (int j = 0; j < elementList.size(); j++) {
   
-                    String pipelineName = editor.getTitle().toLowerCase();       
+                String pipelineName = editor.getTitle().toLowerCase();       
  
-                    EObject element = editor.getDiagram().getElement();
-                    EList<EObject> eContents = element.eContents();
+                EObject element = diagramEditor.getDiagram().getElement();
+                EList<EObject> eContents = element.eContents();
                             
-                    for (int k = 0; k < wrapperList.size(); k++) {
+                for (int k = 0; k < wrapperList.size(); k++) {
                                 
-                        PipelineDataflowInformationWrapper wrapper = wrapperList.get(k);
+                    PipelineDataflowInformationWrapper wrapper = wrapperList.get(k);
                     
-                        if (wrapper.getPipelineName().toLowerCase().equals(pipelineName)) {
+                    if (wrapper.getPipelineName().toLowerCase().equals(pipelineName)) {
                     
-                            for (int l = 0; l < eContents.size(); l++) {
-                                            
-                                String name = eContents.get(l).toString();
-                                name = determineName(name);
+                        for (int l = 0; l < eContents.size(); l++) {
+                                
+                            String name = eContents.get(l).toString();
+                            name = determineName(name);
                                        
-                                if (wrapper.getVariableName().equals(name)) {
-                                    highlightDataFlow(eContents.get(l), wrapper.getIndicator());
-                                }    
-                            }
+                            if (wrapper.getVariableName().equals(name)) {
+                                highlightDataFlow(eContents.get(l), wrapper.getIndicator());
+                            }    
                         }
                     }
                 }

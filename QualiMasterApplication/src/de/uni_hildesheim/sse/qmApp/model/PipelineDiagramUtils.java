@@ -539,15 +539,15 @@ public class PipelineDiagramUtils {
     /**
      * Get diagram(Pipeline-Editor) from opened editor and highlight specific
      * elements.
+     * @param editor 
      * 
      */
-    public static void highlightDiagram() {
+    public static void highlightDiagram(IEditorPart editor) {
 
         resetDiagramMarkings();
     
         // Get diagram.
-        DiagramEditor diagram = (DiagramEditor) PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+        DiagramEditor diagram = (DiagramEditor) editor;
         
         List<Reasoning.PipelineWrapperObject> errors = Reasoning
                 .getPipelineErrors();

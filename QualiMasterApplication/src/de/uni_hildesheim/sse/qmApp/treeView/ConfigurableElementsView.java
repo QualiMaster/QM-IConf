@@ -377,9 +377,9 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                                 DiagramEditor diagramEditor = (DiagramEditor) editor;
                                 listenOnDiagrm(diagramEditor);
                             }
-                            PipelineDiagramUtils.highlightDiagram();
+                            PipelineDiagramUtils.highlightDiagram(editor);
                             
-                            StatusHighlighter.addPipelineColor();
+                            StatusHighlighter.addPipelineColor(editor);
                         }
                     }
                 }
