@@ -146,15 +146,17 @@ public abstract class AbstractVarModelEditor extends EditorPart implements IChan
         if (control instanceof Combo) {
             Combo combo = (Combo) control;
             combo.addSelectionListener(dirtyListener);
-            IDecisionVariable derefName = Configuration.dereference(
-                    ((IDecisionVariable) var.getParent()).getNestedElement(0));
-            //preselect the saved value.
-            for (int i = 0; i < combo.getItemCount(); i++) {
-                String[] dNames = derefName.getQualifiedName().split("::");
-                String item = combo.getItem(i);
-                if (item.equals(dNames[dNames.length - 1].replaceAll("\\s+", ""))) {
-                    combo.select(i);
-                    break;
+            if (var.getParent() instanceof IDecisionVariable) {
+                IDecisionVariable derefName = Configuration.dereference(
+                        ((IDecisionVariable) var.getParent()).getNestedElement(0));
+                //preselect the saved value.
+                for (int i = 0; i < combo.getItemCount(); i++) {
+                    String[] dNames = derefName.getQualifiedName().split("::");
+                    String item = combo.getItem(i);
+                    if (item.equals(dNames[dNames.length - 1].replaceAll("\\s+", ""))) {
+                        combo.select(i);
+                        break;
+                    }
                 }
             }
             
@@ -298,11 +300,31 @@ public abstract class AbstractVarModelEditor extends EditorPart implements IChan
 
     @Override
     public void doSave(IProgressMonitor monitor) {
+
+        //super dirty, but does not work if commit is called before or after only....
         enableChangeEventProcessing = false;
         uiCfg.commitValues(ChangeManager.INSTANCE.getUIChangeListener());
         enableChangeEventProcessing = true;
         ModelAccess.store(getConfiguration());
-        setPartName(getEditorInput().getName());
+        enableChangeEventProcessing = false;
+        uiCfg.commitValues(ChangeManager.INSTANCE.getUIChangeListener());
+        enableChangeEventProcessing = true;
+        
+        parent.refresh();
+        
+        if (this instanceof VariableEditor) {
+            try {
+                setPartName(((VariableEditor) this).getVariable()
+                        .getNestedElement("type").getValue().toString().split(":")[0].trim());
+            } catch (NullPointerException exc) {
+                //do nothing
+            } catch (ArrayIndexOutOfBoundsException exc) {
+                //do nothing
+            }
+        } else {
+            setPartName(getEditorInput().getName());
+        }
+        
         parent.unsetDirty(); // this is dirty listener -> fire property change
     }
 

@@ -64,7 +64,7 @@ abstract class ProcessingElement extends PipelineNode {
 class FamilyElement extends ProcessingElement {
   attr Integer family = -1; // references become integer (see above)
   attr Boolean isConnector = false; // Should only be visible if Pipeline.isSubPipeline = true, can be a Boolean, since this is not modeled in IVML
-  attr String default;
+  attr String defaultAlgorithm;
   attr String[*] permissibleParameters; // List of references
 }
 

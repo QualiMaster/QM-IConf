@@ -422,7 +422,7 @@ public class QualityParameterWeightingEditor extends AbstractContainerOfCompound
                 // get the parameter value for the VALUE column
                 weight = getCompoundSlot(v, QmConstants.SLOT_QPARAMWEIGHTING_WEIGHT);
                 if (null == weight || weight.isEmpty()) {
-                    System.out.println(name + " was initialized incorrectly and has no weight!");
+//                    System.out.println(name + " was initialized incorrectly and has no weight!");
                     try {                        
                         Value compoundValue = ValueFactory.createValue(compound, "name", name, "weight", 0);
                         v.setValue(compoundValue);
@@ -432,13 +432,8 @@ public class QualityParameterWeightingEditor extends AbstractContainerOfCompound
                         e.printStackTrace();
                     }
                     
-                }
-                
-                if (null == name) {
-                    name = "null";
-                }
-                
-                if (!nameFound) {
+                }     
+                if (null == name || !nameFound) {
                     name = "null";
                 }
                 

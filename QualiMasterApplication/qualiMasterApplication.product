@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="de.uni-hildesheim.sse.qualiMasterApplication" uid="de.uni-hildesheim.sse.qualiMasterApplication" id="QualiMasterApplication.QualiMasterApplication" application="QualiMasterApplication.application" version="0.10.5" useFeatures="false" includeLaunchers="true">
+<product name="de.uni-hildesheim.sse.qualiMasterApplication" uid="de.uni-hildesheim.sse.qualiMasterApplication" id="QualiMasterApplication.QualiMasterApplication" application="QualiMasterApplication.application" version="0.11.0" useFeatures="false" includeLaunchers="true">
 
    <configIni use="default">
    </configIni>

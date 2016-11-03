@@ -47,7 +47,7 @@ public class FamilyElementItemProvider extends ProcessingElementItemProvider {
 
 			addFamilyPropertyDescriptor(object);
 			addIsConnectorPropertyDescriptor(object);
-			addDefaultPropertyDescriptor(object);
+			addDefaultAlgorithmPropertyDescriptor(object);
 			addPermissibleParametersPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
@@ -98,19 +98,19 @@ public class FamilyElementItemProvider extends ProcessingElementItemProvider {
 	}
 
 				/**
-	 * This adds a property descriptor for the Default feature.
+	 * This adds a property descriptor for the Default Algorithm feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected void addDefaultPropertyDescriptor(Object object) {
+	protected void addDefaultAlgorithmPropertyDescriptor(Object object) {
 		itemPropertyDescriptors.add
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_FamilyElement_default_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_FamilyElement_default_feature", "_UI_FamilyElement_type"),
-				 PipelinePackage.Literals.FAMILY_ELEMENT__DEFAULT,
+				 getString("_UI_FamilyElement_defaultAlgorithm_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_FamilyElement_defaultAlgorithm_feature", "_UI_FamilyElement_type"),
+				 PipelinePackage.Literals.FAMILY_ELEMENT__DEFAULT_ALGORITHM,
 				 true,
 				 false,
 				 false,
@@ -181,7 +181,7 @@ public class FamilyElementItemProvider extends ProcessingElementItemProvider {
 		switch (notification.getFeatureID(FamilyElement.class)) {
 			case PipelinePackage.FAMILY_ELEMENT__FAMILY:
 			case PipelinePackage.FAMILY_ELEMENT__IS_CONNECTOR:
-			case PipelinePackage.FAMILY_ELEMENT__DEFAULT:
+			case PipelinePackage.FAMILY_ELEMENT__DEFAULT_ALGORITHM:
 			case PipelinePackage.FAMILY_ELEMENT__PERMISSIBLE_PARAMETERS:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;

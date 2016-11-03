@@ -474,7 +474,7 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getFamilyElement_Default() {
+	public EAttribute getFamilyElement_DefaultAlgorithm() {
 		return (EAttribute)familyElementEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -576,7 +576,7 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 		familyElementEClass = createEClass(FAMILY_ELEMENT);
 		createEAttribute(familyElementEClass, FAMILY_ELEMENT__FAMILY);
 		createEAttribute(familyElementEClass, FAMILY_ELEMENT__IS_CONNECTOR);
-		createEAttribute(familyElementEClass, FAMILY_ELEMENT__DEFAULT);
+		createEAttribute(familyElementEClass, FAMILY_ELEMENT__DEFAULT_ALGORITHM);
 		createEAttribute(familyElementEClass, FAMILY_ELEMENT__PERMISSIBLE_PARAMETERS);
 
 		dataManagementElementEClass = createEClass(DATA_MANAGEMENT_ELEMENT);
@@ -663,7 +663,7 @@ public class PipelinePackageImpl extends EPackageImpl implements PipelinePackage
 		initEClass(familyElementEClass, FamilyElement.class, "FamilyElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getFamilyElement_Family(), ecorePackage.getEIntegerObject(), "family", "-1", 0, 1, FamilyElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getFamilyElement_IsConnector(), ecorePackage.getEBooleanObject(), "isConnector", "false", 0, 1, FamilyElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getFamilyElement_Default(), ecorePackage.getEString(), "default", null, 0, 1, FamilyElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getFamilyElement_DefaultAlgorithm(), ecorePackage.getEString(), "defaultAlgorithm", null, 0, 1, FamilyElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getFamilyElement_PermissibleParameters(), ecorePackage.getEString(), "permissibleParameters", null, 0, -1, FamilyElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(dataManagementElementEClass, DataManagementElement.class, "DataManagementElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);

@@ -722,11 +722,11 @@ public class PipelineTranslationOperations {
             fList.add(addPipelineElement(flow, destProject, context));
         }
         if (fList != null) {
-            familyElementCompound.put("output", fList.toArray());
+            familyElementCompound.put(QmConstants.SLOT_OUTPUT, fList.toArray());
         }
         
-        String algorithmRef = familyElement.getDefault();
-        convertCSTBasedReference(familyElementCompound, algorithmRef, "default");
+        String algorithmRef = familyElement.getDefaultAlgorithm();
+        convertCSTBasedReference(familyElementCompound, algorithmRef, QmConstants.SLOT_FAMILYELEMENT_DEFAULT);
         List<String> permParameters = familyElement.getPermissibleParameters();
         storePermissibleParameters(familyElementCompound, permParameters);
         

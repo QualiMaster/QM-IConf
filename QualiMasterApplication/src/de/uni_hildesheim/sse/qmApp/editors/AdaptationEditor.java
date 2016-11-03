@@ -121,7 +121,7 @@ public class AdaptationEditor extends ProjectEditor {
 //            IDecisionVariable name = toAdd.getNestedElement("name");
             toAdd.getNestedElement("weight")
                 .setValue(ValueFactory.createValue(IntegerType.TYPE, "0"), AssignmentState.ASSIGNED);
-            System.out.println("nothing");
+//            System.out.println("nothing");
 //            weight.setValue(ValueFactory.createValue(IntegerType.TYPE, "1"), AssignmentState.ASSIGNED);
 //            Value newValue = ValueFactory.createValue(Compound.TYPE, name, weight);
 //            sequence.getNestedElement(i - 1).setValue(newValue, AssignmentState.ASSIGNED);
@@ -251,7 +251,6 @@ public class AdaptationEditor extends ProjectEditor {
                 }
                 break;
             case CHANGED:
-                System.out.println("CHANGED_OLD");
                 break;
             case DELETED:
                 //if an adaption element is deleted, we also need to delete the observables of that element.

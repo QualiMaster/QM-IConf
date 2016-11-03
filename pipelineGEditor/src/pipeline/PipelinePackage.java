@@ -670,13 +670,13 @@ public interface PipelinePackage extends EPackage
 	int FAMILY_ELEMENT__IS_CONNECTOR = PROCESSING_ELEMENT_FEATURE_COUNT + 1;
 
 								/**
-	 * The feature id for the '<em><b>Default</b></em>' attribute.
+	 * The feature id for the '<em><b>Default Algorithm</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int FAMILY_ELEMENT__DEFAULT = PROCESSING_ELEMENT_FEATURE_COUNT + 2;
+	int FAMILY_ELEMENT__DEFAULT_ALGORITHM = PROCESSING_ELEMENT_FEATURE_COUNT + 2;
 
 								/**
 	 * The feature id for the '<em><b>Permissible Parameters</b></em>' attribute list.
@@ -1115,15 +1115,15 @@ public interface PipelinePackage extends EPackage
 	EAttribute getFamilyElement_IsConnector();
 
 /**
-	 * Returns the meta object for the attribute '{@link pipeline.FamilyElement#getDefault <em>Default</em>}'.
+	 * Returns the meta object for the attribute '{@link pipeline.FamilyElement#getDefaultAlgorithm <em>Default Algorithm</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Default</em>'.
-	 * @see pipeline.FamilyElement#getDefault()
+	 * @return the meta object for the attribute '<em>Default Algorithm</em>'.
+	 * @see pipeline.FamilyElement#getDefaultAlgorithm()
 	 * @see #getFamilyElement()
 	 * @generated
 	 */
-	EAttribute getFamilyElement_Default();
+	EAttribute getFamilyElement_DefaultAlgorithm();
 
 /**
 	 * Returns the meta object for the attribute list '{@link pipeline.FamilyElement#getPermissibleParameters <em>Permissible Parameters</em>}'.
@@ -1463,12 +1463,12 @@ public interface PipelinePackage extends EPackage
 		EAttribute FAMILY_ELEMENT__IS_CONNECTOR = eINSTANCE.getFamilyElement_IsConnector();
 
 				/**
-		 * The meta object literal for the '<em><b>Default</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Default Algorithm</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute FAMILY_ELEMENT__DEFAULT = eINSTANCE.getFamilyElement_Default();
+		EAttribute FAMILY_ELEMENT__DEFAULT_ALGORITHM = eINSTANCE.getFamilyElement_DefaultAlgorithm();
 
 				/**
 		 * The meta object literal for the '<em><b>Permissible Parameters</b></em>' attribute list feature.

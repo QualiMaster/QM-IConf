@@ -30,8 +30,14 @@ public class ContainerVariableEditorInputChangeListener {
         void notifyDeletetion(String parentName, int index);
     }
 
+//    private static final Map<String, String> BLACKLIST = new HashMap<String, String>();
+    
     private Map<String, List<IContainerVariableEditorInputChangeListener>> listeners
         = new HashMap<String, List<IContainerVariableEditorInputChangeListener>>();
+    
+//    static {
+//        BLACKLIST.put("observables", "configuredParameters"); //Adaptation
+//    }
     
     /**
      * Registers a new listener for the given list.
@@ -53,10 +59,20 @@ public class ContainerVariableEditorInputChangeListener {
      * @param index The index of the deleted element, all elements behind this index must move up.
      */
     public void notifyDeletetion(String parentName, int index) {
-        List<IContainerVariableEditorInputChangeListener> list = listeners.get(parentName.toLowerCase());
+        String name = parentName;
+//        if (BLACKLIST.containsKey(parentName)) {
+//            name = BLACKLIST.get(parentName);
+//        } else {
+//        name = parentName.toLowerCase();
+//        }
+        
+        List<IContainerVariableEditorInputChangeListener> list = listeners.get(name);
+        if (null == list) {
+            list = listeners.get(name.toLowerCase());
+        }
         if (null != list) {
             for (int i = 0, end = list.size(); i < end; i++) {
-                list.get(i).notifyDeletetion(parentName, index);
+                list.get(i).notifyDeletetion(name, index);
             }
         }
     }

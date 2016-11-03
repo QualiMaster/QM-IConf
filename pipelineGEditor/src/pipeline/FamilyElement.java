@@ -15,7 +15,7 @@ import org.eclipse.emf.common.util.EList;
  * <ul>
  *   <li>{@link pipeline.FamilyElement#getFamily <em>Family</em>}</li>
  *   <li>{@link pipeline.FamilyElement#getIsConnector <em>Is Connector</em>}</li>
- *   <li>{@link pipeline.FamilyElement#getDefault <em>Default</em>}</li>
+ *   <li>{@link pipeline.FamilyElement#getDefaultAlgorithm <em>Default Algorithm</em>}</li>
  *   <li>{@link pipeline.FamilyElement#getPermissibleParameters <em>Permissible Parameters</em>}</li>
  * </ul>
  * </p>
@@ -80,30 +80,30 @@ public interface FamilyElement extends ProcessingElement {
 	void setIsConnector(Boolean value);
 
 				/**
-	 * Returns the value of the '<em><b>Default</b></em>' attribute.
+	 * Returns the value of the '<em><b>Default Algorithm</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Default</em>' attribute isn't clear,
+	 * If the meaning of the '<em>Default Algorithm</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Default</em>' attribute.
-	 * @see #setDefault(String)
-	 * @see pipeline.PipelinePackage#getFamilyElement_Default()
+	 * @return the value of the '<em>Default Algorithm</em>' attribute.
+	 * @see #setDefaultAlgorithm(String)
+	 * @see pipeline.PipelinePackage#getFamilyElement_DefaultAlgorithm()
 	 * @model
 	 * @generated
 	 */
-	String getDefault();
+	String getDefaultAlgorithm();
 
 				/**
-	 * Sets the value of the '{@link pipeline.FamilyElement#getDefault <em>Default</em>}' attribute.
+	 * Sets the value of the '{@link pipeline.FamilyElement#getDefaultAlgorithm <em>Default Algorithm</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Default</em>' attribute.
-	 * @see #getDefault()
+	 * @param value the new value of the '<em>Default Algorithm</em>' attribute.
+	 * @see #getDefaultAlgorithm()
 	 * @generated
 	 */
-	void setDefault(String value);
+	void setDefaultAlgorithm(String value);
 
 				/**
 	 * Returns the value of the '<em><b>Permissible Parameters</b></em>' attribute list.
