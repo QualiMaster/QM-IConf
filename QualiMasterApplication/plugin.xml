@@ -216,10 +216,12 @@
             name="ValidateAll">
       </command>
       <command
+            defaultHandler="de.uni_hildesheim.sse.qmApp.commands.InstantiateLocal"
             id="de.uni_hildesheim.sse.qmApp.instantiateLocal"
             name="InstantiateLocal">
       </command>
       <command
+            defaultHandler="de.uni_hildesheim.sse.qmApp.commands.InstantiateInterfacesLocal"
             id="de.uni_hildesheim.sse.qmApp.instantiateInterfacesLocal"
             name="InstantiateInterfacesLocal">
       </command>
