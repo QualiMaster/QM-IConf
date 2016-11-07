@@ -335,8 +335,14 @@ public class ClassEditor extends AbstractTextSelectionEditorCreator {
             result = false;
         } else {
             if (!result) {
-                int msgCode = Dialogs.showInfoConfirmDialog(ERROR_PREFIX, "Type in manifest does not match type of "
-                    + "configurable element. Take manifest information over (where applicable) anyway?");
+                int msgCode;
+                if (ManifestType.UNKNOWN == manifestType) {
+                    msgCode = Dialogs.showInfoConfirmDialog("Class Analyzer", "Type of analyzed class does not match"
+                            + "type of configurable element. Take information over (where applicable) anyway?");
+                } else {
+                    msgCode = Dialogs.showInfoConfirmDialog(ERROR_PREFIX, "Type in manifest does not match type of "
+                        + "configurable element. Take manifest information over (where applicable) anyway?");
+                }
                 if (SWT.YES == msgCode) {
                     result = true;
                 }
