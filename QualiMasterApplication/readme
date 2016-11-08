@@ -85,23 +85,29 @@ Release:
   nightly update site, but only if changed!
 - Announce release preparation by mail in case that the model will change.
 - Export product:
-  This needs two steps, an export from the qualiMasterApplication.product and a subsequent installation of the QualiMaster
-  bundle into the RCP platform, as otherwise updates will not work.
-  - Adjust the createInstallable.bat (from QualiMasterApplicationNightlyUpdateSite) to the target platforms to be exported
-  - See https://wiki.eclipse.org/Building#Preferred_way_of_doing_multi-platform_builds for how to build multi platform build.
-  - Execute the export of the QualiMaster Application. Open the 'qualiMasterApplication.product' file
-    in Eclipse and click on the 'Overview' tab. On the right bottom corner there is a link called 'Eclipse Product Export Wizard'.
-    Click on the link and follow the instructions on the screen. Multiple platforms here is only relevant to test the 
-    exported products.
-  - Test the standalone version to install the RCP application into an appropriate eclipse.
-  - Execute the createInstallable.bat
-  - Upload the contents of the exported repository directory to projects.sse.uni-hildesheim.de:www-Ordner/qmConfig (not the nightly one).
+  * Change app.properties, as follows:
+        repository-url = https://svn.l3s.uni-hannover.de/qualimaster/trunk/artifacts/ConfModel/
+    but do not commit this change!
+  * See https://wiki.eclipse.org/Building#Preferred_way_of_doing_multi-platform_builds for how to build multi platform build.
+  * Upload the contents of the exported repository directory to projects.sse.uni-hildesheim.de:www-folder/qmConfig (not the nightly one).
     Yes, this is an extended update site, i.e., the update site itself is not required anymore.
 - Diff configuration model (last release vs. new development version). Please avoid changing the .EASyConfig file. Update release model.
-- Upload now standalone versions to projects.sse.uni-hildesheim.de:www-Ordner/qm/<version>
+- Upload now standalone versions to projects.sse.uni-hildesheim.de:www-folder/qm/<version>
 - Update Configuration page in QM-Wiki.
 - Announce the new version/updates by mail.
 
+Release of demo version:
+- Export product:
+  * Change app.properties, as follows:
+        repository-url = https://svn.l3s.uni-hannover.de/qualimaster/trunk/artifacts/ConfModel/
+        demo-mode = true
+    but do not commit this change!
+- Run the exported tool and close it immediately. This will create a workspace folder within the tool folder. Further it creates an empty project "ConfModel".
+  * Copy the contents of the ConfModel project from the SVN version into the empty project
+  * Create a new folder within the workspace "backup"
+  * Copy the project "ConfModel" into the "backup" folder
+  
+  
 Release nightly:
 - Take a new eclipse of the same base version (typically a dedicated installation is easier to handle for Jenkins than a copied one).
   In case of a new Eclipse version, an update of the qmRepository folder on Jenkins is required. Please note that there is

@@ -364,8 +364,9 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
         }
         
         // Special handling for constraint based combo boxes
-        boolean specialProperty = "tupleType".equals(propertyIdentifier) || "default".equals(propertyIdentifier)
-            || "subPipelineFamily".equals(propertyIdentifier);
+        boolean specialProperty = QmConstants.SLOT_FLOW_TUPLE_TYPE.equals(propertyIdentifier)
+            || QmConstants.SLOT_FAMILYELEMENT_DEFAULT.equals(propertyIdentifier)
+            || QmConstants.SLOT_SUBPIPELINE_FAMILY.equals(propertyIdentifier);
         if (specialProperty && null != value && value instanceof String) {
             
             try {
