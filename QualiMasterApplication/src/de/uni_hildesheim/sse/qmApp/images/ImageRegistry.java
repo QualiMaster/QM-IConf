@@ -195,8 +195,11 @@ public class ImageRegistry {
      */
     public void registerImage(IModelPart modelPart, int providedTypeIndex, Image image) {
         //using getProvidedTypes would be more direct but may fail if the model is not present
-        String imageKey = appendTypeKey(obtainKey(modelPart), modelPart.getProvidedTypeNames()[providedTypeIndex]);
-        registerImage(imageKey, image);
+
+        if (modelPart.getProvidedTypeNames() != null) {
+            String imageKey = appendTypeKey(obtainKey(modelPart), modelPart.getProvidedTypeNames()[providedTypeIndex]);
+            registerImage(imageKey, image);
+        }
     }
     
 }

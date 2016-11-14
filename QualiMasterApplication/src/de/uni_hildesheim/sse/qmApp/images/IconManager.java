@@ -42,6 +42,7 @@ public class IconManager {
     public static final String SUBALGORITHM = PRE + "subAlgorithm.png";
     public static final String HWALGORITHM = PRE + "hardwareAlgorithm.png";
     public static final String ALGORITHMS = PRE + "algorithms.png";
+    public static final String STRATEGY_TACTICS = PRE + "strategyTactics.png";
     public static final String DATA_SOURCE = PRE + "dataSource.png";
     public static final String DATA_SINK = PRE + "dataSink.png";
     public static final String DATA_ELEMENT = PRE + "dataElement.png";

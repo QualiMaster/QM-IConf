@@ -608,6 +608,7 @@ public class VariabilityModel {
             "de.uni_hildesheim.sse.qmApp.StrategiesTacticsEditor", new VarModelEditorInputCreator(
             Configuration.STRATEGIES_TACTICS, "Adaptation Strategies/Tactics"), Configuration.STRATEGIES_TACTICS);
         elt.addChildAtTop(stratTactics);
+        stratTactics.setImage(IconManager.retrieveImage(IconManager.STRATEGY_TACTICS));
         IEditorInputCreator editorInput = new RtVilEditorInputCreator();
         if (editorInput.isEnabled()) {
             ConfigurableElement rtVIL = new ConfigurableElement(elt, "rt-VIL", 
@@ -874,7 +875,6 @@ public class VariabilityModel {
             registry.registerImage(Configuration.ALGORITHMS, "Family", 
                 IconManager.retrieveImage(IconManager.FAMILY));
         }
-        
         registry.registerImage(Configuration.FAMILIES, 
             IconManager.retrieveImage(IconManager.FAMILIES));
         registry.registerImage(Configuration.FAMILIES, 0, 
@@ -885,8 +885,7 @@ public class VariabilityModel {
         registry.registerImage(Configuration.PIPELINES, 0, 
             IconManager.retrieveImage(IconManager.PIPELINE));
         registry.registerImage(Configuration.PIPELINES, 1, 
-                IconManager.retrieveImage(IconManager.SUBPIPELINE));
-        
+                IconManager.retrieveImage(IconManager.SUBPIPELINE));    
         registry.registerImage(Configuration.INFRASTRUCTURE, 
             IconManager.retrieveImage(IconManager.INFRASTRUCTURE));
         
@@ -898,6 +897,7 @@ public class VariabilityModel {
             IconManager.retrieveImage(IconManager.OBSERVABLES));
         registry.registerImage(Configuration.OBSERVABLES, 0, 
                 IconManager.retrieveImage(IconManager.OBSERVABLE));
+
     }
     
     /**

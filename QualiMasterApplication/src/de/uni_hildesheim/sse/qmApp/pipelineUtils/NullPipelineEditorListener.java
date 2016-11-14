@@ -40,6 +40,7 @@ public class NullPipelineEditorListener implements IPipelineEditorListener {
 
     @Override
     public void flowAdded(String node1, String node2) {
+        //Reasoning.reasonOn(Configuration.PIPELINES, true);
     }
 
     @Override
