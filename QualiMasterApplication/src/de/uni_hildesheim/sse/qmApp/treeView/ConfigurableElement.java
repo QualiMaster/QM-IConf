@@ -1,5 +1,7 @@
 package de.uni_hildesheim.sse.qmApp.treeView;
 
+import static eu.qualimaster.easy.extension.QmConstants.SLOT_OBSERVABLE_TYPE;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,17 +14,18 @@ import de.uni_hildesheim.sse.qmApp.editorInput.ContainerVariableEditorInputCreat
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator.CloneMode;
 import de.uni_hildesheim.sse.qmApp.editorInput.IVariableEditorInputCreator;
-import de.uni_hildesheim.sse.qmApp.editorInput.VarModelEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
-import de.uni_hildesheim.sse.qmApp.model.QualiMasterDisplayNameProvider;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
-import de.uni_hildesheim.sse.qmApp.treeView.ConfigurableElements.IElementReferrer;
-import net.ssehub.easy.varModel.confModel.Configuration;
+import net.ssehub.easy.varModel.confModel.AssignmentState;
+import net.ssehub.easy.varModel.confModel.ConfigurationException;
 import net.ssehub.easy.varModel.confModel.ContainerVariable;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
-import net.ssehub.easy.varModel.model.AbstractVariable;
+import net.ssehub.easy.varModel.confModel.SequenceVariable;
 import net.ssehub.easy.varModel.model.datatypes.Compound;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
+import net.ssehub.easy.varModel.model.values.Value;
+import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
+import net.ssehub.easy.varModel.model.values.ValueFactory;
 
 /**
  * Class manages a list of configurable elements which we populate in order to show these elements
@@ -172,6 +175,11 @@ public class ConfigurableElement { // unsure whether this shall be a resource
     public ConfigurableElement addChild(Object source, IDecisionVariable variable) {
         IVariableEditorInputCreator creator = null;
         IDatatype varType = variable.getDeclaration().getType();
+        if (null != variable.getParent() && variable.getParent() instanceof SequenceVariable) {
+            if ("configuredParameters".equals(variable.getParent().getDeclaration().getName())) {
+                addDefaultValues(variable);
+            }
+        }
         if (Compound.TYPE.isAssignableFrom(varType)) {
             if (variable.getParent() instanceof ContainerVariable) {
                 ContainerVariable cVar = (ContainerVariable) variable.getParent();
@@ -189,6 +197,7 @@ public class ConfigurableElement { // unsure whether this shall be a resource
                     variable.getParent().getDeclaration().getName(), index);
             }
         }
+        
         ConfigurableElement child = null;
         if (null != creator) {
             child = modelPart.getElementFactory().createElement(this, variable, creator);
@@ -197,6 +206,44 @@ public class ConfigurableElement { // unsure whether this shall be a resource
             ChangeManager.INSTANCE.variableAdded(source, variable);
         }
         return child;
+    }
+    
+    /**
+     * Adds a default name to the Observable, if not was given yet. This is neccessary for the model to load correctly
+     * and will lead to crashes and freezes if ignored.
+     * @param var The variable that needs a default name.
+     */
+    private void addDefaultValues(IDecisionVariable var) {
+
+        IDecisionVariable type = var.getNestedElement(SLOT_OBSERVABLE_TYPE);
+        if (null != type && null == type.getValue()) {
+            
+            String defaultName = null;
+            SequenceVariable parent = null;
+            if (null != var.getParent() && var.getParent() instanceof SequenceVariable) {
+                parent = (SequenceVariable) var.getParent();
+            }
+            
+            if (null != parent) {
+                defaultName = parent.getDeclaration().getName() + " [" 
+                    + (parent.getNestedElementsCount() - 1) + "]";
+            }
+            
+            Value newValue;
+            try {
+                newValue = ValueFactory.createValue(
+                        type.getDeclaration().getType(), new Object[]{defaultName});
+                type.setValue(newValue, AssignmentState.ASSIGNED);
+                System.out.println("Set new Observable to generated values: " + var.toString());
+                System.out.println("Proof: " + var.getParent().toString());
+                
+            } catch (ValueDoesNotMatchTypeException e) {
+                e.printStackTrace();
+            } catch (ConfigurationException e) {
+                e.printStackTrace();
+            }
+        }
+        
     }
     
     /**

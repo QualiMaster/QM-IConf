@@ -15,7 +15,7 @@
  */
 package de.uni_hildesheim.sse.qmApp.editors;
 
-import static eu.qualimaster.easy.extension.QmConstants.PROJECT_ADAPTIVITY;
+import static eu.qualimaster.easy.extension.QmConstants.PROJECT_ADAPTIVITYCFG;
 import static eu.qualimaster.easy.extension.QmConstants.PROJECT_OBSERVABLES;
 import static eu.qualimaster.easy.extension.QmConstants.PROJECT_OBSERVABLESCFG;
 import static eu.qualimaster.easy.extension.QmConstants.SLOT_OBSERVABLE_TYPE;
@@ -31,6 +31,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.uni_hildesheim.sse.qmApp.model.ConnectorUtils;
+import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.EventKind;
 import eu.qualimaster.easy.extension.internal.VariableHelper;
@@ -49,6 +50,8 @@ import net.ssehub.easy.varModel.model.ModelQueryException;
 import net.ssehub.easy.varModel.model.Project;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 import net.ssehub.easy.varModel.model.datatypes.IntegerType;
+import net.ssehub.easy.varModel.model.datatypes.Reference;
+import net.ssehub.easy.varModel.model.values.Value;
 import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
 import net.ssehub.easy.varModel.model.values.ValueFactory;
 import qualimasterapplication.Activator;
@@ -80,35 +83,56 @@ public class AdaptationEditor extends ProjectEditor {
             while (!(par instanceof Project)) {
                 par = par.getParent();
             }
+//            if (null != variable && EventKind.ADDED == kind) {
+//                addDefaultValues(variable);
+//            }
             if (par instanceof Project) {
                 Project prj = (Project) par;
+                Configuration config = this.getConfiguration();
+                if (null != config) {
+                    prj = config.getProject();
+                    System.out.println(prj.getName());
+                }
                 if (PROJECT_OBSERVABLESCFG.equals(prj.getName())) {
                     String type = VariableHelper.getString(variable, SLOT_OBSERVABLE_TYPE);
                     if (null != type) {
                         handleVariableChangedEvent(kind, variable, type);
                     }
                 } else if (PROJECT_OBSERVABLES.equals(prj.getName())) {
-                    if (EventKind.DELETED == kind && link instanceof SequenceVariable) {
-                        SequenceVariable sequence = (SequenceVariable) link;
-                        deleteMappedAdaption(sequence, variable);
-                    }
-                    
-                } else if (PROJECT_ADAPTIVITY.equals(prj.getName())) {
                     if (null == link && null != variable.getParent()) {
                         link = variable.getParent();
                     }
                     if (EventKind.DELETED == kind && link instanceof SequenceVariable) {
                         SequenceVariable sequence = (SequenceVariable) link;
-                        deleteAdaption(sequence, variable);
-                    } else if (EventKind.ADDED == kind && link instanceof SequenceVariable) {
-                        SequenceVariable sequence = (SequenceVariable) link;
-                        addAdaption(sequence, variable);
+                        deleteMappedAdaption(sequence, variable);
+                    }                    
+                } else if (PROJECT_ADAPTIVITYCFG.equals(prj.getName())) {
+                    if (null == link && null != variable.getParent()) {
+                        link = variable.getParent();
                     }
+                    String type = VariableHelper.getString(variable, SLOT_OBSERVABLE_TYPE);
+                    handleVariableChangedEvent(kind, variable, type);
+//                    if (EventKind.DELETED == kind && link instanceof SequenceVariable) {
+//                        SequenceVariable sequence = (SequenceVariable) link;
+//                        deleteAdaption(sequence, variable);
+//                    } else if (EventKind.ADDED == kind && link instanceof SequenceVariable) {
+//                        SequenceVariable sequence = null;
+//                        Iterator<IDecisionVariable> iter = config.iterator();
+//                        while (iter.hasNext() && null == sequence) {
+//                            IDecisionVariable iVar = iter.next();
+//                            if (iVar.getQualifiedName().endsWith("pipelineImportance") 
+//                                    && iVar instanceof SequenceVariable) {
+//                                sequence = (SequenceVariable) iVar;
+//                            }
+//                        }
+//                        
+//                        addAdaption(sequence, variable);
+//                    }
                 }
             }
         }
     }
-
+    
     /**
      * Adds a weight to the adaption part.
      * @param sequence The sequence to add to.
@@ -116,14 +140,20 @@ public class AdaptationEditor extends ProjectEditor {
      */
     private void addAdaption(SequenceVariable sequence, IDecisionVariable variable) {
         try {
-            int i = AdaptationEditor.getPosition(variable);
+//            int i = AdaptationEditor.getPosition(variable);
+            
+            sequence.addNestedElement();
+            int i = sequence.getNestedElementsCount();
             IDecisionVariable toAdd = sequence.getNestedElement(i - 1);
-//            IDecisionVariable name = toAdd.getNestedElement("name");
+            IDecisionVariable example = sequence.getNestedElement(0);
+            IDecisionVariable name = toAdd.getNestedElement("weight");
             toAdd.getNestedElement("weight")
-                .setValue(ValueFactory.createValue(IntegerType.TYPE, "0"), AssignmentState.ASSIGNED);
+                .setValue(ValueFactory.createValue(IntegerType.TYPE, "1"), AssignmentState.ASSIGNED);
+            System.out.println(toAdd.toString());
+
 //            System.out.println("nothing");
 //            weight.setValue(ValueFactory.createValue(IntegerType.TYPE, "1"), AssignmentState.ASSIGNED);
-//            Value newValue = ValueFactory.createValue(Compound.TYPE, name, weight);
+//            Value newValue = ValueFactory.createValue(Compound.TYPE, "name", name, "weight", weight);
 //            sequence.getNestedElement(i - 1).setValue(newValue, AssignmentState.ASSIGNED);
         } catch (ConfigurationException e) {
             e.printStackTrace();
@@ -155,11 +185,13 @@ public class AdaptationEditor extends ProjectEditor {
             if (sequence.getNestedElement(i) instanceof CompoundVariable) {
                 CompoundVariable compound = (CompoundVariable) sequence.getNestedElement(i);
                 IDecisionVariable derefName = Configuration.dereference(compound.getNestedElement(0));
-                String name = derefName.getNestedElement("type").getValue().toString().split(":")[0].trim();
+                String name = derefName.getNestedElement(SLOT_OBSERVABLE_TYPE).getValue()
+                        .toString().split(":")[0].trim();
                 String varName = null;
-                IDecisionVariable varTypeName = variable.getNestedElement("type");
+                IDecisionVariable varTypeName = variable.getNestedElement(SLOT_OBSERVABLE_TYPE);
                 if (null != varTypeName.getValue()) {
-                    varName = variable.getNestedElement("type").getValue().toString().split(":")[0].trim();
+                    varName = variable.getNestedElement(SLOT_OBSERVABLE_TYPE).getValue()
+                            .toString().split(":")[0].trim();
                 }
                 if (name.equals(varName)) {
                     toDelete = i;
@@ -170,24 +202,6 @@ public class AdaptationEditor extends ProjectEditor {
         if (-1 != toDelete) {
             IDecisionVariable toRemove = sequence.getNestedElement(toDelete);
             sequence.removeNestedElement(toRemove);
-        }
-    }
-    
-    /**
-     * Handles observations and adaption parts.
-     * 
-     * @param kind the event kind
-     * @param variable the causing variable
-     */
-    private void handleObservations(EventKind kind, IDecisionVariable variable) {
-        if (EventKind.ADDED == kind) {
-            //add the weights
-            System.out.println("ADD");
-        } else if (EventKind.DELETED == kind) {
-            //remove weights
-            System.out.println("DELETE");
-        } else if (EventKind.CHANGED == kind) {
-            System.out.println("CHANGED_NEW");
         }
     }
     
@@ -224,23 +238,30 @@ public class AdaptationEditor extends ProjectEditor {
         if (null != container && container instanceof ContainerVariable) {
             ContainerVariable cVar = (ContainerVariable) container;
             IDecisionVariable found = null;
-            for (int n = 0; null != found && n < container.getNestedElementsCount(); n++) {
+            for (int n = 0; null == found && n < container.getNestedElementsCount(); n++) {
                 IDecisionVariable var = Configuration.dereference(container.getNestedElement(n));
                 String obsType = VariableHelper.getString(var, SLOT_OBSERVABLE_TYPE);
-                if (observableType.equals(obsType)) {
+                if (null != observableType && observableType.equals(obsType)) {
                     found = var;
                 }
             }
             switch (kind) {
             case ADDED:
-                if (null == found) {
+                if (null == found && null != observableType) {
                     try {
                         IDatatype qParamType = ModelQuery.findType(container.getConfiguration().getProject(), 
                             TYPE_ADAPTIVITY_QPARAMWEIGHTING, null);
                         found = cVar.addNestedElement();
-                        found.setValue(ValueFactory.createValue(qParamType, new Object[]{
-                            SLOT_QPARAMWEIGHTING_PARAMETER, variable.getDeclaration(), 
-                            SLOT_QPARAMWEIGHTING_WEIGHT, 1}), AssignmentState.ASSIGNED);
+                        Value refValue = ValueFactory.createValue(
+                                new Reference("", variable.getDeclaration().getType(),
+                                       container.getConfiguration().getProject()), variable.getDeclaration()
+                                );
+                        Value newValue = ValueFactory.createValue(qParamType, new Object[]{
+                            //SLOT_QPARAMWEIGHTING_PARAMETER, variable.getDeclaration(), 
+                            SLOT_QPARAMWEIGHTING_PARAMETER, refValue, //refValue,
+                            SLOT_QPARAMWEIGHTING_WEIGHT, 1});
+                        found.setValue(newValue, AssignmentState.ASSIGNED);
+                        System.out.println(found.toString());
                     } catch (ConfigurationException e) {
                         Activator.getLogger(getClass()).exception(e);
                     } catch (ValueDoesNotMatchTypeException e) {
