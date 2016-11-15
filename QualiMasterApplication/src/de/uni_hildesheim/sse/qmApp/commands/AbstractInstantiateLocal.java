@@ -88,12 +88,12 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
         EclipseConsole.INSTANCE.clearConsole();
         EclipseConsole.INSTANCE.displayConsole();
         
-        setEnabled(false);
         
         final String targetLocation = selectTargetFolder(getMessage());
         SessionModel.INSTANCE.setInstantiationFolder(targetLocation);
         final Shell shell = Dialogs.getDefaultShell(); 
         if (null != targetLocation) {
+            setEnabled(false);
             Job job = new Job("QualiMaster Infrastructure Instantiation Process") {
 
                 @Override
@@ -143,6 +143,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                         if (PRUNE_CONFIG && null != modifier) {
                             modifier.clear();
                         }
+                        setEnabled(true);
                     }
                     return org.eclipse.core.runtime.Status.OK_STATUS;
                 }
@@ -166,7 +167,6 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
             }
             
         });
-        setEnabled(true);
     }
     
     /**

@@ -103,19 +103,19 @@
                   label="Exit">
             </command>
          </menu>
-         <menu label="Validate" id="edit">
-            <separator
+         <menu label="Validate" id="QM.Validate.Menu.ID">
+            <!--separator
                   name="additions"
                   visible="false">
             </separator>
             <separator
                   name="validationGroup"
                   visible="false">
-            </separator>
+            </separator-->
             <command commandId="de.uni_hildesheim.sse.qmApp.validateAll"
                   label="Validate All">
             </command>
-            <separator name="find.ext" visible="false"/>            
+            <!--separator name="find.ext" visible="false"/-->            
          </menu>
          <menu label="Instantiate" id="additions">
             <command commandId="de.uni_hildesheim.sse.qmApp.instantiateInterfacesLocal"

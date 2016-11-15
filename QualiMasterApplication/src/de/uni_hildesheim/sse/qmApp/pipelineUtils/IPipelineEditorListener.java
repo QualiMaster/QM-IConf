@@ -1,7 +1,7 @@
 package de.uni_hildesheim.sse.qmApp.pipelineUtils;
 
 /**
- * Interface in order to react on cha ges in the Pipeline-Models.
+ * Interface in order to react on changes in the Pipeline-Models.
  * When a node/flow is added/removed one of the stated methods below will be called.
  * 
  * @author Niko Nowatzki
