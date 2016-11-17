@@ -218,6 +218,10 @@ public class UiTracerFactory extends TracerFactory {
         public void visitedWhileBody() {
         }
 
+        @Override
+        public void visitScriptBody(Script script, RuntimeEnvironment environment) {
+        }
+
     }
     
 }
