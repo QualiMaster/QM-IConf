@@ -27,6 +27,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
+import de.uni_hildesheim.sse.qmApp.editors.AbstractTextSelectionEditorCreator.ArtifactComposite;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.qmApp.model.Reasoning;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
@@ -187,21 +188,13 @@ public class VariableEditor extends AbstractVarModelEditor implements IModelList
             
             for (Control control : comp.getChildren()) {
 
-                if (control instanceof Table) {
+                if (control instanceof Table || control instanceof Combo || control instanceof ArtifactComposite) {
                     final ControlDecoration tableDecorator = new ControlDecoration(control, SWT.RIGHT);
                     Image img = IconManager.retrieveImage(IconManager.ERROR);
                     tableDecorator.setImage(img);
                     tableDecorator.hide();
                     flawedControls.put(control, tableDecorator);
-                }
-                if (control instanceof Combo) {
-                    final ControlDecoration comboDecorator = new ControlDecoration(control, SWT.RIGHT);
-                    Image img = IconManager.retrieveImage(IconManager.ERROR);
-                    comboDecorator.setImage(img);
-                    comboDecorator.hide();
-                    flawedControls.put(control, comboDecorator);
-                }
-                if (!control.getClass().toString().equals(COMPOSITE_STRING)) {
+                } else if (!control.getClass().toString().equals(COMPOSITE_STRING)) {
                     collectTextFields(control);
                 }
             }

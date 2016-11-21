@@ -99,7 +99,7 @@ public abstract class AbstractTextSelectionEditorCreator implements IEditorCreat
      * 
      * @author Holger Eichelberger
      */
-    private class ArtifactComposite extends Composite implements ITextUpdater, IDirtyableEditor, 
+    public class ArtifactComposite extends Composite implements ITextUpdater, IDirtyableEditor, 
         IOverridingEditor, IModelListener<Project> {
 
         private Text textField;
