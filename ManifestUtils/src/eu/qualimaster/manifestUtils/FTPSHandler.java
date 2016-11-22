@@ -108,7 +108,8 @@ public class FTPSHandler extends BasicURLHandler {
             }
             
             //get the actual destination for the file and traverse to it.
-            String finalDestination = dest.getPath();          
+            String finalDestination = dest.getPath();
+            Bundle.getLogger(FTPSHandler.class).info("Upload destination is: " + dest);
             String workingDir = "";
             String[] split = finalDestination.split("/");
             
@@ -249,32 +250,34 @@ public class FTPSHandler extends BasicURLHandler {
      * @param dir The target dir.
      */
     private void traverseToDir(FTPSClient client, String dir) {
-        
         if (null != client && null != dir) {
-            
             String[] split = dir.split("/");
       
             for (int i = 0; i < split.length; i++) {
+                String folder = split[i];
                 
-                //attempt to traverse to the next dir. May fail if the dir does not exist yet.
-                if (null != split[i] && !split[i].isEmpty()) {
+                // Attempt to traverse to the next directory. May fail if the directory does not exist yet.
+                if (null != folder && !folder.isEmpty()) {
                     try {
-                        client.sendSiteCommand(EDIT_ACCESS_COMMAND + split[i]);
-                        client.changeWorkingDirectory(split[i]);
+                        client.sendSiteCommand(EDIT_ACCESS_COMMAND + folder);
+                        client.changeWorkingDirectory(folder);
                     } catch (IOException e) {
-                        //ignore since there is a second chance
+                        // Ignore since there is a second chance
                     }
-                    //if unsucessful try to create the dir and then traverse to it.
+                    // If unsuccessful try to create the directory and then traverse to it.
                     if (client.getReplyCode() != 250) {
                         try {
-                            client.makeDirectory(split[i]);
-                            client.sendSiteCommand(EDIT_ACCESS_COMMAND + split[i]);
-                            client.changeWorkingDirectory(split[i]);
+                            boolean folderCreated = client.makeDirectory(folder);
+                            if (folderCreated) {
+                                client.sendSiteCommand(EDIT_ACCESS_COMMAND + folder);
+                                client.changeWorkingDirectory(folder);
+                            } else {
+                                throw createFolderCreationException(split, i, folder);
+                            }
                         } catch (IOException e) {
                             //kill the process or it will become inconsistent
-                            e.printStackTrace();
-                            throw new ManifestRuntimeException(
-                                    "Please make sure you have permission to write to this dir.");
+                            logger.exception(e);
+                            throw createFolderCreationException(split, i, folder);
                         }
                         
                     }
@@ -285,6 +288,25 @@ public class FTPSHandler extends BasicURLHandler {
             
         }
         
+    }
+
+    /**
+     * Creates a {@link ManifestRuntimeException} in case that a desired folder could not be created.
+     * @param split The segments of the target path
+     * @param index The index of the last segment where the ftp client could navigate to
+     * @param folder The folder which could not be created.
+     * @return The exception to throw.
+     */
+    private ManifestRuntimeException createFolderCreationException(String[] split, int index, String folder) {
+        StringBuffer workingDirectory = new StringBuffer();
+        for (int j = 0; j < index; j++) {
+            if (!split[j].isEmpty()) {
+                workingDirectory.append(split[j]);
+                workingDirectory.append("/");
+            }
+        }
+        return new ManifestRuntimeException("Could not create folder \"" + folder + "\" in directory \""
+            + workingDirectory + "\". Please make sure you have permission to write into this directory.");
     }
     
 }

@@ -891,16 +891,16 @@ public class ManifestConnection {
     public void publishWithPom(String file, String pomPath, String repository, boolean forceOverwrite, 
             ProgressObserver monitor) {
         
-        logger.info("Publishing with POM...");
-        logger.info("Path of pom: " + pomPath); 
-        
+        logger.debug("Publishing with POM...");
+        logger.debug("Path of pom: " + pomPath);       
         PomInfo info = PomReader.getInfo(new File(pomPath));     
         if (null != info) {
-            System.out.println("PomInfo: " + info.toString());
+            logger.debug("PomInfo: " + info.toString());
+            publish(file, repository, info, forceOverwrite, monitor);
+        } else {
+            logger.error("PomInfo is null.");
+            throw new ManifestRuntimeException("No pom file was found at " + pomPath);
         }
-                
-        publish(file, repository, info, forceOverwrite, monitor);
-
     }
     
     /**
@@ -941,7 +941,11 @@ public class ManifestConnection {
         try {
             URL dest = new URL(testRes.getRoot());
             
-            String preDestination = dest + "/" + info.getGroupPath() 
+            String serverURL = dest.toString();
+            if (!serverURL.endsWith("/")) {
+                serverURL += "/";
+            }
+            String preDestination = serverURL + info.getGroupPath() 
                 + info.getArtifactId() + "/";
             String destination = preDestination + info.getVersion() + "/";
             
