@@ -545,21 +545,23 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
         if (null != instFile && instFile.exists()) {
             
             String instDir = instFile.getAbsolutePath();
-            String pipelineDir = instDir + File.separator + PIPELINES_DIR;
+            File pipelineDir = new File(instDir + File.separator + PIPELINES_DIR);
             String[] artifactNameSplitted = artifactName.split(":")[0].split("\\.");
             for (int i = 0; i < artifactNameSplitted.length; i++) {
-                pipelineDir += File.separator + artifactNameSplitted[i];
+                // Instantiation does not create sub folders for all segments of the identifier
+                File tmpDir = new File(pipelineDir, artifactNameSplitted[i]);
+                if (tmpDir.exists() && tmpDir.isDirectory()) {
+                    pipelineDir = tmpDir;
+                }
             }
             
-            pipelineDir += File.separator + artifactName.split(":")[1];
+            pipelineDir = new File(pipelineDir, artifactName.split(":")[1]);
             String pomFile = pipelineDir + File.separator + DEFAULT_POM_NAME;
             String dir = pipelineDir + File.separator + TARGET_FOLDER_NAME;
             String jarName = artifactName.split(":", 2)[1].replace(":", "-");
             String jarFile = dir + File.separator + jarName + JAR_SUFFIX;
             
-            //TODO: This is a testing hack. For safer testing all uploads are redirected to a test dir!
             final String deploymentUrl = ModelAccess.getDeploymentUrl();
-//                   + "eu/qualimaster/PatriksTestDeployment";
             System.out.println("##### " + jarFile);
             con.publishWithPom(jarFile, pomFile, deploymentUrl, overwrite, obs);
 
