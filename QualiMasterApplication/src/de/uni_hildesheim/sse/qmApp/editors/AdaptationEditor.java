@@ -261,6 +261,15 @@ public class AdaptationEditor extends ProjectEditor {
                             SLOT_QPARAMWEIGHTING_PARAMETER, refValue, //refValue,
                             SLOT_QPARAMWEIGHTING_WEIGHT, 1});
                         found.setValue(newValue, AssignmentState.ASSIGNED);
+//                        variable.getConfiguration().notifyReplaced(
+//                                variable.getConfiguration().getProject(), found.getConfiguration().getProject());
+//                        for (int k = 0; k < this.getEditorCount(); k++) {
+//                            if (this.getEditor(k) instanceof QualityParameterWeightingEditor) {
+//                                QualityParameterWeightingEditor editor = (QualityParameterWeightingEditor) 
+//                                        this.getEditor(k);
+//                                editor.getContainer().addElement(newValue);
+//                            }
+//                        }
                         System.out.println(found.toString());
                     } catch (ConfigurationException e) {
                         Activator.getLogger(getClass()).exception(e);

@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.IEditorInput;
 
 import de.uni_hildesheim.sse.qmApp.editorInput.CompoundVariableEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.ContainerVariableEditorInputChangeListener;
@@ -14,6 +15,7 @@ import de.uni_hildesheim.sse.qmApp.editorInput.ContainerVariableEditorInputCreat
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator;
 import de.uni_hildesheim.sse.qmApp.editorInput.IEditorInputCreator.CloneMode;
 import de.uni_hildesheim.sse.qmApp.editorInput.IVariableEditorInputCreator;
+import de.uni_hildesheim.sse.qmApp.editors.DecisionVariableEditorInput;
 import de.uni_hildesheim.sse.qmApp.model.IModelPart;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import net.ssehub.easy.varModel.confModel.AssignmentState;
@@ -175,11 +177,11 @@ public class ConfigurableElement { // unsure whether this shall be a resource
     public ConfigurableElement addChild(Object source, IDecisionVariable variable) {
         IVariableEditorInputCreator creator = null;
         IDatatype varType = variable.getDeclaration().getType();
-        if (null != variable.getParent() && variable.getParent() instanceof SequenceVariable) {
-            if ("configuredParameters".equals(variable.getParent().getDeclaration().getName())) {
-                addDefaultValues(variable);
-            }
-        }
+//        if (null != variable.getParent() && variable.getParent() instanceof SequenceVariable) {
+//            if ("configuredParameters".equals(variable.getParent().getDeclaration().getName())) {
+//                addDefaultValues(variable);
+//            }
+//        }
         if (Compound.TYPE.isAssignableFrom(varType)) {
             if (variable.getParent() instanceof ContainerVariable) {
                 ContainerVariable cVar = (ContainerVariable) variable.getParent();
@@ -201,6 +203,16 @@ public class ConfigurableElement { // unsure whether this shall be a resource
         ConfigurableElement child = null;
         if (null != creator) {
             child = modelPart.getElementFactory().createElement(this, variable, creator);
+            if (null != variable.getParent() && variable.getParent() instanceof SequenceVariable) {
+                if ("configuredParameters".equals(variable.getParent().getDeclaration().getName())) {
+                    addDefaultValues(variable);
+                    IEditorInput input = child.getEditorInputCreator().create();
+                    if (input instanceof DecisionVariableEditorInput) {
+                        DecisionVariableEditorInput decInput = (DecisionVariableEditorInput) input;
+                        addDefaultValues(decInput.getVariable());
+                    }
+                }
+            }
             addChild(child);
             creator.createArtifacts();
             ChangeManager.INSTANCE.variableAdded(source, variable);

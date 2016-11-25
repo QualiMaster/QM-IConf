@@ -339,6 +339,7 @@ public class ConfigurableElementsView extends ViewPart implements IChangeListene
                                 if (null != newElt) {
                                     viewer.add(selectedElement, newElt);
                                     openEditor(newElt);
+                                    
                                 }
                                 
                                 refreshNestedEditors();
