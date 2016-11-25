@@ -42,6 +42,7 @@ public class PipelineDiagramActionBarContributor extends
 		IAction printPreviewAction = new RenderedPrintPreviewAction(
 				new EnhancedPrintActionHelper());
 		fileMenu.insertBefore("print", printPreviewAction); //$NON-NLS-1$
+		/*
 		IMenuManager editMenu = bars.getMenuManager().findMenuUsingPath(
 				IWorkbenchActionConstants.M_EDIT);
 		assert editMenu != null;
@@ -50,5 +51,6 @@ public class PipelineDiagramActionBarContributor extends
 		}
 		IAction validateAction = new ValidateAction(page);
 		editMenu.appendToGroup("validationGroup", validateAction); //$NON-NLS-1$
+		*/
 	}
 }
