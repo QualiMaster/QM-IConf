@@ -320,13 +320,17 @@ public class StatusHighlighter {
      * @return editPart the editPart for given semanticElement {@link EObject}.
      */
     private IGraphicalEditPart getEditPartForSemanticElement(EObject semanticElement) {
+        DiagramEditor editor = null;
+        IEditorPart editorPart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+        IGraphicalEditPart graphicalEditor = null;
         
-        DiagramEditor editor = (DiagramEditor) PlatformUI.getWorkbench()
-                 .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+        if (null != editorPart && editorPart instanceof DiagramEditor) {
+            editor = (DiagramEditor) editorPart;
          
-        IGraphicalEditPart editPart = EditPartUtils.findEditPartForSemanticElement(
-                 editor.getDiagramGraphicalViewer().getRootEditPart(), semanticElement);
-        return editPart;
+            graphicalEditor = EditPartUtils.findEditPartForSemanticElement(
+                editor.getDiagramGraphicalViewer().getRootEditPart(), semanticElement);
+        }
+        return graphicalEditor;
     }
      
     /**
