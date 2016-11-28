@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -28,20 +27,19 @@ import org.eclipse.swt.widgets.TableItem;
 import de.uni_hildesheim.sse.qmApp.WorkspaceUtils;
 import de.uni_hildesheim.sse.qmApp.editors.RuntimeEditor;
 import eu.qualimaster.easy.extension.QmConstants;
+import eu.qualimaster.easy.extension.internal.PipelineContentsContainer;
+import eu.qualimaster.easy.extension.internal.PipelineVisitor;
+import eu.qualimaster.easy.extension.internal.Utils;
 import net.ssehub.easy.dslCore.TranslationResult;
-import net.ssehub.easy.varModel.confModel.CompoundVariable;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.confModel.SequenceVariable;
 import net.ssehub.easy.varModel.confModel.SetVariable;
-import net.ssehub.easy.varModel.cst.ConstantValue;
 import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.AttributeAssignment;
-import net.ssehub.easy.varModel.model.ContainableModelElement;
 import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
 import net.ssehub.easy.varModel.model.Project;
 import net.ssehub.easy.varModel.model.datatypes.Compound;
-import net.ssehub.easy.varModel.model.values.CompoundValue;
 import net.ssehub.easy.varModel.model.values.ContainerValue;
 import net.ssehub.easy.varModel.model.values.ReferenceValue;
 import net.ssehub.easy.varModel.model.values.Value;
@@ -61,11 +59,10 @@ public class PipelinesRuntimeUtils {
         "runtimeSavedItems3.ser",
         "runtimeSavedItems4.ser", "runtimeSavedItems5.ser", "runtimeSavedItems6.ser"};
     
+    private static String fileName = "runtimeSavedItems";
     private static final String EASY_STRING = "EASy";
-    private static final String IVML_STRING = ".ivml";
     private static final String META_STRING = "meta";
     private static final String PIPELINE_IVML_FILE = "Pipelines.ivml";
-    private static final String NAME_STRING = "name";
     
     private RuntimeEditorContentProvider contentProvider = new RuntimeEditorContentProvider();
     private RuntimeEditorLabelProvider labelProvider = new RuntimeEditorLabelProvider();
@@ -74,8 +71,6 @@ public class PipelinesRuntimeUtils {
             = new HashMap<String, CustomObservableList>();
 
     private ArrayList<String> pipelines = new ArrayList<String>();
-    private Map<String, ContainableModelElement> topLevelPipelineElements
-            = new HashMap<String, ContainableModelElement>();
     private List<PipelineGraphColoringWrapper> pipelinesToDisplayInTable
             = new ArrayList<PipelineGraphColoringWrapper>();
     private  ArrayList<String> backupObservableItem = new ArrayList<String>();
@@ -144,25 +139,36 @@ public class PipelinesRuntimeUtils {
         private IDecisionVariable var;
         private Color color;
         private String obs;
-        private DecisionVariableDeclaration decl;
+        private AbstractVariable decl;
         private List<PipelineGraphColoringWrapper> descendants = new ArrayList<PipelineGraphColoringWrapper>();
         private String pipelineParent;
 
         /**
-         * Create a new Wrapper which wraps up info about watned coloring.
-         * @param elemName the elements name.
+         * Create a new Wrapper which wraps up info about wanted coloring.
+         * @param elemName The user configured name of the pipeline element
          * @param type the elements type.
          * @param pipelineParent the elements parent. In the tree this is the Pipeline.
          * @param var the elements variable.
          * @param decl the elements declaration.
          */
         public PipelineGraphColoringWrapper(String elemName, PipelineNodeType type,
-                String pipelineParent, IDecisionVariable var, DecisionVariableDeclaration decl) {
+                String pipelineParent, IDecisionVariable var, AbstractVariable decl) {
             this.elemName = elemName;
             this.type = type;
             this.pipelineParent = pipelineParent;
             this.var = var;
             this.decl = decl;
+        }
+        
+        /**
+         * Create a new Wrapper which wraps up info about wanted coloring.
+         * @param var the pipeline elements variable.
+         * @param type the elements type.
+         * @param pipelineParent the elements parent. In the tree this is the Pipeline.
+         */
+        public PipelineGraphColoringWrapper(IDecisionVariable var, PipelineNodeType type, String pipelineParent) {
+            this(var.getNestedElement(QmConstants.SLOT_NAME).getValue().getValue().toString(), type, pipelineParent,
+                var, var.getDeclaration());
         }
         /**
          * Create a new Wrapper which wraps up info about watned coloring.
@@ -298,7 +304,7 @@ public class PipelinesRuntimeUtils {
          * Get the declaration of the wrapper.
          * @return declaration the wrappers declaration.
          */
-        public DecisionVariableDeclaration getDecl() {
+        public AbstractVariable getDecl() {
             return decl;
         }
         /**
@@ -322,41 +328,19 @@ public class PipelinesRuntimeUtils {
      * ".ivml".
      * 
      * @param workspaceURI EASy-folder from the project we work on right now.
-     * @return toReturn the File which is the EASy-folder of the project we work on right now.
      */
-    public File getPipelineConfiguration(final File workspaceURI) {
-        
-        File toReturn = null;
-        
+    public void getPipelineConfiguration(final File workspaceURI) {
+         
         for (final File fileEntry : workspaceURI.listFiles()) {
- 
-            if (fileEntry.isDirectory()) {
-                
-                for (final File fileEntry2 : fileEntry.listFiles()) {
-                    
+            if (fileEntry.isDirectory()) {   
+                for (final File fileEntry2 : fileEntry.listFiles()) { 
                     if (fileEntry2.getName().equals(EASY_STRING)) {
                         File file = new File(fileEntry2.getPath());
 
                         for (final File fileEntry3 : file.listFiles()) {
-
-                            if (fileEntry3.isDirectory() && fileEntry3.getName().endsWith(
-                                    QmConstants.VAR_PIPELINES_PIPELINES)) { 
-                                File file2 = new File(fileEntry3.getPath());
-
-                                for (final File fileEntry4 : file2.listFiles()) {
-
-                                    if (fileEntry4.isFile() && fileEntry4.toString().endsWith(IVML_STRING)) {
-
-                                        savePipelineStructures(fileEntry4);
-                                    }
-                                }
-                            }
                             if (fileEntry3.isDirectory() && fileEntry3.getName().endsWith(META_STRING)) {
-
                                 File file2 = new File(fileEntry3.getPath());
-
                                 for (final File fileEntry4 : file2.listFiles()) {
-
                                     if (fileEntry4.isFile() && fileEntry4.toString().endsWith(PIPELINE_IVML_FILE)) {
 
                                         saveObservableStructures(fileEntry4);
@@ -368,9 +352,75 @@ public class PipelinesRuntimeUtils {
                 }
             }
         }
-        return toReturn;
+
+        // Find pipelines container
+        Configuration config = de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration
+            .PIPELINES.getConfiguration();
+        IDecisionVariable allPipelinesVariable = null;
+        Iterator<IDecisionVariable> varItr = config.iterator();
+        while (varItr.hasNext() && null == allPipelinesVariable) {
+            IDecisionVariable tmpVar = varItr.next();
+            if (QmConstants.VAR_PIPELINES_PIPELINES.equals(tmpVar.getDeclaration().getName())) {
+                allPipelinesVariable = tmpVar; 
+            }
+        }
+        
+        // Extract all single pipeline instances from pipeline set variable
+        if (null != allPipelinesVariable && null != allPipelinesVariable.getValue()) {
+            Value allPipelinesValue = allPipelinesVariable.getValue();
+            
+            if (allPipelinesValue instanceof ContainerValue) {
+                ContainerValue pipelinesContainer = (ContainerValue) allPipelinesValue;
+                for (int i = 0; i < pipelinesContainer.getElementSize(); i++) {
+                    ReferenceValue referenceValue = (ReferenceValue) pipelinesContainer.getElement(i);
+                    IDecisionVariable pipelineVar = Utils.extractVariable(referenceValue, config);
+                    PipelineVisitor visitor = new PipelineVisitor(pipelineVar, false);
+                    PipelineContentsContainer container = visitor.getPipelineContents();
+                    
+                    String pipelineName = pipelineVar.getDeclaration().getUniqueName();
+                    INSTANCE.addPipeline(pipelineName);
+                    
+                    PipelineGraphColoringWrapper parentElem = new PipelineGraphColoringWrapper(pipelineVar, 
+                            PipelineNodeType.Pipeline, "");
+                    
+                    createPipelineWrappers(parentElem, pipelineVar, container.getSources(), PipelineNodeType.Source);
+                    createPipelineWrappers(parentElem, pipelineVar, container.getFamilyElements(),
+                            PipelineNodeType.FamilyElement);
+                    createPipelineWrappers(parentElem, pipelineVar, container.getDataManagementElements(),
+                        PipelineNodeType.DataManagementElement);
+                    createPipelineWrappers(parentElem, pipelineVar, container.getSinks(), PipelineNodeType.Sink);
+                    
+                    
+                    getPipelinesToDisplayInTable().add(parentElem);
+                }
+            }
+        }
     }
     
+    /**
+     * Create the wrapper objects for all pipeline-elements in the configuration.
+     * @param parentElem The current parentElement from the pipelines-confguration.
+     * @param pipelineVar The current pipeline-element-variable.
+     * @param nodes A List of multiple nodes. Every parent can have several children.
+     * @param type The type of the container. Source, Family, DataManagement or Sink.
+     */
+    private void createPipelineWrappers(PipelineGraphColoringWrapper parentElem, IDecisionVariable pipelineVar,
+            List<IDecisionVariable> nodes, PipelineNodeType type) {
+        
+        for (IDecisionVariable node : nodes) {
+            
+            if (type != PipelineNodeType.Pipeline) {
+                PipelineGraphColoringWrapper subTreeElem = new PipelineGraphColoringWrapper(node, type,
+                        parentElem.getElemName());
+                parentElem.addTreeElement(subTreeElem);
+            } else {
+                PipelineGraphColoringWrapper subTreeElem = new PipelineGraphColoringWrapper(node, type,
+                    null);
+                parentElem.addTreeElement(subTreeElem);
+            }
+        }
+        
+    }
     /**
      * Save all observables which can be found in the configuration. Every observalbes and its mapping to
      * the pipeline-elements.type.
@@ -489,270 +539,6 @@ public class PipelinesRuntimeUtils {
     }
 
     /**
-     * Save the pipelines and their nodes, thus they can be displayed in a tree.
-     * @param fileEntry3 fileEntry for pipeline configurations. For example: PipelineVar_1Cfg.ivml
-     */
-    private void savePipelineStructures(File fileEntry3) {
-        
-        TranslationResult<Project> result;
-        try {
-            result = de.uni_hildesheim.sse.ModelUtility.INSTANCE.parse(fileEntry3);
-            Project project = result.getResult(0);
-            
-            for (int i = 0; i < project.getElementCount(); i++) {
-
-                ContainableModelElement modelElement = project.getElement(i);
-                
-                if (pipelines.contains(modelElement.getName())) {
-
-                    if (modelElement instanceof DecisionVariableDeclaration) {
-                        DecisionVariableDeclaration declaration = (DecisionVariableDeclaration) modelElement;
-                        
-                        if (declaration.getDefaultValue() == null) {
-                            Configuration cfg = new Configuration(project);
-                            
-                            IDecisionVariable actualPipelinesVar = cfg.getDecision(declaration);
-                            CompoundValue cmpValue = (CompoundValue) actualPipelinesVar.getValue();
-                            
-                            getPipelineSource(cmpValue, project, declaration);
-
-                        } else {
-                            if (declaration.getDefaultValue() instanceof ConstantValue) {
-                                ConstantValue cmpValue = (ConstantValue) declaration.getDefaultValue();
-                                CompoundValue cmp = (CompoundValue) cmpValue.getConstantValue();
-
-                                getPipelineSource(cmp, project, declaration);
-                            }
-                        }
-                    }
-
-                }
-            }  
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
-        
-    }
-
-    /**
-     * Start with the source node of the pipeline.
-     * @param cmp compoundValue which is the configurations source node.
-     * @param project pipelines icml-project will be used later in a method.
-     * @param declaration declaration of current node.
-     */
-    private void getPipelineSource(CompoundValue cmp, Project project, DecisionVariableDeclaration declaration) {
-
-        String value = (String) cmp.getNestedValue("name").getValue();
-        
-        PipelineNodeType type = checknodeType(declaration);
-        
-        Configuration cfg = new Configuration(project);
-        
-        IDecisionVariable actualPipelinesVar = cfg.getDecision(declaration);
-        
-        PipelineGraphColoringWrapper treeElem = new PipelineGraphColoringWrapper(
-            value, type, value, actualPipelinesVar, declaration);
-        
-        treeElem.setVar(actualPipelinesVar);
-        treeElem.setDeclaration(declaration);
- 
-        //add all children to this element and then store it in a list.
-        
-        ContainerValue sourceValue = (ContainerValue) cmp.getNestedValue(QmConstants.SLOT_PIPELINE_SOURCES);
-
-        if (sourceValue.getElementSize() > 0) { 
-            
-            for (int i = 0; i < sourceValue.getElementSize(); i++) {
-                
-                String sourceToSearch = sourceValue.getElement(i).getValue().toString();
-                
-                recursiveOverPipeline(treeElem, sourceToSearch, project, value);
-            }
-        }
-        getPipelinesToDisplayInTable().add(treeElem);
-
-    }
-
-    /**
-     * Check for the pipeline nodes type.
-     * @param declaration the given declaration if the node.
-     * @return type The PipelinNodeType e.g family, datamanagementElement...
-     */
-    private PipelineNodeType checknodeType(DecisionVariableDeclaration declaration) {
-        PipelineNodeType type = null;
-
-        String typeName = declaration.getType().getName();
-        
-        if (typeName.equalsIgnoreCase(PipelineNodeType.DataManagementElement.name())) {
-            type = PipelineNodeType.DataManagementElement;
-        }
-        if (typeName.equalsIgnoreCase(PipelineNodeType.FamilyElement.name())) {
-            type = PipelineNodeType.FamilyElement;
-        }
-        if (typeName.equalsIgnoreCase(PipelineNodeType.Sink.name())) {
-            type = PipelineNodeType.Sink;
-        }
-        if (typeName.equalsIgnoreCase(PipelineNodeType.Source.name())) {
-            type = PipelineNodeType.Source;
-        }
-        if (typeName.equalsIgnoreCase(PipelineNodeType.Pipeline.name())) {
-            type = PipelineNodeType.Pipeline;
-        }
-        return type;
-    }
-
-    /**
-     * Check for the pipeline nodes type.
-     * @param actualPipelinesVar the given variable if the node.
-     * @return type The PipelinNodeType e.g family, datamanagementElement...
-     */
-    private PipelineNodeType checknodeType(IDecisionVariable actualPipelinesVar) {
-        
-        PipelineNodeType type = null;
-        
-        AbstractVariable declaration = actualPipelinesVar.getDeclaration();
-        String typeName = declaration.getType().getName();
-        
-        if (typeName.equalsIgnoreCase(PipelineNodeType.DataManagementElement.name())) {
-            type = PipelineNodeType.DataManagementElement;
-        }
-        if (typeName.equalsIgnoreCase(PipelineNodeType.FamilyElement.name())) {
-            type = PipelineNodeType.FamilyElement;
-        }
-        if (typeName.equalsIgnoreCase(PipelineNodeType.Sink.name())) {
-            type = PipelineNodeType.Sink;
-        }
-        if (typeName.equalsIgnoreCase(PipelineNodeType.Source.name())) {
-            type = PipelineNodeType.Source;
-        }
-        if (typeName.equalsIgnoreCase(PipelineNodeType.Pipeline.name())) {
-            type = PipelineNodeType.Pipeline;
-        }
-
-        return type;
-    }
-
-    /**
-     * GO recursively through the pipeline-structures and save the needed information in wrapper-object for displaying.
-     * @param treeElem Current top-Level TreeElement. These are the Pipeline-Knots in the tree.
-     * @param sourceToSearch Current source to search for.
-     * @param project Pipelines project.
-     * @param value nodes name awhich will be later neede in order to set a pipelines.-wrappers name.
-     */
-    private void recursiveOverPipeline(PipelineGraphColoringWrapper treeElem, String sourceToSearch,
-            Project project, String value) {
-        
-        for (int i = 0; i < project.getElementCount(); i++) {
-            ContainableModelElement modelElement = project.getElement(i);
-            topLevelPipelineElements.put(modelElement.getName(), modelElement);
-        }
-        for (int j = 0; j < topLevelPipelineElements.values().size(); j++) {
-            ContainableModelElement modelElement = (ContainableModelElement)
-                    topLevelPipelineElements.values().toArray()[j];
-
-            if (modelElement.getName() != null & sourceToSearch != null) { 
-                if (modelElement.getName().equals(sourceToSearch)) {
-
-                    DecisionVariableDeclaration decl = (DecisionVariableDeclaration) modelElement;
-                    
-                    Configuration cfg = new Configuration(project);
-                    
-                    IDecisionVariable actualPipelinesVar = (IDecisionVariable) cfg.getDecision(decl);
-                    
-                    iterateOverNode(actualPipelinesVar, treeElem, cfg, value);
-
-                }
-            }
-        }
-        
-        
-    }
-
-    /**
-     * Follow the pipline structures by:
-     * - Firstly take the last elements output
-     * - moreover folow the accessed flow in order to get to the next node.
-     * 
-     * @param actualPipelinesVar current pipeline-variable.
-     * @param treeElem current top-level-treeelement.
-     * @param cfg Pipelines Configuration.
-     * @param value value which will be later needed in orrder to name a pipelinewrapper.
-     */
-    private void iterateOverNode(IDecisionVariable actualPipelinesVar, PipelineGraphColoringWrapper treeElem,
-            Configuration cfg, String value) {
-        
-        if (actualPipelinesVar.getNestedElement(QmConstants.SLOT_OUTPUT) != null) {
-            if (actualPipelinesVar.getNestedElement(QmConstants.SLOT_OUTPUT).getNestedElementsCount() > 0
-                    && actualPipelinesVar.getNestedElement(QmConstants.SLOT_OUTPUT).getNestedElement(0).hasValue()) { 
-                
-                    
-                PipelineNodeType type = checknodeType(actualPipelinesVar);
-                IDecisionVariable decNameVar = actualPipelinesVar.getNestedElement(NAME_STRING);
-                String name = decNameVar.toString();
-                
-                if (name.contains("=") && name.contains(":")) {
-                    name = name.substring(name.indexOf("="), name.indexOf(":"));
-                    name = name.replaceAll("[^a-zA-Z0-9]", "");
-                    name = name.trim();
-                    PipelineGraphColoringWrapper newElem = new PipelineGraphColoringWrapper(
-                            name, type, value, actualPipelinesVar);
-
-                    if (!treeElem.alreadyContains(newElem)) {
-                        treeElem.addTreeElement(newElem);
-                    }
-                    
-                    IDecisionVariable reference = actualPipelinesVar.getNestedElement(QmConstants.SLOT_OUTPUT);
-                    for (int i = 0; i < reference.getNestedElementsCount(); i++) {
-                        
-                        ReferenceValue nodeSet = (ReferenceValue) reference.getNestedElement(i).getValue();
-                        String nextFlow = nodeSet.getValue().getName();
-                        
-                        iterateOverFlow(nextFlow, cfg, treeElem, value);
-                    }
-                
-                }
-            }
-        }
-        
-    }
-
-    /**
-     * Follow the pipeline structures by:
-     * Follow the flows destination.
-     * 
-     * @param nextFlow current flow.
-     * @param treeElem current top-level-treeelement.
-     * @param cfg Pipelines Configuration.
-     * @param nameValue value which will be later needed in order to name a pipelinewrapper.
-     */
-    private void iterateOverFlow(String nextFlow, Configuration cfg,
-           PipelineGraphColoringWrapper treeElem, String nameValue) {
-        
-        DecisionVariableDeclaration modelElement = (DecisionVariableDeclaration) topLevelPipelineElements.get(nextFlow);
-        
-        CompoundVariable node = (CompoundVariable) cfg.getDecision(modelElement);
-        //PipelineNodeType type = checknodeType(node);
-        ReferenceValue reference = (ReferenceValue) node.getNestedElement(QmConstants.SLOT_FLOW_DESTINATION).getValue();
-        
-        DecisionVariableDeclaration object = (DecisionVariableDeclaration) reference.getValue();
-        IDecisionVariable variable = (IDecisionVariable) cfg.getDecision(object);
-        PipelineNodeType type = checknodeType(variable);
-        
-        Value value = variable.getNestedElement(NAME_STRING).getValue();
-        PipelineGraphColoringWrapper newElem = new PipelineGraphColoringWrapper(value.getValue().toString(), 
-               type, treeElem.getElemName(), variable, object);
-
-        if (!treeElem.alreadyContains(newElem)) {
-            treeElem.addTreeElement(newElem);
-        }
-        
-        iterateOverNode(variable, treeElem, cfg, nameValue);
-        
-    }
-
-    /**
      * Add a pipeline to the list.
      * @param name name of the pipeline to add.
      */
@@ -805,14 +591,16 @@ public class PipelinesRuntimeUtils {
 
     /**
      * Update the content of the observalbesTable corresponding the the selected pipelines.
-     * @param observablesTable Tabe for observale items.
+     * @param observablesTable Table for observable items.
      * @param type type of the currently selected pipeline element.
      * @param deliveringObservables 
      * @param selectedElementName name of the selected element.
+     * @param connection 
      */
     public void setObservablesTableSelections(Table observablesTable, PipelineNodeType type, HashMap<String,
-            Set<String>> deliveringObservables, String selectedElementName) {
+            Set<String>> deliveringObservables, String selectedElementName, boolean connection) {
         
+        //if (deliveringObservables != null && deliveringObservables.size() > 0) {
         removeAndCollect(observablesTable);
         
         switch (type) {
@@ -876,7 +664,7 @@ public class PipelinesRuntimeUtils {
         default:
             break;
         }
-        disableNonDeliveringObservables(observablesTable, deliveringObservables, selectedElementName);
+        disableNonDeliveringObservables(observablesTable, deliveringObservables, selectedElementName, connection);
     }
 
     /**
@@ -889,9 +677,8 @@ public class PipelinesRuntimeUtils {
         observablesTable.removeAll();
         observablesTable.redraw();
         
-        net.ssehub.easy.varModel.confModel.Configuration config =
-                de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration.
-                OBSERVABLES.getConfiguration();
+        net.ssehub.easy.varModel.confModel.Configuration config = de.uni_hildesheim.sse.qmApp.model.VariabilityModel.
+                Configuration.OBSERVABLES.getConfiguration();
         Iterator<IDecisionVariable> iter = config.iterator();
 
         while (iter.hasNext()) {
@@ -900,11 +687,7 @@ public class PipelinesRuntimeUtils {
                 RuntimeEditor.collectQualityParameters(object);
             }
         }
-        for (String item : backupObservableItem) {
-            TableItem tableItem = new TableItem(observablesTable, SWT.CHECK);
-            tableItem.setText(item);
-        }
-        
+        observablesTable.redraw();
     }
 
     /**
@@ -912,58 +695,54 @@ public class PipelinesRuntimeUtils {
      * @param observablesTable table which holds the observable items.
      * @param deliveringObservables the delivering items we dont want to remove.
      * @param selectedElementName currently selected element in pipeline selection table..
+     * @param connection true if a connection to the infrastructure is on/ false otherwise.
      */
     private void disableNonDeliveringObservables(Table observablesTable,
-            HashMap<String, Set<String>> deliveringObservables, String selectedElementName) {
+            HashMap<String, Set<String>> deliveringObservables, String selectedElementName, boolean connection) {
         
         List<String> supportedObservables = new ArrayList<String>();
         
         Set<String> observations = deliveringObservables.get(selectedElementName);
         
-        for (int i = 0; i < observablesTable.getItemCount(); i++) {
-            TableItem item = observablesTable.getItem(i);
-            String itemText = item.getText();
-            
-            if (observations != null) {
+        if (connection) {
+            for (int i = 0; i < observablesTable.getItemCount(); i++) {
+                TableItem item = observablesTable.getItem(i);
+                String itemText = item.getText();
                 
-                    
-                Iterator<String> iterator = observations.iterator();
-                
-                //boolean contains = false;
-                
-                while (iterator.hasNext()) {
- 
-                    String iterObs = (String) iterator.next();
+                if (observations != null) {
+                                
+                    Iterator<String> iterator = observations.iterator();
+                    while (iterator.hasNext()) {
+     
+                        String iterObs = (String) iterator.next();
+    
+                        HashMap<String, String> observablesMap = RuntimeEditor.getObservablesMap();
+                        
+                        String observableToCompare = observablesMap.get(itemText);
 
-                    HashMap<String, String> observablesMap = RuntimeEditor.getObservablesMap();
-                    String observableToCompare = observablesMap.get(itemText);
- 
-                    if (iterObs.equals(observableToCompare)) {
-      
-                        //Dann enthalten bzw. delivers
-                        //contains = true;
-
-                        supportedObservables.add(itemText.trim());
+                        if (iterObs.equals(observableToCompare)) {
+                            supportedObservables.add(itemText.trim());
+                        }
                     }
                 }
-            }
-        }         
-         
-        Set<String> supportedObservablesWithoutDuplicates = new HashSet<String>(supportedObservables);
-        observablesTable.removeAll();
-        observablesTable.redraw();
+            }         
         
-      
-        Iterator<String> iterator = supportedObservablesWithoutDuplicates.iterator();
-        
-        while (iterator.hasNext()) {
-            String itemText = (String) iterator.next();
+            Set<String> supportedObservablesWithoutDuplicates = new HashSet<String>(supportedObservables);
+            observablesTable.removeAll();
+            observablesTable.redraw();
             
-            TableItem item = new TableItem(observablesTable, SWT.CHECK);
-            item.setText(itemText);
+          
+            Iterator<String> iterator = supportedObservablesWithoutDuplicates.iterator();
+            
+            while (iterator.hasNext()) {
+                String text = (String) iterator.next();
+                
+                TableItem obsItem = new TableItem(observablesTable, SWT.CHECK);
+                obsItem.setText(text);
+            }
+    
+            observablesTable.redraw();
         }
-
-        observablesTable.redraw();
     }
 
     /**
@@ -1092,12 +871,18 @@ public class PipelinesRuntimeUtils {
         try {
             boolean possFile = false;
             for (int i = 0; i < FILENAMES.length; i++) {
-                String name = FILENAMES[i];
+                String name = fileName;
+                
                 if (!new File(WorkspaceUtils.getMetadataFolder(), name).exists()) {
                     possFile = true;
                     FileOutputStream fileoutputstream;
                     
-                    fileoutputstream = new FileOutputStream(getItemsFile(name));
+                    if (i == 0) {
+                        fileoutputstream = new FileOutputStream(getItemsFile(name + ".ser"));
+                    } else {
+                        fileoutputstream = new FileOutputStream(getItemsFile(name + i + ".ser"));
+                    }
+                    
                     
                     ObjectOutputStream outputstream = new ObjectOutputStream(fileoutputstream);
                     outputstream.writeObject(wrapperList);

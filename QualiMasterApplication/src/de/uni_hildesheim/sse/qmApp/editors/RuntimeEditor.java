@@ -117,6 +117,7 @@ import net.ssehub.easy.varModel.confModel.SequenceVariable;
 import net.ssehub.easy.varModel.confModel.SetVariable;
 import net.ssehub.easy.varModel.cst.ConstantValue;
 import net.ssehub.easy.varModel.cst.OCLFeatureCall;
+import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.Constraint;
 import net.ssehub.easy.varModel.model.ContainableModelElement;
 import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
@@ -129,6 +130,7 @@ import net.ssehub.easy.varModel.model.values.IntValue;
 import net.ssehub.easy.varModel.model.values.ReferenceValue;
 import net.ssehub.easy.varModel.model.values.StringValue;
 import net.ssehub.easy.varModel.model.values.Value;
+
 /**
  * The preliminary editor for runtime settings.
  * 
@@ -148,9 +150,9 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     private static Label infoLabel;
     private static HashMap<String, String> observablesMap = new HashMap<String, String>();
     private static Table observablesTable;
-    
+
     private static final int PIPELINE_DISPLAY_BUFFER_SIZE = 50;
-    private static final int PIPELINE_DISPLAY_DELAY = 100; 
+    private static final int PIPELINE_DISPLAY_DELAY = 100;
     private static Collection<Value> observalbeSet = new ArrayList<Value>();
     private String executionTimeString = "execution time (s)";
     private String pipelineActivityString = "pipeline activity (";
@@ -166,14 +168,15 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     private CheckboxTreeViewer treeViewerPipelineChooser;
 
     private Table treeViewerColorChooser;
-    
+
     private List<Color> colorList = new ArrayList<Color>();
     private int colorIndex = 0;
-    private List<PipelineGraphColoringWrapper> pipelinesToDisplayInTableWithObservable =
-            new ArrayList<PipelineGraphColoringWrapper>();
+    private List<PipelineGraphColoringWrapper> pipelinesToDisplayInTableWithObservable
+            = new ArrayList<PipelineGraphColoringWrapper>();
     private HashMap<String, Set<String>> deliveringObservables = new HashMap<String, Set<String>>();
     private int pointStyleIndicator = 0;
-    
+    private boolean connection = false;
+
     /**
      * Represents a pipeline trace, i.e., an observation buffer and an XY-graph trace.
      * 
@@ -191,7 +194,8 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
          * 
          * @param monitoringName
          *            the label
-         * @param actulName The traces actual name.
+         * @param actulName
+         *            The traces actual name.
          * @param xAxis
          *            the x-axis to display on
          * @param yAxis
@@ -209,7 +213,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             // create the latency trace
             this.monitoringName = monitoringName;
             trace = new Trace(actulName, xAxis, yAxis, dataProvider);
-            trace.setLineWidth(5);
+            trace.setLineWidth(4);
             trace.setDataProvider(dataProvider);
         }
 
@@ -311,7 +315,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         Infrastructure.registerListener(this);
 
         fillColorList();
-        
+
         FillLayout fillLayout = new FillLayout();
         fillLayout.marginHeight = 5;
         fillLayout.marginWidth = 5;
@@ -351,7 +355,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         fData.right = new FormAttachment(100);
         fData.bottom = new FormAttachment(60);
         innerRight.setLayoutData(fData);
-        
+
         createMoreControls(outer, innerLeft, innerRight, parent);
     }
 
@@ -373,7 +377,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         colorList.add(orange);
         colorList.add(purple);
         colorList.add(grey);
-        colorList.add(yellow);  
+        colorList.add(yellow);
     }
 
     /**
@@ -381,9 +385,12 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
      * 
      * @param outer
      *            outer composite which constains everything the runtime-editor has to offer.
-     * @param innerLeft left part of the view.
-     * @param innerRight right side of the view.
-     * @param parent parent composite.
+     * @param innerLeft
+     *            left part of the view.
+     * @param innerRight
+     *            right side of the view.
+     * @param parent
+     *            parent composite.
      */
     private void createMoreControls(Composite outer, Composite innerLeft, Composite innerRight, Composite parent) {
         // A special area for a button and a label which holds a tip.
@@ -437,7 +444,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         addTabFolder(innerLeftTop, topButtons, parent);
 
         determineQMObervable();
-        
+
         boolean answer = MessageDialog.openQuestion(this.getSite().getShell(), "Restore selections",
                 "Do you want to load the selections from the last session?");
 
@@ -559,23 +566,13 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         StringBuilder pipelineTitle = new StringBuilder(pipelineString);
         String observables = observablesString;
         StringBuilder observableTitle = new StringBuilder(observables);
-        
+
         // Go through all saved info and create the corresponding traces.
         for (int i = 0; i < pipelinesToDisplayInTableWithObservable.size(); i++) {
 
             PipelineGraphColoringWrapper wrapper = pipelinesToDisplayInTableWithObservable.get(i);
-
-            String varName = wrapper.getElemName();
-            String parent = wrapper.getPipelineParent();
-            String obs = wrapper.getObs();
-            Color color = wrapper.getColor();
-
-            if (parent != null && !"".equals(parent) && !varName.equals(parent)
-                    && !pipelineTitle.toString().contains(parent)) {
-                createObservableTraces(varName, parent, xyGraph, color, obs);
-            } else {
-                createObservableTraces(varName, xyGraph, color, obs);
-            }
+            
+            createObservableTraces(wrapper, xyGraph);
         }
 
         try {
@@ -593,7 +590,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             xyGraph.setTitleFont(titleFont);
             xyGraph.setTitle(pipelineTitle.toString());
 
-            lws.setContents(xyGraph); 
+            lws.setContents(xyGraph);
 
         } catch (java.lang.IndexOutOfBoundsException e) {
             e.printStackTrace();
@@ -604,28 +601,31 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     /**
      * Create the traces which are specified by the selected items in the trees and tables.
      * 
-     * @param pipElementName
-     *            name of the currently selected element from the tree.
-     * @param pipelineName
-     *            name of the possible parents name. (Pipeline name)
-     * @param xyGraph
-     *            the {@link XYGraph} to draw upon.
-     * @param color
-     *            Color for this specific pipeline.
-     * @param obs
-     *            the observable to draw.
+     * @param wrapper The given wrapper which holds all the necessary info about the trace to draw.
+     * @param xyGraph The Graph-object to draw the traces upon.
      */
-    private void createObservableTraces(String pipElementName, String pipelineName, XYGraph xyGraph, Color color,
-            String obs) {
+    private void createObservableTraces(PipelineGraphColoringWrapper wrapper, XYGraph xyGraph) {
 
-        //ArrayList<String> allPossibleObservables = QmObservables.getAllObservables();
+        IDecisionVariable variable = wrapper.getVar();
+        String varName = wrapper.getElemName();
+        String parent = wrapper.getPipelineParent();
+        String obs = wrapper.getObs();
+        Color color = wrapper.getColor();
 
         String observalbeForTrace = observablesMap.get(obs);
 
         if (observalbeForTrace != null) {
 
-            String monitoringName = pipelineName + ":" + pipElementName;
-            String actulName = pipelineName + ":" + pipElementName + " (" + obs + ")";
+            String monitoringName = "";
+            String actulName = "";
+            if (QmConstants.TYPE_PIPELINE.equals(variable.getDeclaration().getType().getName())) {
+                monitoringName = varName + " (" + observalbeForTrace + ")";
+                actulName = varName + " (" + observalbeForTrace + ")";
+            } else {
+                actulName = parent + ":" + varName + " (" + observalbeForTrace + ")";
+                monitoringName = parent + ":" + varName;
+            }
+
             Axis axis = new Axis(actulName, true);
             xyGraph.addAxis(axis);
             axis.setAutoFormat(true);
@@ -642,16 +642,24 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                 pTrace.trace.setPointStyle(getRandomPointStyle());
             }
 
-            ArrayList<PipelineTrace> traces = pipelineTraces.get(pipelineName);
+            ArrayList<PipelineTrace> traces = pipelineTraces.get(parent);
 
             if (traces == null) {
                 traces = new ArrayList<PipelineTrace>();
             }
 
             if (!traces.contains(pTrace)) {
-                traces.add(pTrace);
-                pipelineTraces.put(pipelineName, traces);
-                xyGraph.addTrace(pTrace.getTrace());
+
+                if ("".equals(parent)) {
+                    traces.add(pTrace);
+                    pipelineTraces.put(varName, traces);
+                    xyGraph.addTrace(pTrace.getTrace());
+                } else {
+                    traces.add(pTrace);
+                    pipelineTraces.put(parent + ":" + varName, traces);
+                    xyGraph.addTrace(pTrace.getTrace());
+                }
+
             }
         }
     }
@@ -677,98 +685,46 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     }
 
     /**
-     * Create the traces which are specified by the selected items in the trees and tables.
-     * 
-     * @param pipelineName
-     *            name of the possible parents name. (Pipeline name)
-     * @param xyGraph
-     *            the {@link XYGraph} to draw upon.
-     * @param color
-     *            Color for this specific pipeline.
-     * @param obs
-     *            the observable to draw.
-     */
-    private void createObservableTraces(String pipelineName, XYGraph xyGraph, Color color, String obs) {
-
-        //ArrayList<String> allPossibleObservables = QmObservables.getAllObservables();
-
-        String observalbeForTrace =  observablesMap.get(obs);
-        
-        if (observalbeForTrace != null) {
-            
-            String actulName = pipelineName + " (" + observalbeForTrace + ")";
-            Axis axis = new Axis(actulName, true);
-            xyGraph.addAxis(axis);
-            axis.setAutoFormat(true);
-            
-            PipelineTrace pTrace = new PipelineTrace(pipelineName + " (" + observalbeForTrace + ")",
-                    pipelineName + " (" + observalbeForTrace + ")", xyGraph.primaryXAxis, axis, observalbeForTrace);
-            axis.setAutoScale(true);
-
-            if (!colorList.contains(color)) {
-                pTrace.setColor(color);
-                colorList.add(color);
-            } else {
-                pTrace.setColor(color);
-                pTrace.trace.setPointStyle(getRandomPointStyle());
-            }
-
-            ArrayList<PipelineTrace> traces = pipelineTraces.get(pipelineName);
-
-            if (traces == null) {
-                traces = new ArrayList<PipelineTrace>();
-            }
-
-            if (!traces.contains(pTrace)) {
-                traces.add(pTrace);
-                pipelineTraces.put(pipelineName, traces);
-                xyGraph.addTrace(pTrace.getTrace());
-            }
-        }
-    }
-
-    /**
      * Remove all null-values from the given Collection of values.
-     * @param observalbeSet Given Set of values.
+     * 
+     * @param observalbeSet
+     *            Given Set of values.
      * @return observableSet Same set without null values.
      */
     public static Collection<Value> clean(final Collection<Value> observalbeSet) {
-        
+
         observalbeSet.removeAll(Collections.singleton(null));
         return observalbeSet;
     }
-    
+
     /**
      * Determine the QM observables with given String.
      */
     private void determineQMObervable() {
-        
+
         ArrayList<String> allPossibleObservables = QmObservables.getAllObservables();
         observalbeSet = clean(observalbeSet);
         Iterator<Value> obsIterator = observalbeSet.iterator();
-        
+
         while (obsIterator.hasNext()) {
-            
+
             Value iterObs = (Value) obsIterator.next();
-            
+
             if (iterObs != null && iterObs.getValue() != null) {
                 String oldIterObsString = (String) iterObs.getValue();
-                
 
                 for (int j = 0; j < allPossibleObservables.size(); j++) {
-                
+
                     String oldPossObsString = allPossibleObservables.get(j);
-                    
-                    //Vom iterator
-                    String newIterObsString = oldIterObsString.replaceAll("[^a-zA-Z0-9]", "").trim().toLowerCase(); 
-                    //Von allen möglichen observables als string
-                    String newPossObsString = oldPossObsString.replaceAll("[^a-zA-Z0-9]", "").trim().toLowerCase(); 
-                    
+
+                    String newIterObsString = oldIterObsString.replaceAll("[^a-zA-Z0-9]", "").trim().toLowerCase();
+                    String newPossObsString = oldPossObsString.replaceAll("[^a-zA-Z0-9]", "").trim().toLowerCase();
+
                     if (newIterObsString.equals(newPossObsString)
                             || newIterObsString.substring(0, newIterObsString.
                         length() - 1).equals(newPossObsString) || newPossObsString.substring(0, newPossObsString.
                                 length() - 1).equals(newIterObsString)) {
-                        
+
                         observablesMap.put(oldIterObsString, oldPossObsString);
                     }
                 }
@@ -792,7 +748,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
         PipelinesRuntimeUtils instance = PipelinesRuntimeUtils.INSTANCE;
 
-        treeViewerPipelineChooser = new CheckboxTreeViewer(innerLeftTop, SWT.BORDER | SWT.RADIO);
+        treeViewerPipelineChooser = new CheckboxTreeViewer(innerLeftTop, SWT.BORDER | SWT.SCROLL_PAGE);
 
         Project project = Configuration.PIPELINES.getConfiguration().getProject();
 
@@ -825,7 +781,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         File workspaceURI = ResourcesPlugin.getWorkspace().getRoot().getLocation().toFile();
 
         PipelinesRuntimeUtils.INSTANCE.getPipelineConfiguration(workspaceURI);
-        // getPipelineConfiguration(workspaceURI);
 
         treeViewerPipelineChooser.setContentProvider(PipelinesRuntimeUtils.INSTANCE.getContentProvider());
         treeViewerPipelineChooser.setLabelProvider(PipelinesRuntimeUtils.INSTANCE.getLabelProvider());
@@ -862,10 +817,9 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         observablesTable.setHeaderVisible(true);
         observablesTable.clearAll();
         observablesTable.redraw();
-        
+
         net.ssehub.easy.varModel.confModel.Configuration config = Configuration.OBSERVABLES.getConfiguration();
         Iterator<IDecisionVariable> iter = config.iterator();
-
         while (iter.hasNext()) {
             Object object = iter.next();
             if (object instanceof SetVariable || object instanceof SequenceVariable) {
@@ -878,24 +832,24 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             public void checkStateChanged(CheckStateChangedEvent event) {
                 CheckboxTreeViewer treeViewer = (CheckboxTreeViewer) event.getSource();
                 observablesTable.setToolTipText("");
-                
+
                 PipelineGraphColoringWrapper wrapper = (PipelineGraphColoringWrapper) event.getElement();
                 String pipParent = wrapper.getPipelineParent();
                 String elemName = wrapper.getElemName();
-                
+
                 for (int i = 0; i < treeViewer.getTree().getItemCount(); i++) {
                     TreeItem topLevelItem = treeViewer.getTree().getItem(i);
                     if (topLevelItem.getText().equals(wrapper.getElemName())) {
 
                         PipelineNodeType type = wrapper.getType();
-                       
-                        if (pipParent != null && !elemName.trim().equals(pipParent.trim())) {                           
+
+                        if (pipParent != null && !elemName.trim().equals(pipParent.trim())) {
                             PipelinesRuntimeUtils.INSTANCE.setObservablesTableSelections(observablesTable, type,
-                                deliveringObservables, pipParent + ":" + elemName);
-                                 // Check for observalbes and disable some
+                                    deliveringObservables, elemName, connection);
+                            // Check for observables and disable some
                         } else {
                             PipelinesRuntimeUtils.INSTANCE.setObservablesTableSelections(observablesTable, type,
-                                    deliveringObservables, elemName);
+                                    deliveringObservables, pipParent + ":" + elemName, connection);
                         }
                     } else {
                         topLevelItem.setChecked(false);
@@ -903,14 +857,15 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
                     for (int j = 0; j < topLevelItem.getItemCount(); j++) {
                         TreeItem item = treeViewer.getTree().getItem(i).getItem(j);
-                        if (item.getText().equals(elemName)) {
+                        if (item.getText().equals(elemName) && pipParent.equals(topLevelItem.getText())) {
                             item.setChecked(true);
 
                             PipelineNodeType type = wrapper.getType();
 
                             String elementName = pipParent + ":" + elemName;
                             PipelinesRuntimeUtils.INSTANCE.setObservablesTableSelections(observablesTable, type,
-                                    deliveringObservables, elementName);
+                                    deliveringObservables, elementName, connection);
+
                         } else {
                             item.setChecked(false);
                         }
@@ -932,7 +887,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     private void createObservableTable2(Composite innerLeftTop, Composite innerLeftBottomRight) {
         Button button4 = new Button(innerLeftTop, SWT.NONE);
         button4.setText(saveSelectionsText);
-        GridData data = new GridData(SWT.LEFT, SWT.BOTTOM, true, false);
+        GridData data = new GridData(SWT.LEFT, SWT.BOTTOM, false, false);
         button4.setLayoutData(data);
         treeViewerColorChooser = new Table(innerLeftTop, SWT.MULTI | SWT.BORDER);
         treeViewerColorChooser.setLinesVisible(false);
@@ -941,15 +896,15 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         String[] titles2 = {"Pipeline", "Choose", "Color"};
         TableColumn column1 = new TableColumn(treeViewerColorChooser, SWT.NONE);
         column1.setText(titles2[0]);
-        column1.setWidth(200);
+        column1.setWidth(150);
 
         TableColumn column2 = new TableColumn(treeViewerColorChooser, SWT.NONE);
         column2.setText(titles2[1]);
-        column2.setWidth(70);
+        column2.setWidth(60);
 
         TableColumn column3 = new TableColumn(treeViewerColorChooser, SWT.NONE);
         column3.setText(titles2[2]);
-        column3.setWidth(70);
+        column3.setWidth(50);
 
         data = new GridData(SWT.FILL, SWT.FILL, true, true);
         data.horizontalSpan = 2;
@@ -959,7 +914,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         treeViewerColorChooser.setMenu(menu);
         final MenuItem item = new MenuItem(menu, SWT.PUSH);
         item.setText("Delete Selection");
-        
+
         item.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
                 int activePipCount = pipelineTraces.values().size();
@@ -973,16 +928,15 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         });
         Button button = new Button(innerLeftBottomRight, SWT.NONE);
         button.setText("Draw");
-
         data = new GridData(SWT.LEFT, SWT.BOTTOM, true, false);
         button.setLayoutData(data);
-
         button.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent evt) {
                 // Draw the graph with the collected info so far.
                 drawGraphsInNewTab(false);
             }
+
             @Override
             public void widgetDefaultSelected(SelectionEvent evt) {
             }
@@ -994,6 +948,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                 // by creating objects, which wrap up all info.
                 saveSelections();
             }
+
             @Override
             public void widgetDefaultSelected(SelectionEvent evt) {
             }
@@ -1007,7 +962,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         // Delete a certain PipelineTrace.
         TableItem tableItem = treeViewerColorChooser.getSelection()[0];
         int index = treeViewerColorChooser.getSelectionIndex();
-        
+
         Collection<ArrayList<PipelineTrace>> allTraces = pipelineTraces.values();
 
         for (int i = 0; i < allTraces.size(); i++) {
@@ -1015,7 +970,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
             if (iterator.hasNext()) {
                 ArrayList<PipelineTrace> traces = (ArrayList<PipelineTrace>) iterator.next();
-                
+
                 String name = tableItem.getText();
                 if (name.contains("(")) {
                     name = name.substring(name.lastIndexOf(":"), name.length());
@@ -1025,9 +980,8 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                 for (int j = 0; j < traces.size(); j++) {
                     PipelineTrace trace = traces.get(j);
 
-                    String wholeName = trace.getTrace().getName().replaceAll("[^a-zA-Z0-9]", "")
-                            .toLowerCase().trim();
-                      
+                    String wholeName = trace.getTrace().getName().replaceAll("[^a-zA-Z0-9]", "").toLowerCase().trim();
+
                     String obs = trace.observable.replaceAll("[^a-zA-Z0-9]", "").toLowerCase().trim();
 
                     String item = tableItem.getText().toLowerCase();
@@ -1038,10 +992,10 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                     String itemToCompare = item.trim().replaceAll("[^a-zA-Z0-9]", "").toLowerCase().trim();
                     name = name.replaceAll("[^a-zA-Z0-9]", "");
                     name = name.trim().toLowerCase();
-                                    
+
                     if (wholeName.contains(itemToCompare)) {
-                        
-                        //throughputitem != throughputitems
+
+                        // throughputitem != throughputitems
                         if (name.toLowerCase().equals(obs) || obs.substring(0, obs.length() - 1).equals(name)) {
                             traces.remove(trace);
                             pipelineTraces.remove(trace);
@@ -1063,10 +1017,10 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
         editor2.getEditor().dispose();
         editor2.dispose();
-        
+
         treeViewerColorChooser.update();
         treeViewerColorChooser.redraw();
-        //Go though the labels and update the colors in the pipelineColorChooser-table.
+        // Go though the labels and update the colors in the pipelineColorChooser-table.
         updateColorLabels();
     }
 
@@ -1076,28 +1030,28 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     private void updateColorLabels() {
 
         for (int j = 0; j < pipelinesToDisplayInTableWithObservable.size(); j++) {
-            
+
             PipelineGraphColoringWrapper wrapper = pipelinesToDisplayInTableWithObservable.get(j);
             Color color = wrapper.getColor();
-            
+
             TableItem item = treeViewerColorChooser.getItem(j);
             TableEditor editor = (TableEditor) item.getData("ColorLabel");
             Label label = (Label) editor.getEditor();
             label.setBackground(color);
-                   
-        }            
+
+        }
         treeViewerColorChooser.update();
-        treeViewerColorChooser.redraw();       
+        treeViewerColorChooser.redraw();
     }
 
     /**
      * Collect the qualityParameters from the ivml-configuration, so they can be mapped upn pipeline-elements.
      * 
-     * @param object
-     *            Set which holds the observalbes.
+     * @param object Set which holds the observalbes.
      */
     public static void collectQualityParameters(Object object) {
 
+        
         String name = "";
         ConstantValue value = null;
 
@@ -1119,14 +1073,12 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         }
 
         if (!"".equals(name) && value != null) {
-
             ContainerValue container = (ContainerValue) value.getConstantValue();
 
             if (observalbeSet.size() > 0) {
                 observalbeSet.clear();
             }
             for (int i = 0; i < container.getElementSize(); i++) {
-
                 CompoundValue cmpValue = (CompoundValue) container.getElement(i);
                 Compound cType = (Compound) cmpValue.getType();
 
@@ -1137,23 +1089,27 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                     observalbeSet.add(nestedValue);
                 }
             }
+
+            observalbeSet = clean(observalbeSet);
+
             Object[] valueArray = observalbeSet.toArray();
-            //sort valueArray
+            // sort valueArray
             valueArray = removeNull(valueArray);
             Arrays.sort(valueArray);
-            
-            //clear backup
+    
+            // clear backup
             PipelinesRuntimeUtils.INSTANCE.getBackupObservableItem().clear();
-            
+            observablesTable.removeAll();
+    
             for (int k = 0; k < valueArray.length; k++) {
                 Object obj = valueArray[k];
-
+    
                 if (obj != null && obj instanceof String) {
                     String stringValue = (String) obj;
-
+    
                     TableItem treeItem = new TableItem(observablesTable, 0);
                     treeItem.setText(stringValue);
-
+    
                     PipelinesRuntimeUtils.INSTANCE.getBackupObservableItem().add(stringValue);
                 }
             }
@@ -1162,12 +1118,14 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
     /**
      * Remove null values from an array.
-     * @param array Given array of Strings.
+     * 
+     * @param array
+     *            Given array of Strings.
      * @return toReturn Same array without null values.
      */
     public static String[] removeNull(Object[] array) {
         String[] toReturn = null;
-        
+
         ArrayList<String> removed = new ArrayList<String>();
         for (Object str : array) {
             if (str != null) {
@@ -1178,7 +1136,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         toReturn = removed.toArray(new String[0]);
         return toReturn;
     }
-    
+
     /**
      * Save the users selections concerning the observables.
      */
@@ -1191,18 +1149,22 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             PipelineNodeType type = selection.getType();
             IDecisionVariable var = selection.getVar();
             String pipParent = selection.getPipelineParent();
-            DecisionVariableDeclaration decl = selection.getDecl();
+            AbstractVariable decl = selection.getDecl();
 
+            // if (pipParent.contains(Pip)) {
+            //
+            // }
             for (TableItem item : observablesTable.getItems()) {
 
                 if (item.getChecked()) {
 
                     String observableName = item.getText();
+
                     PipelineGraphColoringWrapper newWrapper = new PipelineGraphColoringWrapper(name, type, pipParent,
                             var, decl);
 
                     newWrapper.setObservable(observableName);
-                    
+
                     Color color = null;
                     if (colorIndex < colorList.size()) {
                         color = colorList.get(colorIndex);
@@ -1210,10 +1172,10 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                         colorIndex = 0;
                         color = colorList.get(colorIndex);
                     }
-                    
+
                     newWrapper.setColor(colorList.get(colorIndex));
                     colorIndex++;
-                    
+
                     if (!containsWrapper(newWrapper)) {
                         if (newWrapper.getObs() != null) {
                             if (!alreadyContains(pipelinesToDisplayInTableWithObservable, selection)) {
@@ -1261,7 +1223,9 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
     /**
      * Draw the graphs.
-     * @param loading true if saved items shall be loadad, false otherwise.
+     * 
+     * @param loading
+     *            true if saved items shall be loadad, false otherwise.
      */
     private void drawGraphsInNewTab(boolean loading) {
 
@@ -1281,8 +1245,8 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         Infrastructure.registerListener(newTabItem);
 
         newTabItem.setControl(control);
-        
-        //Let the new tabItem be shown
+
+        // Let the new tabItem be shown
         tabFolder.setSelection(newTabItem);
         tabFolder.showItem(newTabItem);
 
@@ -1301,7 +1265,8 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
      *            The label which is showing the actual color.
      * @param color2
      *            The chosen color to set.
-     * @param caption The items caption.
+     * @param caption
+     *            The items caption.
      */
     private void adjustChosenColor(Label label, Color color2, String caption) {
         Rectangle bounds = treeViewerColorChooser.getShell().getBounds();
@@ -1354,17 +1319,17 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
      *            Given name where the color should be set.
      * @param observableName
      *            name of the observable.
-     * @param givenColor 
+     * @param givenColor The Given color for the selection. The label must have this color.
      */
     private void performSelection(String pipParent, String name, String observableName, Color givenColor) {
         // get parent pipeline checkbox
         String caption = "";
         TableItem treeItem0 = new TableItem(treeViewerColorChooser, 0);
-        if (!pipParent.equals(name)) {
+        if (pipParent != null && !"".equals(pipParent) && !" ".equals(pipParent)) {
             caption = pipParent + ": " + name + ": " + observableName;
             treeItem0.setText(caption);
         } else {
-            caption = pipParent + ": " + observableName;
+            caption = name + ": " + observableName;
             treeItem0.setText(caption);
         }
 
@@ -1384,7 +1349,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             editor.minimumWidth = button.getSize().x;
             editor.horizontalAlignment = SWT.LEFT;
             editor.setEditor(button, items[i], 1);
-            
+
             if (item.getData("ColorButton") == null) {
                 item.setData("ColorButton", editor);
             }
@@ -1395,13 +1360,13 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
             editor.minimumWidth = label.getSize().x;
             editor.horizontalAlignment = SWT.LEFT;
-            
+
             if (givenColor != null) {
                 label.setBackground(givenColor);
             } else {
                 label.setBackground(new Color(treeViewerColorChooser.getShell().getDisplay(), new RGB(124, 252, 0)));
             }
-            
+
             GridData data = new GridData();
             data.grabExcessHorizontalSpace = true;
 
@@ -1417,7 +1382,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             if (item.getData("ColorLabel") == null) {
                 item.setData("ColorLabel", editor);
             }
-        } 
+        }
     }
 
     @Override
@@ -1427,7 +1392,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
         PipelinesRuntimeUtils instance = PipelinesRuntimeUtils.INSTANCE;
         instance.clearPipelines();
-        
+
     }
 
     /**
@@ -1442,17 +1407,17 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
                 TableItem item = treeViewerColorChooser.getItem(i);
                 String itemText = item.getText();
-                
-                //Get the name from the items text.
+
+                // Get the name from the items text.
                 String name = itemText.substring(0, itemText.indexOf(":"));
-                //Get the observable by cutting with the last occurence of : in the items text.
+                // Get the observable by cutting with the last occurence of : in the items text.
                 String observable = itemText.substring(itemText.lastIndexOf(":") + 1, itemText.length()).trim();
 
                 PipelineElementObservableWrapper wrapper = new PipelineElementObservableWrapper(name.trim(),
                         observable.trim());
                 wrapperList.add(wrapper);
-            }             
-            PipelinesRuntimeUtils.storeInfoInMetadata(wrapperList);  
+            }
+            PipelinesRuntimeUtils.storeInfoInMetadata(wrapperList);
         }
     }
 
@@ -1582,13 +1547,13 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
     /**
      * Get the map of all mapped observables.
-     * @return observableMap A map containing all infrastructur-observables and corresponding
-     * qualimaster-observables.
+     * 
+     * @return observableMap A map containing all infrastructur-observables and corresponding qualimaster-observables.
      */
     public static HashMap<String, String> getObservablesMap() {
         return observablesMap;
     }
-    
+
     /**
      * Enables or disables the buttons on this editor.
      */
@@ -1872,9 +1837,11 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
         String partName = message.getPart();
         Set<String> elementObservations = message.getObservations().keySet();
-        
+
         deliveringObservables.put(partName, elementObservations);
-        
+
+        connection = true;
+
         if (PART_INFRASTRUCTURE.equals(part)) {
             final Double usedMachines = observations.get(RESOURCEUSAGE_USED_MACHINES);
             final Double usedDfes = observations.get(RESOURCEUSAGE_USED_DFES);
@@ -1935,6 +1902,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
                     PipelineTrace actualTrace = traces.get(i);
                     actualTrace.clearTrace();
+                    connection = false;
                 }
 
             }
@@ -1996,5 +1964,5 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
     @Override
     public void handleResourceChangeMessage(ResourceChangeRequest arg0) {
-    } 
+    }
 }
