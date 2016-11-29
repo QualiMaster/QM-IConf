@@ -178,6 +178,9 @@
             <command commandId="de.uni_hildesheim.sse.qmApp.commands.P2UpdateHandler"
                 label="Check for updates">
             </command>
+            <command commandId="de.uni_hildesheim.sse.qmApp.commands.ShowStatisticsHandler"
+                label="Print model statistics"> 
+            </command>
             <command commandId="de.uni_hildesheim.sse.qmApp.commands.AboutHandler"
                 label="About..."> 
             </command>
@@ -232,6 +235,10 @@
       <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.P2UpdateHandler"
             id="de.uni_hildesheim.sse.qmApp.commands.P2UpdateHandler"
             name="P2UpdateHandler">
+      </command>
+      <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.ShowStatisticsHandler"
+          id="de.uni_hildesheim.sse.qmApp.commands.ShowStatisticsHandler"
+          name="Model Statistics">
       </command>
       <command defaultHandler="de.uni_hildesheim.sse.qmApp.commands.AboutHandler"
           id="de.uni_hildesheim.sse.qmApp.commands.AboutHandler"
