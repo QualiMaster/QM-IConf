@@ -26,6 +26,7 @@ import java.util.Map;
  * Some Maven utility functions.
  * 
  * @author Holger Eichelberger
+ * @author Pastuschek
  */
 public class MavenUtils {
 

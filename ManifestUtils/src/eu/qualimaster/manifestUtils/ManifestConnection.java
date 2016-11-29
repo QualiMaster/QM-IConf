@@ -19,27 +19,20 @@ import java.net.URLClassLoader;
 import java.security.Security;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.ivy.Ivy;
 import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
-import org.apache.ivy.core.module.descriptor.DefaultExcludeRule;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
-import org.apache.ivy.core.module.descriptor.ExcludeRule;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
-import org.apache.ivy.core.module.id.ArtifactId;
-import org.apache.ivy.core.module.id.ModuleId;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.publish.PublishOptions;
 import org.apache.ivy.core.report.ResolveReport;
 import org.apache.ivy.core.resolve.ResolveOptions;
 import org.apache.ivy.core.retrieve.RetrieveOptions;
 import org.apache.ivy.core.settings.IvySettings;
-import org.apache.ivy.plugins.matcher.ExactOrRegexpPatternMatcher;
 import org.apache.ivy.plugins.resolver.ChainResolver;
 import org.apache.ivy.plugins.resolver.IBiblioResolver;
 import org.apache.ivy.util.Credentials;
@@ -175,7 +168,6 @@ public class ManifestConnection {
             try {
                 this.out.createNewFile();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -325,6 +317,7 @@ public class ManifestConnection {
     }
     
     /**
+     * Will download the specified artifact and also its dependencies.
      * The main to test things out.
      * @param monitor The monitor tracking the current progress.
      * @param groupId the Id of the group.
@@ -332,12 +325,22 @@ public class ManifestConnection {
      * @param version the target version of the artifact.
      */
     public void load(ProgressObserver monitor, String groupId, String artifactId, String version) {
-        
+        load(monitor, groupId, artifactId, version, false);
+    }
+    
+    /**
+     * Will download the specified artifact. 
+     * @param monitor The monitor tracking the current progress.
+     * @param groupId the Id of the group.
+     * @param artifactId the Id of the artifact.
+     * @param version the target version of the artifact.
+     * @param simple True if only the main artifact needs to be downloaded. Default is false.
+     */
+    public void load(ProgressObserver monitor, String groupId, String artifactId, String version, boolean simple) { 
         ITask mainTask = monitor.registerTask("Loading Dependencies");
         sysOutDownload.setMonitor(monitor);
         System.setProperty("jsse.enableSNIExtension", "false");
-        Security.insertProviderAt(new BouncyCastleProvider(), 1);      
-        
+        Security.insertProviderAt(new BouncyCastleProvider(), 1);       
         //clear our temp folder.
         deleteDir(this.out);
         setRetrievalFolder(this.out);
@@ -352,16 +355,14 @@ public class ManifestConnection {
             ModuleRevisionId.newInstance(groupId, artifactId + "-envelope", version)
         );
         ModuleRevisionId ri = ModuleRevisionId.newInstance(groupId, artifactId, version);
-        DefaultDependencyDescriptor dd = this.getDefaultDependencyDescriptor(md, ri);
-        
-        ModuleId moduleId = new ModuleId("eu.qualimaster", "QualiMaster.Events");
-        ArtifactId aId = new ArtifactId(moduleId, "QualiMaster.Events-tests", "jar", "jar");
-        Map<String, String> map = new HashMap<String, String>();
+        DefaultDependencyDescriptor dd;
+        if (simple) {
+            dd = this.getMasterDependencyDescriptor(md, ri);
+        } else {
+            dd = this.getDefaultDependencyDescriptor(md, ri);
+        }
         //map.put("classifier", "tests");
-        ExcludeRule rule = new DefaultExcludeRule(aId, new ExactOrRegexpPatternMatcher(), map);
-        System.out.println("##### " + rule.toString());
         md.addDependency(dd);
-        //md.addExcludeRule(rule);
         ModuleDescriptor m = null; 
         
         //start the download process. Progress is tracked via an intercepter since ivy doesn't provide
@@ -381,7 +382,6 @@ public class ManifestConnection {
         } catch (IOException | ParseException exc) {
             exc.printStackTrace();
         }
-        
         try {
             ivy.retrieve(
                     m.getModuleRevisionId(),
@@ -419,6 +419,18 @@ public class ManifestConnection {
         dd.addDependencyConfiguration("default", "provided");
         return dd;
         
+    }
+    
+    /**
+     * Returns a configured DependencyDescriptor.
+     * @param md The ModuleDescriptor.
+     * @param ri The ModuleRevisionId.
+     * @return The configured DependencyDescriptor.
+     */
+    private DefaultDependencyDescriptor getMasterDependencyDescriptor(ModuleDescriptor md, ModuleRevisionId ri) {
+        DefaultDependencyDescriptor dd = new DefaultDependencyDescriptor(md, ri, false, false, true);
+        dd.addDependencyConfiguration("default", "master");
+        return dd;
     }
     
     /**
@@ -827,8 +839,11 @@ public class ManifestConnection {
                 if (null == fType) {
                     fType = FieldType.valueOf(cls);
                 }
-                
-                item.addField(new Field(string, fType));
+                String literalName = "";
+                if (null != cls) {
+                    literalName = cls.getName();
+                }
+                item.addField(new Field(string, fType, literalName));
             }
         }
         result = item;

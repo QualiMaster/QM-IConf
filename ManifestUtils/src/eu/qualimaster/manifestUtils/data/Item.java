@@ -36,7 +36,7 @@ public class Item {
      */
     @Override
     public String toString() {
-        String result = "";
+        String result = name + "\n";
         for (Field f: field) {
             result += f.toString();
         }

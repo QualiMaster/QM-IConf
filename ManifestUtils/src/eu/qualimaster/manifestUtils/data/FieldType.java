@@ -7,7 +7,8 @@ package eu.qualimaster.manifestUtils.data;
  */
 public enum FieldType {
     
-    INTEGER, STRING, STRINGLIST, BOOLEAN, REAL, DOUBLE, LONG, OBJECT, RISK, IFEVENTLIST, UNKNOWN;
+    INTEGER, STRING, STRINGLIST, LABELLEDTWEET, STRING_TIMESTAMP, TIMESTAMP, 
+    BOOLEAN, REAL, DOUBLE, LONG, OBJECT, RISK, IFEVENTLIST, UNKNOWN;
 
     /**
      * Returns a FieldType that fits the given FieldType class.
@@ -24,6 +25,8 @@ public enum FieldType {
             
             if (name.equals("INT")) {
                 name = "INTEGER";
+            } else if (name.equals("STRING-TIMESTAMP")) {
+                name = "STRING_TIMESTAMP";
             }
             
             result = FieldType.valueOf(name);

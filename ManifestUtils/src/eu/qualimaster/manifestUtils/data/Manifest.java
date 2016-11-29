@@ -156,7 +156,7 @@ public class Manifest extends Algorithm {
         Algorithm result = null;
         
         for (Algorithm a : this.members) {
-            if (a.getName().equals(name)) {
+            if (a.getName().equalsIgnoreCase(name)) {
                 result = a;
             }
         }

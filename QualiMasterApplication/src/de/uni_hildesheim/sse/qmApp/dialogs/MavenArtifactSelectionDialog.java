@@ -48,11 +48,14 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
 
 import de.uni_hildesheim.sse.qmApp.WorkspaceUtils;
+import de.uni_hildesheim.sse.qmApp.editors.ArtifactUtils;
 import de.uni_hildesheim.sse.qmApp.editors.ITextUpdater;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import de.uni_hildesheim.sse.repositoryConnector.maven.MavenFetcher;
 import de.uni_hildesheim.sse.repositoryConnector.maven.MavenFetcher.TreeElement;
+import eu.qualimaster.easy.extension.QmConstants;
 import net.ssehub.easy.producer.eclipse.observer.EclipseProgressObserver;
+import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 
 /**
  * This editor allows the user to select a maven-artifact directory out of the
@@ -76,6 +79,7 @@ public class MavenArtifactSelectionDialog extends Dialog {
     private List<String> treePathString = new ArrayList<String>();
     private ITextUpdater artifactEditorUpdater;
     private transient boolean updatingTreeSelection = false;
+    private IDecisionVariable context;
 
     private String[] initialTreePath;
     private String initialGroupId;
@@ -89,11 +93,15 @@ public class MavenArtifactSelectionDialog extends Dialog {
      *            the parent shell.
      * @param artifactEditorUpdater
      *            updates the textfield.
+     * @param context
+     *            the context of this dialog.
      *
      */
-    public MavenArtifactSelectionDialog(Shell parentShell, ITextUpdater artifactEditorUpdater) {
+    public MavenArtifactSelectionDialog(Shell parentShell, ITextUpdater artifactEditorUpdater, 
+            IDecisionVariable context) {
         super(parentShell);
         this.artifactEditorUpdater = artifactEditorUpdater;
+        this.context = context;
     }
 
     /**
@@ -449,7 +457,12 @@ public class MavenArtifactSelectionDialog extends Dialog {
                     }
                     artifactEditorUpdater.updateTextAndModel(groupID + ":" + artifactID + ":" + versionID);
 
-                    // TODO: notify the ClassEditor!
+                    //If this is a hardware algorithm, trigger the manifest analysis right away.
+                    if (context.getParent().getDeclaration().getType().getName().equals(
+                            QmConstants.TYPE_HARDWARE_ALGORITHM)) {
+                        //The ClassEditor will be notified and refreshed by ArtifactUtils.
+                        ArtifactUtils.startUpdating(context, null, true);
+                    }
                     MavenArtifactSelectionDialog.this.close();
                 } else {
                     Dialogs.showErrorDialog("No artifact selected", "No artifact selected. Please select a file.");

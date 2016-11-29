@@ -9,16 +9,19 @@ public class Field {
 
     private String name;
     private FieldType type;
+    private String literalType;
     
     /**
      * Simple Constructor for a field.
      * Needs a name and a FieldType, since the Field can not be changed later.
      * @param name The name of the Field as String.
      * @param type The type of  the Field.
+     * @param literalType The literal name of the type.
      */
-    public Field(String name, FieldType type) {
+    public Field(String name, FieldType type, String literalType) {
         this.name = name;
         this.type = type;
+        this.literalType = literalType;
     }
     
     /**
@@ -70,6 +73,14 @@ public class Field {
      */
     public FieldType getFieldType() {
         return this.type;
+    }
+    
+    /**
+     * Returns the literal name of the type.
+     * @return The name of the type as String.
+     */
+    public String getLiteralType() {
+        return this.literalType;
     }
     
     /**

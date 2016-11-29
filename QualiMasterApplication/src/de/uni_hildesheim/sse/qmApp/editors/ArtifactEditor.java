@@ -23,7 +23,8 @@ public class ArtifactEditor extends AbstractTextSelectionEditorCreator {
     
     @Override
     protected void browseButtonSelected(String text, IDecisionVariable context, ITextUpdater updater) {
-        MavenArtifactSelectionDialog dlg = new MavenArtifactSelectionDialog(DialogsUtil.getActiveShell(), updater);
+        MavenArtifactSelectionDialog dlg = 
+                new MavenArtifactSelectionDialog(DialogsUtil.getActiveShell(), updater, context);
         if (null != text) {
             dlg.setInitialTreePath(text);
         }

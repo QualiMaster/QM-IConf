@@ -179,6 +179,7 @@ public class ManifestParser {
             if (TUPLE.equals(subNode.getNodeName())) {
                 
                 Item item = new Item();
+                item.setName(subNode.getAttributes().getNamedItem(NAME).getNodeValue());
                 
                 for (int j = 0; j < subNode.getChildNodes().getLength(); j++) {
                     
@@ -193,7 +194,7 @@ public class ManifestParser {
                         try {
                             
                             //try to create the actual Field object.
-                            Field field = new Field(name, FieldType.valueOf(type.toUpperCase()));
+                            Field field = new Field(name, FieldType.valueOf(type.toUpperCase()), type);
                             item.addField(field);
                             
                         } catch (IllegalArgumentException exc) {
@@ -586,7 +587,8 @@ public class ManifestParser {
                             
                             item.setName(ManifestConnection.decrypt(p));
                             Field field = new Field(ManifestConnection.lowerFirstLetter(met.getName().substring(3)), 
-                                    FieldType.valueOf(met.getParameterTypes()[0]));
+                                    FieldType.valueOf(met.getParameterTypes()[0]), 
+                                    met.getParameterTypes()[0].getName());
                             item.addField(field);
                             
                         }                
@@ -600,7 +602,8 @@ public class ManifestParser {
                             
                             item.setName(ManifestConnection.decrypt(p));
                             Field field = new Field(ManifestConnection.lowerFirstLetter(met.getName().substring(3)), 
-                                    FieldType.valueOf(met.getParameterTypes()[0]));
+                                    FieldType.valueOf(met.getParameterTypes()[0]),
+                                    (met.getParameterTypes()[0].getName()));
                             item.addField(field);
                             
                         }                 
@@ -834,6 +837,21 @@ public class ManifestParser {
         
         return result;
         
+    }
+    
+    /**
+     * Testing only!
+     * @param args args.
+     */
+    public static void main(String[] args) {
+        ManifestParser p = new ManifestParser();
+        try {
+            Manifest m = p.parseFile(new File("C:\\Test\\manifest.xml"));
+            System.out.println(m);
+            
+        } catch (ManifestUtilsException e) {
+            e.printStackTrace();
+        }
     }
     
 }
