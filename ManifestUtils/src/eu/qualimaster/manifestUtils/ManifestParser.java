@@ -194,13 +194,13 @@ public class ManifestParser {
                         try {
                             
                             //try to create the actual Field object.
-                            Field field = new Field(name, FieldType.valueOf(type.toUpperCase()), type);
+                            Field field = new Field(name, FieldType.value(type.toUpperCase()), type);
                             item.addField(field);
                             
                         } catch (IllegalArgumentException exc) {
                             
                             logger.warn("[Error:] At Tuple-Node: " + j + ", name: " + name 
-                                    + ", illegal field declaration!");
+                                    + ", illegal field declaration: " + type.toUpperCase());
                             
                         }
                         

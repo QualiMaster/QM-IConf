@@ -30,6 +30,7 @@ import eu.qualimaster.manifestUtils.ManifestConnection;
 import eu.qualimaster.manifestUtils.ManifestUtilsException;
 import eu.qualimaster.manifestUtils.data.Algorithm;
 import eu.qualimaster.manifestUtils.data.Field;
+import eu.qualimaster.manifestUtils.data.FieldType;
 import eu.qualimaster.manifestUtils.data.Item;
 import eu.qualimaster.manifestUtils.data.Manifest;
 import eu.qualimaster.manifestUtils.data.Manifest.ManifestType;
@@ -231,8 +232,10 @@ public class ArtifactUtils {
         
         if (name.equalsIgnoreCase("double")) {
             name = "real";
+        } else if (name.equalsIgnoreCase("string-timestamp")) {
+            name = "stringtimestamp";
         }
-        
+         
         AbstractVariable result = null;
         Set<AbstractVariable> keys = instances.keySet();
         for (AbstractVariable key : keys) {
@@ -300,7 +303,7 @@ public class ArtifactUtils {
                                     AssignmentState.ASSIGNED);
                         
                         AbstractVariable neededType = getVarInstance(f.getFieldType().name()); 
-                        if (null == neededType) {
+                        if (null == neededType || f.getFieldType() == FieldType.UNKNOWN) {
                             neededType = getVarInstance(f.getLiteralType());
                         }
                         
