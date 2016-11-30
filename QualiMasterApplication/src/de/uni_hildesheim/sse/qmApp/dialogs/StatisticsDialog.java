@@ -124,11 +124,11 @@ public class StatisticsDialog extends Dialog {
             + statistics.noOfSPAlgorithms());
         addNestedValue("Software Algorithms", statistics.noOfSWAlgorithms());
         addNestedValue("Hardware Algorithms", statistics.noOfHWAlgorithms());
-        addNestedValue("Sup Pipeline Algorithms", statistics.noOfSPAlgorithms());
+        addNestedValue("Subpipeline Algorithms", statistics.noOfSPAlgorithms());
         currentItem.setExpanded(true);
         
         addValue("Other Model Elements");
-        addNestedValue("General Purpose Machines", statistics.noOfGeneralMachines());
+        addNestedValue("General-purpose Machines", statistics.noOfGeneralMachines());
         addNestedValue("Families", statistics.noOfFamilies());
         currentItem.setExpanded(true);
         
