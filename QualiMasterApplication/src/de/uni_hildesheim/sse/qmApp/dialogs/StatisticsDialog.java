@@ -139,6 +139,14 @@ public class StatisticsDialog extends Dialog {
         addNestedValue("User Defined Operations", statistics.noOfOperations());
         addNestedValue("Constraint Variables", statistics.noOfConstraintVariables());
         currentItem.setExpanded(true);
+        
+        addValue("Declarations", statistics.noOfToplevelDeclarations() + statistics.noOfNestedDeclarations()
+            + statistics.noOfToplevelAnnotations() + statistics.noOfNestedAnnotations());
+        addNestedValue("Non Nested Variable Declarations", statistics.noOfToplevelDeclarations());
+        addNestedValue("Nested Variable Declarations", statistics.noOfNestedDeclarations());
+        addNestedValue("Non Nested Annotations", statistics.noOfToplevelAnnotations());
+        addNestedValue("Nested Variable Annotations", statistics.noOfNestedAnnotations());
+        currentItem.setExpanded(true);
     };
     
     /**
