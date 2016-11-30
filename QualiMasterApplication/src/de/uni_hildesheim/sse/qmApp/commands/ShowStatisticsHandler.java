@@ -19,7 +19,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import de.uni_hildesheim.sse.qmApp.dialogs.Dialogs;
-import de.uni_hildesheim.sse.qmApp.dialogs.StatisticsDialog;
+import de.uni_hildesheim.sse.qmApp.dialogs.statistics.StatisticsDialog;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import eu.qualimaster.easy.extension.modelop.ModelStatistics;
 import eu.qualimaster.easy.extension.modelop.QMConfigStatisticsVisitor;

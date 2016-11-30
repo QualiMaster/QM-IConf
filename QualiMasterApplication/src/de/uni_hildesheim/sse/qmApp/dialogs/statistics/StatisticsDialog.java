@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.uni_hildesheim.sse.qmApp.dialogs;
+package de.uni_hildesheim.sse.qmApp.dialogs.statistics;
+
+import java.util.ArrayList;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -27,8 +30,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.swt.widgets.TreeItem;
 
+import de.uni_hildesheim.sse.qmApp.dialogs.DialogsUtil;
 import de.uni_hildesheim.sse.qmApp.images.IconManager;
 import eu.qualimaster.easy.extension.modelop.ModelStatistics;
 
@@ -40,8 +43,7 @@ import eu.qualimaster.easy.extension.modelop.ModelStatistics;
 public class StatisticsDialog extends Dialog {
     
     private ModelStatistics statistics;
-    private Tree table;
-    private TreeItem currentItem = null;
+    private ArrayList<StatisticsItem> dataModel = new ArrayList<>();
     
     /**
      * Default constructor for the StatisticsDialo.
@@ -58,23 +60,30 @@ public class StatisticsDialog extends Dialog {
     @Override
     protected Control createDialogArea(Composite parent) {
         final Composite body = (Composite) super.createDialogArea(parent);
-        //Set the qualimaster-icon for the login-shell.
         
         final TreeViewer viewer = new TreeViewer(body, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-        table = viewer.getTree();
+        Tree table = viewer.getTree();
         table.setLinesVisible(true);
         table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        viewer.setContentProvider(new StatisticsContentProvider());
         
-        TreeColumn tc1 = new TreeColumn(table, SWT.CENTER);
-        TreeColumn tc2 = new TreeColumn(table, SWT.CENTER);
+        TreeViewerColumn column1 = new TreeViewerColumn(viewer, SWT.NONE);
+        column1.setLabelProvider(new StatisticsLabelProvider(0));
+        TreeColumn tc1 = column1.getColumn();
+        TreeViewerColumn column2 = new TreeViewerColumn(viewer, SWT.NONE);
+        column2.setLabelProvider(new StatisticsLabelProvider(1));
+        TreeColumn tc2 = column2.getColumn();
+        
         tc1.setText("Type");
         tc2.setText("No. of Elements");
-        tc1.setWidth(380);
+        tc1.setWidth(375);
         tc2.setWidth(180);
         table.setHeaderVisible(true);
         
         // Variables
         fillTable();
+        viewer.setInput(dataModel);
+        viewer.expandAll();
         
         //Capture ESC-Key.
         body.addListener(SWT.Traverse, new Listener() {
@@ -95,21 +104,21 @@ public class StatisticsDialog extends Dialog {
         addValue("Total Variables (Without Container)", statistics.noOfVariablesWithoutContainer());
         addNestedValue("Non Nested Variables", statistics.noOfToplevelVariables());
         addNestedValue("+ Annotation Instances (not Included Before)", statistics.noOfAnnotations());
-        currentItem.setExpanded(true);
         
         addValue("Total Variables", statistics.noOfVariables());
-        addNestedValue("Non Constraint Variables (Nested & Non Nested)", statistics.noOfNormalVariables());
-        addNestedValue("Non Constraint Variables (not Nested in Container)",
-            statistics.noOfNormalVariablesNoContainer());
-        addNestedValue("Constraint Variables (Nested & Non Nested)", statistics.noOfConstraintVariables());
-        addNestedValue("Constraint Variables (not Nested in Container)",
-            statistics.noOfConstraintVariablesNoContainer());
-        currentItem.setExpanded(true);
+        StatisticsItem parent = dataModel.get(dataModel.size() - 1);
+        StatisticsItem vars = new StatisticsItem("Non Constraint Variables (Nested & Non Nested)",
+            String.valueOf(statistics.noOfNormalVariables()), parent);
+        new StatisticsItem("Non Constraint Variables (not Nested in Container)",
+            String.valueOf(statistics.noOfNormalVariablesNoContainer()), vars);
+        StatisticsItem consVars = new StatisticsItem("Constraint Variables (Nested & Non Nested)",
+            String.valueOf(statistics.noOfConstraintVariables()), parent);
+        new StatisticsItem("Constraint Variables (not Nested in Container)",
+                String.valueOf(statistics.noOfConstraintVariablesNoContainer()), consVars);
         
         addValue("All Pipelines", statistics.noOfPipelines() + statistics.noOfSubPipelines());
         addNestedValue("Pipelines", statistics.noOfPipelines());
         addNestedValue("Subpipelines", statistics.noOfSubPipelines());
-        currentItem.setExpanded(true);
         
         addValue("Pipeline Elements", statistics.noOfSources() + statistics.noOfFamilyElements()
             + statistics.noOfDataManagementElements() + statistics.noOfReplaySinks() + statistics.noOfSinks());
@@ -118,19 +127,16 @@ public class StatisticsDialog extends Dialog {
         addNestedValue("Data Mangement Elements", statistics.noOfDataManagementElements());
         addNestedValue("Replay Sinks", statistics.noOfReplaySinks());
         addNestedValue("Sinks", statistics.noOfSinks());
-        currentItem.setExpanded(true);
         
         addValue("Algorithms", statistics.noOfSWAlgorithms() + statistics.noOfHWAlgorithms()
             + statistics.noOfSPAlgorithms());
         addNestedValue("Software Algorithms", statistics.noOfSWAlgorithms());
         addNestedValue("Hardware Algorithms", statistics.noOfHWAlgorithms());
         addNestedValue("Subpipeline Algorithms", statistics.noOfSPAlgorithms());
-        currentItem.setExpanded(true);
         
         addValue("Other Model Elements");
         addNestedValue("General-purpose Machines", statistics.noOfGeneralMachines());
         addNestedValue("Families", statistics.noOfFamilies());
-        currentItem.setExpanded(true);
         
         addValue("Constraints", statistics.noOfConstraints() + statistics.noOfOperations()
             + statistics.noOfConstraintInstances() + statistics.noOfConstraintVariables());
@@ -138,7 +144,6 @@ public class StatisticsDialog extends Dialog {
         addNestedValue("Instantiated Constraint of Compounds", statistics.noOfConstraintInstances());
         addNestedValue("User Defined Operations", statistics.noOfOperations());
         addNestedValue("Constraint Variables", statistics.noOfConstraintVariables());
-        currentItem.setExpanded(true);
         
         addValue("Declarations", statistics.noOfToplevelDeclarations() + statistics.noOfNestedDeclarations()
             + statistics.noOfToplevelAnnotations() + statistics.noOfNestedAnnotations());
@@ -146,7 +151,6 @@ public class StatisticsDialog extends Dialog {
         addNestedValue("Nested Variable Declarations", statistics.noOfNestedDeclarations());
         addNestedValue("Non Nested Annotations", statistics.noOfToplevelAnnotations());
         addNestedValue("Nested Variable Annotations", statistics.noOfNestedAnnotations());
-        currentItem.setExpanded(true);
     };
     
     /**
@@ -154,8 +158,8 @@ public class StatisticsDialog extends Dialog {
      * @param name The header title.
      */
     private void addValue(String name) {
-        currentItem = new TreeItem(table, SWT.NONE);
-        currentItem.setText(name);
+        StatisticsItem item = new StatisticsItem(name, "", dataModel);
+        dataModel.add(item);
     }
     
     /**
@@ -164,8 +168,8 @@ public class StatisticsDialog extends Dialog {
      * @param value The value, to display in the second column.
      */
     private void addValue(String name, int value) {
-        currentItem = new TreeItem(table, SWT.NONE);
-        currentItem.setText(new String[] {name, String.valueOf(value)});
+        StatisticsItem item = new StatisticsItem(name, String.valueOf(value), dataModel);
+        dataModel.add(item);
     }
     
     /**
@@ -174,9 +178,9 @@ public class StatisticsDialog extends Dialog {
      * @param value The value, to display in the second column.
      */
     private void addNestedValue(String name, int value) {
-        if (null != currentItem) {
-            TreeItem item = new TreeItem(currentItem, SWT.NONE);
-            item.setText(new String[] {name, String.valueOf(value)});
+        if (!dataModel.isEmpty()) {
+            StatisticsItem parent = dataModel.get(dataModel.size() - 1);
+            new StatisticsItem(name, String.valueOf(value), parent);
         } else {
             addValue(name, value);
         }
@@ -192,7 +196,7 @@ public class StatisticsDialog extends Dialog {
         Image icon = IconManager.retrieveImage(IconManager.QUALIMASTER_SMALL);
         newShell.setImage(icon);
         newShell.pack();
-        newShell.setSize(600, 700);
+        newShell.setSize(600, 775);
         
         super.configureShell(newShell);
         newShell.setText("Model Statistics");
