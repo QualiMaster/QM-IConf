@@ -222,6 +222,11 @@ public class UiTracerFactory extends TracerFactory {
         public void visitScriptBody(Script script, RuntimeEnvironment environment) {
         }
 
+        @Override
+        public void enable(boolean enable) {
+            // ignore, is anyway a reduced tracer
+        }
+
     }
     
 }
