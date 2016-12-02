@@ -21,7 +21,7 @@ public class ItemTest {
     public void testConstructor() {
         
         Item item = new Item();
-        Field field = new Field("Test", FieldType.INTEGER);
+        Field field = new Field("Test", FieldType.INTEGER, FieldType.INTEGER.name());
         
         Assert.assertTrue(item.getFields().isEmpty());
         
@@ -44,9 +44,9 @@ public class ItemTest {
         Item itemA = new Item();
         Item itemB = new Item();
         
-        Field fieldA = new Field("Test", FieldType.INTEGER);
-        Field fieldB = new Field("Test", FieldType.INTEGER);
-        Field fieldC = new Field("Different", FieldType.BOOLEAN);
+        Field fieldA = new Field("Test", FieldType.INTEGER, FieldType.INTEGER.name());
+        Field fieldB = new Field("Test", FieldType.INTEGER, FieldType.INTEGER.name());
+        Field fieldC = new Field("Different", FieldType.BOOLEAN, FieldType.BOOLEAN.name());
         
         Assert.assertEquals(itemA, itemB);
         

@@ -19,7 +19,7 @@ public class FieldTest {
     @Test
     public void testConstructor() {
         
-        Field field = new Field("Test", FieldType.INTEGER);
+        Field field = new Field("Test", FieldType.INTEGER, FieldType.INTEGER.name());
         
         Assert.assertEquals(field.getName(), "Test");
         Assert.assertEquals(field.getFieldType(), FieldType.INTEGER);
@@ -32,11 +32,11 @@ public class FieldTest {
     @Test
     public void testEquals() {
         
-        Field fieldA = new Field("Test", FieldType.BOOLEAN);
-        Field fieldB = new Field("Test", FieldType.BOOLEAN);
-        Field fieldC = new Field("Test", FieldType.INTEGER);
-        Field fieldD = new Field("Different", FieldType.BOOLEAN);
-        Field fieldE = new Field("Different", FieldType.INTEGER);
+        Field fieldA = new Field("Test", FieldType.BOOLEAN, FieldType.BOOLEAN.name());
+        Field fieldB = new Field("Test", FieldType.BOOLEAN, FieldType.BOOLEAN.name());
+        Field fieldC = new Field("Test", FieldType.INTEGER, FieldType.INTEGER.name());
+        Field fieldD = new Field("Different", FieldType.BOOLEAN, FieldType.BOOLEAN.name());
+        Field fieldE = new Field("Different", FieldType.INTEGER, FieldType.INTEGER.name());
         
         Assert.assertEquals(fieldA, fieldA);
         Assert.assertEquals(fieldA, fieldB);
