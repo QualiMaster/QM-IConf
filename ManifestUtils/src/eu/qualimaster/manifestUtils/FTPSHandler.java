@@ -4,14 +4,18 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Formatter;
 
 import org.apache.commons.net.ftp.FTPClient;
@@ -50,7 +54,18 @@ public class FTPSHandler extends BasicURLHandler {
      * @throws IOException If and IO handling failed.
      */
     public File download(URL source, File destination) throws IOException {
-        return null;
+        
+        if (null != source && null != destination) {
+            FTPSClient client = FTPSConnector.getInstance().getClient();
+            
+            OutputStream output;
+            output = new FileOutputStream(destination);
+            client.retrieveFile(source.toString(), output);
+            output.close();
+        }
+        
+        return destination;
+        
     }
     
     /**
@@ -79,6 +94,31 @@ public class FTPSHandler extends BasicURLHandler {
             FTPSClient client = FTPSConnector.getInstance().getClient();
             upload(source, dest, client, monitor, checksums);
         }
+        
+    }
+    
+    /**
+     * Adds the time stamp and the snapshot version to the destination path.
+     * @param destination The destination path.
+     * @param snapshotVersion The new internal snapshot version.
+     * @return The destination with added time stamp.
+     */
+    public String addTimestamp(String destination, String snapshotVersion) {
+        
+        String result = destination;
+        
+        if (null != destination && destination.contains("SNAPSHOT")) {
+            
+            String timeStamp = new SimpleDateFormat("yyyyMMdd.HHmmss").format(new Date());
+            if (null != snapshotVersion && !snapshotVersion.isEmpty()) {
+                timeStamp += "-" + snapshotVersion;
+            }
+            
+            result = result.replaceFirst("SNAPSHOT", timeStamp);
+            
+        }
+        
+        return result;
         
     }
     
