@@ -2,6 +2,8 @@ package eu.qualimaster.manifestUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -145,6 +147,127 @@ public class MetaGenerator {
         }
             
         return metadata;
+        
+    }
+    
+    /**
+     * Updates the internal metadata of a snapshot.
+     * @param file The metadata.xml of the snapshots.
+     * @param timestamp The new timestamp for the snapshot.
+     * @return The new version number.
+     */
+    public String updateInternalMetadata(File file, String timestamp) {
+        
+        String version = "";
+        String snapshotVersion = "";
+            
+        if (file != null && file.length() > 0) {
+            
+            try { 
+                
+                doc = builder.parse(file);   
+                Element root = doc.getDocumentElement();
+                
+                if (root.getNodeName().equals("metadata")) {
+                    
+                    Node versionNode = getFirstChildByName(root, "version");
+                    Node versioningNode = getFirstChildByName(root, "versioning");
+                    Node snapshotNode = getFirstChildByName(versioningNode, "snapshot");
+                    Node stampNode = getFirstChildByName(snapshotNode, "timestamp");
+                    Node buildNode = getFirstChildByName(snapshotNode, "buildNumber");
+                    Node lastUpdatedNode = getFirstChildByName(versioningNode, "lastUpdated");
+                    Node snapshotVersionsNode = getFirstChildByName(versioningNode, "snapshotVersions");
+                    
+                    stampNode.setTextContent(timestamp);
+                    snapshotVersion = versionNode.getTextContent();
+                    snapshotVersion = snapshotVersion.substring(0, snapshotVersion.indexOf("-") - 1);
+
+                    try {
+                        int versionNumber = Integer.valueOf(buildNode.getTextContent());
+                        version = "" + versionNumber++;
+                    } catch (NumberFormatException exc) {
+                            //TODO what now?
+                    }
+                    buildNode.setTextContent(version);
+                    lastUpdatedNode.setTextContent(timestamp.replace(".", ""));
+                    List<Node> snapshotNodes = getAllChildrenByName(snapshotVersionsNode, "snapshotVersion");
+                    
+                    for (Node node : snapshotNodes) {                    
+                        Node valueNode = getFirstChildByName(node, "value");
+                        Node updateNode =  getFirstChildByName(node, "updated");               
+                        valueNode.setTextContent(snapshotVersion + "-" + timestamp + "-" + version);
+                        updateNode.setTextContent(timestamp.replace(".", ""));                    
+                    }
+                    
+                    //update the actual XML
+                    DOMSource source = new DOMSource(doc);
+                    StreamResult result = new StreamResult(file);    
+                    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");     
+                    try {
+                        transformer.transform(source, result);
+                    } catch (TransformerException e) {
+                        e.printStackTrace();
+                    }   
+                }
+                
+            } catch (SAXException exc) {           
+                exc.printStackTrace();           
+            } catch (IOException exc) {             
+                exc.printStackTrace();       
+            } catch (IllegalArgumentException exc) {
+                exc.printStackTrace();
+            }
+            
+        } else {      
+            logger.info("Unable to parse manifest!");      
+        }   
+        return version;      
+    }
+    
+    /**
+     * Returns the first child of a given node with a given name.
+     * @param node The given node.
+     * @param name The given name.
+     * @return The first child that matches the name or null if none exists.
+     */
+    private Node getFirstChildByName(Node node, String name) {
+        
+        Node result = null;
+        for (int i = 0; (result == null) && (i < node.getChildNodes().getLength()); i++) {
+            
+            if (node.getChildNodes().item(i).getNodeName().equals(name)) {
+                
+                result = node.getChildNodes().item(i);
+                
+            }
+            
+        }
+        return result;
+        
+    }
+    
+    /**
+     * Returns all children of a given node with a given name.
+     * @param node The given node.
+     * @param name The given name.
+     * @return A List of all Nodes that match the name. Can be empty but never null.
+     */
+    private List<Node> getAllChildrenByName(Node node, String name) {
+        
+        List<Node> result = new ArrayList<Node>();
+        
+        for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+            
+            if (node.getChildNodes().item(i).getNodeName().equals(name)) {
+                
+                result.add(node.getChildNodes().item(i));
+                
+            }
+            
+        }
+        
+        return result;
         
     }
     
