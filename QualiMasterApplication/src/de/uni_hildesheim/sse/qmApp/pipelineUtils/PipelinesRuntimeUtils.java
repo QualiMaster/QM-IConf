@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -20,7 +19,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
@@ -55,9 +53,8 @@ public class PipelinesRuntimeUtils {
 
     public static final PipelinesRuntimeUtils INSTANCE = new PipelinesRuntimeUtils();
     
-    public static final String[] FILENAMES = {"runtimeSavedItems1.ser", "runtimeSavedItems2.ser",
-        "runtimeSavedItems3.ser",
-        "runtimeSavedItems4.ser", "runtimeSavedItems5.ser", "runtimeSavedItems6.ser"};
+    public static final String FILENAME = "runtimeSavedItems";
+    public static final String FILENAME_EXT = ".ser";
     
     private static String fileName = "runtimeSavedItems";
     private static final String EASY_STRING = "EASy";
@@ -869,39 +866,24 @@ public class PipelinesRuntimeUtils {
      */
     public static void storeInfoInMetadata(List<PipelineElementObservableWrapper> wrapperList) {
         try {
-            boolean possFile = false;
-            for (int i = 0; i < FILENAMES.length; i++) {
-                String name = fileName;
+            boolean foundFile = false;
+            int counter = 1;
+            while (!foundFile) { 
                 
-                if (!new File(WorkspaceUtils.getMetadataFolder(), name).exists()) {
-                    possFile = true;
+                
+                if (!new File(WorkspaceUtils.getMetadataFolder(), FILENAME + counter + FILENAME_EXT).exists()) {
+                    foundFile = true;
+                    
                     FileOutputStream fileoutputstream;
                     
-                    if (i == 0) {
-                        fileoutputstream = new FileOutputStream(getItemsFile(name + ".ser"));
-                    } else {
-                        fileoutputstream = new FileOutputStream(getItemsFile(name + i + ".ser"));
-                    }
-                    
-                    
+                    fileoutputstream = new FileOutputStream(getItemsFile(FILENAME + counter + FILENAME_EXT));
+     
                     ObjectOutputStream outputstream = new ObjectOutputStream(fileoutputstream);
                     outputstream.writeObject(wrapperList);
                     outputstream.close();
-                    break;
                 }
-            }
-            
-            if (!possFile) {
-                boolean answer = MessageDialog.openQuestion(Display.getCurrent().getActiveShell(), "Reset savings",
-                        "Do you want to discard all previous saved"
-                        + "data in order to save the current selections?");
+                counter++;
                 
-                if (answer) {
-                    for (int j = 0; j < FILENAMES.length; j++) {
-                        new File(WorkspaceUtils.getMetadataFolder(), FILENAMES[j]).delete();
-                    }
-                    storeInfoInMetadata(wrapperList);
-                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -949,7 +931,13 @@ public class PipelinesRuntimeUtils {
      * @return toReturn true if data is found, false otherwise.
      */
     public static boolean storedDataExist() {
-        boolean toReturn = getItemsFile(FILENAMES[0]).exists();
+        File file = getItemsFile(FILENAME + 0 + FILENAME_EXT);
+        
+        boolean toReturn = false;
+        
+        if (file != null) {
+            toReturn = true;
+        }
         return toReturn;
     }
 }

@@ -7,6 +7,7 @@ import static eu.qualimaster.easy.extension.QmObservables.RESOURCEUSAGE_USED_MAC
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
@@ -130,7 +131,6 @@ import net.ssehub.easy.varModel.model.values.IntValue;
 import net.ssehub.easy.varModel.model.values.ReferenceValue;
 import net.ssehub.easy.varModel.model.values.StringValue;
 import net.ssehub.easy.varModel.model.values.Value;
-
 /**
  * The preliminary editor for runtime settings.
  * 
@@ -164,9 +164,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     private MeterFigure usedClusterMachines;
     private MeterFigure usedHardwareMachines;
     private Map<String, ArrayList<PipelineTrace>> pipelineTraces = new HashMap<String, ArrayList<PipelineTrace>>();
-
     private CheckboxTreeViewer treeViewerPipelineChooser;
-
     private Table treeViewerColorChooser;
 
     private List<Color> colorList = new ArrayList<Color>();
@@ -188,7 +186,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         private String observable;
         @SuppressWarnings("unused")
         private String monitoringName;
-
         /**
          * Creates the trace.
          * 
@@ -216,7 +213,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             trace.setLineWidth(4);
             trace.setDataProvider(dataProvider);
         }
-
         /**
          * Set the color of this trace.
          * 
@@ -226,7 +222,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         private void setColor(Color color) {
             trace.setTraceColor(color);
         }
-
         /**
          * Returns the trace.
          * 
@@ -235,14 +230,12 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         private Trace getTrace() {
             return trace;
         }
-
         /**
          * Clears the trace.
          */
         private void clearTrace() {
             dataProvider.clearTrace();
         }
-
         /**
          * Updates the trace.
          * 
@@ -258,37 +251,30 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                         dataProvider.addSample(new Sample(System.currentTimeMillis(), observation.doubleValue()));
                     }
                 });
-
             }
         }
     }
-
     @Override
     public void doSave(IProgressMonitor monitor) {
         // nothing to save
     }
-
     @Override
     public void doSaveAs() {
         // nothing to save
     }
-
     @Override
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
         setSite(site);
         setInput(input);
     }
-
     @Override
     public boolean isDirty() {
         return false;
     }
-
     @Override
     public boolean isSaveAsAllowed() {
         return false;
     }
-
     /**
      * Let a tab pop out.
      * 
@@ -445,11 +431,17 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
         determineQMObervable();
 
-        boolean answer = MessageDialog.openQuestion(this.getSite().getShell(), "Restore selections",
-                "Do you want to load the selections from the last session?");
+        if (PipelinesRuntimeUtils.storedDataExist()) {
+            
+            boolean answer = MessageDialog.openQuestion(this.getSite().getShell(), "Restore previous selections",
+                    "Do you want to load the selections from the last session?");
+            
+            if (answer) {
+                loadItemsLocally();
 
-        if (answer && PipelinesRuntimeUtils.storedDataExist()) {
-            loadItemsLocally();
+            } else {
+                clearLocallySavedItems();
+            }
         }
     }
 
@@ -464,7 +456,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
      *            parent Composite.
      */
     private void addTabFolder(Composite innerLeftTop, Composite topButtons, Composite parent) {
-
         // Let the graphs be tabs in oder to allow floating dialogs for graphs.
         tabFolder = new CTabFolder(innerLeftTop, SWT.CLOSE);
 
@@ -513,7 +504,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                                 Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW),
                                 Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW) },
                         new int[] {50, 100});
-
     }
 
     /**
@@ -1001,7 +991,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                             pipelineTraces.remove(trace);
                             trace.clearTrace();
                             pipelinesToDisplayInTableWithObservable.remove(index);
-
                         }
                     }
                 }
@@ -1232,9 +1221,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         final RuntimeGraphTabItem newTabItem = new RuntimeGraphTabItem(tabFolder, SWT.NONE);
         newTabItem.setText("New Tab");
 
-        if (!loading) {
-            saveTreeLocally();
-        }
         Control control = createGraphPanel(tabFolder);
         GridData data = new GridData(GridData.FILL_BOTH);
         data.grabExcessHorizontalSpace = true;
@@ -1424,32 +1410,33 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     /**
      * Load the serialized tree. Use the extracted list to set the treeviewer input.
      */
-    private void loadItemsLocally() {
+    private void loadItemsLocally() {       
+        boolean foundFile = true;
+        int counter = 1;
         try {
-            for (int a = 0; a < PipelinesRuntimeUtils.FILENAMES.length; a++) {
-                
-                if (PipelinesRuntimeUtils.getItemsFile(PipelinesRuntimeUtils.FILENAMES[a]) != null) {
-                    
-                    FileInputStream fileIn = new FileInputStream(PipelinesRuntimeUtils.getItemsFile(
-                            PipelinesRuntimeUtils.FILENAMES[a]));
+            while (foundFile) {
+                if (PipelinesRuntimeUtils.getItemsFile(PipelinesRuntimeUtils.FILENAME
+                        + counter + PipelinesRuntimeUtils.FILENAME_EXT).exists()) { 
+                    FileInputStream fileIn; 
+                    fileIn = new FileInputStream(PipelinesRuntimeUtils.getItemsFile(PipelinesRuntimeUtils.FILENAME
+                            + counter + PipelinesRuntimeUtils.FILENAME_EXT));               
+                    counter++; 
                     if (fileIn != null) {
                         ObjectInputStream in = new ObjectInputStream(fileIn);
                         @SuppressWarnings("unchecked")
                         List<PipelineElementObservableWrapper> wrapperList =
                                 (ArrayList<PipelineElementObservableWrapper>) in.readObject();
                         pipelinesToDisplayInTableWithObservable.clear();
+                        
                         for (int i = 0; i < wrapperList.size(); i++) {
-                            PipelineElementObservableWrapper wrapper = wrapperList.get(i);
-            
+                            PipelineElementObservableWrapper wrapper = wrapperList.get(i);            
                             String name = wrapper.getName();
                             String observable = wrapper.getObservable();
                             // get real variable and declaration
                             for (int j = 0; j < treeViewerPipelineChooser.getTree().getItemCount(); j++) {
-            
                                 TreeItem outerItem = treeViewerPipelineChooser.getTree().getItem(j);
                                 if (outerItem.getText().equals(name)) {
-                                    outerItem.setChecked(true);
-                                    
+                                    outerItem.setChecked(true);     
                                     for (int m = 0; m < observablesTable.getItemCount(); m++) {
                                         TableItem obsItem = observablesTable.getItem(m);
                                         if (obsItem.getText().equals(observable)) {
@@ -1459,16 +1446,13 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                                     saveSelections();
                                     removeSelections();
                                 }
-                                for (int l = 0; l < outerItem.getItemCount(); l++) {
-            
-                                    TreeItem innerItem = outerItem.getItem(l);
-            
+                                for (int k = 0; k < outerItem.getItemCount(); k++) {
+                                    TreeItem innerItem = outerItem.getItem(k);  
                                     if (innerItem.getText().equals(name)) {
                                         innerItem.setChecked(true);
             
                                         for (int m = 0; m < observablesTable.getItemCount(); m++) {
                                             TableItem obsItem = observablesTable.getItem(m);
-            
                                             if (obsItem.getText().equals(observable)) {
                                                 obsItem.setChecked(true);
                                             }
@@ -1484,13 +1468,42 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                         in.close();
                         fileIn.close();
                     }
+                } else {
+                    foundFile = false;
                 }
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            //...
+            } 
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
+    /**
+     * Delete all saves metadata-files concerning tabs created by the user.
+     */
+    private void clearLocallySavedItems() {
+        boolean foundFile = true;
+        int counter = 1;
+        
+        while (foundFile) {
+            if (PipelinesRuntimeUtils.getItemsFile(PipelinesRuntimeUtils.FILENAME
+                    + counter + PipelinesRuntimeUtils.FILENAME_EXT).exists()) {
+                
+                File toDelete = PipelinesRuntimeUtils.getItemsFile(PipelinesRuntimeUtils.FILENAME
+                        + counter + PipelinesRuntimeUtils.FILENAME_EXT);               
+                toDelete.delete();
+                
+                counter++;
+            } else {
+                foundFile = false;
+            }
+        }
+       
+    }
+    
     /**
      * Check if a {@link PipelineGraphColoringWrapper} already exists in the list.
      * 
