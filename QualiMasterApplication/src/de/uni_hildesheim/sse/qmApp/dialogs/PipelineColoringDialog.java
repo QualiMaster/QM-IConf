@@ -2,6 +2,10 @@ package de.uni_hildesheim.sse.qmApp.dialogs;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -11,6 +15,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
+
+import eu.qualimaster.easy.extension.QmObservables;
 
 /**
  * Dialog for setting borders from very low to low to medium to high to very high.
@@ -29,32 +36,31 @@ public class PipelineColoringDialog extends Dialog {
     private static String mediumToHighValue = "";
     private static String highToVeryhighValue = "";
     
+    private Label descriptionLabel;
+    
     private Label verylowToLowDescription;
     private Label lowToMediumDescription;
     private Label mediumToHighDescription;
     private Label highToVEryhighDescription;
     
-    private Label verylowToLowLabel;
+    private Spinner verylowToLowLabel;
     private Scale verylowToLowScale;
-    private Label verylowToLowLabel2;
+    private Spinner verylowToLowLabel2;
     
-    private Label lowToMediumLabel;
+    private Spinner lowToMediumLabel;
     private Scale lowToMediumScale;
-    private Label lowToMediumLabel2;
+    private Spinner lowToMediumLabel2;
     
-    private Label mediumToHighLabel;
+    private Spinner mediumToHighLabel;
     private Scale mediumToHighScale;
-    private Label mediumToHighLabel2;
+    private Spinner mediumToHighLabel2;
     
-    private Label highToVeryhighLabel;
+    private Spinner highToVeryhighLabel;
     private Scale highToVeryhighScale;
-    private Label highToVeryhighLabel2;
-    
-    
+    private Spinner highToVeryhighLabel2;
+     
     private final int baseMax = 500;
     private final int baseMin = 0;
-    private final String baseMaxString = "500";
-    private final String baseMinString = "0";
       
     @SuppressWarnings("unused")
     private final double multiplicator = 0.8;
@@ -68,12 +74,20 @@ public class PipelineColoringDialog extends Dialog {
     }
 
     /**
+     * Set the dialog title.
+     * @param shell The dialogs shell.
+     */
+    protected void configureShell(Shell shell) {
+        super.configureShell(shell);
+        shell.setText("Color Selection for Pipelines");
+    }
+    
+    /**
      * Run.
      */
     public void run() {
         setBlockOnOpen(true);
         open();
-        //Display.getCurrent().dispose();
     }
     
     /**
@@ -88,72 +102,255 @@ public class PipelineColoringDialog extends Dialog {
         final Composite composite = (Composite) super.createDialogArea(parent);
         GridLayout layout = new GridLayout(3, false);
         composite.setLayout(layout);
-       
-        verylowToLowDescription = new Label(composite, SWT.FILL);
+        descriptionLabel = new Label(composite, SWT.FILL);
         GridData data = new GridData();
+        data.horizontalSpan = 3;
+        descriptionLabel.setLayoutData(data);
+        descriptionLabel.setText("The Observable: " + QmObservables.SCALABILITY_ITEMS + " is monitored");
+        
+        verylowToLowDescription = new Label(composite, SWT.FILL);
+        data = new GridData();
         data.horizontalSpan = 3;
         verylowToLowDescription.setLayoutData(data);
         verylowToLowDescription.setText("Very low to Low");
         
-        verylowToLowLabel = new Label(composite, SWT.NULL);
-        verylowToLowLabel.setText(baseMinString);
-       
+        verylowToLowLabel = new Spinner(composite, SWT.NULL);
+        verylowToLowLabel.setMinimum(baseMin);
+        verylowToLowLabel.setMaximum(baseMax);
+        verylowToLowLabel.setSelection(baseMin);
+        verylowToLowLabel.setEnabled(false);
+        
         verylowToLowScale = new Scale(composite, SWT.NONE);
         verylowToLowScale.setMinimum(baseMin);
         verylowToLowScale.setMaximum(baseMax);
-       
-        verylowToLowLabel2 = new Label(composite, SWT.NULL);
-        verylowToLowLabel2.setText(baseMaxString);
 
+        verylowToLowScale.addMouseWheelListener(new MouseWheelListener() {
+            public void mouseScrolled(final MouseEvent evt) {
+                
+                Scale src = (Scale) evt.getSource();
+                int sel = src.getSelection();
+                src.setSelection(sel - evt.count);
+                
+                verylowToLowLabel2.setSelection(sel);
+                lowToMediumLabel.setSelection(sel);
+
+                lowToMediumLabel2.setMinimum(sel);
+                
+                //lowToMediumScale.setMinimum(sel);
+                //lowToMediumScale.setSelection(sel);
+            }
+        });
+        
+        verylowToLowLabel2 = new Spinner(composite, SWT.NULL);
+        verylowToLowLabel2.setMinimum(baseMin);
+        verylowToLowLabel2.setMaximum(baseMax);
+        verylowToLowLabel2.setSelection(baseMax);
         //...
         lowToMediumDescription = new Label(composite, SWT.FILL);
         lowToMediumDescription.setLayoutData(data);
-        lowToMediumDescription.setText("Low low Medium");
+        lowToMediumDescription.setText("Low to Medium");
         
-        lowToMediumLabel = new Label(composite, SWT.NULL);
-        lowToMediumLabel.setText("XXX");
+        lowToMediumLabel = new Spinner(composite, SWT.NULL);
+        lowToMediumLabel.setMinimum(baseMin);
+        lowToMediumLabel.setMaximum(baseMax);
+        lowToMediumLabel.setSelection(baseMin);
         
         lowToMediumScale = new Scale(composite, SWT.NONE);
         lowToMediumScale.setMaximum(baseMax);
-        //lowToMediumScale.setEnabled(false);
         
-        lowToMediumLabel2 = new Label(composite, SWT.NULL);
-        lowToMediumLabel2.setText(baseMaxString);
+        createAdditionalUI(composite);
+        return composite;
+    };
+    
+    /**
+     * Create more UI-Components for this dialog like scales and Spinners.
+     * @param composite parent Composite.
+     */
+    private void createAdditionalUI(Composite composite) {
+        GridData data = new GridData();
+        data.horizontalSpan = 3;
         
+        lowToMediumScale.addMouseWheelListener(new MouseWheelListener() {
+            public void mouseScrolled(final MouseEvent evt) {
+                
+                Scale src = (Scale) evt.getSource();
+                int sel = src.getSelection();
+                src.setSelection(sel - evt.count);
+
+                
+                lowToMediumLabel2.setSelection(sel);
+                mediumToHighLabel.setSelection(sel);
+                mediumToHighLabel2.setMinimum(sel);
+                
+//                mediumToHighScale.setMinimum(sel);
+//                mediumToHighScale.setSelection(sel);
+                
+            }
+        });
+        
+        lowToMediumLabel2 = new Spinner(composite, SWT.NULL);
+        lowToMediumLabel2.setMinimum(baseMin);
+        lowToMediumLabel2.setMaximum(baseMax);
+        lowToMediumLabel2.setSelection(baseMax);
+       
         //...
         mediumToHighDescription = new Label(composite, SWT.FILL);
         mediumToHighDescription.setLayoutData(data);
         mediumToHighDescription.setText("Medium To High");
         
-        mediumToHighLabel = new Label(composite, SWT.NULL);
-        mediumToHighLabel.setText("XXX");
+        mediumToHighLabel = new Spinner(composite, SWT.NULL);
+        mediumToHighLabel.setMinimum(baseMin);
+        mediumToHighLabel.setMaximum(baseMax);
+        mediumToHighLabel.setSelection(baseMin);
         
         mediumToHighScale = new Scale(composite, SWT.NONE);
         mediumToHighScale.setMinimum(baseMin);
         mediumToHighScale.setMaximum(baseMax);
-        //mediumToHighScale.setEnabled(false);
         
-        mediumToHighLabel2 = new Label(composite, SWT.NULL);
-        mediumToHighLabel2.setText(baseMaxString);
+        createAdditionalUIComponents2(composite);
+        
+    }
+    /**
+     Create more UI-Components for this dialog like scales and Spinners.
+     * @param composite parent Composite.
+     */
+    private void createAdditionalUIComponents2(Composite composite) {
+        
+        GridData data = new GridData();
+        data.horizontalSpan = 3;
+        
+        mediumToHighScale.addMouseWheelListener(new MouseWheelListener() {
+            public void mouseScrolled(final MouseEvent evt) {
+                
+                Scale src = (Scale) evt.getSource();
+                int sel = src.getSelection();
+                src.setSelection(sel - evt.count);
+                
+                mediumToHighLabel2.setSelection(sel);
+                highToVeryhighLabel.setSelection(sel);
+                highToVeryhighLabel2.setMinimum(sel);
+            }
+        });
+        
+        mediumToHighLabel2 = new Spinner(composite, SWT.NULL);
+        mediumToHighLabel2.setMinimum(baseMin);
+        mediumToHighLabel2.setMaximum(baseMax);
+        mediumToHighLabel2.setSelection(baseMax);
         //...
         highToVEryhighDescription = new Label(composite, SWT.FILL);
         highToVEryhighDescription.setLayoutData(data);
         highToVEryhighDescription.setText("High To Very High");
         
-        highToVeryhighLabel = new Label(composite, SWT.NULL);
-        highToVeryhighLabel.setText("XXX");
+        highToVeryhighLabel = new Spinner(composite, SWT.NULL);
+        highToVeryhighLabel.setMinimum(baseMin);
+        highToVeryhighLabel.setMaximum(baseMax);
+        highToVeryhighLabel.setSelection(baseMin);
         
         highToVeryhighScale =  new Scale(composite, SWT.NONE);
-        //highToVeryhighScale.setEnabled(false);
         
-        highToVeryhighLabel2 = new Label(composite, SWT.NULL);
-        highToVeryhighLabel2.setText(baseMaxString);
+        highToVeryhighScale.setEnabled(false);
+        highToVeryhighLabel2 = new Spinner(composite, SWT.NULL);
+        highToVeryhighLabel2.setMinimum(baseMin);
+        highToVeryhighLabel2.setMaximum(baseMax);
+        highToVeryhighLabel2.setSelection(baseMax);
+        highToVeryhighLabel2.setEnabled(false);
         
+        addSpinnerListeners();
         addListenersToScales(composite);
-        addSavedValuesToScales();
-        return composite;
-    };
-    
+        addSavedValuesToScales(); 
+    }
+
+    /**
+     * A listeners to the {@Spinner}s so the scale-selections can be adjusted.
+     */
+    private void addSpinnerListeners() { 
+        verylowToLowLabel2.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent evt) {
+                int selection = verylowToLowLabel2.getSelection();
+              
+                verylowToLowScale.setSelection(selection);
+                lowToMediumLabel.setSelection(selection);
+                
+                lowToMediumScale.setMinimum(selection);
+                lowToMediumScale.setSelection(selection);
+                mediumToHighScale.setMinimum(selection);
+                mediumToHighScale.setSelection(selection);
+                highToVeryhighScale.setMinimum(selection);
+                highToVeryhighScale.setSelection(selection);
+                lowToMediumLabel2.setMinimum(selection);
+            }
+        });
+        lowToMediumLabel.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent evt) {
+                int selection = lowToMediumLabel.getSelection();
+              
+                lowToMediumLabel2.setMinimum(selection);
+                verylowToLowScale.setSelection(selection);
+                verylowToLowLabel2.setSelection(selection);
+                
+                if (lowToMediumLabel2.getSelection() >= mediumToHighLabel.getSelection()) {
+                    mediumToHighLabel.setSelection(selection);
+                }
+            }
+        });
+        lowToMediumLabel2.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent evt) {
+                int selection = lowToMediumLabel2.getSelection();
+              
+                lowToMediumScale.setSelection(selection);
+                mediumToHighLabel.setSelection(selection);
+
+                mediumToHighScale.setMinimum(selection);
+                mediumToHighScale.setSelection(selection);
+                highToVeryhighScale.setMinimum(selection);
+                highToVeryhighScale.setSelection(selection);
+                mediumToHighLabel2.setMinimum(selection);
+            }
+        });
+        addMoreSpinnerListeners();
+    }
+
+    /**
+     * Create more listeners for the needed Spinners.
+     */
+    private void addMoreSpinnerListeners() {
+        mediumToHighLabel.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent evt) {
+                int selection = mediumToHighLabel.getSelection();
+              
+                mediumToHighLabel2.setMinimum(selection);
+                lowToMediumLabel2.setSelection(selection);
+                lowToMediumScale.setSelection(selection);
+                
+                if (mediumToHighLabel2.getSelection() >= highToVeryhighLabel.getSelection()) {
+                    highToVeryhighLabel.setSelection(selection);
+                }
+            }
+        });
+        mediumToHighLabel2.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent evt) {
+                int selection = mediumToHighLabel2.getSelection();
+              
+                mediumToHighScale.setSelection(selection);
+                highToVeryhighLabel.setSelection(selection);
+
+                highToVeryhighScale.setMinimum(selection);
+                highToVeryhighScale.setSelection(selection);
+                highToVeryhighLabel2.setMinimum(selection);
+            }
+        });
+        highToVeryhighLabel.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent evt) {
+                int selection = highToVeryhighLabel.getSelection();
+              
+                highToVeryhighLabel2.setMinimum(selection);
+                mediumToHighLabel2.setSelection(selection);
+                highToVeryhighScale.setSelection(selection);
+            }
+        });
+        
+    }
+
     /**
      * Use previously saved values for the scales.
      */
@@ -177,22 +374,26 @@ public class PipelineColoringDialog extends Dialog {
             verylowToLowScale.setMinimum(baseMin);
             verylowToLowScale.setMaximum(baseMax);
             verylowToLowScale.setSelection(veryLowToLowInteger);
+            verylowToLowLabel2.setSelection(veryLowToLowInteger);
             
             lowToMediumScale.setMinimum(baseMin);
             lowToMediumScale.setMaximum(baseMax);
             lowToMediumScale.setSelection(lowToMediumInteger);
+            lowToMediumLabel2.setSelection(lowToMediumInteger);
             
             mediumToHighScale.setMinimum(baseMin);
             mediumToHighScale.setMaximum(baseMax);
             mediumToHighScale.setSelection(mediumToHighInteger);
+            mediumToHighLabel2.setSelection(mediumToHighInteger);
             
             highToVeryhighScale.setMinimum(baseMin);
             highToVeryhighScale.setMaximum(baseMax);
             highToVeryhighScale.setSelection(highToVeryHighInteger);
+            highToVeryhighLabel2.setSelection(highToVeryHighInteger);
             
-            lowToMediumLabel.setText(veryLowToLow);
-            mediumToHighLabel.setText(lowToMedium);
-            highToVeryhighLabel.setText(mediumToHigh);
+            lowToMediumLabel.setSelection(Integer.valueOf(veryLowToLow));
+            mediumToHighLabel.setSelection(Integer.valueOf(lowToMedium));
+            highToVeryhighLabel.setSelection(Integer.valueOf(mediumToHigh));
         }
         
     }
@@ -208,45 +409,45 @@ public class PipelineColoringDialog extends Dialog {
             public void handleEvent(Event event) {
                 int perspectiveValue = verylowToLowScale.getSelection();
               
-                lowToMediumLabel.setText(String.valueOf(perspectiveValue));
-                lowToMediumLabel2.setText(baseMaxString);  
+                lowToMediumLabel.setSelection(perspectiveValue);
+                lowToMediumLabel2.setMaximum(baseMax);  
                 
                 lowToMediumScale.setMinimum(perspectiveValue);
                 lowToMediumScale.setMaximum(baseMax);
                 lowToMediumScale.setSelection(perspectiveValue);
                 //lowToMediumScale.setEnabled(true);
                 
-                verylowToLowLabel2.setText(String.valueOf(perspectiveValue));
+                verylowToLowLabel2.setSelection(perspectiveValue);
             }
         });
         lowToMediumScale.addListener(SWT.MouseUp, new Listener() {
             public void handleEvent(Event event) {
                 int perspectiveValue = lowToMediumScale.getSelection();
               
-                mediumToHighLabel.setText(String.valueOf(perspectiveValue));
-                mediumToHighLabel2.setText(baseMaxString);
+                mediumToHighLabel.setSelection(perspectiveValue);
+                mediumToHighLabel2.setMaximum(baseMax);
                 
                 mediumToHighScale.setMinimum(perspectiveValue);
                 mediumToHighScale.setMaximum(baseMax);
                 mediumToHighScale.setSelection(perspectiveValue);
                 //mediumToHighScale.setEnabled(true);
                
-                lowToMediumLabel2.setText(String.valueOf(perspectiveValue));
+                lowToMediumLabel2.setSelection(perspectiveValue);
             }
         });
         mediumToHighScale.addListener(SWT.MouseUp, new Listener() {
             public void handleEvent(Event event) {
                 int perspectiveValue = mediumToHighScale.getSelection();
               
-                highToVeryhighLabel.setText(String.valueOf(perspectiveValue));
-                highToVeryhighLabel2.setText(baseMaxString);
+                highToVeryhighLabel.setSelection(perspectiveValue);
+                highToVeryhighLabel2.setSelection(baseMax);
                 
                 highToVeryhighScale.setMinimum(perspectiveValue);
                 highToVeryhighScale.setMaximum(baseMax);
                 highToVeryhighScale.setSelection(perspectiveValue);
                 //highToVeryhighScale.setEnabled(true);
                 
-                mediumToHighLabel2.setText(String.valueOf(perspectiveValue));
+                mediumToHighLabel2.setSelection(perspectiveValue);
             }
         });
     }
