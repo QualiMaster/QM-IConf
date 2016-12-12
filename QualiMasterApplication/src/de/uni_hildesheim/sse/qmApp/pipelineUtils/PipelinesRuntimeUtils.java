@@ -56,7 +56,6 @@ public class PipelinesRuntimeUtils {
     public static final String FILENAME = "runtimeSavedItems";
     public static final String FILENAME_EXT = ".ser";
     
-    private static String fileName = "runtimeSavedItems";
     private static final String EASY_STRING = "EASy";
     private static final String META_STRING = "meta";
     private static final String PIPELINE_IVML_FILE = "Pipelines.ivml";
