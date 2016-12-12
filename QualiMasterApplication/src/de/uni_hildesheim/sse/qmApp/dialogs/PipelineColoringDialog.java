@@ -106,7 +106,8 @@ public class PipelineColoringDialog extends Dialog {
         GridData data = new GridData();
         data.horizontalSpan = 3;
         descriptionLabel.setLayoutData(data);
-        descriptionLabel.setText("The Observable: " + QmObservables.SCALABILITY_ITEMS + " is monitored");
+        descriptionLabel.setText("The Observable: " + QmObservables.SCALABILITY_ITEMS
+                + " is monitored" + "\n" + "with the max-value of: " + baseMax);
         
         verylowToLowDescription = new Label(composite, SWT.FILL);
         data = new GridData();
@@ -129,15 +130,15 @@ public class PipelineColoringDialog extends Dialog {
                 
                 Scale src = (Scale) evt.getSource();
                 int sel = src.getSelection();
-                src.setSelection(sel - evt.count);
+                src.setSelection(sel + evt.count);
                 
                 verylowToLowLabel2.setSelection(sel);
                 lowToMediumLabel.setSelection(sel);
 
                 lowToMediumLabel2.setMinimum(sel);
                 
-                //lowToMediumScale.setMinimum(sel);
-                //lowToMediumScale.setSelection(sel);
+                lowToMediumScale.setMinimum(sel);
+                lowToMediumScale.setSelection(sel);
             }
         });
         
@@ -156,7 +157,7 @@ public class PipelineColoringDialog extends Dialog {
         lowToMediumLabel.setSelection(baseMin);
         
         lowToMediumScale = new Scale(composite, SWT.NONE);
-        lowToMediumScale.setMaximum(baseMax);
+        //lowToMediumScale.setMaximum(baseMax);
         
         createAdditionalUI(composite);
         return composite;
@@ -175,15 +176,15 @@ public class PipelineColoringDialog extends Dialog {
                 
                 Scale src = (Scale) evt.getSource();
                 int sel = src.getSelection();
-                src.setSelection(sel - evt.count);
+                src.setSelection(sel + evt.count);
 
                 
                 lowToMediumLabel2.setSelection(sel);
                 mediumToHighLabel.setSelection(sel);
                 mediumToHighLabel2.setMinimum(sel);
                 
-//                mediumToHighScale.setMinimum(sel);
-//                mediumToHighScale.setSelection(sel);
+                mediumToHighScale.setMinimum(sel);
+                mediumToHighScale.setSelection(sel);
                 
             }
         });
@@ -224,11 +225,14 @@ public class PipelineColoringDialog extends Dialog {
                 
                 Scale src = (Scale) evt.getSource();
                 int sel = src.getSelection();
-                src.setSelection(sel - evt.count);
+                src.setSelection(sel + evt.count);
                 
                 mediumToHighLabel2.setSelection(sel);
                 highToVeryhighLabel.setSelection(sel);
-                highToVeryhighLabel2.setMinimum(sel);
+                //highToVeryhighLabel2.setMinimum(sel);
+                
+                highToVeryhighScale.setMinimum(sel);
+                highToVeryhighScale.setSelection(sel);
             }
         });
         
@@ -271,22 +275,22 @@ public class PipelineColoringDialog extends Dialog {
                 verylowToLowScale.setSelection(selection);
                 lowToMediumLabel.setSelection(selection);
                 
-                lowToMediumScale.setMinimum(selection);
+                //lowToMediumScale.setMinimum(selection);
                 lowToMediumScale.setSelection(selection);
-                mediumToHighScale.setMinimum(selection);
+                //mediumToHighScale.setMinimum(selection);
                 mediumToHighScale.setSelection(selection);
-                highToVeryhighScale.setMinimum(selection);
+                //highToVeryhighScale.setMinimum(selection);
                 highToVeryhighScale.setSelection(selection);
-                lowToMediumLabel2.setMinimum(selection);
+                //lowToMediumLabel2.setMinimum(selection);
             }
         });
         lowToMediumLabel.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent evt) {
                 int selection = lowToMediumLabel.getSelection();
               
-                lowToMediumLabel2.setMinimum(selection);
+                //lowToMediumLabel2.setMinimum(selection);
                 verylowToLowScale.setSelection(selection);
-                verylowToLowLabel2.setSelection(selection);
+                //verylowToLowLabel2.setSelection(selection);
                 
                 if (lowToMediumLabel2.getSelection() >= mediumToHighLabel.getSelection()) {
                     mediumToHighLabel.setSelection(selection);
@@ -389,7 +393,7 @@ public class PipelineColoringDialog extends Dialog {
             highToVeryhighScale.setMinimum(baseMin);
             highToVeryhighScale.setMaximum(baseMax);
             highToVeryhighScale.setSelection(highToVeryHighInteger);
-            highToVeryhighLabel2.setSelection(highToVeryHighInteger);
+            highToVeryhighLabel2.setSelection(baseMax);
             
             lowToMediumLabel.setSelection(Integer.valueOf(veryLowToLow));
             mediumToHighLabel.setSelection(Integer.valueOf(lowToMedium));
