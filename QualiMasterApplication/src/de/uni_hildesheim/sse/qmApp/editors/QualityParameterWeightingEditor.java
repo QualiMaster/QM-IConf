@@ -277,7 +277,8 @@ public class QualityParameterWeightingEditor extends AbstractContainerOfCompound
         setLayoutData(gridData);
         
         setLayout(new FillLayout());
-        tableViewer = setTableViewer(new TableViewer(this, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER));
+        tableViewer = setTableViewer(new TableViewer(
+                this, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION));
         Table table = tableViewer.getTable();
         TableLayout layout = new TableLayout();
         table.setLayout(layout);
@@ -378,6 +379,11 @@ public class QualityParameterWeightingEditor extends AbstractContainerOfCompound
         }
 
         tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
+        layout.addColumnData(new ColumnWeightData(3, 300, true));
+        tableViewerColumn.getColumn().setText("parameter");
+        tableViewerColumn.getColumn().setResizable(true);
+        
+        tableViewerColumn = new TableViewerColumn(tableViewer, SWT.CENTER);
         layout.addColumnData(new ColumnWeightData(3, 100, true));
         tableViewerColumn.getColumn().setText("weight");
         tableViewerColumn.getColumn().setResizable(true);
