@@ -246,8 +246,6 @@ public class ConfigurableElement { // unsure whether this shall be a resource
                 newValue = ValueFactory.createValue(
                         type.getDeclaration().getType(), new Object[]{defaultName});
                 type.setValue(newValue, AssignmentState.ASSIGNED);
-                System.out.println("Set new Observable to generated values: " + var.toString());
-                System.out.println("Proof: " + var.getParent().toString());
                 
             } catch (ValueDoesNotMatchTypeException e) {
                 e.printStackTrace();

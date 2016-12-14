@@ -67,8 +67,18 @@ public class BaseMetaData {
      * Generates the actual time stamp and stores it in lastUpdated.
      * @return The actual time in maven time stamp format.
      */
-    public String generateTimestamp() {
+    public static String generateTimestamp() {
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        Date date = new Date();
+        return dateFormat.format(date);
+    }
+    
+    /**
+     * Generates the actual time stamp and stores it in lastUpdated.
+     * @return The actual time in maven time stamp format.
+     */
+    public static String generateTimestampWithDot() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd.HHmmss");
         Date date = new Date();
         return dateFormat.format(date);
     }

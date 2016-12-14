@@ -58,9 +58,25 @@ public class FTPSHandler extends BasicURLHandler {
         if (null != source && null != destination) {
             FTPSClient client = FTPSConnector.getInstance().getClient();
             
+          //get the actual destination for the file and traverse to it.
+            String finalDestination = source.getPath();
+            Bundle.getLogger(FTPSHandler.class).info("Upload destination is: " + source);
+            String workingDir = "";
+            String[] split = finalDestination.split("/");
+            
+            for (int i = 3; i < split.length; i++) {
+                if (!((i == split.length - 1) && split[i].contains("."))) {
+                    workingDir += "/" + split[i];
+                }
+            }
+            client.changeWorkingDirectory("/"); //reset the path.
+            traverseToDir(client, workingDir, false);
+            
+            String fileName = split[split.length - 1]; 
+            
             OutputStream output;
             output = new FileOutputStream(destination);
-            client.retrieveFile(source.toString(), output);
+            client.retrieveFile(fileName, output);
             output.close();
         }
         
@@ -168,7 +184,7 @@ public class FTPSHandler extends BasicURLHandler {
                 client.setFileType(FTPClient.BINARY_FILE_TYPE);
                 client.setConnectTimeout(5000);
                 client.storeFile(fileName, input);
-                client.sendSiteCommand(EDIT_ACCESS_COMMAND + fileName); //TODO
+                client.sendSiteCommand(EDIT_ACCESS_COMMAND + fileName);
                 replyCode = client.getReplyCode();
                 replyString = client.getReplyString();
                 
@@ -288,8 +304,9 @@ public class FTPSHandler extends BasicURLHandler {
      * Traverses the client to the target dir and creates all directories that do not already exist.
      * @param client The FTPSClient in use.
      * @param dir The target dir.
+     * @param createDirs True if non existing dirs shall be created.
      */
-    private void traverseToDir(FTPSClient client, String dir) {
+    private void traverseToDir(FTPSClient client, String dir, boolean createDirs) {
         if (null != client && null != dir) {
             String[] split = dir.split("/");
       
@@ -305,7 +322,7 @@ public class FTPSHandler extends BasicURLHandler {
                         // Ignore since there is a second chance
                     }
                     // If unsuccessful try to create the directory and then traverse to it.
-                    if (client.getReplyCode() != 250) {
+                    if (client.getReplyCode() != 250 && createDirs) {
                         try {
                             boolean folderCreated = client.makeDirectory(folder);
                             if (folderCreated) {
@@ -320,6 +337,8 @@ public class FTPSHandler extends BasicURLHandler {
                             throw createFolderCreationException(split, i, folder);
                         }
                         
+                    } else if (client.getReplyCode() != 250) {
+                        throw createTraverseToDirException(split, i, folder);
                     }
 
                 }
@@ -328,6 +347,15 @@ public class FTPSHandler extends BasicURLHandler {
             
         }
         
+    }
+    
+    /**
+     * Traverses the client to the target dir and creates all directories that do not already exist.
+     * @param client The FTPSClient in use.
+     * @param dir The target dir.
+     */
+    private void traverseToDir(FTPSClient client, String dir) {
+        traverseToDir(client, dir, true);
     }
 
     /**
@@ -347,6 +375,25 @@ public class FTPSHandler extends BasicURLHandler {
         }
         return new ManifestRuntimeException("Could not create folder \"" + folder + "\" in directory \""
             + workingDirectory + "\". Please make sure you have permission to write into this directory.");
+    }
+    
+    /**
+     * Creates a {@link ManifestRuntimeException} in case that a desired folder could not be traversed.
+     * @param split The segments of the target path
+     * @param index The index of the last segment where the ftp client could navigate to
+     * @param folder The folder which could not be traversed.
+     * @return The exception to throw.
+     */
+    private ManifestRuntimeException createTraverseToDirException(String[] split, int index, String folder) {
+        StringBuffer workingDirectory = new StringBuffer();
+        for (int j = 0; j < index; j++) {
+            if (!split[j].isEmpty()) {
+                workingDirectory.append(split[j]);
+                workingDirectory.append("/");
+            }
+        }
+        return new ManifestRuntimeException("Could not traverse folder \"" + folder + "\" in directory \""
+            + workingDirectory + "\". Insufficient permissions or folder does not exist.");
     }
     
 }

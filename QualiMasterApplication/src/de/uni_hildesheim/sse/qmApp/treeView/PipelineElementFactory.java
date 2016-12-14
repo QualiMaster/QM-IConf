@@ -383,7 +383,6 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
                             IDecisionVariable pipelineVar = getVariable(); // take data from
                             Dialogs.showInfoDialog("Ivy Publish", "Will deploy '" 
                                 + ModelAccess.getDisplayName(pipelineVar) + "' to " + deploymentUrl);
-//                                + "eu/qualimaster/PatriksTestDeployment"); //TODO: !!!!
                             createProgressDialog(DialogsUtil.getActiveShell(), pipelineVar);
                         }
                     };
@@ -530,8 +529,6 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
             overwrite = false;
         }
         
-        System.out.println("Overwrite = " + overwrite);
-        
         IDecisionVariable artifact = pipelineVar.getNestedElement("artifact");
         //example: eu.qualimaster:PriorityPip:0.0.2-SNAPSHOT
         String artifactName = artifact.getValue().getValue().toString();
@@ -562,7 +559,6 @@ public class PipelineElementFactory implements IConfigurableElementFactory {
             String jarFile = dir + File.separator + jarName + JAR_SUFFIX;
             
             final String deploymentUrl = ModelAccess.getDeploymentUrl();
-            System.out.println("##### " + jarFile);
             con.publishWithPom(jarFile, pomFile, deploymentUrl, overwrite, obs);
 
         } else {

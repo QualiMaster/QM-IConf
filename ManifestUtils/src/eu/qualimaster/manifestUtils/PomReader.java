@@ -31,6 +31,7 @@ public class PomReader {
         private String groupId = null;
         private String artifactId = null;
         private String version = null;
+        private String timestamp = null;
         
         /**
          * Returns the fullPath.
@@ -79,6 +80,22 @@ public class PomReader {
         @Override
         public String toString() {
             return this.groupId + "#" + this.artifactId + "#" + this.version;
+        }
+        
+        /**
+         * Returns the timestamp.
+         * @return The timestamp as String, can be null.
+         */
+        public String getTimestamp() {
+            return this.timestamp;
+        }
+        
+        /**
+         * Sets a new timestamp.
+         * @param timestamp The new timestamp.
+         */
+        public void setTimestamp(String timestamp) {
+            this.timestamp = timestamp;
         }
         
     }

@@ -39,6 +39,7 @@ import org.apache.ivy.util.Credentials;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import eu.qualimaster.manifestUtils.PomReader.PomInfo;
+import eu.qualimaster.manifestUtils.data.BaseMetaData;
 import eu.qualimaster.manifestUtils.data.Field;
 import eu.qualimaster.manifestUtils.data.FieldType;
 import eu.qualimaster.manifestUtils.data.Item;
@@ -906,6 +907,8 @@ public class ManifestConnection {
     public void publishWithPom(String file, String pomPath, String repository, boolean forceOverwrite, 
             ProgressObserver monitor) {
         
+        repository += "eu/qualimaster/PatriksTestDeployment/";
+        System.out.println(repository);
         logger.debug("Publishing with POM...");
         logger.debug("Path of pom: " + pomPath);       
         PomInfo info = PomReader.getInfo(new File(pomPath));     
@@ -929,72 +932,118 @@ public class ManifestConnection {
      * @param monitor The ProgressObserver to track progress.
      */
     public void publish(String file, String repository, 
-            PomInfo info, boolean forceOverwrite, ProgressObserver monitor) {
-        
+            PomInfo info, boolean forceOverwrite, ProgressObserver monitor) {   
         IBiblioResolver testRes = new IBiblioResolver();
         testRes.setName("publish_" + repository);
         testRes.setRoot(repository);     
-        
+        boolean isSnapshot = true; 
         //calculate target paths.
         String targetPath = file.substring(0, file.lastIndexOf(File.separator));
         String pomPath = targetPath.substring(0, targetPath.lastIndexOf(File.separator));
-        logger.info("Target path for pom: " + pomPath);
-        
+        String buildVersion = null;
+        logger.info("Target path for pom: " + pomPath);  
         //generate meta data for the artifact.
         MetaGenerator gen = new MetaGenerator();
         Metadata meta = new Metadata();
-        meta.setLastUpdated(meta.generateTimestamp());
+        String timestampWithDot = BaseMetaData.generateTimestampWithDot();
+        meta.setLastUpdated(timestampWithDot.replace(".", ""));
         meta.setArtifactId(info.getArtifactId());
         meta.setGroupId(info.getGroupId());
         meta.addVersion(info.getVersion());
+        info.setTimestamp(timestampWithDot);
         if (!info.getVersion().contains("SNAPSHOT")) {
             meta.setReleaseVersion(info.getVersion());
+            isSnapshot = false;
         }
         gen.writeMetaData(meta, new File(targetPath + "/" + METAFILE_NAME));
-        
         //upload all files.
         try {
-            URL dest = new URL(testRes.getRoot());
-            
+            URL dest = new URL(testRes.getRoot()); 
             String serverURL = dest.toString();
             if (!serverURL.endsWith("/")) {
                 serverURL += "/";
             }
             String preDestination = serverURL + info.getGroupPath() 
                 + info.getArtifactId() + "/";
-            String destination = preDestination + info.getVersion() + "/";
-            
+            String destination = preDestination + info.getVersion() + "/"; 
             FTPSConnector.getInstance().initialize(dest);
-            FTPSHandler urlPostHandler = new FTPSHandler();
-            
+            FTPSHandler urlPostHandler = new FTPSHandler(); 
+            String combinedVersion = info.getVersion();
+            if (isSnapshot) {
+                buildVersion = updateInternalMetadata(urlPostHandler, destination, targetPath, monitor, info);
+                combinedVersion = combinedVersion.replace("SNAPSHOT", timestampWithDot + "-" + buildVersion);
+            }
             //upload the pom
             urlPostHandler.uploadWithoutIvy(new File(pomPath + "/" + POM_NAME), 
-                new URL(destination + info.getArtifactId() + "-" + info.getVersion() 
+                new URL(destination + info.getArtifactId() + "-" + combinedVersion
                 + POM_DEST_NAME), monitor);
             //upload the jar with dependencies
             urlPostHandler.uploadWithoutIvy(new File(targetPath + "/" + info.getArtifactId() + "-" + info.getVersion() 
-                + JAR_WITH_DEPENDENCIES), new URL(destination + info.getArtifactId() + "-" + info.getVersion() 
+                + JAR_WITH_DEPENDENCIES), new URL(destination + info.getArtifactId() + "-" + combinedVersion 
                 + JAR_WITH_DEPENDENCIES), monitor);
             //upload the jar
             urlPostHandler.uploadWithoutIvy(new File(targetPath + "/" + info.getArtifactId() + "-" + info.getVersion() 
-                + JAR), new URL(destination + info.getArtifactId() + "-" + info.getVersion() 
+                + JAR), new URL(destination + info.getArtifactId() + "-" + combinedVersion 
                 + JAR), monitor);
             //upload the sources
             urlPostHandler.uploadWithoutIvy(new File(targetPath + "/" + info.getArtifactId() + "-" + info.getVersion() 
-                + SOURCES_JAR), new URL(destination + info.getArtifactId() + "-" + info.getVersion() 
+                + SOURCES_JAR), new URL(destination + info.getArtifactId() + "-" + combinedVersion 
                 + SOURCES_JAR), monitor);
             //upload the metadata
             urlPostHandler.uploadWithoutIvy(new File(targetPath + "/" + METAFILE_NAME), 
                 new URL(preDestination + METAFILE_NAME), monitor);
-
         } catch (IOException exc) {
             exc.printStackTrace();
         } catch (IllegalStateException exc) {
             exc.printStackTrace();
         } finally {
             FTPSConnector.getInstance().disconnect();
+        } 
+    }
+    
+    /**
+     * Updates the internal metadata (aka the metadata specifying which build is the latest and what files exist).
+     * @param urlPostHandler The FTPSHandler.
+     * @param destination The destination.
+     * @param targetPath The path of the target.
+     * @param monitor The ProgressObserver to track progress.
+     * @param info The corresponding pom information.
+     * @return The new build version.
+     */
+    private String updateInternalMetadata(FTPSHandler urlPostHandler, String destination, String targetPath, 
+            ProgressObserver monitor, PomInfo info) {
+        
+        String buildVersion = null;
+        MetaGenerator gen = new MetaGenerator();
+        
+        try {
+            urlPostHandler.download(new URL(destination + METAFILE_NAME), 
+                    new File(targetPath + "/" + "INTERNAL_META.xml"));
+            buildVersion = gen.updateInternalMetadata(
+                    new File(targetPath + "/" + "INTERNAL_META.xml"), info.getTimestamp());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         
+        if (null == buildVersion) {
+            buildVersion = "1";
+            gen.writeNewInternalMetadata(info.getArtifactId(), info.getGroupId(), info.getVersion(), 
+                    new File(targetPath + "/" + "INTERNAL_META.xml"), info.getTimestamp());
+        }
+        
+        //Upload the updated / new file.
+        try {
+            urlPostHandler.uploadWithoutIvy(new File(targetPath + "/" + "INTERNAL_META.xml"), 
+                    new URL(destination + METAFILE_NAME), 
+                    monitor);
+        } catch (MalformedURLException e1) {
+            e1.printStackTrace();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        return buildVersion;
     }
     
     

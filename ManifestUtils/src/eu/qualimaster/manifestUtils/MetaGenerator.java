@@ -158,7 +158,7 @@ public class MetaGenerator {
      */
     public String updateInternalMetadata(File file, String timestamp) {
         
-        String version = "";
+        String version = null;
         String snapshotVersion = "";
             
         if (file != null && file.length() > 0) {
@@ -180,13 +180,13 @@ public class MetaGenerator {
                     
                     stampNode.setTextContent(timestamp);
                     snapshotVersion = versionNode.getTextContent();
-                    snapshotVersion = snapshotVersion.substring(0, snapshotVersion.indexOf("-") - 1);
+                    snapshotVersion = snapshotVersion.substring(0, snapshotVersion.indexOf("-"));
 
                     try {
                         int versionNumber = Integer.valueOf(buildNode.getTextContent());
-                        version = "" + versionNumber++;
+                        version = "" + (versionNumber + 1);
                     } catch (NumberFormatException exc) {
-                            //TODO what now?
+                        exc.printStackTrace();
                     }
                     buildNode.setTextContent(version);
                     lastUpdatedNode.setTextContent(timestamp.replace(".", ""));
@@ -223,6 +223,105 @@ public class MetaGenerator {
             logger.info("Unable to parse manifest!");      
         }   
         return version;      
+    }
+    
+    /**
+     * Writes a complete and new metadata file.
+     * @param artifactId the ID of the artifact.
+     * @param groupId the ID of the group.
+     * @param version The version.
+     * @param target The file to write to.
+     * @param timestamp The most recent time stamp.
+     */
+    public void writeNewInternalMetadata(String artifactId, String groupId, 
+            String version, File target, String timestamp) {
+        
+        String timestampNoDot = timestamp.replace(".", "");
+        Document doc = builder.newDocument();   
+        Element root = doc.createElement("metadata");
+        root.setAttribute("modelVersion", "1.1.0");
+        doc.appendChild(root);
+        //create necessary elements
+        Element groupIdNode = doc.createElement("groupId");
+        groupIdNode.setTextContent(groupId);
+        Element artifactIdNode = doc.createElement("artifactId");
+        artifactIdNode.setTextContent(artifactId);
+        Element versionNode = doc.createElement("version");
+        versionNode.setTextContent(version);
+        Element versioning = doc.createElement("versioning"); //empty
+        Element snapshot = doc.createElement("snapshot"); //empty
+        Element timestampElement = doc.createElement("timestamp");
+        timestampElement.setTextContent(timestamp);
+        Element buildNumber = doc.createElement("buildNumber");
+        buildNumber.setTextContent("1");
+        Element lastUpdated = doc.createElement("lastUpdated");
+        lastUpdated.setTextContent(timestampNoDot);
+        Element snapshotVersions = doc.createElement("snapshotVersions"); //empty
+        root.appendChild(groupIdNode);
+        root.appendChild(artifactIdNode);
+        root.appendChild(versionNode);
+        root.appendChild(versioning);    
+        versioning.appendChild(snapshot);
+        snapshot.appendChild(timestampElement);
+        snapshot.appendChild(buildNumber);
+        versioning.appendChild(lastUpdated);
+        versioning.appendChild(snapshotVersions);   
+        String jarDep = "jar-with-dependenices";
+        String source = "sources";
+        String snapshotVer = "";
+        snapshotVer = versionNode.getTextContent();
+        snapshotVer = snapshotVer.substring(0, snapshotVer.indexOf("-"));
+        
+        for (int i = 0; i < 4; i++) {
+ 
+            Element snapshotVersion = doc.createElement("snapshotVersion"); //empty  
+            snapshotVersions.appendChild(snapshotVersion);
+            String ext = "jar";
+            String classif = null; 
+            if (i == 1) {
+                ext = "pom";
+            }
+            if (i == 2) {
+                classif = source;
+            } else if (i == 3) {
+                classif = jarDep;
+            }     
+            if (null != classif) {
+                Element classifier = doc.createElement("classifier");
+                classifier.setTextContent(classif);
+                snapshotVersion.appendChild(classifier);
+            }
+            Element extension = doc.createElement("extension");
+            snapshotVersion.appendChild(extension);
+            extension.setTextContent(ext);
+            Element value = doc.createElement("value");
+            snapshotVersion.appendChild(value);
+            value.setTextContent(snapshotVer + "-" + timestamp + "-" + "1");
+            Element updated = doc.createElement("updated");
+            snapshotVersion.appendChild(updated);
+            updated.setTextContent(timestampNoDot); 
+        }
+
+        writeToFile(target, doc);
+    }
+    
+    /**
+     * Writes an XML document to a file.
+     * @param target The file.
+     * @param doc The document.
+     */
+    private void writeToFile(File target, Document doc) {
+        //create the actual XML
+        DOMSource sourceDom = new DOMSource(doc);
+        StreamResult result = new StreamResult(target);    
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+        
+        try {
+            transformer.transform(sourceDom, result);
+        } catch (TransformerException e) {
+            e.printStackTrace();
+        }    
     }
     
     /**

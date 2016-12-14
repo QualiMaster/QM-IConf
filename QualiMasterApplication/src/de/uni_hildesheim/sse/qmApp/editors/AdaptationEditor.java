@@ -133,6 +133,7 @@ public class AdaptationEditor extends ProjectEditor {
         }
     }
     
+    
     /**
      * Adds a weight to the adaption part.
      * @param sequence The sequence to add to.
@@ -261,6 +262,9 @@ public class AdaptationEditor extends ProjectEditor {
                             SLOT_QPARAMWEIGHTING_PARAMETER, refValue, //refValue,
                             SLOT_QPARAMWEIGHTING_WEIGHT, 1});
                         found.setValue(newValue, AssignmentState.ASSIGNED);
+                        Configuration config = variable.getConfiguration();
+                        AbstractVariable test = ModelQuery.findVariable(container.getConfiguration().getProject(), 
+                                VAR_ADAPTIVITY_PIPELINEIMPORTANCE, null);
 //                        variable.getConfiguration().notifyReplaced(
 //                                variable.getConfiguration().getProject(), found.getConfiguration().getProject());
 //                        for (int k = 0; k < this.getEditorCount(); k++) {

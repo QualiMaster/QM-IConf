@@ -165,7 +165,7 @@ public abstract class AbstractVarModelEditor extends EditorPart implements IChan
             ((Table) control).addSelectionListener(dirtyListener);
         }
         if (control instanceof IDirtyableEditor) {
-            ((IDirtyableEditor) control).addDirtyListener(dirtyListener);
+            ((IDirtyableEditor) control).addDirtyListener(dirtyListener); //here
         }
         EditorUtils.assignHelpText(var, control);
         return control;

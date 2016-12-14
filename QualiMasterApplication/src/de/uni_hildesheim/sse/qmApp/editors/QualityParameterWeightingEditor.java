@@ -29,6 +29,7 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -57,9 +58,6 @@ import net.ssehub.easy.varModel.model.values.ContainerValue;
 import net.ssehub.easy.varModel.model.values.Value;
 import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
 import net.ssehub.easy.varModel.model.values.ValueFactory;
-import net.ssehub.easy.varModel.model.datatypes.IntegerType;
-import net.ssehub.easy.varModel.model.datatypes.RealType;
-import net.ssehub.easy.varModel.model.datatypes.StringType;
 import qualimasterapplication.Activator;
 
 /**
@@ -272,11 +270,12 @@ public class QualityParameterWeightingEditor extends AbstractContainerOfCompound
         super(config, variable, parent, SWT.NULL);
         GridLayout gLayout = new GridLayout();
         GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-        gridData.heightHint = 80;
+        gridData.heightHint = 121;
         setLayout(gLayout);
         setLayoutData(gridData);
         
         setLayout(new FillLayout());
+//        ScrolledComposite scroll = new ScrolledComposite(this, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
         tableViewer = setTableViewer(new TableViewer(
                 this, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION));
         Table table = tableViewer.getTable();
@@ -294,7 +293,7 @@ public class QualityParameterWeightingEditor extends AbstractContainerOfCompound
                 createRows(container, table, compound);
             }
         }
-
+        
         // Set providers
         tableViewer.setLabelProvider(new QualityParameterWeightingLabelProvider());
         tableViewer.setContentProvider(new QualityParameterWeightingContentProvider());
