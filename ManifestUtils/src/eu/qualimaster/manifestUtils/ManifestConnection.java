@@ -907,8 +907,6 @@ public class ManifestConnection {
     public void publishWithPom(String file, String pomPath, String repository, boolean forceOverwrite, 
             ProgressObserver monitor) {
         
-        repository += "eu/qualimaster/PatriksTestDeployment/";
-        System.out.println(repository);
         logger.debug("Publishing with POM...");
         logger.debug("Path of pom: " + pomPath);       
         PomInfo info = PomReader.getInfo(new File(pomPath));     
