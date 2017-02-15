@@ -136,7 +136,9 @@ public class StatusHighlighter {
         }
         
         //Go through all saved information
-        for (PipelineDataflowInformationWrapper existingWrapper : pipelineDataflowList) {
+        int pdlSize = pipelineDataflowList.size(); // potential add in loop
+        for (int p = 0; p < pdlSize; p++) {
+            PipelineDataflowInformationWrapper existingWrapper = pipelineDataflowList.get(p);
             
             // if combination of pipeline and variable is found, change indicator of existing wrapper!
             if (existingWrapper.pipelineName.equals(wrapper.pipelineName)

@@ -25,13 +25,9 @@ import static eu.qualimaster.easy.extension.QmConstants.TYPE_ADAPTIVITY_QPARAMWE
 import static eu.qualimaster.easy.extension.QmConstants.VAR_ADAPTIVITY_CROSSPIPELINETRADEOFFS;
 import static eu.qualimaster.easy.extension.QmConstants.VAR_ADAPTIVITY_PIPELINEIMPORTANCE;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.uni_hildesheim.sse.qmApp.model.ConnectorUtils;
-import de.uni_hildesheim.sse.qmApp.model.ModelAccess;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import de.uni_hildesheim.sse.qmApp.treeView.ChangeManager.EventKind;
 import eu.qualimaster.easy.extension.internal.VariableHelper;
@@ -65,7 +61,6 @@ import qualimasterapplication.Activator;
 public class AdaptationEditor extends ProjectEditor {
 
     private IConfigurationElement link;
-    private Map<IDecisionVariable, IDecisionVariable> observerMap = new HashMap<IDecisionVariable, IDecisionVariable>();
     
     @Override
     public void doSave(IProgressMonitor monitor) {
