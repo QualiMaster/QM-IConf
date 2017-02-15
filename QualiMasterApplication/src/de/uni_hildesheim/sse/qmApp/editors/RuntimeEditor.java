@@ -696,7 +696,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
      *            Composite which holds buttons we´ll listen to.
      */
     private void createOptionsPanel(Composite innerLeftTop, Composite innerLeftBottomRight) {
-        GridLayout gridLayout = new GridLayout(5, true);
+        GridLayout gridLayout = new GridLayout(6, false);
         gridLayout.horizontalSpacing = 10;
         innerLeftTop.setLayout(gridLayout);
 
@@ -763,11 +763,12 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
      */
     private void createObservableTable(Composite innerLeftTop, Composite innerLeftBottomRight) {
         GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+        data.widthHint = 100;
         observablesTable = new Table(innerLeftTop, SWT.CHECK | SWT.BORDER);
         observablesTable.setLayoutData(data);
         TableColumn column2 = new TableColumn(observablesTable, SWT.LEFT);
         column2.setText("Observables");
-        column2.setWidth(200);
+        column2.setWidth(150);
         observablesTable.setHeaderVisible(true);
         observablesTable.clearAll();
         observablesTable.redraw();
@@ -821,7 +822,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     private void createObservableTable2(Composite innerLeftTop, Composite innerLeftBottomRight) {
         Button button4 = new Button(innerLeftTop, SWT.NONE);
         button4.setText(saveSelectionsText);
-        GridData data = new GridData(SWT.LEFT, SWT.BOTTOM, false, false);
+        GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
         button4.setLayoutData(data);
         treeViewerColorChooser = new Table(innerLeftTop, SWT.MULTI | SWT.BORDER);
         treeViewerColorChooser.setLinesVisible(false);
@@ -846,9 +847,9 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
         Menu menu = new Menu(treeViewerColorChooser.getShell(), SWT.POP_UP);
         treeViewerColorChooser.setMenu(menu);
-        Button button = new Button(innerLeftBottomRight, SWT.NONE);
+        Button button = new Button(innerLeftTop, SWT.NONE);
         button.setText("Create");
-        data = new GridData(SWT.LEFT, SWT.BOTTOM, true, false);
+        data = new GridData(SWT.LEFT, SWT.CENTER, true, false);
         button.setLayoutData(data);
         button.addSelectionListener(new SelectionListener() {
             @Override
