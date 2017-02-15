@@ -177,14 +177,14 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         private CircularBufferDataProvider dataProvider;
         private Trace trace;
         private String observable;
-        @SuppressWarnings("unused")
         private String monitoringName;
+        
         /**
          * Creates the trace.
          * 
          * @param monitoringName
          *            the label
-         * @param actulName
+         * @param actualName
          *            The traces actual name.
          * @param xAxis
          *            the x-axis to display on
@@ -193,19 +193,19 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
          * @param observable
          *            the observable to draw
          */
-        private PipelineTrace(String monitoringName, String actulName, Axis xAxis, Axis yAxis, String observable) {
+        private PipelineTrace(String monitoringName, String actualName, Axis xAxis, Axis yAxis, String observable) {
             this.observable = observable;
             // create a trace data provider, which will provide the data to the trace.
             dataProvider = new CircularBufferDataProvider(true);
             dataProvider.setBufferSize(PIPELINE_DISPLAY_BUFFER_SIZE);
             dataProvider.setUpdateDelay(PIPELINE_DISPLAY_DELAY);
 
-            // create the latency trace
             this.monitoringName = monitoringName;
-            trace = new Trace(actulName, xAxis, yAxis, dataProvider);
+            trace = new Trace(actualName, xAxis, yAxis, dataProvider);
             trace.setLineWidth(4);
             trace.setDataProvider(dataProvider);
         }
+        
         /**
          * Set the color of this trace.
          * 
@@ -215,6 +215,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         private void setColor(Color color) {
             trace.setTraceColor(color);
         }
+        
         /**
          * Returns the trace.
          * 
@@ -223,12 +224,14 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         private Trace getTrace() {
             return trace;
         }
+        
         /**
          * Clears the trace.
          */
         private void clearTrace() {
             dataProvider.clearTrace();
         }
+        
         /**
          * Updates the trace.
          * 
@@ -246,6 +249,12 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                 });
             }
         }
+        
+        @Override
+        public String toString() {
+            return "Trace " + monitoringName + " " + observable;
+        }
+        
     }
     
     @Override
@@ -601,17 +610,16 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         String obs = wrapper.getObs();
         Color color = wrapper.getColor();
 
-        //String observalbeForTrace = observablesMap.get(obs);
-        String observalbeForTrace = Observables.getIvmlObservableName(obs);
-        if (observalbeForTrace != null) {
+        String observableForTrace = Observables.getIvmlObservableName(obs);
+        if (observableForTrace != null) {
 
             String monitoringName = "";
             String actulName = "";
             if (QmConstants.TYPE_PIPELINE.equals(variable.getDeclaration().getType().getName())) {
-                monitoringName = varName + " (" + observalbeForTrace + ")";
-                actulName = varName + " (" + observalbeForTrace + ")";
+                monitoringName = varName + " (" + observableForTrace + ")";
+                actulName = varName + " (" + observableForTrace + ")";
             } else {
-                actulName = parent + ":" + varName + " (" + observalbeForTrace + ")";
+                actulName = parent + ":" + varName + " (" + observableForTrace + ")";
                 monitoringName = parent + ":" + varName;
             }
 
@@ -620,7 +628,7 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             axis.setAutoFormat(true);
 
             PipelineTrace pTrace = new PipelineTrace(monitoringName, actulName, xyGraph.primaryXAxis, axis,
-                    observalbeForTrace);
+                    observableForTrace);
             axis.setAutoScale(true);
 
             if (!colorList.contains(color)) {
@@ -631,25 +639,33 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
                 pTrace.trace.setPointStyle(getRandomPointStyle());
             }
 
-            ArrayList<PipelineTrace> traces = pipelineTraces.get(parent);
-
-            if (traces == null) {
-                traces = new ArrayList<PipelineTrace>();
+            if ("".equals(parent)) {
+                addTrace(varName, pTrace);
+                xyGraph.addTrace(pTrace.getTrace());
+            } else {
+                addTrace(parent + ":" + varName, pTrace);
+                xyGraph.addTrace(pTrace.getTrace());
             }
+        }
+    }
 
-            if (!traces.contains(pTrace)) {
-
-                if ("".equals(parent)) {
-                    traces.add(pTrace);
-                    pipelineTraces.put(varName, traces);
-                    xyGraph.addTrace(pTrace.getTrace());
-                } else {
-                    traces.add(pTrace);
-                    pipelineTraces.put(parent + ":" + varName, traces);
-                    xyGraph.addTrace(pTrace.getTrace());
-                }
-
-            }
+    /**
+     * Adds a trace.
+     * 
+     * @param name the name of the pipeline element
+     * @param trace the trace
+     */
+    private void addTrace(String name, PipelineTrace trace) {
+        ArrayList<PipelineTrace> traces = pipelineTraces.get(name);
+        boolean add = true;
+        if (traces == null) {
+            traces = new ArrayList<PipelineTrace>();
+            pipelineTraces.put(name, traces);
+        } else {
+            add = !traces.contains(trace);
+        }
+        if (add) {
+            traces.add(trace);
         }
     }
 
@@ -881,19 +897,22 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
      * Clears the table viewer color chooser.
      */
     private void clearTableViewerColorChooser() {
+        treeViewerColorChooser.deselectAll();
         for (int i = treeViewerColorChooser.getItemCount() - 1; i >= 0; i--) {
             TableItem item = treeViewerColorChooser.getItem(i);
             dispose(item, "ColorButton");
             dispose(item, "ColorLabel");
             treeViewerColorChooser.remove(i);
+            item.dispose();
         }
-        treeViewerColorChooser.clearAll();
+        treeViewerColorChooser.removeAll();
+        treeViewerColorChooser.setItemCount(0);
         treeViewerColorChooser.update();
         treeViewerColorChooser.redraw();
     }
-
+    
     /**
-     * Disposes a given table item/ke.
+     * Disposes a given table item/key.
      * 
      * @param item the item
      * @param key the key
@@ -902,7 +921,8 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         Object data = item.getData(key);
         if (data instanceof TableEditor) {
             TableEditor editor = (TableEditor) data;
-            editor.getEditor().dispose();
+            Control ctrl = editor.getEditor();
+            ctrl.dispose();
             editor.dispose();
         }
         item.setData(key, null);
@@ -1115,64 +1135,57 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     private void performSelection(String pipParent, String name, String observableName, Color givenColor) {
         // get parent pipeline checkbox
         String caption = "";
-        TableItem treeItem0 = new TableItem(treeViewerColorChooser, 0);
+        TableItem item = new TableItem(treeViewerColorChooser, 0);
         if (pipParent != null && !"".equals(pipParent) && !" ".equals(pipParent)) {
             caption = pipParent + ": " + name + ": " + observableName;
-            treeItem0.setText(caption);
+            item.setText(caption);
         } else {
             caption = name + ": " + observableName;
-            treeItem0.setText(caption);
+            item.setText(caption);
         }
 
         final String finalString = caption;
 
-        TableItem[] items = treeViewerColorChooser.getItems();
+        TableEditor editor = new TableEditor(treeViewerColorChooser);
+        Button button = new Button(treeViewerColorChooser, SWT.NONE);
+        button.setText("Color");
+        button.pack();
 
-        for (int i = 0; i < items.length; i++) {
-            TableEditor editor = new TableEditor(treeViewerColorChooser);
-            TableItem item = items[i];
+        editor.minimumWidth = button.getSize().x;
+        editor.horizontalAlignment = SWT.LEFT;
+        editor.setEditor(button, item, 1);
 
-            editor = new TableEditor(treeViewerColorChooser);
-            Button button = new Button(treeViewerColorChooser, SWT.NONE);
-            button.setText("Color");
-            button.pack();
+        if (item.getData("ColorButton") == null) {
+            item.setData("ColorButton", editor);
+        }
+        editor = new TableEditor(treeViewerColorChooser);
+        final Label label = new Label(treeViewerColorChooser, SWT.BORDER);
+        label.setText("                  ");
+        label.pack();
 
-            editor.minimumWidth = button.getSize().x;
-            editor.horizontalAlignment = SWT.LEFT;
-            editor.setEditor(button, items[i], 1);
+        editor.minimumWidth = label.getSize().x;
+        editor.horizontalAlignment = SWT.LEFT;
 
-            if (item.getData("ColorButton") == null) {
-                item.setData("ColorButton", editor);
+        if (givenColor != null) {
+            label.setBackground(givenColor);
+        } else {
+            label.setBackground(new Color(treeViewerColorChooser.getShell().getDisplay(), new RGB(124, 252, 0)));
+        }
+
+        GridData data = new GridData();
+        data.grabExcessHorizontalSpace = true;
+
+        final Color color = givenColor;
+        label.setLayoutData(SWT.FILL);
+
+        button.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                adjustChosenColor(label, color, finalString);
             }
-            editor = new TableEditor(treeViewerColorChooser);
-            final Label label = new Label(treeViewerColorChooser, SWT.BORDER);
-            label.setText("                  ");
-            label.pack();
-
-            editor.minimumWidth = label.getSize().x;
-            editor.horizontalAlignment = SWT.LEFT;
-
-            if (givenColor != null) {
-                label.setBackground(givenColor);
-            } else {
-                label.setBackground(new Color(treeViewerColorChooser.getShell().getDisplay(), new RGB(124, 252, 0)));
-            }
-
-            GridData data = new GridData();
-            data.grabExcessHorizontalSpace = true;
-
-            final Color color = givenColor;
-            label.setLayoutData(SWT.FILL);
-
-            button.addSelectionListener(new SelectionAdapter() {
-                public void widgetSelected(SelectionEvent event) {
-                    adjustChosenColor(label, color, finalString);
-                }
-            });
-            editor.setEditor(label, items[i], 2);
-            if (item.getData("ColorLabel") == null) {
-                item.setData("ColorLabel", editor);
-            }
+        });
+        editor.setEditor(label, item, 2);
+        if (item.getData("ColorLabel") == null) {
+            item.setData("ColorLabel", editor);
         }
     }
 
@@ -1657,15 +1670,11 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         } else {
             ArrayList<PipelineTrace> traces = pipelineTraces.get(part);
             if (null != traces) {
-
                 for (int i = 0; i < traces.size(); i++) {
                     PipelineTrace trace = traces.get(i);
-
                     trace.update(observations);
                 }
-
             }
-
         }
     }
 
