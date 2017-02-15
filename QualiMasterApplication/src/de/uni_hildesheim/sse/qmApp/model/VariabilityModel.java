@@ -602,7 +602,7 @@ public class VariabilityModel {
         QualiMasterDisplayNameProvider.INSTANCE.registerModelPartDisplayName(Configuration.ADAPTIVITY, 
             "Adaptation");
         ConfigurableElement elt = elements.variableToConfigurableElements(Configuration.ADAPTIVITY, 
-                "de.uni_hildesheim.sse.qmApp.AdaptationEditor");
+                "de.uni_hildesheim.sse.qmApp.AdaptationEditor", null, true);
         elt.setImage(IconManager.retrieveImage(IconManager.ADAPTATION));
         ConfigurableElement stratTactics = new ConfigurableElement(elt, "Strategies/Tactics", 
             "de.uni_hildesheim.sse.qmApp.StrategiesTacticsEditor", new VarModelEditorInputCreator(

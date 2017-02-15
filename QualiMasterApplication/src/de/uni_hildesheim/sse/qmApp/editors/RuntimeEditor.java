@@ -151,13 +151,14 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     private static HashMap<String, String> observablesMap = new HashMap<String, String>();
     private static Table observablesTable;
 
+    private static final boolean LOAD_DATA = false;
     private static final int PIPELINE_DISPLAY_BUFFER_SIZE = 50;
     private static final int PIPELINE_DISPLAY_DELAY = 100;
     private static Collection<Value> observalbeSet = new ArrayList<Value>();
     private String executionTimeString = "execution time (s)";
     private String pipelineActivityString = "pipeline activity (";
     private String observablesString = "observables (";
-    private String saveSelectionsText = "Save Selections";
+    private String saveSelectionsText = ">>";
 
     @SuppressWarnings("unused")
     private int insertMark = 0;
@@ -426,22 +427,26 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
         // Create the controls which will be needed for displaying graphs.
         createMonitoringPanel(innerRight);
-
         addTabFolder(innerLeftTop, topButtons, parent);
-
         determineQMObervable();
 
-        if (PipelinesRuntimeUtils.storedDataExist()) {
-            
-            boolean answer = MessageDialog.openQuestion(this.getSite().getShell(), "Restore previous selections",
-                    "Do you want to load the selections from the last session?");
-            
-            if (answer) {
-                loadItemsLocally();
-
+        if (LOAD_DATA) {
+            if (PipelinesRuntimeUtils.storedDataExist()) {
+                
+                boolean answer = MessageDialog.openQuestion(this.getSite().getShell(), "Restore previous selections",
+                        "Do you want to load the selections from the last session?");
+                
+                if (answer) {
+                    loadItemsLocally();
+    
+                } else {
+                    clearLocallySavedItems();
+                }
             } else {
                 clearLocallySavedItems();
             }
+        } else {
+            clearLocallySavedItems();
         }
     }
 

@@ -87,9 +87,25 @@ public class ConfigurableElements {
      */
     public ConfigurableElement variableToConfigurableElements(IModelPart modelPart, String modelEditorId, 
         IElementReferrer referrer) {
+        return variableToConfigurableElements(modelPart, modelEditorId, referrer, false);
+    }
+    
+    /**
+     * Turns a <code>modelPart</code> into a sub-hierarchy of configurable elements.
+     * The display name is taken form {@link QualiMasterDisplayNameProvider}.
+     * 
+     * @param modelPart the model part to iterate over
+     * @param modelEditorId the editor id for the entire model
+     * @param referrer an instance which leads to a subgrouping according to <code>modelPart</code>, but contained
+     *   elements based on the elements returned by the referrer
+     * @param skipAll skips all contained elements
+     * @return the parent element created for <code>modelName</code>
+     */
+    public ConfigurableElement variableToConfigurableElements(IModelPart modelPart, String modelEditorId, 
+        IElementReferrer referrer, boolean skipAll) {
         ConfigurableElement element = null;
 
-        boolean readable = VariabilityModel.isReadable(modelPart); 
+        boolean readable = VariabilityModel.isReadable(modelPart) && !skipAll; 
         IModelPart headPart = modelPart;
         if (null != referrer) {
             headPart = referrer.getSubModelPart();
