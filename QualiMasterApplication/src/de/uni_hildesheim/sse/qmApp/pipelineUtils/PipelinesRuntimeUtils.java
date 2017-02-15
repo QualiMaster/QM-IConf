@@ -4,40 +4,30 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+//import java.util.Collection;
+//import java.util.HashMap;
+//import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+//import java.util.Map;
+//import java.util.Set;
 
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
 import de.uni_hildesheim.sse.qmApp.WorkspaceUtils;
-import de.uni_hildesheim.sse.qmApp.editors.RuntimeEditor;
+//import de.uni_hildesheim.sse.qmApp.editors.RuntimeEditor;
 import eu.qualimaster.easy.extension.QmConstants;
 import eu.qualimaster.easy.extension.internal.PipelineContentsContainer;
 import eu.qualimaster.easy.extension.internal.PipelineVisitor;
 import eu.qualimaster.easy.extension.internal.Utils;
-import net.ssehub.easy.dslCore.TranslationResult;
+//import net.ssehub.easy.dslCore.TranslationResult;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
-import net.ssehub.easy.varModel.confModel.SequenceVariable;
-import net.ssehub.easy.varModel.confModel.SetVariable;
-import net.ssehub.easy.varModel.model.AbstractVariable;
-import net.ssehub.easy.varModel.model.AttributeAssignment;
-import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
-import net.ssehub.easy.varModel.model.Project;
-import net.ssehub.easy.varModel.model.datatypes.Compound;
+//import net.ssehub.easy.varModel.model.Project;
+//import net.ssehub.easy.varModel.model.datatypes.Compound;
+//import net.ssehub.easy.varModel.model.values.CompoundValue;
 import net.ssehub.easy.varModel.model.values.ContainerValue;
 import net.ssehub.easy.varModel.model.values.ReferenceValue;
 import net.ssehub.easy.varModel.model.values.Value;
@@ -56,29 +46,27 @@ public class PipelinesRuntimeUtils {
     public static final String FILENAME = "runtimeSavedItems";
     public static final String FILENAME_EXT = ".ser";
     
-    private static final String EASY_STRING = "EASy";
-    private static final String META_STRING = "meta";
-    private static final String PIPELINE_IVML_FILE = "Pipelines.ivml";
+    //private static final String EASY_STRING = "EASy";
+    //private static final String META_STRING = "meta";
+    //private static final String PIPELINE_IVML_FILE = "Pipelines.ivml";
     
-    private RuntimeEditorContentProvider contentProvider = new RuntimeEditorContentProvider();
-    private RuntimeEditorLabelProvider labelProvider = new RuntimeEditorLabelProvider();
+    //private RuntimeEditorContentProvider contentProvider = new RuntimeEditorContentProvider();
+    //private RuntimeEditorLabelProvider labelProvider = new RuntimeEditorLabelProvider();
     
-    private HashMap<String, CustomObservableList> observalesPipMapping
-            = new HashMap<String, CustomObservableList>();
+    //private HashMap<String, CustomObservableList> observalesPipMapping
+    //        = new HashMap<String, CustomObservableList>();
 
     private ArrayList<String> pipelines = new ArrayList<String>();
     private List<PipelineGraphColoringWrapper> pipelinesToDisplayInTable
             = new ArrayList<PipelineGraphColoringWrapper>();
-    private  ArrayList<String> backupObservableItem = new ArrayList<String>();
+    //private  ArrayList<String> backupObservableItem = new ArrayList<String>();
    
-    private CustomObservableList observablePipelines = new CustomObservableList();
-    private CustomObservableList observablePipelineNodes = new CustomObservableList();
+    /*private CustomObservableList observablePipelineNodes = new CustomObservableList();
     private CustomObservableList observableFamily = new CustomObservableList();
     private CustomObservableList observableDatamanagement = new CustomObservableList();
     private CustomObservableList observableSink = new CustomObservableList();
-    private CustomObservableList observableSource = new CustomObservableList();
-    
-    
+    private CustomObservableList observableSource = new CustomObservableList();*/
+
     /**
      * // Exists only to avoid instantiation.
      */
@@ -89,22 +77,22 @@ public class PipelinesRuntimeUtils {
      * Get the contentprovider.
      * @return contentProvider the contentprovider.
      */
-    public RuntimeEditorContentProvider getContentProvider() {
+    /*public RuntimeEditorContentProvider getContentProvider() {
         return contentProvider;
-    }
+    }*/
     /**
      * Get the Labelprovider.
      * @return labelprovidfer labelprovider.
      */
-    public RuntimeEditorLabelProvider getLabelProvider() {
+    /*public RuntimeEditorLabelProvider getLabelProvider() {
         return labelProvider;
-    }
+    }*/
     /**
      * A ArrayList with useful contains-method.
      * 
      * @author Niko Nowatzki
      */
-    public class CustomObservableList extends ArrayList<String> {
+    public static class CustomObservableList extends ArrayList<String> {
 
         private static final long serialVersionUID = -543700414925717790L;
 
@@ -122,204 +110,6 @@ public class PipelinesRuntimeUtils {
     }
     
     /**
-     * Wrapper which wraps up info about a pipelines element, its type, variable,
-     * declaration, color and observable which should be drawn.
-     * 
-     * @author Niko Nowatzki
-     */
-    public static class PipelineGraphColoringWrapper implements Serializable {
-        
-        private static final long serialVersionUID = 998164785967639136L;
-        private String elemName;
-        private PipelineNodeType type;
-        private IDecisionVariable var;
-        private Color color;
-        private String obs;
-        private AbstractVariable decl;
-        private List<PipelineGraphColoringWrapper> descendants = new ArrayList<PipelineGraphColoringWrapper>();
-        private String pipelineParent;
-
-        /**
-         * Create a new Wrapper which wraps up info about wanted coloring.
-         * @param elemName The user configured name of the pipeline element
-         * @param type the elements type.
-         * @param pipelineParent the elements parent. In the tree this is the Pipeline.
-         * @param var the elements variable.
-         * @param decl the elements declaration.
-         */
-        public PipelineGraphColoringWrapper(String elemName, PipelineNodeType type,
-                String pipelineParent, IDecisionVariable var, AbstractVariable decl) {
-            this.elemName = elemName;
-            this.type = type;
-            this.pipelineParent = pipelineParent;
-            this.var = var;
-            this.decl = decl;
-        }
-        
-        /**
-         * Create a new Wrapper which wraps up info about wanted coloring.
-         * @param var the pipeline elements variable.
-         * @param type the elements type.
-         * @param pipelineParent the elements parent. In the tree this is the Pipeline.
-         */
-        public PipelineGraphColoringWrapper(IDecisionVariable var, PipelineNodeType type, String pipelineParent) {
-            this(var.getNestedElement(QmConstants.SLOT_NAME).getValue().getValue().toString(), type, pipelineParent,
-                var, var.getDeclaration());
-        }
-        /**
-         * Create a new Wrapper which wraps up info about watned coloring.
-         * @param elemName the elements name.
-         * @param type the elements type.
-         * @param pipelineParent the elements parent. In the tree this is the Pipeline.
-         * @param var the elements variable.
-         */
-        public PipelineGraphColoringWrapper(String elemName, PipelineNodeType type,
-                String pipelineParent, IDecisionVariable var) {
-            this.elemName = elemName;
-            this.type = type;
-            this.pipelineParent = pipelineParent;
-            this.var = var;
-        }
-
-        /**
-         * Set the color of a pipeline wrapper.
-         * @param color Color to set for the wrapper which stands for a pipelines.
-         */
-        public void setColor(Color color) {
-            this.color = color;
-        }
-        /**
-         * Set the observable of a pipeline wrapper.
-         * @param obs Observable to set for the wrapper which stands for a pipelines. 
-         */
-        public void setObservable(String obs) {
-            this.setObs(obs);
-        }
-        /**
-         * Set the observables for this wrapper.
-         * @param obs observable zo set.
-         */
-        private void setObs(String obs) {
-            this.obs = obs;
-        }
-        /**
-         * Set the variable of a pipeline wrapper.
-         * @param desVar Variable to set for the wrapper which stands for a pipelines. 
-         */
-        public void setVar(IDecisionVariable desVar) {
-            this.var = desVar;
-        }
-        /**
-         * Set the declaration of a pipeline wrapper.
-         * @param decl Declaration to set for the wrapper which stands for a pipelines. 
-         */
-        public void setDeclaration(DecisionVariableDeclaration decl) {
-            this.setDecl(decl);
-        }
-        /**
-         * Set the declaration fot this wrapper.
-         * @param decl declaration to set.
-         */
-        private void setDecl(DecisionVariableDeclaration decl) {
-            this.decl = decl;
-        }
-        /**
-         * Add a treeElement to this wrapper.
-         * @param newElem new element to add.
-         */
-        public void addTreeElement(PipelineGraphColoringWrapper newElem) {
-            
-            boolean contained = false;
-            for (int i = 0; i < this.descendants.size(); i++) {
-                PipelineGraphColoringWrapper wrapper = this.descendants.get(i);
-                
-                if (wrapper.getElemName().trim().equals(newElem.getElemName().trim())) {
-                    contained = true;
-                }
-            }
-            if (!contained) {
-                descendants.add(newElem);
-            }
-        }
-        /**
-         * Method which checks whether a certain element is already contained within this wrapper.
-         * @param newElem element which can be added.
-         * @return true if newElem is not contained. Therefore it can be added. False if already contained.
-         */
-        public boolean alreadyContains(PipelineGraphColoringWrapper newElem) {
-            
-            boolean contains = false;
-            for (int i = 0; i < this.descendants.size(); i++) {
-                PipelineGraphColoringWrapper in = this.descendants.get(i);
-                String inName = in.getElemName().replaceAll("\\s", "");
-                String attendName = newElem.getElemName().replaceAll("\\s", "");
-                
-                if (inName.equals(attendName)) {
-                    contains = true;
-                }
-            }
-            return contains;
-        }
-        
-        /**
-         * Get the descendants of this wrapper.
-         * @return descendants Alle children of this wrapper object.
-         */
-        public List<PipelineGraphColoringWrapper> getDecendant() {
-            return descendants;
-        }
-        /**
-         * Get the name of the wrapper.
-         * @return elemName name of the wrapper,
-         */
-        public String getElemName() {
-            return elemName;
-        }
-        /**
-         * Get the type of the wrapper.
-         * @return type the type of the wrapper.
-         */
-        public PipelineNodeType getType() {
-            return type;
-        }
-        /**
-         * Get the var of the wrapper.
-         * @return var the variable of thw wrapper.
-         */
-        public IDecisionVariable getVar() {
-            return var;
-        }
-        /**
-         * Get the pipelineParent of the wrapper.
-         * @return pipelineParent pipeline parent of the wrapper.
-         */
-        public String getPipelineParent() {
-            return pipelineParent;
-        }
-        /**
-         * Get the declaration of the wrapper.
-         * @return declaration the wrappers declaration.
-         */
-        public AbstractVariable getDecl() {
-            return decl;
-        }
-        /**
-         * Get the observables for the wrapper.
-         * @return obs the wrappers observable.
-         */
-        public String getObs() {
-            return obs;
-        }
-        /**
-         * Get the wrappers color.
-         * @return color the wrappers color.
-         */
-        public Color getColor() {
-            return color;
-        }
-        
-    }
-    /**
      * Search for a specific file within the given folder, in this case a folder with the extension
      * ".ivml".
      * 
@@ -327,7 +117,7 @@ public class PipelinesRuntimeUtils {
      */
     public void getPipelineConfiguration(final File workspaceURI) {
          
-        for (final File fileEntry : workspaceURI.listFiles()) {
+        /*for (final File fileEntry : workspaceURI.listFiles()) {
             if (fileEntry.isDirectory()) {   
                 for (final File fileEntry2 : fileEntry.listFiles()) { 
                     if (fileEntry2.getName().equals(EASY_STRING)) {
@@ -347,7 +137,7 @@ public class PipelinesRuntimeUtils {
                     }
                 }
             }
-        }
+        }*/
 
         // Find pipelines container
         Configuration config = de.uni_hildesheim.sse.qmApp.model.VariabilityModel.Configuration
@@ -422,7 +212,7 @@ public class PipelinesRuntimeUtils {
      * the pipeline-elements.type.
      * @param fileEntry fileEntry for the Pipelines.ivml.
      */
-    private void saveObservableStructures(File fileEntry) {
+    /*private void saveObservableStructures(File fileEntry) {
         TranslationResult<Project> result;
         try {
             result = de.uni_hildesheim.sse.ModelUtility.INSTANCE.parse(fileEntry);
@@ -462,13 +252,13 @@ public class PipelinesRuntimeUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     /**
      * Save observables.
      * @param project123 Project which contains the observables.
      */
-    private void saveMoreObservableStructures(Project project123) {
+    /*private void saveMoreObservableStructures(Project project123) {
 
         Compound modelElement3 = (Compound) project123.getElement(QmConstants.TYPE_SINK);
         
@@ -532,7 +322,7 @@ public class PipelinesRuntimeUtils {
         CustomObservableList newList5 = new CustomObservableList();
         newList5.addAll(observablePipelines);
         observalesPipMapping.put(PipelineNodeType.Pipeline.name(), newList5);
-    }
+    }*/
 
     /**
      * Add a pipeline to the list.
@@ -584,6 +374,18 @@ public class PipelinesRuntimeUtils {
         }
         return toReturn;
     }
+    
+    /*private void purgeTable(Table observablesTable, CustomObservableList list1, CustomObservableList list2) {
+        for (int i = observablesTable.getItemCount() - 1; i >= 0; i--) {
+            TableItem item = observablesTable.getItem(i);
+            String text = item.getText();
+            String toContain = text.toLowerCase().replaceAll("[^a-zA-Z0-9]", "");
+            if (!list1.contains(toContain) && (null == list2 || !list2.contains(toContain))) {
+                observablesTable.remove(i);
+            }
+        }
+        observablesTable.redraw();
+    }*/
 
     /**
      * Update the content of the observalbesTable corresponding the the selected pipelines.
@@ -593,7 +395,7 @@ public class PipelinesRuntimeUtils {
      * @param selectedElementName name of the selected element.
      * @param connection 
      */
-    public void setObservablesTableSelections(Table observablesTable, PipelineNodeType type, HashMap<String,
+    /*public void setObservablesTableSelections(Table observablesTable, PipelineNodeType type, HashMap<String,
             Set<String>> deliveringObservables, String selectedElementName, boolean connection) {
         
         //if (deliveringObservables != null && deliveringObservables.size() > 0) {
@@ -601,40 +403,47 @@ public class PipelinesRuntimeUtils {
         
         switch (type) {
         case Source:
-            for (TableItem item : observablesTable.getItems()) {
+            purgeTable(observablesTable, observableSource, observablePipelineNodes);*/
+            /*for (TableItem item : observablesTable.getItems()) {
                 String text = item.getText();
                 String toContain = text.toLowerCase().replaceAll("[^a-zA-Z0-9]", "");
 
                 if (!observableSource.contains(toContain) && !observablePipelineNodes.contains(toContain)) {
+System.out.println("REMOVE " + observablesTable.indexOf(item));                    
                     observablesTable.remove(observablesTable.indexOf(item));
                 }
             }
-            observablesTable.redraw();
-            break;               
+            observablesTable.redraw();*/
+/*            break;               
         case Sink:
-            for (TableItem item : observablesTable.getItems()) {
+            purgeTable(observablesTable, observableSink, observablePipelineNodes);*/
+            /*for (TableItem item : observablesTable.getItems()) {
                 String text = item.getText();
                 String toContain = text.toLowerCase().replaceAll("[^a-zA-Z0-9]", "");
                 
                 if (!observableSink.contains(toContain) && !observablePipelineNodes.contains(toContain)) {
+System.out.println("REMOVE " + observablesTable.indexOf(item));
                     observablesTable.remove(observablesTable.indexOf(item));
                 }
             }
-            observablesTable.redraw();
-            break;           
+            observablesTable.redraw();*/
+/*            break;           
         case FamilyElement:
-            for (TableItem item : observablesTable.getItems()) {
+            purgeTable(observablesTable, observableFamily, observablePipelineNodes);*/
+            /*for (TableItem item : observablesTable.getItems()) {
                 String text = item.getText();
                 String toContain = text.toLowerCase().replaceAll("[^a-zA-Z0-9]", "");
                 
                 if (!observableFamily.contains(toContain) && !observablePipelineNodes.contains(toContain)) {
+System.out.println("REMOVE " + observablesTable.indexOf(item));
                     observablesTable.remove(observablesTable.indexOf(item));
                 } 
             }
-            observablesTable.redraw();
-            break;  
+            observablesTable.redraw();*/
+/*            break;  
         case DataManagementElement:
-            for (TableItem item : observablesTable.getItems()) {
+            purgeTable(observablesTable, observableDatamanagement, observablePipelineNodes);*/
+            /*for (TableItem item : observablesTable.getItems()) {
                 String text = item.getText();
                 String toContain = text.toLowerCase().replaceAll("[^a-zA-Z0-9]", "");
                 
@@ -642,33 +451,36 @@ public class PipelinesRuntimeUtils {
                     observablesTable.remove(observablesTable.indexOf(item));
                 } 
             }
-            observablesTable.redraw();
-            break;  
+            observablesTable.redraw();*/
+/*            break;  
         case Flow:    
-        case ProcessingElement:     
+        case ProcessingElement: 
+        case SubPipeline:
         case Pipeline:
-            for (TableItem item : observablesTable.getItems()) {
+            purgeTable(observablesTable, observablePipelines, null);
+            /*for (TableItem item : observablesTable.getItems()) {
                 String text = item.getText();
                 String toContain = text.toLowerCase().replaceAll("[^a-zA-Z0-9]", "");
                 
                 if (!containsObservable(observablePipelines, toContain)) {
+System.out.println("REMOVE " + observablesTable.indexOf(item));                    
                     observablesTable.remove(observablesTable.indexOf(item));
                 }
             }
-            observablesTable.redraw();
-            break;      
+            observablesTable.redraw();*/
+/*            break;      
         default:
             break;
         }
         disableNonDeliveringObservables(observablesTable, deliveringObservables, selectedElementName, connection);
-    }
+    }*/
 
     /**
      * Remove all items from the observableTable and collect all qualityparameters again.
      * Then add these observables back to the table.
      * @param observablesTable The table which displays obserbalves- items.
      */
-    private void removeAndCollect(Table observablesTable) {
+    /*private void removeAndCollect(Table observablesTable) {
         
         observablesTable.removeAll();
         observablesTable.redraw();
@@ -684,7 +496,7 @@ public class PipelinesRuntimeUtils {
             }
         }
         observablesTable.redraw();
-    }
+    }*/
 
     /**
      * Remove the observables from the table which wont provide data.
@@ -693,7 +505,7 @@ public class PipelinesRuntimeUtils {
      * @param selectedElementName currently selected element in pipeline selection table..
      * @param connection true if a connection to the infrastructure is on/ false otherwise.
      */
-    private void disableNonDeliveringObservables(Table observablesTable,
+    /*private void disableNonDeliveringObservables(Table observablesTable,
             HashMap<String, Set<String>> deliveringObservables, String selectedElementName, boolean connection) {
         
         List<String> supportedObservables = new ArrayList<String>();
@@ -739,7 +551,7 @@ public class PipelinesRuntimeUtils {
     
             observablesTable.redraw();
         }
-    }
+    }*/
 
     /**
      * Check whether a list contains a String.
@@ -747,7 +559,7 @@ public class PipelinesRuntimeUtils {
      * @param toContain The String object to be checked.
      * @return true if observablePipelines contains toContain, false otherwise.
      */
-    private boolean containsObservable(CustomObservableList observablePipelines, String toContain) {
+    /*private boolean containsObservable(CustomObservableList observablePipelines, String toContain) {
         
         boolean toReturn = false;
         
@@ -764,100 +576,7 @@ public class PipelinesRuntimeUtils {
             
         }
         return toReturn;
-    }
-    
-    /**
-     * This class provides the content for the tree in FileTree.
-     */
-    public class RuntimeEditorContentProvider implements ITreeContentProvider {
-
-        @Override
-        public void dispose() {
-        }
-
-        @Override
-        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        }
-
-        @Override
-        public Object[] getElements(Object inputElement) {
-            Object[] result;
-            if (inputElement instanceof List) {
-                result = ((List<?>) inputElement).toArray();
-            } else {
-                result = null;
-            }
-            return result;
-        }
-
-        @Override
-        public Object[] getChildren(Object parentElement) {
-            Object[] result;
-            if (parentElement instanceof PipelineGraphColoringWrapper) {
-                PipelineGraphColoringWrapper treeElement = (PipelineGraphColoringWrapper) parentElement;
-                result = treeElement.descendants.toArray();
-            } else {
-                result = null;
-            }
-            return result;
-        }
-
-        @Override
-        public Object getParent(Object element) {
-            return null;
-        }
-
-        @Override
-        public boolean hasChildren(Object element) {
-            boolean toReturn = false;
-            if (element instanceof PipelineGraphColoringWrapper) {
-                PipelineGraphColoringWrapper treeElement = (PipelineGraphColoringWrapper) element;
-                
-                if (treeElement.descendants.size() > 0) {
-                    toReturn = true;
-                } 
-            }
-            return toReturn;
-        }
-    }
-
-    /**
-     * This class provides the labels for the file tree.
-     */
-    public class RuntimeEditorLabelProvider implements ILabelProvider {
-
-        @Override
-        public void addListener(ILabelProviderListener listener) {
-        }
-
-        @Override
-        public void dispose() {
-        }
-
-        @Override
-        public boolean isLabelProperty(Object element, String property) {
-            return false;
-        }
-
-        @Override
-        public void removeListener(ILabelProviderListener listener) {
-        }
-
-        @Override
-        public Image getImage(Object element) {
-            return null;
-        }
-
-        @Override
-        public String getText(Object element) {
-            String toReturn = "";
-            if (element instanceof PipelineGraphColoringWrapper) {
-                PipelineGraphColoringWrapper treeElem = (PipelineGraphColoringWrapper) element;
-                toReturn = treeElem.getElemName();
-            }
-            return toReturn;
-        }
-    }
+    }*/
     
     /**
      * Store selected items as metadata. They can be loaded with the next session.
@@ -906,16 +625,16 @@ public class PipelinesRuntimeUtils {
      * Get the backUp-List for the observable-Elements.
      * @return backupObservableItem backUp-List for the observable-Elements.
      */
-    public ArrayList<String> getBackupObservableItem() {
+    /*public ArrayList<String> getBackupObservableItem() {
         return backupObservableItem;
-    }
+    }*/
     /**
      * Set the backUp-List for the observable-Elements.
      * @param backupObservableItem List for observalbe items.
      */
-    public void setBackupObservableItem(ArrayList<String> backupObservableItem) {
+    /*public void setBackupObservableItem(ArrayList<String> backupObservableItem) {
         this.backupObservableItem = backupObservableItem;
-    }
+    }*/
 
     /**
      * Clear the list of pipelines.
