@@ -687,41 +687,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     }
 
     /**
-     * Determine the QM observables with given String.
-     */
-    /*private void determineQMObervable() {
-
-        ArrayList<String> allPossibleObservables = QmObservables.getAllObservables();
-        observableSet = clean(observableSet);
-        Iterator<Value> obsIterator = observableSet.iterator();
-
-        while (obsIterator.hasNext()) {
-
-            Value iterObs = (Value) obsIterator.next();
-
-            if (iterObs != null && iterObs.getValue() != null) {
-                String oldIterObsString = (String) iterObs.getValue();
-
-                for (int j = 0; j < allPossibleObservables.size(); j++) {
-
-                    String oldPossObsString = allPossibleObservables.get(j);
-
-                    String newIterObsString = oldIterObsString.replaceAll("[^a-zA-Z0-9]", "").trim().toLowerCase();
-                    String newPossObsString = oldPossObsString.replaceAll("[^a-zA-Z0-9]", "").trim().toLowerCase();
-
-                    if (newIterObsString.equals(newPossObsString)
-                            || newIterObsString.substring(0, newIterObsString.
-                        length() - 1).equals(newPossObsString) || newPossObsString.substring(0, newPossObsString.
-                                length() - 1).equals(newIterObsString)) {
-
-                        observablesMap.put(oldIterObsString, oldPossObsString);
-                    }
-                }
-            }
-        }
-    }*/
-
-    /**
      * Create the options panel in which the user can specify the pipelines, pipeline-elements, observables and colors
      * he wants to display.
      * 
@@ -807,14 +772,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
         observablesTable.clearAll();
         observablesTable.redraw();
 
-        /*net.ssehub.easy.varModel.confModel.Configuration config = Configuration.OBSERVABLES.getConfiguration();
-        Iterator<IDecisionVariable> iter = config.iterator();
-        while (iter.hasNext()) {
-            Object object = iter.next();
-            if (object instanceof SetVariable || object instanceof SequenceVariable) {
-                collectQualityParameters(object);
-            }
-        }*/
         // Add listener for user action. When the user selects pipeline-elements and/or observalbes, we have to react.
         treeViewerPipelineChooser.addCheckStateListener(new ICheckStateListener() {
             @Override
@@ -832,15 +789,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
                         PipelineNodeType type = wrapper.getType();
                         fill(type, observablesTable);
-
-                        /*if (pipParent != null && !elemName.trim().equals(pipParent.trim())) {
-                            PipelinesRuntimeUtils.INSTANCE.setObservablesTableSelections(observablesTable, type,
-                                    deliveringObservables, elemName, connection);
-                            // Check for observables and disable some
-                        } else {
-                            PipelinesRuntimeUtils.INSTANCE.setObservablesTableSelections(observablesTable, type,
-                                    deliveringObservables, pipParent + ":" + elemName, connection);
-                        }*/
                     } else {
                         topLevelItem.setChecked(false);
                     }
@@ -852,11 +800,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
                             PipelineNodeType type = wrapper.getType();
                             fill(type, observablesTable);
-
-                            /*String elementName = pipParent + ":" + elemName;
-                            PipelinesRuntimeUtils.INSTANCE.setObservablesTableSelections(observablesTable, type,
-                                    deliveringObservables, elementName, connection);
-                            */
                         } else {
                             item.setChecked(false);
                         }
@@ -903,17 +846,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
 
         Menu menu = new Menu(treeViewerColorChooser.getShell(), SWT.POP_UP);
         treeViewerColorChooser.setMenu(menu);
-        /*final MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Delete Selection");
-
-        item.addListener(SWT.Selection, new Listener() {
-            public void handleEvent(Event event) {
-                int activePipCount = pipelineTraces.values().size();
-                if (activePipCount > 0) {
-                    performDeletion();
-                }
-            }
-        });*/
         Button button = new Button(innerLeftBottomRight, SWT.NONE);
         button.setText("Create");
         data = new GridData(SWT.LEFT, SWT.BOTTOM, true, false);
@@ -943,74 +875,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             }
         });
     }
-
-    /**
-     * Remove the chosen item from the savedObservablesTable.
-     */
-    /*protected void performDeletion() {
-        // Delete a certain PipelineTrace.
-        TableItem tableItem = treeViewerColorChooser.getSelection()[0];
-        int index = treeViewerColorChooser.getSelectionIndex();*/
-
-        /*Collection<ArrayList<PipelineTrace>> allTraces = pipelineTraces.values();
-
-        for (int i = 0; i < allTraces.size(); i++) {
-            Iterator<ArrayList<PipelineTrace>> iterator = allTraces.iterator();
-
-            if (iterator.hasNext()) {
-                ArrayList<PipelineTrace> traces = (ArrayList<PipelineTrace>) iterator.next();
-
-                String name = tableItem.getText();
-                if (name.contains("(")) {
-                    name = name.substring(name.lastIndexOf(":"), name.length());
-                } else {
-                    name = name.substring(name.lastIndexOf(":"), name.length());
-                }
-                for (int j = 0; j < traces.size(); j++) {
-                    PipelineTrace trace = traces.get(j);
-
-                    String wholeName = trace.getTrace().getName().replaceAll("[^a-zA-Z0-9]", "").toLowerCase().trim();
-
-                    String obs = trace.observable.replaceAll("[^a-zA-Z0-9]", "").toLowerCase().trim();
-
-                    String item = tableItem.getText().toLowerCase();
-                    if (item.contains(":")) {
-                        item = item.substring(0, item.lastIndexOf(":"));
-                    }
-
-                    String itemToCompare = item.trim().replaceAll("[^a-zA-Z0-9]", "").toLowerCase().trim();
-                    name = name.replaceAll("[^a-zA-Z0-9]", "");
-                    name = name.trim().toLowerCase();
-
-                    if (wholeName.contains(itemToCompare)) {
-
-                        // throughputitem != throughputitems
-                        if (name.toLowerCase().equals(obs) || obs.substring(0, obs.length() - 1).equals(name)) {
-                            traces.remove(trace);
-                            pipelineTraces.remove(trace);
-                            trace.clearTrace();
-                            pipelinesToDisplayInTableWithObservable.remove(index);
-                        }
-                    }
-                }
-            }
-        }*/
-
-        /*TableEditor editor = (TableEditor) tableItem.getData("ColorButton");
-        TableEditor editor2 = (TableEditor) tableItem.getData("ColorLabel");
-        treeViewerColorChooser.remove(treeViewerColorChooser.indexOf(tableItem));
-
-        editor.getEditor().dispose();
-        editor.dispose();
-
-        editor2.getEditor().dispose();
-        editor2.dispose();
-
-        treeViewerColorChooser.update();
-        treeViewerColorChooser.redraw();
-        // Go though the labels and update the colors in the pipelineColorChooser-table.
-        updateColorLabels();
-    }*/
     
     /**
      * Clears the table viewer color chooser.
@@ -1044,28 +908,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
     }
 
     /**
-     * Update the color-labels in PipelineColorChooser.
-     */
-    /*private void updateColorLabels() {
-
-        for (int j = 0; j < pipelinesToDisplayInTableWithObservable.size(); j++) {
-
-            PipelineGraphColoringWrapper wrapper = pipelinesToDisplayInTableWithObservable.get(j);
-            Color color = wrapper.getColor();
-
-            if (j < treeViewerColorChooser.getItemCount()) {
-                TableItem item = treeViewerColorChooser.getItem(j);
-                TableEditor editor = (TableEditor) item.getData("ColorLabel");
-                Label label = (Label) editor.getEditor();
-                label.setBackground(color);
-            }
-
-        }
-        treeViewerColorChooser.update();
-        treeViewerColorChooser.redraw();
-    }*/
-
-    /**
      * Fills the observables table with the available observables per type.
      * 
      * @param type the type of the entry
@@ -1088,75 +930,6 @@ public class RuntimeEditor extends EditorPart implements IClientDispatcher, IInf
             }
         }
     }
-    
-    /**
-     * Collect the qualityParameters from the ivml-configuration, so they can be mapped upn pipeline-elements.
-     * 
-     * @param object Set which holds the observalbes.
-     */
-    /*public static void collectQualityParameters(Object object) {
-
-        
-        String name = "";
-        ConstantValue value = null;
-        if (object instanceof SetVariable) {
-            SetVariable set = (SetVariable) object;
-            name = set.getDeclaration().getName();
-
-            if (name.equals(QmConstants.VAR_OBSERVABLES_QUALITYPARAMS)) {
-                value = (ConstantValue) set.getDeclaration().getDefaultValue();
-            }
-        }
-        if (object instanceof SequenceVariable) {
-            SequenceVariable sequence = (SequenceVariable) object;
-            name = sequence.getDeclaration().getName();
-
-            if (name.equals(QmConstants.VAR_OBSERVABLES_QUALITYPARAMS)) {
-                value = (ConstantValue) sequence.getDeclaration().getDefaultValue();
-            }
-        }
-
-        if (!"".equals(name) && value != null) {
-            ContainerValue container = (ContainerValue) value.getConstantValue();
-
-            if (observableSet.size() > 0) {
-                observableSet.clear();
-            }
-            for (int i = 0; i < container.getElementSize(); i++) {
-                CompoundValue cmpValue = (CompoundValue) container.getElement(i);
-                Compound cType = (Compound) cmpValue.getType();
-
-                for (int j = 0; j < cType.getInheritedElementCount(); j++) {
-                    DecisionVariableDeclaration slotDecl = cType.getInheritedElement(j);
-                    Value nestedValue = cmpValue.getNestedValue(slotDecl.getName());
-                    observableSet.add(nestedValue);
-                }
-            }
-
-            observableSet = clean(observableSet);
-            Object[] valueArray = observableSet.toArray();
-            // sort valueArray
-            valueArray = removeNull(valueArray);
-            Arrays.sort(valueArray);
-    
-            // clear backup
-            PipelinesRuntimeUtils.INSTANCE.getBackupObservableItem().clear();
-            observablesTable.removeAll();
-    
-            for (int k = 0; k < valueArray.length; k++) {
-                Object obj = valueArray[k];
-    
-                if (obj != null && obj instanceof String) {
-                    String stringValue = (String) obj;
-    
-                    TableItem treeItem = new TableItem(observablesTable, 0);
-                    treeItem.setText(stringValue);
-    
-                    PipelinesRuntimeUtils.INSTANCE.getBackupObservableItem().add(stringValue);
-                }
-            }
-        }
-    }*/
 
     /**
      * Remove null values from an array.
