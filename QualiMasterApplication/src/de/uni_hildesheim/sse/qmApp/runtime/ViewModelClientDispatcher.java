@@ -18,7 +18,10 @@ package de.uni_hildesheim.sse.qmApp.runtime;
 import org.eclipse.swt.widgets.Display;
 
 import de.uni_hildesheim.sse.qmApp.tabbedViews.adaptation.AdaptationEventsViewModel;
+import eu.qualimaster.adaptation.external.AlgorithmChangedMessage;
+import eu.qualimaster.adaptation.external.ChangeParameterRequest;
 import eu.qualimaster.adaptation.external.InformationMessage;
+import eu.qualimaster.adaptation.external.Message;
 
 /**
  * A dispatcher for the view model, linking the view model with the runtime instance.
@@ -55,6 +58,28 @@ public class ViewModelClientDispatcher extends DispatcherAdapter {
      */
     private static String toDisplay(String string) {
         return null == string ? "-" : string;
+    }
+    
+    @Override
+    public void handleAlgorithmChangedMessage(AlgorithmChangedMessage message) {
+        toInformationMessage(message);
+    }
+
+    @Override
+    public void handleChangeParameterRequest(ChangeParameterRequest<?> message) {
+        toInformationMessage(message);
+    }
+    
+    /**
+     * Turns a message to an information message if possible.
+     * 
+     * @param message the message
+     */
+    private void toInformationMessage(Message message) {
+        Message info = message.toInformation();
+        if (info instanceof InformationMessage) {
+            handleInformationMessage((InformationMessage) info);
+        }
     }
 
     @Override
