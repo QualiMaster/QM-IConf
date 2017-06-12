@@ -194,7 +194,7 @@ public class TupleTypeEditor extends AbstractChangeableConstraintCellEditorCreat
             
             for (int i = 0, end = conValue.getElementSize(); i < end; i++) {
                 try {
-                    Value indexValue = ValueFactory.createValue(IntegerType.TYPE, i);
+                    Value indexValue = ValueFactory.createValue(IntegerType.TYPE, OclKeyWords.toIvmlIndex(i));
                     ConstantValue indexCst = new ConstantValue(indexValue);
                     ConstraintSyntaxTree cst = new OCLFeatureCall(basis, OclKeyWords.INDEX_ACCESS, indexCst);
                     cst.inferDatatype();

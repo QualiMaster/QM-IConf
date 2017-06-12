@@ -135,7 +135,7 @@ public class PermissibleParameterCellEditorCreator extends AbstractChangeableCon
                 
                 for (int i = 0, end = value.getElementSize(); i < end; i++) {
                     try {
-                        Value index = ValueFactory.createValue(IntegerType.TYPE, i);
+                        Value index = ValueFactory.createValue(IntegerType.TYPE, OclKeyWords.toIvmlIndex(i));
                         ConstantValue indexValue = new ConstantValue(index);
                         ConstraintSyntaxTree cstValue = new OCLFeatureCall(basis, OclKeyWords.INDEX_ACCESS, indexValue);
                         cstValue.inferDatatype();
