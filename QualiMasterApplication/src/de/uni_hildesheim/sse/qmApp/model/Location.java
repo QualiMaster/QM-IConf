@@ -65,7 +65,7 @@ public class Location {
      * @return  The location of the model as {@link File}
      */
     public static File getModelLocationFile() {
-        return new File(modelLocation);
+        return new File(null == modelLocation ? "" : modelLocation);
     }
     
     /**
