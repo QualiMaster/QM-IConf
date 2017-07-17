@@ -228,6 +228,14 @@ public class UiTracerFactory extends TracerFactory {
             // ignore, is anyway a reduced tracer
         }
 
+        @Override
+        public void visitFlush() {
+        }
+
+        @Override
+        public void visitedFlush() {
+        }
+
     }
     
 }
