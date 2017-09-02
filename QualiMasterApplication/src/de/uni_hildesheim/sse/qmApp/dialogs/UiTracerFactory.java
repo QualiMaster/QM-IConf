@@ -113,11 +113,11 @@ public class UiTracerFactory extends TracerFactory {
         }
 
         @Override
-        public void visitDef(Def def, RuntimeEnvironment<?> environment) {
+        public void visitDef(Def def, RuntimeEnvironment<?, ?> environment) {
         }
 
         @Override
-        public void visitedDef(Def def, RuntimeEnvironment<?> environment, Object result) {
+        public void visitedDef(Def def, RuntimeEnvironment<?, ?> environment, Object result) {
         }
 
         @Override
@@ -141,7 +141,7 @@ public class UiTracerFactory extends TracerFactory {
         }
 
         @Override
-        public void visitScript(Script script, RuntimeEnvironment<?> environment) {
+        public void visitScript(Script script, RuntimeEnvironment<?, ?> environment) {
             write("Executing script: " + script.getName());
         }
 
@@ -150,11 +150,11 @@ public class UiTracerFactory extends TracerFactory {
         }
 
         @Override
-        public void visitRule(Rule rule, RuntimeEnvironment<?> environment) {
+        public void visitRule(Rule rule, RuntimeEnvironment<?, ?> environment) {
         }
 
         @Override
-        public void visitedRule(Rule rule, RuntimeEnvironment<?> environment, Object result) {
+        public void visitedRule(Rule rule, RuntimeEnvironment<?, ?> environment, Object result) {
         }
 
         @Override
@@ -198,7 +198,7 @@ public class UiTracerFactory extends TracerFactory {
         }
 
         @Override
-        public void visitLoop(IEnumeratingLoop loop, RuntimeEnvironment<?> environment) {
+        public void visitLoop(IEnumeratingLoop loop, RuntimeEnvironment<?, ?> environment) {
         }
 
         @Override
@@ -208,7 +208,7 @@ public class UiTracerFactory extends TracerFactory {
         }
 
         @Override
-        public void visitedLoop(IEnumeratingLoop loop, RuntimeEnvironment<?> environment) {
+        public void visitedLoop(IEnumeratingLoop loop, RuntimeEnvironment<?, ?> environment) {
         }
 
         @Override
@@ -220,7 +220,7 @@ public class UiTracerFactory extends TracerFactory {
         }
 
         @Override
-        public void visitScriptBody(Script script, RuntimeEnvironment<?> environment) {
+        public void visitScriptBody(Script script, RuntimeEnvironment<?, ?> environment) {
         }
 
         @Override
