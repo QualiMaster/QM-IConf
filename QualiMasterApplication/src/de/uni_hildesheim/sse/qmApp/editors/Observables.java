@@ -137,7 +137,11 @@ public class Observables {
                         }
                     }
                 }
-                decl = compound.getRefines();
+                if (compound.getRefinesCount() > 0) {
+                    decl = compound.getRefines(0); // legacy, consider only the first one
+                } else {
+                    decl = null;
+                }
             } else {
                 decl = null;
             }

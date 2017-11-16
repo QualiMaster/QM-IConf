@@ -273,11 +273,7 @@ public class ConfigurationEditor extends EditorPart {
                 appendIndentation(actualCompound);
                 actualCompound.append("<ul>\n");
                 increaseIndentation();
-                Compound iter = compound.getRefines();
-                while (null != iter) {
-                    super.visitCompound(iter);
-                    iter = iter.getRefines();
-                }
+                superVisitRefines(compound);
                 super.visitCompound(compound);
                 decreaseIndentation();
                 appendIndentation(actualCompound);
@@ -289,6 +285,19 @@ public class ConfigurationEditor extends EditorPart {
             }
         }
 
+        /**
+         * Calls the super visit compound method on all refines.
+         * 
+         * @param cmp the compound
+         */
+        private void superVisitRefines(Compound cmp) {
+            for (int r = 0; r < cmp.getRefinesCount(); r++) {
+                Compound tmp = cmp.getRefines(r);
+                super.visitCompound(tmp);
+                superVisitRefines(tmp);
+            }
+        }
+ 
         @Override
         public void visitAttribute(Attribute attribute) {
         }

@@ -30,12 +30,12 @@ public class CompoundUtil {
      * @return the topmost refined compound or <b>this</b> if this compound does not refine another compound
      */
     public static Compound getRefinementBasis(Compound cmp) {
+        // for legacy reasons we just consider the first refined compound here
         Compound basis = cmp;
-        while (null != basis.getRefines()) {
-            basis = basis.getRefines();
+        while (basis.getRefinesCount() > 0) {
+            basis = basis.getRefines(0);
         }
         return basis;
     }
-
     
 }

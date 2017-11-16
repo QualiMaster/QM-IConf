@@ -746,7 +746,7 @@ public class ModelAccess {
                     Compound cmp = (Compound) type;
                     for (int d = 0; d < declaredTypes.size(); d++) {
                         IDatatype decl = declaredTypes.get(d);
-                        if (decl instanceof Compound && ((Compound) decl).getRefines() == cmp) {
+                        if (decl instanceof Compound && ((Compound) decl).isRefinedFrom(cmp, false)) {
                             //declaredTypes.remove(d);
                             // Avoid duplicates
                             if (!tmp.contains(decl)) {

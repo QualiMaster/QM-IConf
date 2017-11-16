@@ -270,7 +270,10 @@ class ConstraintEditorDialog extends Dialog implements IValidationStateListener 
                 addVariables(type.getAssignment(a), done);
             }
             if (type instanceof Compound) {
-                addVariables(((Compound) type).getRefines(), done);
+                Compound cmp = (Compound) type;
+                for (int r = 0; r < cmp.getRefinesCount(); r++) {
+                    addVariables(cmp.getRefines(r), done);
+                }
             }
         }
     }
