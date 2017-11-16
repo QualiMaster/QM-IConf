@@ -285,7 +285,7 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
         }
         if (null != compound && null != slot) {
             // find top-level type to exclude references
-            Compound topCompoundType = compound.getRefinementBasis();
+            Compound topCompoundType = CompoundUtil.getRefinementBasis(compound);
             IDatatype slotType = slot.getType();
             if (Reference.isReferenceTo(slotType, topCompoundType)) {
                 // leave this to the graphical editor
@@ -353,7 +353,7 @@ public class PipelineDiagramElementPropertyEditorCreator implements IPropertyEdi
             slot = getVariableDeclaration(propertyIdentifier);
         }
         if (null != compound && null != slot) {
-            Compound topCompoundType = compound.getRefinementBasis();
+            Compound topCompoundType = CompoundUtil.getRefinementBasis(compound);
             IDatatype slotType = slot.getType();
             if (!Reference.isReferenceTo(slotType, topCompoundType)) {
                 labelCreator.bind(value, slot, imageProvider);
