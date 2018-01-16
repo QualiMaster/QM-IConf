@@ -66,7 +66,6 @@ public class Reasoning {
     static {
         CONFIGURATION = new ReasonerConfiguration();
         CONFIGURATION.enableCustomMessages();
-        CONFIGURATION.setFreshConfiguration(false);
     }
     
     /**
@@ -153,8 +152,8 @@ public class Reasoning {
     private static boolean reasonOn(boolean runsInUI, boolean showSuccessDialog, Configuration cfg) {
         boolean success;
         Project project = cfg.getProject();
-        ReasoningResult result = ReasonerFrontend.getInstance().check(project, cfg, CONFIGURATION, 
-            ProgressObserver.NO_OBSERVER); // currently same as propagate, ... 
+        ReasoningResult result = ReasonerFrontend.getInstance().propagate(project, cfg, CONFIGURATION, 
+            ProgressObserver.NO_OBSERVER);
         if (result.hasConflict()) {
             IResource resource = ResourcesPlugin.getWorkspace().getRoot();
             StringBuilder message = new StringBuilder();
