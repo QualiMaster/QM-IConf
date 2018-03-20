@@ -66,7 +66,13 @@ and limitations under the License.
       <import plugin="de.uni_hildesheim.sse.easy.instantiator.maven" version="4.0.0" match="greaterOrEqual"/>
       <import plugin="de.uni-hildesheim.sse.easy.instantiatorCore.rt" version="4.0.0" match="greaterOrEqual"/>
       <import plugin="de.uni_hildesheim.sse.varModel.persistency" version="4.0.0" match="greaterOrEqual"/>
+	  <import plugin="eu.qualimaster.libs.QualiMaster" version="4.0.0" match="greaterOrEqual"/>
       <import plugin="QualiMaster.Extension" version="4.0.0" match="greaterOrEqual"/>
+	  <import plugin="net.ssehub.easy.libs.ant" version="4.0.0" match="greaterOrEqual"/>
+	  <import plugin="net.ssehub.easy.libs.aspectj" version="4.0.0" match="greaterOrEqual"/>
+	  <import plugin="net.ssehub.easy.libs.maven" version="4.0.0" match="greaterOrEqual"/>
+	  <import plugin="net.ssehub.easy.libs.velocity" version="4.0.0" match="greaterOrEqual"/>
+	  <import plugin="net.ssehub.easy.libs.xvcl" version="4.0.0" match="greaterOrEqual"/>
    </requires>
    
 
@@ -313,6 +319,41 @@ and limitations under the License.
          download-size="0"
          install-size="0"
          version="0.0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.ssehub.easy.libs.ant"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.ssehub.easy.libs.aspectj"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.ssehub.easy.libs.maven"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.ssehub.easy.libs.velocity"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.ssehub.easy.libs.xvcl"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>
