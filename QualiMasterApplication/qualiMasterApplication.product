@@ -22,7 +22,6 @@
       startupForegroundColor="0080FF" />
    <launcher name="QualiMasterApplication">
       <linux icon="/icons/icon.xpm"/>
-      <solaris/>
       <win useIco="false">
          <bmp/>
       </win>
@@ -52,13 +51,16 @@ and limitations under the License.
       <plugin id="QualiMaster.Extension"/>
       <plugin id="QualiMasterApplication"/>
       <plugin id="RepositoryConnector"/>
+      <plugin id="com.github.spotbugs.plugin.eclipse"/>
       <plugin id="com.google.guava"/>
       <plugin id="com.google.inject"/>
       <plugin id="com.google.inject.multibindings" fragment="true"/>
       <plugin id="com.ibm.icu"/>
+      <plugin id="com.jcraft.jsch"/>
       <plugin id="de.uni-hildesheim.sse.easy.instantiatorCore.rt"/>
       <plugin id="de.uni_hildesheim.sse.ivml"/>
       <plugin id="de.uni_hildesheim.sse.ivml.ui"/>
+      <plugin id="de.uni_hildesheim.sse.svn.connector.test" fragment="true"/>
       <plugin id="de.uni_hildesheim.sse.vil.buildlang"/>
       <plugin id="de.uni_hildesheim.sse.vil.buildlang.ui"/>
       <plugin id="de.uni_hildesheim.sse.vil.expressions"/>
@@ -68,6 +70,7 @@ and limitations under the License.
       <plugin id="de.uni_hildesheim.sse.vil.templatelang"/>
       <plugin id="de.uni_hildesheim.sse.vil.templatelang.ui"/>
       <plugin id="eu.qualimaster.ManifestUtils"/>
+      <plugin id="eu.qualimaster.libs.QualiMaster"/>
       <plugin id="javax.annotation"/>
       <plugin id="javax.el"/>
       <plugin id="javax.inject"/>
@@ -83,8 +86,16 @@ and limitations under the License.
       <plugin id="net.ssehub.easy.instantiation.maven"/>
       <plugin id="net.ssehub.easy.instantiation.serializer.xml"/>
       <plugin id="net.ssehub.easy.instantiation.velocity"/>
+      <plugin id="net.ssehub.easy.libs.ant"/>
+      <plugin id="net.ssehub.easy.libs.aspectj.tools"/>
+      <plugin id="net.ssehub.easy.libs.commons.io"/>
+      <plugin id="net.ssehub.easy.libs.maven"/>
+      <plugin id="net.ssehub.easy.libs.velocity"/>
+      <plugin id="net.ssehub.easy.libs.xvcl"/>
       <plugin id="net.ssehub.easy.producer.core"/>
+      <plugin id="net.ssehub.easy.producer.core.tests" fragment="true"/>
       <plugin id="net.ssehub.easy.producer.eclipse"/>
+      <plugin id="net.ssehub.easy.producer.eclipse.tests" fragment="true"/>
       <plugin id="net.ssehub.easy.producer.ui"/>
       <plugin id="net.ssehub.easy.reasoning.core"/>
       <plugin id="net.ssehub.easy.reasoning.sseReasoner"/>
@@ -108,12 +119,17 @@ and limitations under the License.
       <plugin id="org.apache.commons.jxpath"/>
       <plugin id="org.apache.commons.lang"/>
       <plugin id="org.apache.commons.logging"/>
+      <plugin id="org.apache.felix.gogo.command"/>
       <plugin id="org.apache.felix.gogo.runtime"/>
       <plugin id="org.apache.felix.gogo.shell"/>
+      <plugin id="org.apache.felix.scr"/>
       <plugin id="org.apache.jasper.glassfish"/>
       <plugin id="org.apache.log4j"/>
       <plugin id="org.apache.lucene.analysis"/>
+      <plugin id="org.apache.lucene.analyzers-common"/>
+      <plugin id="org.apache.lucene.analyzers-smartcn"/>
       <plugin id="org.apache.lucene.core"/>
+      <plugin id="org.apache.lucene.misc"/>
       <plugin id="org.apache.xerces"/>
       <plugin id="org.apache.xml.resolver"/>
       <plugin id="org.apache.xml.serializer"/>
@@ -162,6 +178,7 @@ and limitations under the License.
       <plugin id="org.eclipse.e4.core.di"/>
       <plugin id="org.eclipse.e4.core.di.annotations"/>
       <plugin id="org.eclipse.e4.core.di.extensions"/>
+      <plugin id="org.eclipse.e4.core.di.extensions.supplier"/>
       <plugin id="org.eclipse.e4.core.services"/>
       <plugin id="org.eclipse.e4.emf.xpath"/>
       <plugin id="org.eclipse.e4.ui.bindings"/>
@@ -249,6 +266,7 @@ and limitations under the License.
       <plugin id="org.eclipse.equinox.p2.publisher"/>
       <plugin id="org.eclipse.equinox.p2.publisher.eclipse"/>
       <plugin id="org.eclipse.equinox.p2.repository"/>
+      <plugin id="org.eclipse.equinox.p2.repository.tools"/>
       <plugin id="org.eclipse.equinox.p2.touchpoint.eclipse"/>
       <plugin id="org.eclipse.equinox.p2.touchpoint.natives"/>
       <plugin id="org.eclipse.equinox.p2.transport.ecf"/>
@@ -256,6 +274,7 @@ and limitations under the License.
       <plugin id="org.eclipse.equinox.p2.ui.sdk"/>
       <plugin id="org.eclipse.equinox.p2.ui.sdk.scheduler"/>
       <plugin id="org.eclipse.equinox.p2.updatechecker"/>
+      <plugin id="org.eclipse.equinox.p2.updatesite"/>
       <plugin id="org.eclipse.equinox.preferences"/>
       <plugin id="org.eclipse.equinox.region" fragment="true"/>
       <plugin id="org.eclipse.equinox.registry"/>
@@ -310,6 +329,7 @@ and limitations under the License.
       <plugin id="org.eclipse.help.base"/>
       <plugin id="org.eclipse.help.ui"/>
       <plugin id="org.eclipse.help.webapp"/>
+      <plugin id="org.eclipse.jdt"/>
       <plugin id="org.eclipse.jdt.annotation"/>
       <plugin id="org.eclipse.jdt.compiler.apt" fragment="true"/>
       <plugin id="org.eclipse.jdt.compiler.tool" fragment="true"/>
@@ -336,6 +356,9 @@ and limitations under the License.
       <plugin id="org.eclipse.osgi"/>
       <plugin id="org.eclipse.osgi.compatibility.state" fragment="true"/>
       <plugin id="org.eclipse.osgi.services"/>
+      <plugin id="org.eclipse.osgi.util"/>
+      <plugin id="org.eclipse.pde.build"/>
+      <plugin id="org.eclipse.pde.core"/>
       <plugin id="org.eclipse.search"/>
       <plugin id="org.eclipse.swt"/>
       <plugin id="org.eclipse.swt.cocoa.macosx" fragment="true"/>
@@ -358,11 +381,13 @@ and limitations under the License.
       <plugin id="org.eclipse.team.ui"/>
       <plugin id="org.eclipse.text"/>
       <plugin id="org.eclipse.ui"/>
+      <plugin id="org.eclipse.ui.cheatsheets"/>
       <plugin id="org.eclipse.ui.cocoa" fragment="true"/>
       <plugin id="org.eclipse.ui.console"/>
       <plugin id="org.eclipse.ui.editors"/>
       <plugin id="org.eclipse.ui.forms"/>
       <plugin id="org.eclipse.ui.ide"/>
+      <plugin id="org.eclipse.ui.intro"/>
       <plugin id="org.eclipse.ui.navigator"/>
       <plugin id="org.eclipse.ui.navigator.resources"/>
       <plugin id="org.eclipse.ui.trace"/>
@@ -371,6 +396,7 @@ and limitations under the License.
       <plugin id="org.eclipse.ui.win32" fragment="true"/>
       <plugin id="org.eclipse.ui.workbench"/>
       <plugin id="org.eclipse.ui.workbench.texteditor"/>
+      <plugin id="org.eclipse.update.configurator"/>
       <plugin id="org.eclipse.xpand"/>
       <plugin id="org.eclipse.xtend"/>
       <plugin id="org.eclipse.xtend.lib"/>
@@ -399,6 +425,8 @@ and limitations under the License.
       <plugin id="org.objectweb.asm"/>
       <plugin id="org.sat4j.core"/>
       <plugin id="org.sat4j.pb"/>
+      <plugin id="org.slf4j.api"/>
+      <plugin id="org.slf4j.impl.log4j12" fragment="true"/>
       <plugin id="org.tukaani.xz"/>
       <plugin id="org.w3c.css.sac"/>
       <plugin id="org.w3c.dom.events"/>

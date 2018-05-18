@@ -13,6 +13,7 @@
 
 	    <!-- include required EASy components -->
 	    <pathelement path="${libs.utils}"/>
+        <pathelement path="${libs.libs.common.io}"/>
         <pathelement path="${libs.model}"/>
 	    <pathelement path="${libs.reasonerCore}"/>
         <pathelement path="${libs.instantiator.copy.core}"/>
