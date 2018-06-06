@@ -2,7 +2,7 @@
 <feature
       id="QualiMasterApplicationFeature.platform"
       label="QualiMasterApplicationFeature - required platform bundles"
-      version="0.6.6"
+      version="0.6.7"
       provider-name="University of Hildesheim - SSE">
 
    <description url="http://www.example.com/description">
@@ -61,13 +61,6 @@
 
    <plugin
          id="org.apache.commons.io"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.gmf.runtime.lite"
          download-size="0"
          install-size="0"
          version="0.0.0"
