@@ -52,7 +52,7 @@ and limitations under the License.
       <import plugin="de.uni_hildesheim.sse.vil.templatelang.ui" version="4.0.0" match="greaterOrEqual"/>
       <import plugin="RepositoryConnector" version="4.0.0" match="greaterOrEqual"/>
       <import plugin="eu.qualimaster.ManifestUtils" version="4.0.0" match="greaterOrEqual"/>
-      <import plugin="ReasonerCore" version="4.0.0" match="greaterOrEqual"/>
+      <import plugin="net.ssehub.easy.reasoning.core" version="4.0.0" match="greaterOrEqual"/>
       <import plugin="de.uni-hildesheim.sse.easy.instantiator.velocity" version="4.0.0" match="greaterOrEqual"/>
       <import plugin="de.uni_hildesheim.sse.easy.instantiator.java" version="4.0.0" match="greaterOrEqual"/>
       <import plugin="de.uni_hildesheim.sse.easy.instantiator.ant" version="4.0.0" match="greaterOrEqual"/>
