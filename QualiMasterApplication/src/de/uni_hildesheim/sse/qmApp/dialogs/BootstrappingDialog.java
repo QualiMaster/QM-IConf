@@ -54,7 +54,7 @@ public class BootstrappingDialog {
             + "model, all the remainder of QM-IConf configuration will be done automatically. Please choose how you "
             + "want to configure QM-IConf.";
 
-    private static final String REPO_URL_CONNECTOR_INFO_TEXT = "Please provide the url of the repository. "
+    private static final String REPO_URL_CONNECTOR_INFO_TEXT = "Please provide URL url of the repository. "
             + "You can either use the default repository (" + ConfigurationProperties.REPOSITORY_URL.getValue() + ") "
             + "or you can configure your own repository url. If the field is left blank the default repository will "
             + "be used.";
