@@ -65,7 +65,8 @@
             <include name="p2.inf"/>
           </patternset>
         </unzip>
-        <replace file="gen/appFiles/app.properties" token="https://svn.l3s.uni-hannover.de/qualimaster/trunk/artifacts/ConfModel" value="https://svn.l3s.uni-hannover.de/qualimaster/trunk/artifacts/QM2.devel"/>
+    	
+        <replace file="gen/appFiles/app.properties" token="https://projects.sse.uni-hildesheim.de/svn/QualiMaster/trunk/artifacts/ConfModel" value="https://projects.sse.uni-hildesheim.de/svn/QualiMaster/trunk/artifacts/QM2.devel"/>
         <replace file="gen/appFiles/p2.inf" token="//projects.sse.uni-hildesheim.de/qmConfig/" value="//projects.sse.uni-hildesheim.de/qm/qmicNightly/"/>
         <jar update="true" destfile="gen/tmpBundles/QMIConf.jar" basedir="gen/appFiles" includes="app.properties p2.inf"/>
 
