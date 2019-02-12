@@ -370,16 +370,6 @@ and limitations under the License.
       <plugin id="org.sat4j.core"/>
       <plugin id="org.sat4j.pb"/>
       <plugin id="org.w3c.css.sac"/>
-      <plugin id="org.w3c.dom"/>
-      <plugin id="org.w3c.dom.bootstrap"/>
-      <plugin id="org.w3c.dom.css"/>
-      <plugin id="org.w3c.dom.html"/>
-      <plugin id="org.w3c.dom.ls"/>
-      <plugin id="org.w3c.dom.ranges"/>
-      <plugin id="org.w3c.dom.stylesheets"/>
-      <plugin id="org.w3c.dom.traversal"/>
-      <plugin id="org.w3c.dom.views"/>
-      <plugin id="org.w3c.dom.xpath"/>
       <plugin id="org.w3c.dom.events"/>
       <plugin id="org.w3c.dom.smil"/>
       <plugin id="org.w3c.dom.svg"/>
