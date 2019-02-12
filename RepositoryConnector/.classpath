@@ -30,5 +30,6 @@
 	<classpathentry kind="lib" path="lib/svnkit-javahl16-1.8.7.jar"/>
 	<classpathentry kind="lib" path="lib/jsoup-1.6.0.jar"/>
 	<classpathentry kind="lib" path="lib/bcprov-jdk15on-161.jar"/>
+	<classpathentry kind="lib" path="lib/javax.activation-api-1.2.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
