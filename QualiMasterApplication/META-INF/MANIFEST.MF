@@ -62,7 +62,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.help.base;bundle-version="4.0.300",
  org.eclipse.help.ui;bundle-version="4.0.100",
  org.eclipse.equinox.http.jetty;bundle-version="3.1.1",
- org.apache.xerces;bundle-version="2.9.0"
+ org.apache.xerces;bundle-version="2.9.0",
+ javax.xml
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: org.apache.commons.lang,
