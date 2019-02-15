@@ -291,7 +291,10 @@
                 <arg value="x86_64" />
         </java>
         <!-- copying is a hack -> product configuration based on features using org.eclipse.equinox.executable -->
-        <copy todir="${basedir}/gen/final/cocoa.macosx.x86_64/QualiMasterApplication.app" dir="${user.home}/Eclipse/qmRepository/binary/bin/cocoa/macosx/x86_64/Eclipse.app"/>
+    	<mkdir dir="${basedir}/gen/final/cocoa.macosx.x86_64/QualiMasterApplication.app"/>
+        <copy todir="${basedir}/gen/final/cocoa.macosx.x86_64/QualiMasterApplication.app">
+    	    <fileset dir="${user.home}/Eclipse/qmRepository/binary/bin/cocoa/macosx/x86_64/Eclipse.app" includes="**"/>
+    	</copy>
     	<!-- copy readme -->
         <copy tofile="${basedir}/gen/final/cocoa.macosx.x86_64/README.txt" file="QM/README.txt"/>
     	<!-- another hack -> ini-file, not sure whether needed -->
