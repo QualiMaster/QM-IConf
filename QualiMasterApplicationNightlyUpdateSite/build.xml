@@ -214,7 +214,7 @@
         <copy tofile="${basedir}/gen/final/win32.win32.x86_64/README.txt" file="QM/README.txt"/>
         <zip update="true" destfile="${basedir}/gen/final/win32.win32.x86_64/plugins/org.eclipse.osgi_3.10.101.v20150820-1432.jar" basedir="QM/osgi" includes="JavaSE-1.9.profile JavaSE-10.profile profile.list"/> 
         <zip destfile="${basedir}/archive/QM-IConf.win32.win32.x86_64-${NOW}-java8.zip" basedir="${basedir}/gen/final/win32.win32.x86_64"/>
-    	<copy todir="${basedir}/gen/final/win32.win32.x86_64/" file="QM/java9/QualiMasterApplication.ini"/>
+    	<copy todir="${basedir}/gen/final/win32.win32.x86_64/" file="QM/java9/QualiMasterApplication.ini" overwrite="true"/>
     	<zip destfile="${basedir}/archive/QM-IConf.win32.win32.x86_64-${NOW}-java9-10.zip" basedir="${basedir}/gen/final/win32.win32.x86_64"/>
 
         <mkdir dir="${basedir}/gen/final/gtk.linux.x86_64"/>
@@ -250,7 +250,7 @@
         <copy tofile="${basedir}/gen/final/gtk.linux.x86_64/README.txt" file="QM/README.txt"/>
     	<zip update="true" destfile="${basedir}/gen/final/gtk.linux.x86_64/plugins/org.eclipse.osgi_3.10.101.v20150820-1432.jar" basedir="QM/osgi" includes="JavaSE-1.9.profile JavaSE-10.profile profile.list"/>
         <tar destfile="${basedir}/archive/QM-IConf.gtk.linux.x86_64-${NOW}-java8.tar.gz" compression="gzip" basedir="${basedir}/gen/final/gtk.linux.x86_64"/>
-    	<copy todir="${basedir}/gen/final/gtk.linux.x86_64/" file="QM/java9/QualiMasterApplication.ini"/>
+    	<copy todir="${basedir}/gen/final/gtk.linux.x86_64/" file="QM/java9/QualiMasterApplication.ini" overwrite="true"/>
     	<tar destfile="${basedir}/archive/QM-IConf.gtk.linux.x86_64-${NOW}-java9-10.tar.gz" compression="gzip" basedir="${basedir}/gen/final/gtk.linux.x86_64"/>
     </target>
     
