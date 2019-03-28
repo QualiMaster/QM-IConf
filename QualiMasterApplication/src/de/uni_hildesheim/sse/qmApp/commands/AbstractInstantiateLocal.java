@@ -23,7 +23,9 @@ import de.uni_hildesheim.sse.qmApp.model.SessionModel;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import eu.qualimaster.easy.extension.modelop.ModelModifier;
 import eu.qualimaster.easy.extension.modelop.ModelModifier.QMPlatformProvider;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
+import net.ssehub.easy.instantiation.core.Bundle;
 import net.ssehub.easy.instantiation.core.model.common.VilException;
 import net.ssehub.easy.instantiation.core.model.execution.Executor;
 import net.ssehub.easy.instantiation.core.model.execution.TracerFactory;
@@ -137,8 +139,10 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                         notifyInstantiationCompleted(shell);
                     } catch (ModelManagementException e) {
                         showExceptionDialog("Model resolution problem", e);
+                        EASyLoggerFactory.INSTANCE.getLogger(this.getClass(), Bundle.ID).exception(e);
                     } catch (VilException e) {
                         showExceptionDialog("Instantiation problem", e);
+                        EASyLoggerFactory.INSTANCE.getLogger(this.getClass(), Bundle.ID).exception(e);
                     } finally {
                         if (PRUNE_CONFIG && null != modifier) {
                             modifier.clear();
