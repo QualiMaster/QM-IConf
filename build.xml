@@ -120,7 +120,7 @@
 		  <property name="plugin-name" value="${test.plugin.repositoryConnector}"/>
 		  <property name="classname" value="${test.suite.repositoryConnector}"/>
 		  <property name="vmargs" value="-Dbaz=true"/>
-		  <property name="extraVMargs" value="-XX:-UseSplitVerifier -Demma.coverage.out.file=${basedir}/${coverage.results.dir}/${ant.project.name}.emma -Dosgi.dev=${emma.path}/emma.jar -Dde.uni_hildesheim.sse.svn.connector.test.testdata=${home.RepositoryConnector.test.dir}/testdata" />
+          <property name="extraVMargs" value="-javaagent:${jacoco.path}/jacocoagent.jar=append=true,destfile=${basedir}/${coverage.results.dir}/${ant.project.name}.exec -Dde.uni_hildesheim.sse.svn.connector.test.testdata=${home.RepositoryConnector.test.dir}/testdata"/>
 		  <property name="os" value="win32"/>
 		  <property name="ws" value="win32"/>
 		  <property name="arch" value="x86"/>
