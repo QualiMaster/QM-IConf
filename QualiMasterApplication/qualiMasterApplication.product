@@ -48,6 +48,7 @@ and limitations under the License.
    </license>
 
    <plugins>
+      <plugin id="EASyLoader"/>
       <plugin id="QualiMaster.Extension"/>
       <plugin id="QualiMasterApplication"/>
       <plugin id="RepositoryConnector"/>
