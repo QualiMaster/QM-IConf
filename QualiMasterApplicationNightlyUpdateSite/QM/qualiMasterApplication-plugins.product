@@ -53,6 +53,7 @@ and limitations under the License.
       <plugin id="com.google.guava"/>
       <plugin id="com.google.inject"/>
       <plugin id="com.ibm.icu"/>
+      <plugin id="net.ssehub.easy.loader"/>
       <plugin id="net.ssehub.easy.instantiation.velocity"/>
       <plugin id="net.ssehub.easy.libs.ant"/>
       <plugin id="net.ssehub.easy.libs.aspectj.tools"/>

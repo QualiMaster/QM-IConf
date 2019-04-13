@@ -70,6 +70,7 @@ and limitations under the License.
       <import plugin="org.eclipse.emf.validation"/>
       <import plugin="org.eclipse.gef"/>
       <import plugin="org.eclipse.emf.edit"/>
+      <import plugin="net.ssehub.easy.loader" version="1.2.0" match="greaterOrEqual"/>
       <import plugin="net.ssehub.easy.basics" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="net.ssehub.easy.basics" version="0.4.2" match="greaterOrEqual"/>
       <import plugin="net.ssehub.easy.varModel" version="1.1.0" match="greaterOrEqual"/>

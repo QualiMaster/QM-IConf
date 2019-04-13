@@ -31,6 +31,7 @@ and limitations under the License.
    </license>
    
       <requires>
+      <import plugin="net.ssehub.easy.loader" version="1.2.0" match="greaterOrEqual"/>
       <import plugin="de.uni_hildesheim.sse.utils" version="4.0.0" match="greaterOrEqual"/>
       <import plugin="de.uni_hildesheim.sse.easy_producer.eclipse" version="4.0.0" match="greaterOrEqual"/>
       <import plugin="de.uni_hildesheim.sse.vil.buildlang" version="4.0.0" match="greaterOrEqual"/>
