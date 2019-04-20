@@ -44,6 +44,11 @@ public class Utils {
         DISABLE_LOGIN("disable-login"),
         
         /**
+         * Disable model pruning.
+         */
+        DISABLE_PRUNING("disable-pruning"),
+        
+        /**
          * The actual model location. May be determined by the repository
          * connector or as fallback from <code>conf.properties</code> (local).
          */

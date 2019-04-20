@@ -20,6 +20,7 @@ import de.uni_hildesheim.sse.qmApp.model.Location;
 import de.uni_hildesheim.sse.qmApp.model.ProjectDescriptor;
 import de.uni_hildesheim.sse.qmApp.model.Reasoning;
 import de.uni_hildesheim.sse.qmApp.model.SessionModel;
+import de.uni_hildesheim.sse.qmApp.model.Utils.ConfigurationProperties;
 import de.uni_hildesheim.sse.qmApp.model.VariabilityModel;
 import eu.qualimaster.easy.extension.modelop.ModelModifier;
 import eu.qualimaster.easy.extension.modelop.ModelModifier.QMPlatformProvider;
@@ -49,7 +50,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
      * <tt>false</tt> use underlying model and configuration.
      * @see ModelModifier
      */
-    private static final boolean PRUNE_CONFIG = true;
+    //private static final boolean PRUNE_CONFIG = false;
     
     /**
      * For testing purpose: <tt>true</tt> expected behavior, <tt>false</tt> Reasoning, model pruning,
@@ -90,11 +91,11 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
         EclipseConsole.INSTANCE.clearConsole();
         EclipseConsole.INSTANCE.displayConsole();
         
-        
         final String targetLocation = selectTargetFolder(getMessage());
         SessionModel.INSTANCE.setInstantiationFolder(targetLocation);
         final Shell shell = Dialogs.getDefaultShell(); 
         if (null != targetLocation) {
+            final boolean pruneConfig = !ConfigurationProperties.DISABLE_PRUNING.getBooleanValue();
             setEnabled(false);
             Job job = new Job("QualiMaster Infrastructure Instantiation Process") {
 
@@ -104,7 +105,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                     try {
                         File trgFolder = new File(targetLocation);
                         Executor executor = null;
-                        if (PRUNE_CONFIG) {
+                        if (pruneConfig) {
                             // Maybe null in case of any error
                             modifier = new ModelModifier(trgFolder,
                                 VariabilityModel.Definition.TOP_LEVEL.getConfiguration().getProject(),
@@ -120,7 +121,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                                 }
                             }
                         }
-                        if (!PRUNE_CONFIG || null == executor) {
+                        if (!pruneConfig || null == executor) {
                             ProjectDescriptor source = new ProjectDescriptor();
                             ProjectDescriptor target = new ProjectDescriptor(source, trgFolder);
                             executor = new Executor(source.getMainVilScript())
@@ -144,7 +145,7 @@ public abstract class AbstractInstantiateLocal extends AbstractConfigurableHandl
                         showExceptionDialog("Instantiation problem", e);
                         EASyLoggerFactory.INSTANCE.getLogger(this.getClass(), Bundle.ID).exception(e);
                     } finally {
-                        if (PRUNE_CONFIG && null != modifier) {
+                        if (pruneConfig && null != modifier) {
                             modifier.clear();
                         }
                         setEnabled(true);
