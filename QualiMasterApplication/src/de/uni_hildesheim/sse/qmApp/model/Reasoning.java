@@ -151,8 +151,7 @@ public class Reasoning {
      */
     private static boolean reasonOn(boolean runsInUI, boolean showSuccessDialog, Configuration cfg) {
         boolean success;
-        Project project = cfg.getProject();
-        ReasoningResult result = ReasonerFrontend.getInstance().propagate(project, cfg, CONFIGURATION, 
+        ReasoningResult result = ReasonerFrontend.getInstance().propagate(cfg, CONFIGURATION, 
             ProgressObserver.NO_OBSERVER);
         if (result.hasConflict()) {
             IResource resource = ResourcesPlugin.getWorkspace().getRoot();
