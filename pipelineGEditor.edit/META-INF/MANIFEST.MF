@@ -2,6 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: QualiMaster Pipeline Editor - edit parts
 Bundle-SymbolicName: pipelineGEditor.edit;singleton:=true
+Automatic-Module-Name: pipelineGEditor.edit
 Bundle-Version: 1.0.1
 Bundle-ClassPath: .
 Bundle-Activator: pipeline.provider.PipelineEditPlugin$Implementation

@@ -2,6 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: QualiMaster Pipeline Editor - tests
 Bundle-SymbolicName: pipelineGEditor.tests;singleton:=true
+Automatic-Module-Name: pipelineGEditor.tests
 Bundle-Version: 1.0.1
 Bundle-ClassPath: .
 Bundle-Vendor: University of Hildesheim - SSE

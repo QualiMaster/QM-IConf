@@ -2,6 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: QualiMasterApplication
 Bundle-SymbolicName: QualiMasterApplication;singleton:=true
+Automatic-Module-Name: QualiMasterApplication
 Bundle-Version: 0.11.1
 Bundle-Activator: qualimasterapplication.Activator
 Bundle-Vendor: University of Hildesheim - SSE
