@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
-import org.tmatesoft.svn.core.SVNException;
-
 import de.uni_hildesheim.sse.repositoryConnector.svnConnector.ConnectorException;
 import de.uni_hildesheim.sse.repositoryConnector.svnConnector.RepositoryEventHandler;
 

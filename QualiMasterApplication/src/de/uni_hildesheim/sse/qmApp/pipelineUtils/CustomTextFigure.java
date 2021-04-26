@@ -29,7 +29,7 @@ public class CustomTextFigure extends RoundedRectangle {
      * Creates a new TextNoteFigure with a default border size.
      */
     public CustomTextFigure() {
-         this(DEFAULT_BORDER_WIDTH);
+        this(DEFAULT_BORDER_WIDTH);
     }
 
     /**
