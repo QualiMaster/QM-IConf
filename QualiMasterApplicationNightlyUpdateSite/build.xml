@@ -164,7 +164,7 @@
             <arg value="-console"/>
             <arg value="-consolelog"/>
             <arg value="-repository" />
-            <arg value="${repository}"/>
+            <arg value="${eclipse.repository}"/>
             <arg value="-metadataRepository" />
             <arg value="file:${basedir}/gen/final" />
             <arg value="-artifactRepository" />
@@ -188,7 +188,7 @@
             <arg value="-console"/>
             <arg value="-consolelog"/>
             <arg value="-repository" />
-            <arg value="${repository}"/>
+            <arg value="${eclipse.repository}"/>
             <arg value="-destination"/>
             <arg value="file:${basedir}/gen/final" />
             <arg value="-metadataRepository" />
@@ -214,13 +214,14 @@
     	<!-- copy readme -->
         <copy tofile="${basedir}/gen/final/win32.win32.x86_64/README.txt" file="QM/README.txt"/>
     	<!-- patch OSGi for Java9 and 10 -->
-        <zip update="true" destfile="${basedir}/gen/final/win32.win32.x86_64/plugins/org.eclipse.osgi_3.10.101.v20150820-1432.jar" basedir="QM/osgi" includes="JavaSE-1.9.profile JavaSE-10.profile profile.list"/>
+        <!--<zip update="true" destfile="${basedir}/gen/final/win32.win32.x86_64/plugins/org.eclipse.osgi_3.10.101.v20150820-1432.jar" basedir="QM/osgi" includes="JavaSE-1.9.profile JavaSE-10.profile profile.list"/>-->
         <!-- package for Java8 -->
-        <zip destfile="${basedir}/archive/QM-IConf.win32.win32.x86_64-${NOW}-java8.zip" basedir="${basedir}/gen/final/win32.win32.x86_64"/>
+    	<!--<zip destfile="${basedir}/archive/QM-IConf.win32.win32.x86_64-${NOW}-java8.zip" basedir="${basedir}/gen/final/win32.win32.x86_64"/>-->
         <!-- replace ini for Java9 and 10  -->
-        <copy todir="${basedir}/gen/final/win32.win32.x86_64/" file="QM/java9/QualiMasterApplication.ini" overwrite="true"/>
+    	<!--<copy todir="${basedir}/gen/final/win32.win32.x86_64/" file="QM/java9/QualiMasterApplication.ini" overwrite="true"/>-->
     	<!-- package for Java9 and 10 -->
-    	<zip destfile="${basedir}/archive/QM-IConf.win32.win32.x86_64-${NOW}-java9-10.zip" basedir="${basedir}/gen/final/win32.win32.x86_64"/>
+    	<!--<zip destfile="${basedir}/archive/QM-IConf.win32.win32.x86_64-${NOW}-java9-10.zip" basedir="${basedir}/gen/final/win32.win32.x86_64"/>-->
+        <zip destfile="${basedir}/archive/QM-IConf.win32.win32.x86_64-${NOW}-java9-10.zip" basedir="${basedir}/gen/final/win32.win32.x86_64"/>
 
         <mkdir dir="${basedir}/gen/final/gtk.linux.x86_64"/>
         <java jar="${eclipse.product.launcher}" fork="true" failonerror="true" maxmemory="128m">
@@ -229,7 +230,7 @@
             <arg value="-console"/>
             <arg value="-consolelog"/>
             <arg value="-repository" />
-            <arg value="${repository}"/>
+            <arg value="${eclipse.repository}"/>
             <arg value="-destination"/>
             <arg value="file:${basedir}/gen/final" />
             <arg value="-metadataRepository" />
@@ -255,13 +256,14 @@
     	<!-- copy readme -->
         <copy tofile="${basedir}/gen/final/gtk.linux.x86_64/README.txt" file="QM/README.txt"/>
         <!-- patch OSGi for Java9 and 10 -->
-        <zip update="true" destfile="${basedir}/gen/final/gtk.linux.x86_64/plugins/org.eclipse.osgi_3.10.101.v20150820-1432.jar" basedir="QM/osgi" includes="JavaSE-1.9.profile JavaSE-10.profile profile.list"/>
+        <!--<zip update="true" destfile="${basedir}/gen/final/gtk.linux.x86_64/plugins/org.eclipse.osgi_3.10.101.v20150820-1432.jar" basedir="QM/osgi" includes="JavaSE-1.9.profile JavaSE-10.profile profile.list"/>-->
     	<!-- package for Java8 -->
-        <tar destfile="${basedir}/archive/QM-IConf.gtk.linux.x86_64-${NOW}-java8.tar.gz" compression="gzip" basedir="${basedir}/gen/final/gtk.linux.x86_64"/>
+    	<!--<tar destfile="${basedir}/archive/QM-IConf.gtk.linux.x86_64-${NOW}-java8.tar.gz" compression="gzip" basedir="${basedir}/gen/final/gtk.linux.x86_64"/>-->
         <!-- replace ini for Java9 and 10  -->
-        <copy todir="${basedir}/gen/final/gtk.linux.x86_64/" file="QM/java9/QualiMasterApplication.ini" overwrite="true"/>
+    	<!--<copy todir="${basedir}/gen/final/gtk.linux.x86_64/" file="QM/java9/QualiMasterApplication.ini" overwrite="true"/>-->
     	<!-- package for Java9 and 10 -->
-    	<tar destfile="${basedir}/archive/QM-IConf.gtk.linux.x86_64-${NOW}-java9-10.tar.gz" compression="gzip" basedir="${basedir}/gen/final/gtk.linux.x86_64"/>
+    	<!--<tar destfile="${basedir}/archive/QM-IConf.gtk.linux.x86_64-${NOW}-java9-10.tar.gz" compression="gzip" basedir="${basedir}/gen/final/gtk.linux.x86_64"/>-->
+        <tar destfile="${basedir}/archive/QM-IConf.gtk.linux.x86_64-${NOW}.tar.gz" compression="gzip" basedir="${basedir}/gen/final/gtk.linux.x86_64"/>
     	
         <mkdir dir="${basedir}/gen/final/cocoa.macosx.x86_64"/>
         <java jar="${eclipse.product.launcher}" fork="true" failonerror="true" maxmemory="128m">
@@ -270,7 +272,7 @@
             <arg value="-console"/>
             <arg value="-consolelog"/>
             <arg value="-repository" />
-            <arg value="${repository}"/>
+            <arg value="${eclipse.repository}"/>
             <arg value="-destination"/>
             <arg value="file:${basedir}/gen/final" />
             <arg value="-metadataRepository" />
@@ -298,15 +300,16 @@
     	<!-- copy readme -->
         <copy tofile="${basedir}/gen/final/cocoa.macosx.x86_64/README.txt" file="QM/README.txt"/>
     	<!-- another hack -> ini-file, not sure whether needed -->
-    	<copy todir="${basedir}/gen/final/cocoa.macosx.x86_64/" file="${basedir}/gen/final/gtk.linux.x86_64/QualiMasterApplication.ini" overwrite="true"/>
+    	<!-- <copy todir="${basedir}/gen/final/cocoa.macosx.x86_64/" file="${basedir}/gen/final/gtk.linux.x86_64/QualiMasterApplication.ini" overwrite="true"/>-->
     	<!-- patch OSGi for Java9 and 10 -->
-        <zip update="true" destfile="${basedir}/gen/final/cocoa.macosx.x86_64/plugins/org.eclipse.osgi_3.10.101.v20150820-1432.jar" basedir="QM/osgi" includes="JavaSE-1.9.profile JavaSE-10.profile profile.list"/>
+    	<!-- <zip update="true" destfile="${basedir}/gen/final/cocoa.macosx.x86_64/plugins/org.eclipse.osgi_3.10.101.v20150820-1432.jar" basedir="QM/osgi" includes="JavaSE-1.9.profile JavaSE-10.profile profile.list"/>-->
     	<!-- package for Java8 -->
-    	<zip destfile="${basedir}/archive/QM-IConf.cocoa.macosx.x86_64-${NOW}-java8.zip" basedir="${basedir}/gen/final/cocoa.macosx.x86_64"/>
+    	<!-- <zip destfile="${basedir}/archive/QM-IConf.cocoa.macosx.x86_64-${NOW}-java8.zip" basedir="${basedir}/gen/final/cocoa.macosx.x86_64"/>-->
     	<!-- replace ini for Java9 and 10  -->
-        <copy todir="${basedir}/gen/final/cocoa.macosx.x86_64/" file="QM/java9/QualiMasterApplication.ini" overwrite="true"/>
+    	<!-- <copy todir="${basedir}/gen/final/cocoa.macosx.x86_64/" file="QM/java9/QualiMasterApplication.ini" overwrite="true"/>-->
     	<!-- package for Java9 and 10 -->
-    	<zip destfile="${basedir}/archive/QM-IConf.cocoa.macosx.x86_64-${NOW}-java9-10.zip" basedir="${basedir}/gen/final/cocoa.macosx.x86_64"/>
+    	<!--<zip destfile="${basedir}/archive/QM-IConf.cocoa.macosx.x86_64-${NOW}-java9-10.zip" basedir="${basedir}/gen/final/cocoa.macosx.x86_64"/>-->
+        <zip destfile="${basedir}/archive/QM-IConf.cocoa.macosx.x86_64-${NOW}.zip" basedir="${basedir}/gen/final/cocoa.macosx.x86_64"/>
     </target>
     
     <target name="zip.Site">
