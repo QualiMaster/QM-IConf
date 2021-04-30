@@ -32,7 +32,8 @@
         <antcall target="replacePlugins"/>
         <antcall target="createFeature"/>
         <antcall target="createSiteXML"/>
-        <antcall target="createArtifactJars"/>
+    	<!-- Eclipse 4.19 does not properly run
+        <antcall target="createArtifactJars"/> -->
         <!--<antcall target="zip.Site"/>
         <antcall target="publish"/>-->
     </target>
