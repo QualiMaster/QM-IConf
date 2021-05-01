@@ -36,8 +36,10 @@
     	<!-- Eclipse 4.19 does not properly run
         <antcall target="createArtifactJars"/> -->
         <touch file="gen/final/empty.txt"/> <!-- something that Jenkins does not fail -->
-        <antcall target="zip.Site"/>
-        <!--<antcall target="publish"/>-->
+        <mkdir dir="${basedir}/archive"/>
+        <zip destfile="${basedir}/archive/Update-Site.zip" basedir="gen/final"/>
+    	<!--<antcall target="zip.Site"/>
+        <antcall target="publish"/>-->
     </target>
 	
 	<target name="buildAntTask">
