@@ -32,10 +32,12 @@
         <antcall target="replacePlugins"/>
         <antcall target="createFeature"/>
         <antcall target="createSiteXML"/>
+    	
     	<!-- Eclipse 4.19 does not properly run
         <antcall target="createArtifactJars"/> -->
-        <!--<antcall target="zip.Site"/>
-        <antcall target="publish"/>-->
+        <touch file="gen/final/empty.txt"/> <!-- something that Jenkins does not fail -->
+        <antcall target="zip.Site"/>
+        <!--<antcall target="publish"/>-->
     </target>
 	
 	<target name="buildAntTask">
