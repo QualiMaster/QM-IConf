@@ -2,6 +2,7 @@
 <project name="QMIConf-Nightly-UpdateSite" default="createUpdateSite" basedir="." xmlns:plugins="antlib:de.uni_hildesheim.sse.easy.standalone.versionReplacement">
     <property file="${user.home}/global-build.properties"/>
     <property name="configs" value="gtk.linux.x86_64,win32.win32.x86_64" />
+    <include file="${user.home}/macros.xml"/>
 
     <path id ="task.libs">
         <!-- Libs of the Task -->
@@ -89,9 +90,7 @@
     	
         <!-- the update site for the eclipse to create the nightly versions -->
     	<mkdir dir="${basedir}/gen/final/internal"/>
-        <java jar="${eclipse.launcher}" fork="true" failonerror="true" maxmemory="128m">
-            <arg value="-application" />
-            <arg value="org.eclipse.equinox.p2.publisher.UpdateSitePublisher" />
+    	<eclipseLauncher application="org.eclipse.equinox.p2.publisher.UpdateSitePublisher">
             <arg value="-metadataRepository" />
             <arg value="file:${basedir}/gen/final/internal" />
             <arg value="-artifactRepository" />
@@ -100,7 +99,7 @@
             <arg value="${basedir}/gen/intermediate" />
             <arg value="-compress" />
             <arg value="-publishArtifacts" />
-        </java>
+        </eclipseLauncher>
     	
     	<!-- and now the update site for the RCP application -->
         <product ProductFile="QM/qualiMasterApplication.product" DestinationFile="gen/intermediate/QualiMasterApplication.product" Version="${version}"/>
@@ -116,11 +115,7 @@
         </copy>
 -->    	
         <!-- create a repository and put all from target platform in it -->
-    	<java jar="${eclipse.launcher}" fork="true" failonerror="true" maxmemory="128m">
-            <arg value="-application" />
-            <arg value="org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher" />
-            <arg value="-console"/>
-            <arg value="-consolelog"/>
+    	<eclipseLauncher application="org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher">
             <arg value="-metadataRepository" />
             <arg value="file:${basedir}/gen/final" />
             <arg value="-artifactRepository" />
@@ -131,14 +126,10 @@
             <arg value="${eclipse.launcher.repo}" />
             <arg value="-compress" />
             <arg value="-publishArtifacts" />
-        </java>
+        </eclipseLauncher>
 
         <!-- import the RCP plugin into the repository -->
-        <java jar="${eclipse.launcher}" fork="true" failonerror="true" maxmemory="128m">
-            <arg value="-application" />
-            <arg value="org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher" />
-            <arg value="-console"/>
-            <arg value="-consolelog"/>
+    	<eclipseLauncher application="org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher">
             <arg value="-metadataRepository" />
             <arg value="file:${basedir}/gen/final" />
             <arg value="-artifactRepository" />
@@ -150,7 +141,7 @@
             <arg value="-compress" />
             <arg value="-publishArtifacts" />
             <arg value="-append" />
-        </java>
+        </eclipseLauncher>
 
         <mkdir dir="${basedir}/archive"/>
         <tstamp>
@@ -162,11 +153,7 @@
 -->
         <!-- import the RCP product into the repository
              See: http://www.eclipse.org/forums/index.php/t/746045/ -->
-        <java jar="${eclipse.launcher}" fork="true" failonerror="true" maxmemory="128m">
-            <arg value="-application" />
-            <arg value="org.eclipse.equinox.p2.publisher.ProductPublisher" />
-            <arg value="-console"/>
-            <arg value="-consolelog"/>
+    	<eclipseLauncher application="org.eclipse.equinox.p2.publisher.ProductPublisher">
             <arg value="-repository" />
             <arg value="${eclipse.repository}"/>
             <arg value="-metadataRepository" />
@@ -182,15 +169,11 @@
             <arg value="-configs" />
             <arg value="${configs}" />
             <arg value="-append"/>
-        </java>
+        </eclipseLauncher>
     
         <mkdir dir="${basedir}/gen/final/win32.win32.x86_64"/>    
         <!-- Creation of a prepacked Eclipse/QM app -->
-        <java jar="${eclipse.launcher}" fork="true" failonerror="true" maxmemory="128m">
-            <arg value="-application" />
-            <arg value="org.eclipse.equinox.p2.director" />
-            <arg value="-console"/>
-            <arg value="-consolelog"/>
+    	<eclipseLauncher application="org.eclipse.equinox.p2.director">
             <arg value="-repository" />
             <arg value="${eclipse.repository}"/>
             <arg value="-destination"/>
@@ -205,13 +188,13 @@
             <arg value="${basedir}/gen/final/win32.win32.x86_64"/>
             <arg value="-profileProperties" />
             <arg value="org.eclipse.update.install.features=true" />
-            	<arg value="-p2.os" />
+            <arg value="-p2.os" />
         	<arg value="win32" />
         	<arg value="-p2.ws" />
         	<arg value="win32" />
         	<arg value="-p2.arch" />
         	<arg value="x86_64" />
-        </java>
+        </eclipseLauncher>
 		<!-- copying is a hack -> product configuration based on features using org.eclipse.equinox.executable -->
         <copy tofile="${basedir}/gen/final/win32.win32.x86_64/QualiMasterApplication.exe" file="${eclipse.launcher.repo}/binary/bin/win32/win32/x86_64/launcher.exe"/>
         <copy tofile="${basedir}/gen/final/win32.win32.x86_64/eclipsec.exe" file="${eclipse.launcher.repo}/binary/bin/win32/win32/x86_64/eclipsec.exe"/>
@@ -228,11 +211,7 @@
         <zip destfile="${basedir}/archive/QM-IConf.win32.win32.x86_64-${NOW}-java9-10.zip" basedir="${basedir}/gen/final/win32.win32.x86_64"/>
 
         <mkdir dir="${basedir}/gen/final/gtk.linux.x86_64"/>
-        <java jar="${eclipse.launcher}" fork="true" failonerror="true" maxmemory="128m">
-            <arg value="-application" />
-            <arg value="org.eclipse.equinox.p2.director" />
-            <arg value="-console"/>
-            <arg value="-consolelog"/>
+    	<eclipseLauncher application="org.eclipse.equinox.p2.director">
             <arg value="-repository" />
             <arg value="${eclipse.repository}"/>
             <arg value="-destination"/>
@@ -247,13 +226,13 @@
             <arg value="${basedir}/gen/final/gtk.linux.x86_64"/>
             <arg value="-profileProperties" />
             <arg value="org.eclipse.update.install.features=true" />
-                <arg value="-p2.os" />
-                <arg value="gtk" />
-                <arg value="-p2.ws" />
-                <arg value="linux" />
-                <arg value="-p2.arch" />
-                <arg value="x86_64" />
-        </java>
+            <arg value="-p2.os" />
+            <arg value="gtk" />
+            <arg value="-p2.ws" />
+            <arg value="linux" />
+            <arg value="-p2.arch" />
+            <arg value="x86_64" />
+        </eclipseLauncher>
 		<!-- copying is a hack -> product configuration based on features using org.eclipse.equinox.executable -->
         <copy tofile="${basedir}/gen/final/gtk.linux.x86_64/QualiMasterApplication" file="${eclipse.launcher.repo}/binary/bin/gtk/linux/x86_64/launcher"/>
         <chmod file="${basedir}/gen/final/gtk.linux.x86_64/QualiMasterApplication" perm="a+x"/>
@@ -270,11 +249,7 @@
         <tar destfile="${basedir}/archive/QM-IConf.gtk.linux.x86_64-${NOW}.tar.gz" compression="gzip" basedir="${basedir}/gen/final/gtk.linux.x86_64"/>
     	
         <mkdir dir="${basedir}/gen/final/cocoa.macosx.x86_64"/>
-        <java jar="${eclipse.launcher}" fork="true" failonerror="true" maxmemory="128m">
-            <arg value="-application" />
-            <arg value="org.eclipse.equinox.p2.director" />
-            <arg value="-console"/>
-            <arg value="-consolelog"/>
+    	<eclipseLauncher application="org.eclipse.equinox.p2.director">
             <arg value="-repository" />
             <arg value="${eclipse.repository}"/>
             <arg value="-destination"/>
@@ -289,13 +264,13 @@
             <arg value="${basedir}/gen/final/cocoa.macosx.x86_64"/>
             <arg value="-profileProperties" />
             <arg value="org.eclipse.update.install.features=true" />
-                <arg value="-p2.os" />
-                <arg value="cocoa" />
-                <arg value="-p2.ws" />
-                <arg value="macosx" />
-                <arg value="-p2.arch" />
-                <arg value="x86_64" />
-        </java>
+            <arg value="-p2.os" />
+            <arg value="cocoa" />
+            <arg value="-p2.ws" />
+            <arg value="macosx" />
+            <arg value="-p2.arch" />
+            <arg value="x86_64" />
+        </eclipseLauncher>
         <!-- copying is a hack -> product configuration based on features using org.eclipse.equinox.executable -->
     	<mkdir dir="${basedir}/gen/final/cocoa.macosx.x86_64/QualiMasterApplication.app"/>
         <copy todir="${basedir}/gen/final/cocoa.macosx.x86_64/QualiMasterApplication.app">
