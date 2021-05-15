@@ -123,7 +123,7 @@
             <arg value="-configs"/>
             <arg value="ANY"/>
             <arg value="-source" />
-            <arg value="${eclipse.launcher.repo}" />
+            <arg value="${eclipse.home}" />
             <arg value="-compress" />
             <arg value="-publishArtifacts" />
         </eclipseLauncher>
