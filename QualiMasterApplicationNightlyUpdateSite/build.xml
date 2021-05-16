@@ -40,6 +40,7 @@
         <zip destfile="${basedir}/archive/Update-Site.zip" basedir="gen/final"/>
     	<antcall target="zip.Site"/>
         <antcall target="publish"/>
+        <delete dir="gen"/>
     </target>
 	
 	<target name="buildAntTask">
