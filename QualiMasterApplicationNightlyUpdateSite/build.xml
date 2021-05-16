@@ -33,13 +33,13 @@
         <antcall target="createFeature"/>
         <antcall target="createSiteXML"/>
     	
-    	<!-- Eclipse 4.19 does not properly run
-        <antcall target="createArtifactJars"/> -->
-        <touch file="gen/final/empty.txt"/> <!-- something that Jenkins does not fail -->
+    	<!-- Eclipse 4.19 does not properly run-->
+        <antcall target="createArtifactJars"/>
+        <!--<touch file="gen/final/empty.txt"/> something that Jenkins does not fail -->
         <mkdir dir="${basedir}/archive"/>
         <zip destfile="${basedir}/archive/Update-Site.zip" basedir="gen/final"/>
-    	<!--<antcall target="zip.Site"/>
-        <antcall target="publish"/>-->
+    	<antcall target="zip.Site"/>
+        <antcall target="publish"/>
     </target>
 	
 	<target name="buildAntTask">
@@ -176,8 +176,6 @@
     	<eclipseLauncher application="org.eclipse.equinox.p2.director">
             <arg value="-repository" />
             <arg value="${eclipse.repository}"/>
-            <arg value="-destination"/>
-            <arg value="file:${basedir}/gen/final" />
             <arg value="-metadataRepository" />
             <arg value="file:${basedir}/gen/final" />
             <arg value="-artifactRepository" />
@@ -214,8 +212,6 @@
     	<eclipseLauncher application="org.eclipse.equinox.p2.director">
             <arg value="-repository" />
             <arg value="${eclipse.repository}"/>
-            <arg value="-destination"/>
-            <arg value="file:${basedir}/gen/final" />
             <arg value="-metadataRepository" />
             <arg value="file:${basedir}/gen/final" />
             <arg value="-artifactRepository" />
@@ -252,8 +248,6 @@
     	<eclipseLauncher application="org.eclipse.equinox.p2.director">
             <arg value="-repository" />
             <arg value="${eclipse.repository}"/>
-            <arg value="-destination"/>
-            <arg value="file:${basedir}/gen/final" />
             <arg value="-metadataRepository" />
             <arg value="file:${basedir}/gen/final" />
             <arg value="-artifactRepository" />
