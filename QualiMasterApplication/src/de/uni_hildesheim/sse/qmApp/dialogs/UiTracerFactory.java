@@ -82,6 +82,11 @@ public class UiTracerFactory extends TracerFactory {
         }
 
         @Override
+        public void traceWarning(String text) {
+            write("WARNING: " + text);
+        }
+
+        @Override
         public void valueDefined(VariableDeclaration var, FieldDescriptor field, Object value) {
         }
 
