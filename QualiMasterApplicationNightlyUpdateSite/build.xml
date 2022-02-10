@@ -297,11 +297,11 @@
                 <b>Build from</b>: ${GENERATED_TIME}
             ]]>
         </echo>
-        <sshexec host="projects.sse.uni-hildesheim.de" username="jenkins" trust="true" keyfile="${user.home}/.ssh/id_rsa" command="rm -R ${remoteFolder}/*"/>
-        <scp todir="jenkins@projects.sse.uni-hildesheim.de:${remoteFolder}" trust="true" keyfile="${user.home}/.ssh/id_rsa">
+        <osshexec host="projects.sse.uni-hildesheim.de" username="jenkins" trust="true" keyfile="${user.home}/.ssh/id_rsa" command="rm -R ${remoteFolder}/*"/>
+        <oscp todir="jenkins@projects.sse.uni-hildesheim.de:${remoteFolder}" trust="true" keyfile="${user.home}/.ssh/id_rsa">
             <fileset dir="${basedir}/gen/final">
                 <include name="**/*"/>
             </fileset>
-        </scp>
+        </oscp>
     </target>
 </project>
