@@ -4,6 +4,7 @@ import net.ssehub.easy.instantiation.core.model.buildlangModel.IBuildlangElement
 import net.ssehub.easy.instantiation.core.model.buildlangModel.IEnumeratingLoop;
 import net.ssehub.easy.instantiation.core.model.buildlangModel.Rule;
 import net.ssehub.easy.instantiation.core.model.buildlangModel.Script;
+import net.ssehub.easy.instantiation.core.model.common.ITraceFilter;
 import net.ssehub.easy.instantiation.core.model.common.RuntimeEnvironment;
 import net.ssehub.easy.instantiation.core.model.common.VariableDeclaration;
 import net.ssehub.easy.instantiation.core.model.common.VilException;
@@ -76,6 +77,15 @@ public class UiTracerFactory extends TracerFactory {
     private static class Tracer extends AbstractTracerBase implements 
         net.ssehub.easy.instantiation.core.model.buildlangModel.ITracer, 
         net.ssehub.easy.instantiation.core.model.templateModel.ITracer, IInstantiatorTracer {
+
+        @Override
+        public void setTraceFilter(ITraceFilter filter) {
+        }
+
+        @Override
+        public ITraceFilter getTraceFilter() {
+            return null;
+        }
 
         @Override
         public void trace(String text) {
